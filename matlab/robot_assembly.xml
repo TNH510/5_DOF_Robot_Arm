@@ -1,0 +1,587 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<SimscapeMultibodyImportXML version="2.0" xmlns="urn:mathworks:SimscapeMultibody:import" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<Created by="" on="10/01/23||10:52:13" using="Simscape Multibody Link Version 4.8" from="SolidWorks 28.2.0"/>
+<ModelUnits mass="kilogram" length="meter"/>
+<DataUnits mass="kilogram" length="meter"/>
+<RootAssembly name="robot_assembly" uid="robot_assembly" version="210">
+<AssemblyFile name="robot_assembly.SLDASM" type="SolidWorks Assembly"/>
+<InstanceTree>
+<Instance name="Khop_1-1" uid="Khop_1-1" grounded="true" entityUid="Khop_1*:*Default">
+<Transform>
+<Rotation>1 0 0 0 1 0 0 0 1</Rotation>
+<Translation>0.23847919688379082 0.14521191969990493 0.51419733018252423</Translation>
+</Transform>
+<VisualProperties>
+<Ambient r="0.054901960784313725" g="0.054901960784313725" b="0.054901960784313725" a="1"/>
+<Diffuse r="0.054901960784313725" g="0.054901960784313725" b="0.054901960784313725" a="1"/>
+<Specular r="0.027450980392156862" g="0.027450980392156862" b="0.027450980392156862" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.40000000596046448</Shininess>
+</VisualProperties>
+</Instance>
+<Instance name="HG_KG73B.stp-1" uid="HG_KG73B.stp-1" entityUid="HG_KG73B.stp*:*Default">
+<Transform>
+<Rotation>-0.50364632967807044 0 -0.86390993431133101 0 1 0 0.86390993431133101 0 -0.50364632967807044</Rotation>
+<Translation>0.34474011880409205 0.94721191969990404 0.57614582873293296</Translation>
+</Transform>
+</Instance>
+<Instance name="Khop3-1" uid="Khop3-1" entityUid="Khop3*:*Default">
+<Transform>
+<Rotation>0.41678372953757542 -0.28275598701166582 0.86390993431133078 0.56141774564782898 0.82753254611024785 0 -0.71491358755059264 0.48501436776383133 0.50364632967807088</Rotation>
+<Translation>0.10198142726260441 0.94421191969990315 0.4346212100933905</Translation>
+</Transform>
+</Instance>
+<Instance name="Khop_5-1" uid="Khop_5-1" entityUid="Khop_5*:*Default">
+<Transform>
+<Rotation>0.86390993431133045 -0.048927532587722582 0.50126412394372477 0 -0.99527008221052804 -0.09714660805529321 0.50364632967807133 0.083925919783616937 -0.85982371134452973</Rotation>
+<Translation>-0.11729402026258258 1.0668720262536762 1.0887195685151414</Translation>
+</Transform>
+</Instance>
+<Instance name="HG_KG73B.stp-2" uid="HG_KG73B.stp-2" entityUid="HG_KG73B.stp*:*Default">
+<Transform>
+<Rotation>0.50364632967807077 0 0.86390993431133101 0 1 0 -0.86390993431133101 0 0.50364632967807077</Rotation>
+<Translation>0.099389697459654522 0.94421191969990403 0.43311027110434963</Translation>
+</Transform>
+</Instance>
+<Instance name="Khop_2-1" uid="Khop_2-1" entityUid="Khop_2*:*Default">
+<Transform>
+<Rotation>0.86390993431133067 0 -0.5036463296780711 0 1 0 0.5036463296780711 0 0.86390993431133067</Rotation>
+<Translation>0.23847919688379085 0.70521191969990493 0.51419733018252445</Translation>
+</Transform>
+</Instance>
+<Instance name="Khop_1_2_Shield-1" uid="Khop_1_2_Shield-1" entityUid="Khop_1_2_Shield*:*Default">
+<Transform>
+<Rotation>-0.50364632967807055 0 -0.86390993431133112 0 1 0 0.86390993431133112 0 -0.50364632967807055</Rotation>
+<Translation>0.23847919688379166 0.45521191969990471 0.51419733018252567</Translation>
+</Transform>
+</Instance>
+<Instance name="Khop_4-1" uid="Khop_4-1" entityUid="Khop_4*:*Default&lt;As Machined&gt;">
+<Transform>
+<Rotation>0.86390993431133123 -0.19486814443925485 -0.46442010258061944 7.3801641881088267e-016 0.92211553070877361 -0.38691465212069281 0.50364632967807021 0.33425941169767898 0.79662476756207501</Rotation>
+<Translation>0.16243107741484999 1.2603293523140187 0.7181077328663994</Translation>
+</Transform>
+</Instance>
+<Instance name="Khop_1_2_Shield-2" uid="Khop_1_2_Shield-2" entityUid="Khop_1_2_Shield*:*Default">
+<Transform>
+<Rotation>0.50364632967806988 0 0.86390993431133134 0 1 0 -0.86390993431133134 0 0.50364632967806988</Rotation>
+<Translation>0.23847919688379088 0.45521191969990493 0.51419733018252423</Translation>
+</Transform>
+</Instance>
+<Instance name="Khop_6-1" uid="Khop_6-1" entityUid="Khop_6*:*Default">
+<Transform>
+<Rotation>0.85010195449167159 0.0489275325877227 0.52434031270189152 -0.085607336481745192 0.99527008221052815 0.045922188505667115 -0.51961336675449477 -0.083925919783616867 0.85026959787971512</Rotation>
+<Translation>-0.097206062013099961 0.99222677008788518 1.1088642865650564</Translation>
+</Transform>
+</Instance>
+</InstanceTree>
+<Constraints>
+<Coincident name="Coincident1">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Khop_1-1</Uid>
+</InstancePath>
+<Position>0 0.56000000000000005 0</Position>
+<Axis>0 1 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Khop_2-1</Uid>
+</InstancePath>
+<Position>0 0 0</Position>
+<Axis>0 -1 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Concentric name="Concentric1">
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Khop_1-1</Uid>
+</InstancePath>
+<Position>0 0.56000000000000005 0</Position>
+<Axis>0 -1 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Khop_2-1</Uid>
+</InstancePath>
+<Position>0 0.35199999999999987 0</Position>
+<Axis>0 -1 0</Axis>
+</ConstraintGeometry>
+</Concentric>
+<Concentric name="Concentric2">
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Khop_2-1</Uid>
+</InstancePath>
+<Position>-0.052999999999999992 0.23899999999999999 0</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Khop3-1</Uid>
+</InstancePath>
+<Position>-1.1102230246251565e-016 0 0.10499999999999993</Position>
+<Axis>0 0 -1</Axis>
+</ConstraintGeometry>
+</Concentric>
+<Coincident name="Coincident2">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Khop_2-1</Uid>
+</InstancePath>
+<Position>-0.052999999999999992 0 0</Position>
+<Axis>-1 0 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Khop3-1</Uid>
+</InstancePath>
+<Position>-1.1102230246251565e-016 0 0.10499999999999993</Position>
+<Axis>0 0 1</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Concentric name="Concentric4">
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Khop_2-1</Uid>
+</InstancePath>
+<Position>0.12 0.24199999999999999 0</Position>
+<Axis>-1 0 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>HG_KG73B.stp-1</Uid>
+</InstancePath>
+<Position>1.1102230246251565e-016 8.8817841970012523e-016 0.0015000000000000568</Position>
+<Axis>0 0 1</Axis>
+</ConstraintGeometry>
+</Concentric>
+<Parallel name="Parallel1">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Khop_2-1</Uid>
+</InstancePath>
+<Position>0 0.35199999999999987 0</Position>
+<Axis>0 1 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>HG_KG73B.stp-1</Uid>
+</InstancePath>
+<Position>1.1102230246251565e-016 0.040000000000000036 -0.0055000000000000604</Position>
+<Axis>0 1 0</Axis>
+</ConstraintGeometry>
+</Parallel>
+<Coincident name="Coincident6">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Khop_2-1</Uid>
+</InstancePath>
+<Position>0.12 0 0</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>HG_KG73B.stp-1</Uid>
+</InstancePath>
+<Position>0 0 0.0030000000000001137</Position>
+<Axis>0 0 1</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Concentric name="Concentric5">
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Khop3-1</Uid>
+</InstancePath>
+<Position>-1.1102230246251565e-016 0 0.10499999999999993</Position>
+<Axis>0 0 -1</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>HG_KG73B.stp-2</Uid>
+</InstancePath>
+<Position>0 8.8817841970012523e-016 0.0014999999999999458</Position>
+<Axis>0 0 1.0000000000000002</Axis>
+</ConstraintGeometry>
+</Concentric>
+<Coincident name="Coincident8">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Khop3-1</Uid>
+</InstancePath>
+<Position>0 0 0</Position>
+<Axis>0 0 -1</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>HG_KG73B.stp-2</Uid>
+</InstancePath>
+<Position>0 0 0.0030000000000000027</Position>
+<Axis>0 0 1.0000000000000002</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Parallel name="Parallel3">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Khop_2-1</Uid>
+</InstancePath>
+<Position>0 0.35199999999999987 0</Position>
+<Axis>0 1 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>HG_KG73B.stp-2</Uid>
+</InstancePath>
+<Position>0 0.040000000000000036 -0.0055000000000000049</Position>
+<Axis>0 1 0</Axis>
+</ConstraintGeometry>
+</Parallel>
+<Coincident name="Coincident9">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Khop3-1</Uid>
+</InstancePath>
+<Position>0 0.3819999999999999 0.19499999999999995</Position>
+<Axis>0 0 1</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Khop_4-1</Uid>
+</InstancePath>
+<Position>0 0 0</Position>
+<Axis>-1 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Concentric name="Concentric6">
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Khop3-1</Uid>
+</InstancePath>
+<Position>0 0.3819999999999999 0.19499999999999995</Position>
+<Axis>0 0 -1</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="point">
+<InstancePath>
+<Uid>Khop_4-1</Uid>
+</InstancePath>
+<Position>0 0 0</Position>
+</ConstraintGeometry>
+</Concentric>
+<Concentric name="Concentric7">
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Khop_1-1</Uid>
+</InstancePath>
+<Position>0 0.53000000000000003 0</Position>
+<Axis>0 -1 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Khop_1_2_Shield-1</Uid>
+</InstancePath>
+<Position>0 0.28200000000000003 0</Position>
+<Axis>0 -1 0</Axis>
+</ConstraintGeometry>
+</Concentric>
+<Coincident name="Coincident12">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Khop_2-1</Uid>
+</InstancePath>
+<Position>0 0.032000000000000028 0</Position>
+<Axis>0 1 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Khop_1_2_Shield-1</Uid>
+</InstancePath>
+<Position>0 0.28200000000000003 0</Position>
+<Axis>0 1 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Concentric name="Concentric8">
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Khop_1-1</Uid>
+</InstancePath>
+<Position>0 0.53000000000000003 0</Position>
+<Axis>0 -1 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Khop_1_2_Shield-2</Uid>
+</InstancePath>
+<Position>0 0.28200000000000003 0</Position>
+<Axis>0 -1 0</Axis>
+</ConstraintGeometry>
+</Concentric>
+<Coincident name="Coincident13">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Khop_2-1</Uid>
+</InstancePath>
+<Position>0 0.032000000000000028 0</Position>
+<Axis>0 1 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Khop_1_2_Shield-2</Uid>
+</InstancePath>
+<Position>0 0.28200000000000003 0</Position>
+<Axis>0 1 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident14">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Khop_1_2_Shield-1</Uid>
+</InstancePath>
+<Position>0 0.28200000000000003 0</Position>
+<Axis>1.0000000000000002 0 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Khop_1_2_Shield-2</Uid>
+</InstancePath>
+<Position>0 0.28200000000000003 0</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Concentric name="Concentric10">
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Khop_4-1</Uid>
+</InstancePath>
+<Position>0.099999999999999978 0 0.50000000000000011</Position>
+<Axis>-1 0 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Khop_5-1</Uid>
+</InstancePath>
+<Position>0.054999999999999938 0 0</Position>
+<Axis>-1 0 0</Axis>
+</ConstraintGeometry>
+</Concentric>
+<Coincident name="Coincident15">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Khop_4-1</Uid>
+</InstancePath>
+<Position>0 0 0</Position>
+<Axis>-1 0 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Khop_5-1</Uid>
+</InstancePath>
+<Position>0.054999999999999938 0 0</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Concentric name="Concentric11">
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Khop_5-1</Uid>
+</InstancePath>
+<Position>0.027500000000000024 0.049999999999999933 0</Position>
+<Axis>0 -1 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Khop_6-1</Uid>
+</InstancePath>
+<Position>1.1102230246251565e-016 -0.014999999999999902 -1.1102230246251565e-016</Position>
+<Axis>0 1.0000000000000002 0</Axis>
+</ConstraintGeometry>
+</Concentric>
+<Coincident name="Coincident16">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Khop_5-1</Uid>
+</InstancePath>
+<Position>0.027499999999999913 0.075000000000000067 2.2204460492503131e-016</Position>
+<Axis>0 1 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Khop_6-1</Uid>
+</InstancePath>
+<Position>0 0 0</Position>
+<Axis>0 1.0000000000000002 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Perpendicular name="Perpendicular1">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Khop_2-1</Uid>
+</InstancePath>
+<Position>0 0.032000000000000028 0</Position>
+<Axis>0 1 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Khop_1_2_Shield-1</Uid>
+</InstancePath>
+<Position>0 0.28200000000000003 0</Position>
+<Axis>1.0000000000000002 0 0</Axis>
+</ConstraintGeometry>
+</Perpendicular>
+<Parallel name="Parallel6">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Khop_2-1</Uid>
+</InstancePath>
+<Position>0 0.032000000000000028 -0.10800000000000001</Position>
+<Axis>1.6653345369377348e-016 0 -1.0000000000000002</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Khop_1_2_Shield-1</Uid>
+</InstancePath>
+<Position>0 0.28200000000000003 0</Position>
+<Axis>1.0000000000000002 0 0</Axis>
+</ConstraintGeometry>
+</Parallel>
+</Constraints>
+</RootAssembly>
+<Assemblies>
+</Assemblies>
+<Parts>
+<Part name="HG_KG73B.stp" uid="HG_KG73B.stp*:*Default" version="121">
+<ModelUnits mass="kilogram" length="millimeter"/>
+<PartFile name="HG_KG73B.stp.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.88452444879951408</Mass>
+<CenterOfMass>4.2370604720626482e-005 -0.00039351302858540912 -0.073024175609753605</CenterOfMass>
+<Inertia>0.0022225606299623758 0.0022095595433404358 0.0007976691707539214 -1.1925475687650819e-005 4.1577366872568024e-006 1.4324853089518358e-006</Inertia>
+</MassProperties>
+<GeometryFile name="HG_KG73B.stp_Default_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0" g="0" b="0" a="1"/>
+<Diffuse r="0" g="0" b="0" a="1"/>
+<Specular r="0" g="0" b="0" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.40000000596046448</Shininess>
+</VisualProperties>
+</Part>
+<Part name="Khop3" uid="Khop3*:*Default" version="597">
+<ModelUnits mass="kilogram" length="millimeter"/>
+<PartFile name="Khop3.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>43.61588498657791</Mass>
+<CenterOfMass>-9.3488090499532422e-009 0.19344062122715325 0.059219147335152683</CenterOfMass>
+<Inertia>1.1781567287616279 0.11675106830918687 1.137550730956352 -0.077815214640947525 1.2128935833662843e-008 2.4835559508931681e-009</Inertia>
+</MassProperties>
+<GeometryFile name="Khop3_Default_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.77647058823529413" g="0.75686274509803919" b="0.73725490196078436" a="1"/>
+<Diffuse r="0.77647058823529413" g="0.75686274509803919" b="0.73725490196078436" a="1"/>
+<Specular r="0.38823529411764707" g="0.3784313725490196" b="0.36862745098039218" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.3125</Shininess>
+</VisualProperties>
+</Part>
+<Part name="Khop_1" uid="Khop_1*:*Default" version="218">
+<ModelUnits mass="kilogram" length="millimeter"/>
+<PartFile name="Khop_1.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>159.64759545566068</Mass>
+<CenterOfMass>0.0032009107533383257 0.24498753394792194 1.2654566994917121e-007</CenterOfMass>
+<Inertia>4.6750581997828293 1.8775177566535002 4.3998065140355758 -4.144607956094571e-006 1.6205560791747275e-006 0.015522576215210356</Inertia>
+</MassProperties>
+<GeometryFile name="Khop_1_Default_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.77647058823529413" g="0.75686274509803919" b="0.73725490196078436" a="1"/>
+<Diffuse r="0.77647058823529413" g="0.75686274509803919" b="0.73725490196078436" a="1"/>
+<Specular r="0.38823529411764707" g="0.3784313725490196" b="0.36862745098039218" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.3125</Shininess>
+</VisualProperties>
+</Part>
+<Part name="Khop_1_2_Shield" uid="Khop_1_2_Shield*:*Default" version="129">
+<ModelUnits mass="kilogram" length="millimeter"/>
+<PartFile name="Khop_1_2_Shield.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>10.096934146915787</Mass>
+<CenterOfMass>-0.092346454336538847 0.14099999999999982 0</CenterOfMass>
+<Inertia>0.17318261448789971 0.12643514593369054 0.08707729662901266 0 0 0</Inertia>
+</MassProperties>
+<GeometryFile name="Khop_1_2_Shield_Default_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.77647058823529413" g="0.75686274509803919" b="0.73725490196078436" a="1"/>
+<Diffuse r="0.77647058823529413" g="0.75686274509803919" b="0.73725490196078436" a="1"/>
+<Specular r="0.38823529411764707" g="0.3784313725490196" b="0.36862745098039218" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.3125</Shininess>
+</VisualProperties>
+</Part>
+<Part name="Khop_2" uid="Khop_2*:*Default" version="278">
+<ModelUnits mass="kilogram" length="millimeter"/>
+<PartFile name="Khop_2.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>95.177117781406579</Mass>
+<CenterOfMass>0.022202814960063648 0.15710720504229078 -8.0589898006944549e-006</CenterOfMass>
+<Inertia>1.3502351779648327 0.60263033925399745 1.300288096798158 -6.0581061638075389e-005 -0.00010062543768809905 -0.14153599431215388</Inertia>
+</MassProperties>
+<GeometryFile name="Khop_2_Default_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.94901960784313721" g="0.3529411764705882" b="0.066666666666666666" a="1"/>
+<Diffuse r="0.94901960784313721" g="0.3529411764705882" b="0.066666666666666666" a="1"/>
+<Specular r="0.47450980392156861" g="0.1764705882352941" b="0.033333333333333333" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.40000000596046448</Shininess>
+</VisualProperties>
+</Part>
+<Part name="Khop_4" uid="Khop_4*:*Default&lt;As Machined&gt;" version="183">
+<ModelUnits mass="kilogram" length="millimeter"/>
+<PartFile name="Khop_4.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>91.245119508472897</Mass>
+<CenterOfMass>0.089665533786286944 0 0.054589871062266801</CenterOfMass>
+<Inertia>6.2437673641133395 6.5607046402766809 0.47589945626237196 5.3017898591514329e-016 0.70735299275827102 0</Inertia>
+</MassProperties>
+<GeometryFile name="Khop_4_Default&lt;As Machined&gt;_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.77647058823529413" g="0.75686274509803919" b="0.73725490196078436" a="1"/>
+<Diffuse r="0.77647058823529413" g="0.75686274509803919" b="0.73725490196078436" a="1"/>
+<Specular r="0.38823529411764707" g="0.3784313725490196" b="0.36862745098039218" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.3125</Shininess>
+</VisualProperties>
+</Part>
+<Part name="Khop_5" uid="Khop_5*:*Default" version="156">
+<ModelUnits mass="kilogram" length="millimeter"/>
+<PartFile name="Khop_5.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>4.2049538708981453</Mass>
+<CenterOfMass>0.02390629109636553 0.0048332461261089083 -8.4690859082484471e-009</CenterOfMass>
+<Inertia>0.0060514881344119562 0.0037787646228846948 0.0049124249101548416 2.045209137852047e-009 -2.1332424634400289e-009 -7.3035452426888076e-005</Inertia>
+</MassProperties>
+<GeometryFile name="Khop_5_Default_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.77647058823529413" g="0.75686274509803919" b="0.73725490196078436" a="1"/>
+<Diffuse r="0.77647058823529413" g="0.75686274509803919" b="0.73725490196078436" a="1"/>
+<Specular r="0.38823529411764707" g="0.3784313725490196" b="0.36862745098039218" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.3125</Shininess>
+</VisualProperties>
+</Part>
+<Part name="Khop_6" uid="Khop_6*:*Default" version="204">
+<ModelUnits mass="kilogram" length="millimeter"/>
+<PartFile name="Khop_6.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.56160252498617313</Mass>
+<CenterOfMass>3.5173127890535921e-006 -0.015101259438542854 3.9989834242671794e-007</CenterOfMass>
+<Inertia>0.00028033624281906998 0.00039753457960226479 0.00017588917177794997 1.6616381498129462e-009 1.3954735345501846e-009 1.4614967092958663e-008</Inertia>
+</MassProperties>
+<GeometryFile name="Khop_6_Default_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.77647058823529413" g="0.75686274509803919" b="0.73725490196078436" a="1"/>
+<Diffuse r="0.77647058823529413" g="0.75686274509803919" b="0.73725490196078436" a="1"/>
+<Specular r="0.38823529411764707" g="0.3784313725490196" b="0.36862745098039218" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.3125</Shininess>
+</VisualProperties>
+</Part>
+</Parts>
+</SimscapeMultibodyImportXML>
