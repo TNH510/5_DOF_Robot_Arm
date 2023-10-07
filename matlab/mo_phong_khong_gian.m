@@ -22,7 +22,6 @@ for t1 = t1_values
     for t2 = t2_values
         for t3 = t3_values
             for t4 = t4_values
-                  
             x_value = l6*sin(t1) + sin(t1)*(l2 - l4) + l3*cos(t1)*cos(t2) + sin(t2 - t3 + t4)*cos(t1)*(l7 + l8) + l5*cos(t1)*cos(t2)*cos(t3) + l5*cos(t1)*sin(t2)*sin(t3)
             y_value = sin(t2 - t3 + t4)*sin(t1)*(l7 + l8) - cos(t1)*(l2 - l4) - l6*cos(t1) + l3*cos(t2)*sin(t1) + l5*cos(t2)*cos(t3)*sin(t1) + l5*sin(t1)*sin(t2)*sin(t3)
             z_value = l1 - l7*cos(t2 - t3 + t4) - l8*cos(t2 - t3 + t4) + l3*sin(t2) + l5*sin(t2 - t3)
