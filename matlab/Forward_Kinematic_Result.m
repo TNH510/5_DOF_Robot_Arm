@@ -4,8 +4,8 @@ syms th1 th2 th3 th4 th5
 % Condition: th2 - th3 + th4 = 0 --> set as this rule
 th1 = 0;
 th2 = 0;
-th3 = 0;
-th4 = -pi/2;
+th3 = pi/12;
+th4 = -7*pi/12;
 
 l1 = 240;
 l4 = 200;
