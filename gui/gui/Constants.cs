@@ -8,6 +8,10 @@ namespace gui
 {
     static class Constants
     {
+        public const double l1 = 800.0;
+        public const double l2 = 440.0;
+        public const double l3 = 500.0;
+        public const double l4 = 240.0;
         //PLC
         public const string R_PLCREADY = "M512"; /*Address of reg Servo ON*/
         public const string R_BRAKE = "M513"; /*Address of reg BRAKE*/
@@ -27,6 +31,7 @@ namespace gui
         public const string R_SERVO_ERROR3 = "D46";
         public const string R_SERVO_ERROR4 = "D66";
         public const string R_SERVO_ERROR5 = "D86";
+        public const string R_RUN = "M528";
         //Object
         public static readonly Color OBJECT_WHITE = Color.FromArgb(255, 255, 255);
         public static readonly Color OBJECT_GREEN = Color.FromArgb(0, 255, 0);
