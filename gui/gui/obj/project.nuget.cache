@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "4t+o6xXNhVj0KOaN8V7v0N1aZKrlw1MXD2Ffz/2A1tOMIshc4v76+hpO3Vm1sEQcbcocAuMrlbBwNEHzgoSvOw==",
+  "dgSpecHash": "g+EBzRtEx47LexTU4z2BFtc40mlXolmwcm/vVhPlzDGVdkZf2GetMiPkWzjbWqbS+xEQXsPGI81neKiDRzk0uA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\daveb\\OneDrive\\Máy tính\\Capstone Project\\5_DOF_Robot_Arm\\gui\\gui\\gui.csproj",
+  "projectFilePath": "C:\\Users\\daveb\\OneDrive\\Máy tính\\Capstone Project\\5_DOF_Robot_Arm\\GUI\\GUI\\gui.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }
