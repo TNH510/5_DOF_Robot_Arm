@@ -179,7 +179,30 @@ namespace gui
         //    await Task.Delay(1);
         //    return;
         //}
-
+        public int Check_angle(double t1, double t2, double t3, double t4, double t5)
+        {
+            if ((t1 > Constants.T1_LU) || (t1 < Constants.T1_LD) || double.IsNaN(t1))
+            {
+                return 1;
+            }
+            if ((t2 > Constants.T2_LU) || (t2 < Constants.T2_LD) || double.IsNaN(t2))
+            {
+                return 2;
+            }
+            if ((t3 > Constants.T3_LU) || (t3 < Constants.T3_LD) || double.IsNaN(t3))
+            {
+                return 3;
+            }
+            if ((t4 > Constants.T4_LU) || (t4 < Constants.T4_LD) || double.IsNaN(t4))
+            {
+                return 4;
+            }
+            if ((t5 > Constants.T5_LU) || (t5 < Constants.T5_LD) || double.IsNaN(t5))
+            {
+                return 5;
+            }
+            return 0;
+        }
         #endregion Functions
 
         #region Buttons
@@ -212,6 +235,28 @@ namespace gui
             else
             {
                 PrintLog("Error", MethodBase.GetCurrentMethod().Name, "Connect PLC unsuccessfully");
+            }
+            /* Read the servo mode */
+            int servo_status;
+            string getName = MethodBase.GetCurrentMethod().Name;
+            /* Read status of Brake and AC Servo */
+            ret = PLCReadbit(Constants.R_SERVO_ON, out servo_status);
+            if (ret != 0)
+            {
+                PrintLog("Error", getName, "Read PLC Fail");
+                return;
+            }
+            if (servo_status == 0) /* Servo is currently off */
+            {
+                OnServo_button.Text = "SERVO: OFF";
+                ChangeColorObject(OnServo_button, Constants.OBJECT_RED);
+                PrintLog("SERVO:", servo_status.ToString(), "OFF");
+            }
+            else
+            {
+                OnServo_button.Text = "SERVO: ON";
+                ChangeColorObject(OnServo_button, Constants.OBJECT_GREEN);
+                PrintLog("SERVO:", servo_status.ToString(), "ON");
             }
 
         }
@@ -348,9 +393,17 @@ namespace gui
             }
             PLCReadbit("M528", out readbit);
             PrintLog("Info", "M528", Convert.ToString(readbit));
-        }
-        #endregion
 
+            /* Reverse it into the initial state */
+            ret = PLCWritebit(Constants.R_RUN, (~(~run_status)) & 0x01);
+            if (ret != 0)
+            {
+                PrintLog("Error", getName, "Write PLC Fail");
+                return;
+            }
+            PLCReadbit("M528", out readbit);
+            PrintLog("Info", "M528", Convert.ToString(readbit));
+        }
         private void Start_button_Click(object sender, EventArgs e)
         {
             double pos_x, pos_y, pos_z;
@@ -411,6 +464,126 @@ namespace gui
                 Roll_curpos.Text = Convert.ToString(Math.Round(t1_out + t5_out, diginumber_display));
             }
         }
+
+        private void Transmit_button_Click(object sender, EventArgs e)
+        {
+            double x, y, z, alpha, gamma;
+            double velocity = 100.0; /* Assign directly the value of velocity */
+            double t1, t2, t3, t4, t5, v1, v2, v3, v4, v5;
+            double t1_current, t2_current, t3_current, t4_current, t5_current;
+            double delta_theta1, delta_theta2, delta_theta3, delta_theta4, delta_theta5;
+            double delta_theta_max = -1.0;
+            int t1_out, t2_out, t3_out, t4_out, t5_out, v1_out, v2_out, v3_out, v4_out, v5_out;
+            int[] arr = new int[100];
+            int count = 0, ret;
+            try
+            {
+                x = double.Parse(X_tb.Text);
+                y = double.Parse(Y_tb.Text);
+                z = double.Parse(X_tb.Text);
+                //alpha = double.Parse(Position_P.Text);
+                //gamma = double.Parse(Position_G.Text);
+                //velocity = double.Parse(Position_Time.Text);
+                (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
+                ret = Check_angle(t1, t2, t3, t4, t5);
+                if (ret != 0)
+                {
+                    double theta = 0.0;
+                    if (ret == 1) theta = t1;
+                    else if (ret == 2) theta = t2;
+                    else if (ret == 3) theta = t3;
+                    else if (ret == 4) theta = t4;
+                    else if (ret == 5) theta = t5;
+                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
+                    return;
+                }
+                t1_current = double.Parse(t1_tb.Text);
+                t2_current = double.Parse(t2_tb.Text);
+                t3_current = double.Parse(t3_tb.Text);
+                t4_current = double.Parse(t4_tb.Text);
+                t5_current = double.Parse(t5_tb.Text);
+                /* Offset data */
+                t2 -= 90.0;
+                t3 += 90.0;
+                t4 += 90.0;
+                delta_theta1 = Math.Abs(t1 - t1_current);
+                //delta_theta_max = (delta_theta_max < delta_theta1) ? delta_theta1 : delta_theta_max;
+                delta_theta2 = Math.Abs(t2 - t2_current);
+                //delta_theta_max = (delta_theta_max < delta_theta2) ? delta_theta2 : delta_theta_max;
+                delta_theta3 = Math.Abs(t3 - t3_current);
+                //delta_theta_max = (delta_theta_max < delta_theta3) ? delta_theta3 : delta_theta_max;
+                delta_theta4 = Math.Abs(t4 - t4_current);
+                //delta_theta_max = (delta_theta_max < delta_theta4) ? delta_theta4 : delta_theta_max;
+                delta_theta5 = Math.Abs(t5 - t5_current);
+                //delta_theta_max = (delta_theta_max < delta_theta5) ? delta_theta5 : delta_theta_max;
+                delta_theta_max = Math.Sqrt(delta_theta1 * delta_theta1 + delta_theta2 * delta_theta2 + delta_theta3 * delta_theta3 + delta_theta4 * delta_theta4 + delta_theta5 * delta_theta5);
+                v1 = velocity * delta_theta1 / delta_theta_max;
+                v2 = velocity * delta_theta2 / delta_theta_max;
+                v3 = velocity * delta_theta3 / delta_theta_max;
+                v4 = velocity * delta_theta4 / delta_theta_max;
+                v5 = velocity * delta_theta5 / delta_theta_max;
+
+                //v = Math.Sqrt(v1 * v1 + v2 * v2 + v3 * v3 + v4 * v4 + v5 * v5);
+                t1_out = Convert.ToInt32((t1 + 180.0) * 100000.0);
+                t2_out = Convert.ToInt32((t2 + 180.0) * 100000.0);
+                t3_out = Convert.ToInt32((t3 + 180.0) * 100000.0);
+                t4_out = Convert.ToInt32((t4 + 180.0) * 100000.0);
+                t5_out = Convert.ToInt32((t5 + 180.0) * 100000.0);
+                //v_out = Convert.ToInt32(v * 1000.0);
+                v1_out = Convert.ToInt32(v1 * 1000.0);
+                v2_out = Convert.ToInt32(v2 * 1000.0);
+                v3_out = Convert.ToInt32(v3 * 1000.0);
+                v4_out = Convert.ToInt32(v4 * 1000.0);
+                v5_out = Convert.ToInt32(v5 * 1000.0);
+                v1_out = (v1_out == 0) ? 1 : v1_out;
+                v2_out = (v2_out == 0) ? 1 : v2_out;
+                v3_out = (v3_out == 0) ? 1 : v3_out;
+                v4_out = (v4_out == 0) ? 1 : v4_out;
+                v5_out = (v5_out == 0) ? 1 : v5_out;
+                arr[count++] = v1_out & 0xFFFF;
+                arr[count++] = (v1_out >> 16) & 0xFFFF;
+                arr[count++] = v2_out & 0xFFFF;
+                arr[count++] = (v2_out >> 16) & 0xFFFF;
+                arr[count++] = v3_out & 0xFFFF;
+                arr[count++] = (v3_out >> 16) & 0xFFFF;
+                arr[count++] = v4_out & 0xFFFF;
+                arr[count++] = (v4_out >> 16) & 0xFFFF;
+                arr[count++] = v5_out & 0xFFFF;
+                arr[count++] = (v5_out >> 16) & 0xFFFF;
+                arr[count++] = t1_out & 0xFFFF;
+                arr[count++] = (t1_out >> 16) & 0xFFFF;
+                arr[count++] = t2_out & 0xFFFF;
+                arr[count++] = (t2_out >> 16) & 0xFFFF;
+                arr[count++] = t3_out & 0xFFFF;
+                arr[count++] = (t3_out >> 16) & 0xFFFF;
+                arr[count++] = t4_out & 0xFFFF;
+                arr[count++] = (t4_out >> 16) & 0xFFFF;
+                arr[count++] = t5_out & 0xFFFF;
+                arr[count++] = (t5_out >> 16) & 0xFFFF;
+                plc.WriteDeviceBlock(Constants.R_P2P_DATA, count, ref arr[0]);
+                if (ret == 0)
+                {
+
+                    PrintLog("Info", MethodBase.GetCurrentMethod().Name, string.Format("P2P: Write trajectory to PLC successfully"));
+                }
+                else
+                {
+                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: Write trajectory to PLC fail {0}", ret));
+                }
+            }
+            catch (Exception er)
+            {
+                PrintLog("Bug", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", er));
+            }
+        }
+        private void Go_button_Click(object sender, EventArgs e)
+        {
+
+        }
+        #endregion
+
+
+
     }
 
 }

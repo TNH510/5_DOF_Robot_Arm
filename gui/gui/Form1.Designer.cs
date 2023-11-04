@@ -45,8 +45,10 @@
             Control_Label = new Label();
             panel4 = new Panel();
             Run_button = new Button();
+            Start_button = new Button();
             Exe_button = new Button();
             panel5 = new Panel();
+            label3 = new Label();
             t5_tb = new TextBox();
             label7 = new Label();
             t4_tb = new TextBox();
@@ -57,7 +59,6 @@
             label4 = new Label();
             t1_tb = new TextBox();
             label2 = new Label();
-            label3 = new Label();
             panel10 = new Panel();
             panel11 = new Panel();
             Roll_curpos = new TextBox();
@@ -73,8 +74,9 @@
             label30 = new Label();
             panel6 = new Panel();
             panel7 = new Panel();
+            Go_button = new Button();
+            Transmit_button = new Button();
             label12 = new Label();
-            Start_button = new Button();
             Z_tb = new TextBox();
             label8 = new Label();
             Y_tb = new TextBox();
@@ -86,7 +88,6 @@
             panel2.SuspendLayout();
             panel3.SuspendLayout();
             panel4.SuspendLayout();
-            panel5.SuspendLayout();
             panel10.SuspendLayout();
             panel11.SuspendLayout();
             panel6.SuspendLayout();
@@ -95,6 +96,7 @@
             // 
             // Connect_Panel
             // 
+            Connect_Panel.BorderStyle = BorderStyle.FixedSingle;
             Connect_Panel.Controls.Add(panel1);
             Connect_Panel.Controls.Add(Connect_Label);
             Connect_Panel.Location = new Point(12, 12);
@@ -104,6 +106,7 @@
             // 
             // panel1
             // 
+            panel1.BorderStyle = BorderStyle.FixedSingle;
             panel1.Controls.Add(Disconnect_button);
             panel1.Controls.Add(Connect_button);
             panel1.Controls.Add(PLC_Label);
@@ -155,16 +158,18 @@
             // 
             // ErrorLog
             // 
-            ErrorLog.Location = new Point(425, 12);
+            ErrorLog.BorderStyle = BorderStyle.FixedSingle;
+            ErrorLog.Location = new Point(239, 190);
             ErrorLog.Margin = new Padding(3, 2, 3, 2);
             ErrorLog.Multiline = true;
             ErrorLog.Name = "ErrorLog";
             ErrorLog.ReadOnly = true;
-            ErrorLog.Size = new Size(385, 173);
+            ErrorLog.Size = new Size(432, 238);
             ErrorLog.TabIndex = 73;
             // 
             // panel2
             // 
+            panel2.BorderStyle = BorderStyle.FixedSingle;
             panel2.Controls.Add(panel3);
             panel2.Controls.Add(Control_Label);
             panel2.Location = new Point(170, 12);
@@ -174,6 +179,7 @@
             // 
             // panel3
             // 
+            panel3.BorderStyle = BorderStyle.FixedSingle;
             panel3.Controls.Add(SetHome_button);
             panel3.Controls.Add(OnServo_button);
             panel3.Controls.Add(GoHome_button);
@@ -246,13 +252,15 @@
             // 
             // panel4
             // 
+            panel4.BorderStyle = BorderStyle.FixedSingle;
             panel4.Controls.Add(Run_button);
+            panel4.Controls.Add(Start_button);
             panel4.Controls.Add(Exe_button);
             panel4.Controls.Add(panel5);
             panel4.Controls.Add(label3);
-            panel4.Location = new Point(233, 190);
+            panel4.Location = new Point(677, 12);
             panel4.Name = "panel4";
-            panel4.Size = new Size(314, 170);
+            panel4.Size = new Size(314, 268);
             panel4.TabIndex = 2;
             // 
             // Run_button
@@ -264,6 +272,16 @@
             Run_button.Text = "RUN";
             Run_button.UseVisualStyleBackColor = true;
             Run_button.Click += Run_button_Click;
+            // 
+            // Start_button
+            // 
+            Start_button.Location = new Point(41, 170);
+            Start_button.Name = "Start_button";
+            Start_button.Size = new Size(113, 85);
+            Start_button.TabIndex = 74;
+            Start_button.Text = "START";
+            Start_button.UseVisualStyleBackColor = true;
+            Start_button.Click += Start_button_Click;
             // 
             // Exe_button
             // 
@@ -277,115 +295,10 @@
             // 
             // panel5
             // 
-            panel5.Controls.Add(t5_tb);
-            panel5.Controls.Add(label7);
-            panel5.Controls.Add(t4_tb);
-            panel5.Controls.Add(label5);
-            panel5.Controls.Add(t3_tb);
-            panel5.Controls.Add(label6);
-            panel5.Controls.Add(t2_tb);
-            panel5.Controls.Add(label4);
-            panel5.Controls.Add(t1_tb);
-            panel5.Controls.Add(label2);
             panel5.Location = new Point(9, 49);
             panel5.Name = "panel5";
             panel5.Size = new Size(293, 80);
             panel5.TabIndex = 1;
-            // 
-            // t5_tb
-            // 
-            t5_tb.Location = new Point(223, 20);
-            t5_tb.Margin = new Padding(3, 2, 3, 2);
-            t5_tb.Multiline = true;
-            t5_tb.Name = "t5_tb";
-            t5_tb.Size = new Size(62, 24);
-            t5_tb.TabIndex = 82;
-            // 
-            // label7
-            // 
-            label7.AutoSize = true;
-            label7.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
-            label7.Location = new Point(195, 23);
-            label7.Name = "label7";
-            label7.Size = new Size(22, 19);
-            label7.TabIndex = 81;
-            label7.Text = "t5";
-            // 
-            // t4_tb
-            // 
-            t4_tb.Location = new Point(127, 50);
-            t4_tb.Margin = new Padding(3, 2, 3, 2);
-            t4_tb.Multiline = true;
-            t4_tb.Name = "t4_tb";
-            t4_tb.Size = new Size(62, 24);
-            t4_tb.TabIndex = 80;
-            // 
-            // label5
-            // 
-            label5.AutoSize = true;
-            label5.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
-            label5.Location = new Point(99, 53);
-            label5.Name = "label5";
-            label5.Size = new Size(22, 19);
-            label5.TabIndex = 79;
-            label5.Text = "t4";
-            // 
-            // t3_tb
-            // 
-            t3_tb.Location = new Point(31, 50);
-            t3_tb.Margin = new Padding(3, 2, 3, 2);
-            t3_tb.Multiline = true;
-            t3_tb.Name = "t3_tb";
-            t3_tb.Size = new Size(62, 24);
-            t3_tb.TabIndex = 78;
-            // 
-            // label6
-            // 
-            label6.AutoSize = true;
-            label6.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
-            label6.Location = new Point(3, 52);
-            label6.Name = "label6";
-            label6.Size = new Size(22, 19);
-            label6.TabIndex = 77;
-            label6.Text = "t3";
-            // 
-            // t2_tb
-            // 
-            t2_tb.Location = new Point(127, 18);
-            t2_tb.Margin = new Padding(3, 2, 3, 2);
-            t2_tb.Multiline = true;
-            t2_tb.Name = "t2_tb";
-            t2_tb.Size = new Size(62, 24);
-            t2_tb.TabIndex = 76;
-            // 
-            // label4
-            // 
-            label4.AutoSize = true;
-            label4.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
-            label4.Location = new Point(99, 21);
-            label4.Name = "label4";
-            label4.Size = new Size(22, 19);
-            label4.TabIndex = 75;
-            label4.Text = "t2";
-            // 
-            // t1_tb
-            // 
-            t1_tb.Location = new Point(31, 18);
-            t1_tb.Margin = new Padding(3, 2, 3, 2);
-            t1_tb.Multiline = true;
-            t1_tb.Name = "t1_tb";
-            t1_tb.Size = new Size(62, 24);
-            t1_tb.TabIndex = 74;
-            // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
-            label2.Location = new Point(3, 20);
-            label2.Name = "label2";
-            label2.Size = new Size(22, 19);
-            label2.TabIndex = 5;
-            label2.Text = "t1";
             // 
             // label3
             // 
@@ -397,35 +310,153 @@
             label3.TabIndex = 0;
             label3.Text = "Forward Kinematic";
             // 
+            // t5_tb
+            // 
+            t5_tb.BorderStyle = BorderStyle.FixedSingle;
+            t5_tb.Location = new Point(130, 138);
+            t5_tb.Margin = new Padding(3, 2, 3, 2);
+            t5_tb.Multiline = true;
+            t5_tb.Name = "t5_tb";
+            t5_tb.ReadOnly = true;
+            t5_tb.Size = new Size(62, 24);
+            t5_tb.TabIndex = 82;
+            // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
+            label7.Location = new Point(102, 141);
+            label7.Name = "label7";
+            label7.Size = new Size(22, 19);
+            label7.TabIndex = 81;
+            label7.Text = "t5";
+            // 
+            // t4_tb
+            // 
+            t4_tb.BorderStyle = BorderStyle.FixedSingle;
+            t4_tb.Location = new Point(130, 104);
+            t4_tb.Margin = new Padding(3, 2, 3, 2);
+            t4_tb.Multiline = true;
+            t4_tb.Name = "t4_tb";
+            t4_tb.ReadOnly = true;
+            t4_tb.Size = new Size(62, 24);
+            t4_tb.TabIndex = 80;
+            // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
+            label5.Location = new Point(102, 107);
+            label5.Name = "label5";
+            label5.Size = new Size(22, 19);
+            label5.TabIndex = 79;
+            label5.Text = "t4";
+            // 
+            // t3_tb
+            // 
+            t3_tb.BorderStyle = BorderStyle.FixedSingle;
+            t3_tb.Location = new Point(130, 75);
+            t3_tb.Margin = new Padding(3, 2, 3, 2);
+            t3_tb.Multiline = true;
+            t3_tb.Name = "t3_tb";
+            t3_tb.ReadOnly = true;
+            t3_tb.Size = new Size(62, 24);
+            t3_tb.TabIndex = 78;
+            // 
+            // label6
+            // 
+            label6.AutoSize = true;
+            label6.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
+            label6.Location = new Point(102, 77);
+            label6.Name = "label6";
+            label6.Size = new Size(22, 19);
+            label6.TabIndex = 77;
+            label6.Text = "t3";
+            // 
+            // t2_tb
+            // 
+            t2_tb.BorderStyle = BorderStyle.FixedSingle;
+            t2_tb.Location = new Point(130, 46);
+            t2_tb.Margin = new Padding(3, 2, 3, 2);
+            t2_tb.Multiline = true;
+            t2_tb.Name = "t2_tb";
+            t2_tb.ReadOnly = true;
+            t2_tb.Size = new Size(62, 24);
+            t2_tb.TabIndex = 76;
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
+            label4.Location = new Point(102, 49);
+            label4.Name = "label4";
+            label4.Size = new Size(22, 19);
+            label4.TabIndex = 75;
+            label4.Text = "t2";
+            // 
+            // t1_tb
+            // 
+            t1_tb.BorderStyle = BorderStyle.FixedSingle;
+            t1_tb.Location = new Point(130, 18);
+            t1_tb.Margin = new Padding(3, 2, 3, 2);
+            t1_tb.Multiline = true;
+            t1_tb.Name = "t1_tb";
+            t1_tb.ReadOnly = true;
+            t1_tb.Size = new Size(62, 24);
+            t1_tb.TabIndex = 74;
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
+            label2.Location = new Point(102, 20);
+            label2.Name = "label2";
+            label2.Size = new Size(22, 19);
+            label2.TabIndex = 5;
+            label2.Text = "t1";
+            // 
             // panel10
             // 
+            panel10.BorderStyle = BorderStyle.FixedSingle;
             panel10.Controls.Add(panel11);
             panel10.Controls.Add(label30);
             panel10.Location = new Point(12, 190);
             panel10.Name = "panel10";
-            panel10.Size = new Size(215, 170);
+            panel10.Size = new Size(221, 238);
             panel10.TabIndex = 82;
             // 
             // panel11
             // 
+            panel11.BorderStyle = BorderStyle.FixedSingle;
+            panel11.Controls.Add(t5_tb);
             panel11.Controls.Add(Roll_curpos);
+            panel11.Controls.Add(label7);
             panel11.Controls.Add(label21);
+            panel11.Controls.Add(t4_tb);
             panel11.Controls.Add(Pitch_curpos);
+            panel11.Controls.Add(label5);
             panel11.Controls.Add(label22);
+            panel11.Controls.Add(t3_tb);
             panel11.Controls.Add(Z_curpos);
+            panel11.Controls.Add(label6);
             panel11.Controls.Add(label23);
+            panel11.Controls.Add(t2_tb);
             panel11.Controls.Add(Y_curpos);
+            panel11.Controls.Add(label4);
             panel11.Controls.Add(label24);
+            panel11.Controls.Add(t1_tb);
+            panel11.Controls.Add(label2);
             panel11.Controls.Add(X_curpos);
             panel11.Controls.Add(label25);
             panel11.Location = new Point(9, 49);
             panel11.Name = "panel11";
-            panel11.Size = new Size(197, 113);
+            panel11.Size = new Size(201, 174);
             panel11.TabIndex = 81;
             // 
             // Roll_curpos
             // 
-            Roll_curpos.Location = new Point(127, 47);
+            Roll_curpos.BorderStyle = BorderStyle.FixedSingle;
+            Roll_curpos.Location = new Point(31, 136);
             Roll_curpos.Margin = new Padding(3, 2, 3, 2);
             Roll_curpos.Multiline = true;
             Roll_curpos.Name = "Roll_curpos";
@@ -437,7 +468,7 @@
             // 
             label21.AutoSize = true;
             label21.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
-            label21.Location = new Point(101, 49);
+            label21.Location = new Point(5, 138);
             label21.Name = "label21";
             label21.Size = new Size(18, 19);
             label21.TabIndex = 81;
@@ -445,7 +476,8 @@
             // 
             // Pitch_curpos
             // 
-            Pitch_curpos.Location = new Point(127, 18);
+            Pitch_curpos.BorderStyle = BorderStyle.FixedSingle;
+            Pitch_curpos.Location = new Point(31, 107);
             Pitch_curpos.Margin = new Padding(3, 2, 3, 2);
             Pitch_curpos.Multiline = true;
             Pitch_curpos.Name = "Pitch_curpos";
@@ -457,7 +489,7 @@
             // 
             label22.AutoSize = true;
             label22.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
-            label22.Location = new Point(99, 18);
+            label22.Location = new Point(3, 107);
             label22.Name = "label22";
             label22.Size = new Size(20, 19);
             label22.TabIndex = 79;
@@ -465,6 +497,7 @@
             // 
             // Z_curpos
             // 
+            Z_curpos.BorderStyle = BorderStyle.FixedSingle;
             Z_curpos.Location = new Point(31, 75);
             Z_curpos.Margin = new Padding(3, 2, 3, 2);
             Z_curpos.Multiline = true;
@@ -485,6 +518,7 @@
             // 
             // Y_curpos
             // 
+            Y_curpos.BorderStyle = BorderStyle.FixedSingle;
             Y_curpos.Location = new Point(31, 46);
             Y_curpos.Margin = new Padding(3, 2, 3, 2);
             Y_curpos.Multiline = true;
@@ -505,6 +539,7 @@
             // 
             // X_curpos
             // 
+            X_curpos.BorderStyle = BorderStyle.FixedSingle;
             X_curpos.Location = new Point(31, 18);
             X_curpos.Margin = new Padding(3, 2, 3, 2);
             X_curpos.Multiline = true;
@@ -535,17 +570,20 @@
             // 
             // panel6
             // 
+            panel6.BorderStyle = BorderStyle.FixedSingle;
             panel6.Controls.Add(panel7);
             panel6.Controls.Add(label13);
-            panel6.Location = new Point(553, 190);
+            panel6.Location = new Point(425, 12);
             panel6.Name = "panel6";
-            panel6.Size = new Size(257, 170);
+            panel6.Size = new Size(246, 172);
             panel6.TabIndex = 75;
             // 
             // panel7
             // 
+            panel7.BorderStyle = BorderStyle.FixedSingle;
+            panel7.Controls.Add(Go_button);
+            panel7.Controls.Add(Transmit_button);
             panel7.Controls.Add(label12);
-            panel7.Controls.Add(Start_button);
             panel7.Controls.Add(Z_tb);
             panel7.Controls.Add(label8);
             panel7.Controls.Add(Y_tb);
@@ -556,6 +594,26 @@
             panel7.Size = new Size(220, 113);
             panel7.TabIndex = 1;
             // 
+            // Go_button
+            // 
+            Go_button.Location = new Point(99, 64);
+            Go_button.Name = "Go_button";
+            Go_button.Size = new Size(113, 29);
+            Go_button.TabIndex = 75;
+            Go_button.Text = "Go";
+            Go_button.UseVisualStyleBackColor = true;
+            Go_button.Click += Go_button_Click;
+            // 
+            // Transmit_button
+            // 
+            Transmit_button.Location = new Point(99, 29);
+            Transmit_button.Name = "Transmit_button";
+            Transmit_button.Size = new Size(113, 29);
+            Transmit_button.TabIndex = 75;
+            Transmit_button.Text = "Transmit";
+            Transmit_button.UseVisualStyleBackColor = true;
+            Transmit_button.Click += Transmit_button_Click;
+            // 
             // label12
             // 
             label12.AutoSize = true;
@@ -565,16 +623,6 @@
             label12.Size = new Size(18, 19);
             label12.TabIndex = 83;
             label12.Text = "X";
-            // 
-            // Start_button
-            // 
-            Start_button.Location = new Point(99, 20);
-            Start_button.Name = "Start_button";
-            Start_button.Size = new Size(113, 85);
-            Start_button.TabIndex = 74;
-            Start_button.Text = "START";
-            Start_button.UseVisualStyleBackColor = true;
-            Start_button.Click += Start_button_Click;
             // 
             // Z_tb
             // 
@@ -632,9 +680,9 @@
             label13.Font = new Font("Segoe UI", 16.2F, FontStyle.Bold, GraphicsUnit.Point);
             label13.Location = new Point(3, 9);
             label13.Name = "label13";
-            label13.Size = new Size(250, 38);
+            label13.Size = new Size(199, 38);
             label13.TabIndex = 0;
-            label13.Text = "Inverse Kinematic";
+            label13.Text = "Point to Point";
             // 
             // Form1
             // 
@@ -659,8 +707,6 @@
             panel3.PerformLayout();
             panel4.ResumeLayout(false);
             panel4.PerformLayout();
-            panel5.ResumeLayout(false);
-            panel5.PerformLayout();
             panel10.ResumeLayout(false);
             panel10.PerformLayout();
             panel11.ResumeLayout(false);
@@ -728,5 +774,7 @@
         private TextBox X_tb;
         private Label label13;
         private Label label12;
+        private Button Go_button;
+        private Button Transmit_button;
     }
 }
