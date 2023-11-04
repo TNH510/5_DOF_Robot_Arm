@@ -21,6 +21,8 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolTip;
 using static System.Net.WebRequestMethods;
 using System.Data.SqlTypes;
 using System.Security.AccessControl;
+using System.Diagnostics.Metrics;
+
 namespace gui
 {
     public partial class Form1 : Form
@@ -187,7 +189,28 @@ namespace gui
         {
             Press_button(MethodBase.GetCurrentMethod().Name, Constants.R_SETHOME);
         }
+        private void Exe_button_Click(object sender, EventArgs e)
+        {
+            int t1, t2, t3, t4 = 0;
+            t1 = Convert.ToInt32(t1_tb.Text) & 0xFFFF;
+            t1 = (t1 >> 16) & 0xFFFF;
+
+            t2 = Convert.ToInt32(t2_tb.Text) & 0xFFFF;
+            t2 = (t2 >> 16) & 0xFFFF;
+
+            t3 = Convert.ToInt32(t3_tb.Text) & 0xFFFF;
+            t3 = (t3 >> 16) & 0xFFFF;
+
+            t4 = Convert.ToInt32(t4_tb.Text) & 0xFFFF;
+            t4 = (t4 >> 16) & 0xFFFF;
+
+            plc.WriteDeviceBlock("ZR0", 1, ref t1);
+            plc.WriteDeviceBlock("ZR1", 1, ref t2);
+            plc.WriteDeviceBlock("ZR2", 1, ref t3);
+            plc.WriteDeviceBlock("ZR3", 1, ref t4);
+        }
         #endregion
+
 
 
     }

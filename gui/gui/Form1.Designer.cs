@@ -44,14 +44,15 @@
             ResetError_button = new Button();
             Control_Label = new Label();
             panel4 = new Panel();
+            Exe_button = new Button();
             panel5 = new Panel();
-            textBox3 = new TextBox();
+            t4_tb = new TextBox();
             label5 = new Label();
-            textBox4 = new TextBox();
+            t3_tb = new TextBox();
             label6 = new Label();
-            textBox2 = new TextBox();
+            t2_tb = new TextBox();
             label4 = new Label();
-            textBox1 = new TextBox();
+            t1_tb = new TextBox();
             label2 = new Label();
             label3 = new Label();
             Connect_Panel.SuspendLayout();
@@ -214,36 +215,47 @@
             // 
             // panel4
             // 
+            panel4.Controls.Add(Exe_button);
             panel4.Controls.Add(panel5);
             panel4.Controls.Add(label3);
             panel4.Location = new Point(388, 12);
             panel4.Name = "panel4";
-            panel4.Size = new Size(220, 172);
+            panel4.Size = new Size(335, 172);
             panel4.TabIndex = 2;
+            // 
+            // Exe_button
+            // 
+            Exe_button.Location = new Point(216, 66);
+            Exe_button.Name = "Exe_button";
+            Exe_button.Size = new Size(113, 29);
+            Exe_button.TabIndex = 12;
+            Exe_button.Text = "EXECUTE";
+            Exe_button.UseVisualStyleBackColor = true;
+            Exe_button.Click += Exe_button_Click;
             // 
             // panel5
             // 
-            panel5.Controls.Add(textBox3);
+            panel5.Controls.Add(t4_tb);
             panel5.Controls.Add(label5);
-            panel5.Controls.Add(textBox4);
+            panel5.Controls.Add(t3_tb);
             panel5.Controls.Add(label6);
-            panel5.Controls.Add(textBox2);
+            panel5.Controls.Add(t2_tb);
             panel5.Controls.Add(label4);
-            panel5.Controls.Add(textBox1);
+            panel5.Controls.Add(t1_tb);
             panel5.Controls.Add(label2);
             panel5.Location = new Point(9, 49);
             panel5.Name = "panel5";
             panel5.Size = new Size(201, 113);
             panel5.TabIndex = 1;
             // 
-            // textBox3
+            // t4_tb
             // 
-            textBox3.Location = new Point(128, 75);
-            textBox3.Margin = new Padding(3, 2, 3, 2);
-            textBox3.Multiline = true;
-            textBox3.Name = "textBox3";
-            textBox3.Size = new Size(62, 24);
-            textBox3.TabIndex = 80;
+            t4_tb.Location = new Point(128, 75);
+            t4_tb.Margin = new Padding(3, 2, 3, 2);
+            t4_tb.Multiline = true;
+            t4_tb.Name = "t4_tb";
+            t4_tb.Size = new Size(62, 24);
+            t4_tb.TabIndex = 80;
             // 
             // label5
             // 
@@ -255,14 +267,14 @@
             label5.TabIndex = 79;
             label5.Text = "t4";
             // 
-            // textBox4
+            // t3_tb
             // 
-            textBox4.Location = new Point(31, 75);
-            textBox4.Margin = new Padding(3, 2, 3, 2);
-            textBox4.Multiline = true;
-            textBox4.Name = "textBox4";
-            textBox4.Size = new Size(62, 24);
-            textBox4.TabIndex = 78;
+            t3_tb.Location = new Point(31, 75);
+            t3_tb.Margin = new Padding(3, 2, 3, 2);
+            t3_tb.Multiline = true;
+            t3_tb.Name = "t3_tb";
+            t3_tb.Size = new Size(62, 24);
+            t3_tb.TabIndex = 78;
             // 
             // label6
             // 
@@ -274,14 +286,14 @@
             label6.TabIndex = 77;
             label6.Text = "t3";
             // 
-            // textBox2
+            // t2_tb
             // 
-            textBox2.Location = new Point(128, 18);
-            textBox2.Margin = new Padding(3, 2, 3, 2);
-            textBox2.Multiline = true;
-            textBox2.Name = "textBox2";
-            textBox2.Size = new Size(62, 24);
-            textBox2.TabIndex = 76;
+            t2_tb.Location = new Point(128, 18);
+            t2_tb.Margin = new Padding(3, 2, 3, 2);
+            t2_tb.Multiline = true;
+            t2_tb.Name = "t2_tb";
+            t2_tb.Size = new Size(62, 24);
+            t2_tb.TabIndex = 76;
             // 
             // label4
             // 
@@ -293,14 +305,14 @@
             label4.TabIndex = 75;
             label4.Text = "t2";
             // 
-            // textBox1
+            // t1_tb
             // 
-            textBox1.Location = new Point(31, 18);
-            textBox1.Margin = new Padding(3, 2, 3, 2);
-            textBox1.Multiline = true;
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(62, 24);
-            textBox1.TabIndex = 74;
+            t1_tb.Location = new Point(31, 18);
+            t1_tb.Margin = new Padding(3, 2, 3, 2);
+            t1_tb.Multiline = true;
+            t1_tb.Name = "t1_tb";
+            t1_tb.Size = new Size(62, 24);
+            t1_tb.TabIndex = 74;
             // 
             // label2
             // 
@@ -370,12 +382,13 @@
         private Panel panel5;
         private Label label3;
         private Label label2;
-        private TextBox textBox3;
+        private TextBox t4_tb;
         private Label label5;
-        private TextBox textBox4;
+        private TextBox t3_tb;
         private Label label6;
-        private TextBox textBox2;
+        private TextBox t2_tb;
         private Label label4;
-        private TextBox textBox1;
+        private TextBox t1_tb;
+        private Button Exe_button;
     }
 }
