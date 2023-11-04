@@ -20,7 +20,7 @@ namespace gui
         public const string R_SERVO_ON = "M516"; /*Address of reg Servo ON*/
         public const string R_SETHOME = "M1999"; /*Address of reg BRAKE*/
         public const string R_STATUS = "M8000"; /*Address of value 17bit contain SERVO, BRAKE, STATUS OF SERVO*/
-        public const string R_POSITION = "D8000"; /*Address of value 17bit contain SERVO, BRAKE, STATUS OF SERVO*/
+        public const string R_POSITION = "D1010"; /* Address of angle */
         public const string R_P2P_DATA = "D1000"; /*Address of value 17bit contain SERVO, BRAKE, STATUS OF SERVO*/
         public const string R_P2P_TRIGGER = "M517";
         public const string R_STOP_SERVO = "M4096";

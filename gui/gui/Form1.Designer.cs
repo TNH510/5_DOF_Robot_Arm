@@ -60,32 +60,27 @@
             label3 = new Label();
             panel10 = new Panel();
             panel11 = new Panel();
-            textBox10 = new TextBox();
+            Roll_curpos = new TextBox();
             label21 = new Label();
-            textBox11 = new TextBox();
+            Pitch_curpos = new TextBox();
             label22 = new Label();
-            textBox12 = new TextBox();
+            Z_curpos = new TextBox();
             label23 = new Label();
-            textBox13 = new TextBox();
+            Y_curpos = new TextBox();
             label24 = new Label();
-            textBox14 = new TextBox();
+            X_curpos = new TextBox();
             label25 = new Label();
             label30 = new Label();
             panel6 = new Panel();
-            button1 = new Button();
-            button2 = new Button();
             panel7 = new Panel();
-            textBox1 = new TextBox();
-            label8 = new Label();
-            textBox2 = new TextBox();
-            label9 = new Label();
-            textBox3 = new TextBox();
-            label10 = new Label();
-            textBox4 = new TextBox();
-            label11 = new Label();
-            textBox5 = new TextBox();
-            label13 = new Label();
             label12 = new Label();
+            Start_button = new Button();
+            Z_tb = new TextBox();
+            label8 = new Label();
+            Y_tb = new TextBox();
+            label11 = new Label();
+            X_tb = new TextBox();
+            label13 = new Label();
             Connect_Panel.SuspendLayout();
             panel1.SuspendLayout();
             panel2.SuspendLayout();
@@ -164,7 +159,8 @@
             ErrorLog.Margin = new Padding(3, 2, 3, 2);
             ErrorLog.Multiline = true;
             ErrorLog.Name = "ErrorLog";
-            ErrorLog.Size = new Size(370, 173);
+            ErrorLog.ReadOnly = true;
+            ErrorLog.Size = new Size(385, 173);
             ErrorLog.TabIndex = 73;
             // 
             // panel2
@@ -412,29 +408,30 @@
             // 
             // panel11
             // 
-            panel11.Controls.Add(textBox10);
+            panel11.Controls.Add(Roll_curpos);
             panel11.Controls.Add(label21);
-            panel11.Controls.Add(textBox11);
+            panel11.Controls.Add(Pitch_curpos);
             panel11.Controls.Add(label22);
-            panel11.Controls.Add(textBox12);
+            panel11.Controls.Add(Z_curpos);
             panel11.Controls.Add(label23);
-            panel11.Controls.Add(textBox13);
+            panel11.Controls.Add(Y_curpos);
             panel11.Controls.Add(label24);
-            panel11.Controls.Add(textBox14);
+            panel11.Controls.Add(X_curpos);
             panel11.Controls.Add(label25);
             panel11.Location = new Point(9, 49);
             panel11.Name = "panel11";
             panel11.Size = new Size(197, 113);
             panel11.TabIndex = 81;
             // 
-            // textBox10
+            // Roll_curpos
             // 
-            textBox10.Location = new Point(127, 47);
-            textBox10.Margin = new Padding(3, 2, 3, 2);
-            textBox10.Multiline = true;
-            textBox10.Name = "textBox10";
-            textBox10.Size = new Size(62, 24);
-            textBox10.TabIndex = 82;
+            Roll_curpos.Location = new Point(127, 47);
+            Roll_curpos.Margin = new Padding(3, 2, 3, 2);
+            Roll_curpos.Multiline = true;
+            Roll_curpos.Name = "Roll_curpos";
+            Roll_curpos.ReadOnly = true;
+            Roll_curpos.Size = new Size(62, 24);
+            Roll_curpos.TabIndex = 82;
             // 
             // label21
             // 
@@ -446,14 +443,15 @@
             label21.TabIndex = 81;
             label21.Text = "R";
             // 
-            // textBox11
+            // Pitch_curpos
             // 
-            textBox11.Location = new Point(127, 18);
-            textBox11.Margin = new Padding(3, 2, 3, 2);
-            textBox11.Multiline = true;
-            textBox11.Name = "textBox11";
-            textBox11.Size = new Size(62, 24);
-            textBox11.TabIndex = 80;
+            Pitch_curpos.Location = new Point(127, 18);
+            Pitch_curpos.Margin = new Padding(3, 2, 3, 2);
+            Pitch_curpos.Multiline = true;
+            Pitch_curpos.Name = "Pitch_curpos";
+            Pitch_curpos.ReadOnly = true;
+            Pitch_curpos.Size = new Size(62, 24);
+            Pitch_curpos.TabIndex = 80;
             // 
             // label22
             // 
@@ -465,14 +463,15 @@
             label22.TabIndex = 79;
             label22.Text = "φ";
             // 
-            // textBox12
+            // Z_curpos
             // 
-            textBox12.Location = new Point(31, 75);
-            textBox12.Margin = new Padding(3, 2, 3, 2);
-            textBox12.Multiline = true;
-            textBox12.Name = "textBox12";
-            textBox12.Size = new Size(62, 24);
-            textBox12.TabIndex = 78;
+            Z_curpos.Location = new Point(31, 75);
+            Z_curpos.Margin = new Padding(3, 2, 3, 2);
+            Z_curpos.Multiline = true;
+            Z_curpos.Name = "Z_curpos";
+            Z_curpos.ReadOnly = true;
+            Z_curpos.Size = new Size(62, 24);
+            Z_curpos.TabIndex = 78;
             // 
             // label23
             // 
@@ -484,14 +483,15 @@
             label23.TabIndex = 77;
             label23.Text = "Z";
             // 
-            // textBox13
+            // Y_curpos
             // 
-            textBox13.Location = new Point(31, 46);
-            textBox13.Margin = new Padding(3, 2, 3, 2);
-            textBox13.Multiline = true;
-            textBox13.Name = "textBox13";
-            textBox13.Size = new Size(62, 24);
-            textBox13.TabIndex = 76;
+            Y_curpos.Location = new Point(31, 46);
+            Y_curpos.Margin = new Padding(3, 2, 3, 2);
+            Y_curpos.Multiline = true;
+            Y_curpos.Name = "Y_curpos";
+            Y_curpos.ReadOnly = true;
+            Y_curpos.Size = new Size(62, 24);
+            Y_curpos.TabIndex = 76;
             // 
             // label24
             // 
@@ -503,14 +503,15 @@
             label24.TabIndex = 75;
             label24.Text = "Y";
             // 
-            // textBox14
+            // X_curpos
             // 
-            textBox14.Location = new Point(31, 18);
-            textBox14.Margin = new Padding(3, 2, 3, 2);
-            textBox14.Multiline = true;
-            textBox14.Name = "textBox14";
-            textBox14.Size = new Size(62, 24);
-            textBox14.TabIndex = 74;
+            X_curpos.Location = new Point(31, 18);
+            X_curpos.Margin = new Padding(3, 2, 3, 2);
+            X_curpos.Multiline = true;
+            X_curpos.Name = "X_curpos";
+            X_curpos.ReadOnly = true;
+            X_curpos.Size = new Size(62, 24);
+            X_curpos.TabIndex = 74;
             // 
             // label25
             // 
@@ -534,134 +535,96 @@
             // 
             // panel6
             // 
-            panel6.Controls.Add(button1);
-            panel6.Controls.Add(button2);
             panel6.Controls.Add(panel7);
             panel6.Controls.Add(label13);
             panel6.Location = new Point(553, 190);
             panel6.Name = "panel6";
-            panel6.Size = new Size(314, 170);
+            panel6.Size = new Size(257, 170);
             panel6.TabIndex = 75;
-            // 
-            // button1
-            // 
-            button1.Location = new Point(41, 135);
-            button1.Name = "button1";
-            button1.Size = new Size(113, 29);
-            button1.TabIndex = 74;
-            button1.Text = "RUN";
-            button1.UseVisualStyleBackColor = true;
-            // 
-            // button2
-            // 
-            button2.Location = new Point(160, 135);
-            button2.Name = "button2";
-            button2.Size = new Size(113, 29);
-            button2.TabIndex = 12;
-            button2.Text = "EXECUTE";
-            button2.UseVisualStyleBackColor = true;
             // 
             // panel7
             // 
             panel7.Controls.Add(label12);
-            panel7.Controls.Add(textBox1);
+            panel7.Controls.Add(Start_button);
+            panel7.Controls.Add(Z_tb);
             panel7.Controls.Add(label8);
-            panel7.Controls.Add(textBox2);
-            panel7.Controls.Add(label9);
-            panel7.Controls.Add(textBox3);
-            panel7.Controls.Add(label10);
-            panel7.Controls.Add(textBox4);
+            panel7.Controls.Add(Y_tb);
             panel7.Controls.Add(label11);
-            panel7.Controls.Add(textBox5);
-            panel7.Location = new Point(9, 49);
+            panel7.Controls.Add(X_tb);
+            panel7.Location = new Point(12, 49);
             panel7.Name = "panel7";
-            panel7.Size = new Size(293, 80);
+            panel7.Size = new Size(220, 113);
             panel7.TabIndex = 1;
             // 
-            // textBox1
+            // label12
             // 
-            textBox1.Location = new Point(223, 20);
-            textBox1.Margin = new Padding(3, 2, 3, 2);
-            textBox1.Multiline = true;
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(62, 24);
-            textBox1.TabIndex = 82;
+            label12.AutoSize = true;
+            label12.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
+            label12.Location = new Point(5, 20);
+            label12.Name = "label12";
+            label12.Size = new Size(18, 19);
+            label12.TabIndex = 83;
+            label12.Text = "X";
+            // 
+            // Start_button
+            // 
+            Start_button.Location = new Point(99, 20);
+            Start_button.Name = "Start_button";
+            Start_button.Size = new Size(113, 85);
+            Start_button.TabIndex = 74;
+            Start_button.Text = "START";
+            Start_button.UseVisualStyleBackColor = true;
+            Start_button.Click += Start_button_Click;
+            // 
+            // Z_tb
+            // 
+            Z_tb.Location = new Point(31, 79);
+            Z_tb.Margin = new Padding(3, 2, 3, 2);
+            Z_tb.Multiline = true;
+            Z_tb.Name = "Z_tb";
+            Z_tb.Size = new Size(62, 24);
+            Z_tb.TabIndex = 82;
+            Z_tb.Text = "0";
             // 
             // label8
             // 
             label8.AutoSize = true;
             label8.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
-            label8.Location = new Point(195, 23);
+            label8.Location = new Point(5, 82);
             label8.Name = "label8";
             label8.Size = new Size(18, 19);
             label8.TabIndex = 81;
             label8.Text = "Z";
             // 
-            // textBox2
+            // Y_tb
             // 
-            textBox2.Location = new Point(127, 50);
-            textBox2.Margin = new Padding(3, 2, 3, 2);
-            textBox2.Multiline = true;
-            textBox2.Name = "textBox2";
-            textBox2.Size = new Size(62, 24);
-            textBox2.TabIndex = 80;
-            // 
-            // label9
-            // 
-            label9.AutoSize = true;
-            label9.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
-            label9.Location = new Point(99, 53);
-            label9.Name = "label9";
-            label9.Size = new Size(22, 19);
-            label9.TabIndex = 79;
-            label9.Text = "t4";
-            // 
-            // textBox3
-            // 
-            textBox3.Location = new Point(31, 50);
-            textBox3.Margin = new Padding(3, 2, 3, 2);
-            textBox3.Multiline = true;
-            textBox3.Name = "textBox3";
-            textBox3.Size = new Size(62, 24);
-            textBox3.TabIndex = 78;
-            // 
-            // label10
-            // 
-            label10.AutoSize = true;
-            label10.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
-            label10.Location = new Point(3, 52);
-            label10.Name = "label10";
-            label10.Size = new Size(22, 19);
-            label10.TabIndex = 77;
-            label10.Text = "t3";
-            // 
-            // textBox4
-            // 
-            textBox4.Location = new Point(127, 18);
-            textBox4.Margin = new Padding(3, 2, 3, 2);
-            textBox4.Multiline = true;
-            textBox4.Name = "textBox4";
-            textBox4.Size = new Size(62, 24);
-            textBox4.TabIndex = 76;
+            Y_tb.Location = new Point(31, 48);
+            Y_tb.Margin = new Padding(3, 2, 3, 2);
+            Y_tb.Multiline = true;
+            Y_tb.Name = "Y_tb";
+            Y_tb.Size = new Size(62, 24);
+            Y_tb.TabIndex = 76;
+            Y_tb.Text = "0";
             // 
             // label11
             // 
             label11.AutoSize = true;
             label11.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
-            label11.Location = new Point(99, 21);
+            label11.Location = new Point(5, 51);
             label11.Name = "label11";
             label11.Size = new Size(18, 19);
             label11.TabIndex = 75;
             label11.Text = "Y";
             // 
-            // textBox5
+            // X_tb
             // 
-            textBox5.Location = new Point(31, 18);
-            textBox5.Margin = new Padding(3, 2, 3, 2);
-            textBox5.Multiline = true;
-            textBox5.Name = "textBox5";
-            textBox5.Size = new Size(62, 24);
-            textBox5.TabIndex = 74;
+            X_tb.Location = new Point(31, 18);
+            X_tb.Margin = new Padding(3, 2, 3, 2);
+            X_tb.Multiline = true;
+            X_tb.Name = "X_tb";
+            X_tb.Size = new Size(62, 24);
+            X_tb.TabIndex = 74;
+            X_tb.Text = "0";
             // 
             // label13
             // 
@@ -669,19 +632,9 @@
             label13.Font = new Font("Segoe UI", 16.2F, FontStyle.Bold, GraphicsUnit.Point);
             label13.Location = new Point(3, 9);
             label13.Name = "label13";
-            label13.Size = new Size(265, 38);
+            label13.Size = new Size(250, 38);
             label13.TabIndex = 0;
-            label13.Text = "Forward Kinematic";
-            // 
-            // label12
-            // 
-            label12.AutoSize = true;
-            label12.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
-            label12.Location = new Point(3, 20);
-            label12.Name = "label12";
-            label12.Size = new Size(18, 19);
-            label12.TabIndex = 83;
-            label12.Text = "X";
+            label13.Text = "Inverse Kinematic";
             // 
             // Form1
             // 
@@ -752,32 +705,27 @@
         private Button Run_button;
         private Panel panel10;
         private Panel panel11;
-        private TextBox textBox10;
+        private TextBox Roll_curpos;
         private Label label21;
-        private TextBox textBox11;
+        private TextBox Pitch_curpos;
         private Label label22;
-        private TextBox textBox12;
+        private TextBox Z_curpos;
         private Label label23;
-        private TextBox textBox13;
+        private TextBox Y_curpos;
         private Label label24;
-        private TextBox textBox14;
+        private TextBox X_curpos;
         private Label label25;
         private Label label30;
         private TextBox t5_tb;
         private Label label7;
         private Panel panel6;
-        private Button button1;
-        private Button button2;
+        private Button Start_button;
         private Panel panel7;
-        private TextBox textBox1;
+        private TextBox Z_tb;
         private Label label8;
-        private TextBox textBox2;
-        private Label label9;
-        private TextBox textBox3;
-        private Label label10;
-        private TextBox textBox4;
+        private TextBox Y_tb;
         private Label label11;
-        private TextBox textBox5;
+        private TextBox X_tb;
         private Label label13;
         private Label label12;
     }

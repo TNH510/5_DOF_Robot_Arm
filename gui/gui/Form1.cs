@@ -43,6 +43,16 @@ namespace gui
 
         }
         #region Functions
+        //private async void Timer1_Tick(object sender, EventArgs e)
+        //{
+        //    if (this.Connect_button.Enabled == false)
+        //    {
+        //        await Task.Run(async () =>
+        //        {
+        //            await Forward_Kinematic();
+        //        });
+        //    }
+        //}
         public void ChangeColorObject(object objectin, Color color_object)
         {
             var button = objectin as Button;
@@ -92,9 +102,10 @@ namespace gui
             PrintLog("Info", name, string.Format("Raise {0} Successfully", adr));
         }
 
-        public static (double, double, double, double, double) convert_position_angle(double x, double y, double z, double alpha, double gamma)
+        public static (double, double, double, double, double) convert_position_angle(double x, double y, double z)
         {
             double t1, t2, t3, t4, t5, s2, c2, s3, c3, m, n;
+            double alpha, gamma;
             alpha = 0.0;
             gamma = -Math.PI / 2;
             t1 = Math.Atan2(y, x);
@@ -114,69 +125,65 @@ namespace gui
             t4 = t4 / Math.PI * 180.0;
             t5 = t5 / Math.PI * 180.0;
             return (t1, t2, t3, t4, t5);
-
         }
         public int Read_Position(int value_positon1, int value_positon2)
         {
             return (value_positon2 << 16 | value_positon1) - 18000000;
         }
-        public async Task Forward_Kinematic()
-        {
-            int diginumber_display = 5;
-            int t1, t2, t3, t4, t5;
-            int[] value_positon = new int[16];
-            int[] adc_raw = new int[4];
-            double t1_out, t2_out, t3_out, t4_out, t5_out;
-            double t1_dh, t2_dh, t3_dh, t4_dh, x, y, z;
-            if (this.Connect_button.Enabled == false)
-            {
-                plc.ReadDeviceBlock(Constants.R_POSITION, 12, out value_positon[0]);
-                plc.ReadDeviceBlock("D8021", 4, out adc_raw[0]);
+        //public async Task Forward_Kinematic()
+        //{
+        //    int diginumber_display = 5;
+        //    int t1, t2, t3, t4, t5;
+        //    int[] value_positon = new int[16];
+        //    double t1_out, t2_out, t3_out, t4_out, t5_out;
+        //    double t1_dh, t2_dh, t3_dh, t4_dh, x, y, z;
+        //    if (this.Connect_button.Enabled == false)
+        //    {
+        //        plc.ReadDeviceBlock(Constants.R_POSITION, 12, out value_positon[0]);
+        //        //plc.ReadDeviceBlock("D8021", 4, out adc_raw[0]);
 
-                t1 = Read_Position(value_positon[0], value_positon[1]);
-                t2 = Read_Position(value_positon[2], value_positon[3]);
-                t3 = Read_Position(value_positon[4], value_positon[5]);
-                t4 = Read_Position(value_positon[6], value_positon[7]);
-                t5 = Read_Position(value_positon[8], value_positon[9]);
-                // MCode.Text = Convert.ToString(value_positon[10]);
+        //        t1 = Read_Position(value_positon[0], value_positon[1]);
+        //        t2 = Read_Position(value_positon[2], value_positon[3]);
+        //        t3 = Read_Position(value_positon[4], value_positon[5]);
+        //        t4 = Read_Position(value_positon[6], value_positon[7]);
+        //        t5 = Read_Position(value_positon[8], value_positon[9]);
+        //        // MCode.Text = Convert.ToString(value_positon[10]);
 
-                t1_out = double.Parse(Convert.ToString(t1)) / 100000;
-                t2_out = double.Parse(Convert.ToString(t2)) / 100000;
-                t3_out = double.Parse(Convert.ToString(t3)) / 100000;
-                t4_out = double.Parse(Convert.ToString(t4)) / 100000;
-                t5_out = double.Parse(Convert.ToString(t5)) / 100000;
-                /* Transfer the angle value into float */
-                t1_out = Math.Round(t1_out, diginumber_display);
-                t2_out = Math.Round(t2_out, diginumber_display);
-                t3_out = Math.Round(t3_out, diginumber_display);
-                t4_out = Math.Round(t4_out, diginumber_display);
-                t5_out = Math.Round(t5_out, diginumber_display);
-                /* Convert the angle from degree to radian */
-                t1_dh = t1_out / 180 * Math.PI;
-                t2_dh = (t2_out + 90) / 180 * Math.PI;
-                t3_dh = (t3_out - 90) / 180 * Math.PI;
-                t4_dh = (t4_out - 90) / 180 * Math.PI;
-                x = Math.Cos(t1_dh) * (Constants.l2 * Math.Cos(t2_dh) + Constants.l3 * Math.Cos(t2_dh + t3_dh) + Constants.l4 * Math.Cos(t2_dh + t3_dh + t4_dh));
-                y = Math.Sin(t1_dh) * (Constants.l2 * Math.Cos(t2_dh) + Constants.l3 * Math.Cos(t2_dh + t3_dh) + Constants.l4 * Math.Cos(t2_dh + t3_dh + t4_dh));
-                z = Constants.l1 + Constants.l2 * Math.Sin(t2_dh) + Constants.l3 * Math.Sin(t2_dh + t3_dh) + Constants.l4 * Math.Sin(t2_dh + t3_dh + t4_dh);
+        //        t1_out = double.Parse(Convert.ToString(t1)) / 100000;
+        //        t2_out = double.Parse(Convert.ToString(t2)) / 100000;
+        //        t3_out = double.Parse(Convert.ToString(t3)) / 100000;
+        //        t4_out = double.Parse(Convert.ToString(t4)) / 100000;
+        //        t5_out = double.Parse(Convert.ToString(t5)) / 100000;
+        //        /* Transfer the angle value into float */
+        //        t1_out = Math.Round(t1_out, diginumber_display);
+        //        t2_out = Math.Round(t2_out, diginumber_display);
+        //        t3_out = Math.Round(t3_out, diginumber_display);
+        //        t4_out = Math.Round(t4_out, diginumber_display);
+        //        t5_out = Math.Round(t5_out, diginumber_display);
+        //        /* Convert the angle from degree to radian */
+        //        t1_dh = t1_out / 180 * Math.PI;
+        //        t2_dh = (t2_out + 90) / 180 * Math.PI;
+        //        t3_dh = (t3_out - 90) / 180 * Math.PI;
+        //        t4_dh = (t4_out - 90) / 180 * Math.PI;
 
-                X_tb.Text = Convert.ToString(Math.Round(x, diginumber_display));
-                Y_tb.Text = Convert.ToString(Math.Round(y, diginumber_display));
-                Z_tb.Text = Convert.ToString(Math.Round(z, diginumber_display));
-                Pitch_tb.Text = Convert.ToString(Math.Round(t2_out + t3_out + t4_out, diginumber_display));
-                Roll_tb.Text = Convert.ToString(Math.Round(t1_out + t5_out, diginumber_display));
+        //        x = Math.Cos(t1_dh) * (Constants.l2 * Math.Cos(t2_dh) + Constants.l3 * Math.Cos(t2_dh + t3_dh) + Constants.l4 * Math.Cos(t2_dh + t3_dh + t4_dh));
+        //        y = Math.Sin(t1_dh) * (Constants.l2 * Math.Cos(t2_dh) + Constants.l3 * Math.Cos(t2_dh + t3_dh) + Constants.l4 * Math.Cos(t2_dh + t3_dh + t4_dh));
+        //        z = Constants.l1 + Constants.l2 * Math.Sin(t2_dh) + Constants.l3 * Math.Sin(t2_dh + t3_dh) + Constants.l4 * Math.Sin(t2_dh + t3_dh + t4_dh);
 
-                //ADC2.Text = Convert.ToString(0.01336 * (float)(adc_raw[0]) - 116.22360);
-                //ADC3.Text = Convert.ToString(0.00894 * (float)(adc_raw[1]) - 53.82361);
-                //ADC4.Text = Convert.ToString(0.02212 * (float)(adc_raw[2]) - 84.06421);
-                //ADC5.Text = Convert.ToString(0.03095 * (float)(adc_raw[3]) - 133.03176);
-            }
-            await Task.Delay(1);
-            return;
-        }
+        //        X_curpos.Text = Convert.ToString(Math.Round(x, diginumber_display));
+        //        Y_curpos.Text = Convert.ToString(Math.Round(y, diginumber_display));
+        //        Z_curpos.Text = Convert.ToString(Math.Round(z, diginumber_display));
+        //        Pitch_curpos.Text = Convert.ToString(Math.Round(t2_out + t3_out + t4_out, diginumber_display));
+        //        Roll_curpos.Text = Convert.ToString(Math.Round(t1_out + t5_out, diginumber_display));
+        //    }
+        //    await Task.Delay(1);
+        //    return;
+        //}
+
         #endregion Functions
 
         #region Buttons
+
         private void Connect_button_Click(object sender, EventArgs e)
         {
             /* Declare the variable(s) */
@@ -285,7 +292,7 @@ namespace gui
             int temp_value_4 = Convert.ToInt16(t4_tb.Text) * 100000;
             int temp_value_5 = Convert.ToInt16(t5_tb.Text) * 100000;
 
-            value_angle[0] =  temp_value_1 & 0xFFFF; //byte high for register
+            value_angle[0] = temp_value_1 & 0xFFFF; //byte high for register
             value_angle[1] = (temp_value_1 >> 16) & 0xFFFF; // byte low for register
             //t1 = (t1 << 16) & 0xFFFF;
 
@@ -344,6 +351,66 @@ namespace gui
         }
         #endregion
 
+        private void Start_button_Click(object sender, EventArgs e)
+        {
+            double pos_x, pos_y, pos_z;
+            double t1_1, t2_1, t3_1, t4_1, t5_1;
+            pos_x = Convert.ToInt32(X_tb.Text);
+            pos_y = Convert.ToInt32(Y_tb.Text);
+            pos_z = Convert.ToInt32(Z_tb.Text);
+
+            (t1_1, t2_1, t3_1, t4_1, t5_1) = convert_position_angle(pos_x, pos_y, pos_z);
+            t1_tb.Text = t1_1.ToString();
+            t2_tb.Text = t2_1.ToString();
+            t3_tb.Text = t3_1.ToString();
+            t4_tb.Text = t4_1.ToString();
+            t5_tb.Text = t5_1.ToString();
+
+            int diginumber_display = 5;
+            int t1, t2, t3, t4, t5;
+            int[] value_positon = new int[16];
+            double t1_out, t2_out, t3_out, t4_out, t5_out;
+            double t1_dh, t2_dh, t3_dh, t4_dh, x, y, z;
+            if (this.Connect_button.Enabled == false)
+            {
+                plc.ReadDeviceBlock(Constants.R_POSITION, 12, out value_positon[0]);
+                //plc.ReadDeviceBlock("D8021", 4, out adc_raw[0]);
+
+                t1 = Read_Position(value_positon[0], value_positon[1]);
+                t2 = Read_Position(value_positon[2], value_positon[3]);
+                t3 = Read_Position(value_positon[4], value_positon[5]);
+                t4 = Read_Position(value_positon[6], value_positon[7]);
+                t5 = Read_Position(value_positon[8], value_positon[9]);
+                // MCode.Text = Convert.ToString(value_positon[10]);
+
+                t1_out = double.Parse(Convert.ToString(t1)) / 100000;
+                t2_out = double.Parse(Convert.ToString(t2)) / 100000;
+                t3_out = double.Parse(Convert.ToString(t3)) / 100000;
+                t4_out = double.Parse(Convert.ToString(t4)) / 100000;
+                t5_out = double.Parse(Convert.ToString(t5)) / 100000;
+                /* Transfer the angle value into float */
+                t1_out = Math.Round(t1_out, diginumber_display);
+                t2_out = Math.Round(t2_out, diginumber_display);
+                t3_out = Math.Round(t3_out, diginumber_display);
+                t4_out = Math.Round(t4_out, diginumber_display);
+                t5_out = Math.Round(t5_out, diginumber_display);
+                /* Convert the angle from degree to radian */
+                t1_dh = t1_out / 180 * Math.PI;
+                t2_dh = (t2_out + 90) / 180 * Math.PI;
+                t3_dh = (t3_out - 90) / 180 * Math.PI;
+                t4_dh = (t4_out - 90) / 180 * Math.PI;
+
+                x = Math.Cos(t1_dh) * (Constants.l2 * Math.Cos(t2_dh) + Constants.l3 * Math.Cos(t2_dh + t3_dh) + Constants.l4 * Math.Cos(t2_dh + t3_dh + t4_dh));
+                y = Math.Sin(t1_dh) * (Constants.l2 * Math.Cos(t2_dh) + Constants.l3 * Math.Cos(t2_dh + t3_dh) + Constants.l4 * Math.Cos(t2_dh + t3_dh + t4_dh));
+                z = Constants.l1 + Constants.l2 * Math.Sin(t2_dh) + Constants.l3 * Math.Sin(t2_dh + t3_dh) + Constants.l4 * Math.Sin(t2_dh + t3_dh + t4_dh);
+
+                X_curpos.Text = Convert.ToString(Math.Round(x, diginumber_display));
+                Y_curpos.Text = Convert.ToString(Math.Round(y, diginumber_display));
+                Z_curpos.Text = Convert.ToString(Math.Round(z, diginumber_display));
+                Pitch_curpos.Text = Convert.ToString(Math.Round(t2_out + t3_out + t4_out, diginumber_display));
+                Roll_curpos.Text = Convert.ToString(Math.Round(t1_out + t5_out, diginumber_display));
+            }
+        }
     }
 
 }
