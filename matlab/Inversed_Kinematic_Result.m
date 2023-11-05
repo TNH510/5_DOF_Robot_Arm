@@ -8,11 +8,11 @@ l3 = 500.0;
 l4 = 0.0;
 l5 = 230.0;
 
-px = 584.6666;
+px = 500;
 
 py = 0;
 
-pz = -143.5314;
+pz = 900;
 
 roll = 0;
 
@@ -41,10 +41,10 @@ th4 = pitch - th3 - th2;
 
 
 % Show the result
-th1 = th1 * 180 / pi
-th2 = th2 * 180 / pi
-th3 = th3 * 180 / pi
-th4 = th4 * 180 / pi
-th5 = th5 * 180 / pi
+th1 = th1 * 180 / pi 
+th2 = th2 * 180 / pi 
+th3 = th3 * 180 / pi 
+th4 = th4 * 180 / pi 
+th5 = th5 * 180 / pi 
 
 
