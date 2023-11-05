@@ -101,7 +101,7 @@ namespace gui
             double t1, t2, t3, t4, t5, s2, c2, s3, c3, m, n;
             double roll, pitch;
             roll = 0.0;
-            pitch = - Math.PI / 2;
+            pitch = -Math.PI / 2;
             t1 = Math.Atan2(y, x);
             t5 = roll - t1;
             m = Math.Sqrt(x * x + y * y);
@@ -138,6 +138,14 @@ namespace gui
         public int Read_Position(int value_positon1, int value_positon2)
         {
             return (value_positon2 << 16 | value_positon1) - 18000000;
+        }
+        // Convert value read from PLC to int value
+        public int[] Write_Theta(int value_angle)
+        {
+            int[] value_angle_arr = new int[2];
+            value_angle_arr[0] = value_angle & 0xFFFF; //byte high for register
+            value_angle_arr[1] = (value_angle >> 16) & 0xFFFF; // byte low for register
+            return value_angle_arr;
         }
         public void Forward_Kinematic()
         {
@@ -354,34 +362,6 @@ namespace gui
         {
             Press_button(MethodBase.GetCurrentMethod().Name, Constants.R_SETHOME);
         }
-        private void Exe_button_Click(object sender, EventArgs e)
-        {
-            int[] value_angle = new int[10];
-            int[] value_angle_out = new int[10];
-            int temp_value_1 = (int) (Convert.ToDouble(t1_tb.Text) + 180) * 100000;
-            int temp_value_2 = (int) (Convert.ToDouble(t2_tb.Text) + 180) * 100000;
-            int temp_value_3 = (int) (Convert.ToDouble(t3_tb.Text) + 180) * 100000;
-            int temp_value_4 = (int) (Convert.ToDouble(t4_tb.Text) + 180) * 100000;
-            int temp_value_5 = (int) (Convert.ToDouble(t5_tb.Text) + 180) * 100000;
-
-            value_angle[0] = temp_value_1 & 0xFFFF; //byte high for register
-            value_angle[1] = (temp_value_1 >> 16) & 0xFFFF; // byte low for register
-            //t1 = (t1 << 16) & 0xFFFF;
-
-            value_angle[2] = temp_value_2 & 0xFFFF; //byte high for register
-            value_angle[3] = (temp_value_2 >> 16) & 0xFFFF; // byte low for register
-
-            value_angle[4] = temp_value_3 & 0xFFFF; //byte high for register
-            value_angle[5] = (temp_value_3 >> 16) & 0xFFFF; // byte low for register
-
-            value_angle[6] = temp_value_4 & 0xFFFF; //byte high for register
-            value_angle[7] = (temp_value_4 >> 16) & 0xFFFF; // byte low for register
-
-            value_angle[8] = temp_value_5 & 0xFFFF; //byte high for register
-            value_angle[9] = (temp_value_5 >> 16) & 0xFFFF; // byte low for register
-            /* Write the angle */
-            plc.WriteDeviceBlock("D1010", 10, ref value_angle[0]);
-        }
         private void Run_button_Click(object sender, EventArgs e)
         {
             int ret, run_status;
@@ -548,94 +528,109 @@ namespace gui
                 t3_tb.Text = t3.ToString("0.####");
                 t4_tb.Text = t4.ToString("0.####");
                 t5_tb.Text = t5.ToString("0.####");
-                //t1_current = double.Parse(t1_tb.Text);
-                //t2_current = double.Parse(t2_tb.Text);
-                //t3_current = double.Parse(t3_tb.Text);
-                //t4_current = double.Parse(t4_tb.Text);
-                //t5_current = double.Parse(t5_tb.Text);
-                ///* Offset data */
-                //t2 -= 90.0;
-                //t3 += 90.0;
-                //t4 += 90.0;
-                //delta_theta1 = Math.Abs(t1 - t1_current);
-                ////delta_theta_max = (delta_theta_max < delta_theta1) ? delta_theta1 : delta_theta_max;
-                //delta_theta2 = Math.Abs(t2 - t2_current);
-                ////delta_theta_max = (delta_theta_max < delta_theta2) ? delta_theta2 : delta_theta_max;
-                //delta_theta3 = Math.Abs(t3 - t3_current);
-                ////delta_theta_max = (delta_theta_max < delta_theta3) ? delta_theta3 : delta_theta_max;
-                //delta_theta4 = Math.Abs(t4 - t4_current);
-                ////delta_theta_max = (delta_theta_max < delta_theta4) ? delta_theta4 : delta_theta_max;
-                //delta_theta5 = Math.Abs(t5 - t5_current);
-                ////delta_theta_max = (delta_theta_max < delta_theta5) ? delta_theta5 : delta_theta_max;
-                //delta_theta_max = Math.Sqrt(delta_theta1 * delta_theta1 + delta_theta2 * delta_theta2 + delta_theta3 * delta_theta3 + delta_theta4 * delta_theta4 + delta_theta5 * delta_theta5);
-                //v1 = velocity * delta_theta1 / delta_theta_max;
-                //v2 = velocity * delta_theta2 / delta_theta_max;
-                //v3 = velocity * delta_theta3 / delta_theta_max;
-                //v4 = velocity * delta_theta4 / delta_theta_max;
-                //v5 = velocity * delta_theta5 / delta_theta_max;
-
-                ////v = Math.Sqrt(v1 * v1 + v2 * v2 + v3 * v3 + v4 * v4 + v5 * v5);
-                //t1_out = Convert.ToInt32((t1 + 180.0) * 100000.0);
-                //t2_out = Convert.ToInt32((t2 + 180.0) * 100000.0);
-                //t3_out = Convert.ToInt32((t3 + 180.0) * 100000.0);
-                //t4_out = Convert.ToInt32((t4 + 180.0) * 100000.0);
-                //t5_out = Convert.ToInt32((t5 + 180.0) * 100000.0);
-                ////v_out = Convert.ToInt32(v * 1000.0);
-                //v1_out = Convert.ToInt32(v1 * 1000.0);
-                //v2_out = Convert.ToInt32(v2 * 1000.0);
-                //v3_out = Convert.ToInt32(v3 * 1000.0);
-                //v4_out = Convert.ToInt32(v4 * 1000.0);
-                //v5_out = Convert.ToInt32(v5 * 1000.0);
-                //v1_out = (v1_out == 0) ? 1 : v1_out;
-                //v2_out = (v2_out == 0) ? 1 : v2_out;
-                //v3_out = (v3_out == 0) ? 1 : v3_out;
-                //v4_out = (v4_out == 0) ? 1 : v4_out;
-                //v5_out = (v5_out == 0) ? 1 : v5_out;
-                //arr[count++] = v1_out & 0xFFFF;
-                //arr[count++] = (v1_out >> 16) & 0xFFFF;
-                //arr[count++] = v2_out & 0xFFFF;
-                //arr[count++] = (v2_out >> 16) & 0xFFFF;
-                //arr[count++] = v3_out & 0xFFFF;
-                //arr[count++] = (v3_out >> 16) & 0xFFFF;
-                //arr[count++] = v4_out & 0xFFFF;
-                //arr[count++] = (v4_out >> 16) & 0xFFFF;
-                //arr[count++] = v5_out & 0xFFFF;
-                //arr[count++] = (v5_out >> 16) & 0xFFFF;
-                //arr[count++] = t1_out & 0xFFFF;
-                //arr[count++] = (t1_out >> 16) & 0xFFFF;
-                //arr[count++] = t2_out & 0xFFFF;
-                //arr[count++] = (t2_out >> 16) & 0xFFFF;
-                //arr[count++] = t3_out & 0xFFFF;
-                //arr[count++] = (t3_out >> 16) & 0xFFFF;
-                //arr[count++] = t4_out & 0xFFFF;
-                //arr[count++] = (t4_out >> 16) & 0xFFFF;
-                //arr[count++] = t5_out & 0xFFFF;
-                //arr[count++] = (t5_out >> 16) & 0xFFFF;
-                //plc.WriteDeviceBlock(Constants.R_P2P_DATA, count, ref arr[0]);
-                //if (ret == 0)
-                //{
-
-                //    PrintLog("Info", MethodBase.GetCurrentMethod().Name, string.Format("P2P: Write trajectory to PLC successfully"));
-                //}
-                //else
-                //{
-                //    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: Write trajectory to PLC fail {0}", ret));
-                //}
             }
             catch (Exception er)
             {
                 PrintLog("Bug", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", er));
             }
         }
-        private void Go_button_Click(object sender, EventArgs e)
+        private void pRu_button_Click(object sender, EventArgs e)
         {
+            double[] vect_u = new double[3];
+            double[] curr_pos = new double[3];
+            double[] targ_pos = new double[3];
+            double t1, t2, t3, t4, t5;
+            int[,] angle_array = new int[10, 4];
+            double x, y, z;
+            int ret;
+            int[] value_angle = new int[40];
 
+            /* Assign corrdination for each array */
+            curr_pos[0] = Convert.ToDouble(X_curpos.Text);
+            curr_pos[1] = Convert.ToDouble(Y_curpos.Text);
+            curr_pos[2] = Convert.ToDouble(Z_curpos.Text);
+
+            targ_pos[0] = Convert.ToDouble(X_tb.Text);
+            targ_pos[1] = Convert.ToDouble(Y_tb.Text);
+            targ_pos[2] = Convert.ToDouble(Z_tb.Text);
+
+            /* Referred vector */
+            for (int i = 0; i < 3; i++)
+            {
+                vect_u[i] = targ_pos[i] - curr_pos[i];
+                //PrintLog("vect", "value", Convert.ToString(vect_u[i]));
+            }
+
+            /* Linear Equation */
+            for (int t = 0; t < 5; t++)
+            {
+                x = 500 + vect_u[0] * t; /* 500 is the actual position of robot following the x axis */
+                y = 0 + vect_u[1] * t; /* 0 is the actual position of robot following the y axis */
+                z = 900 + vect_u[2] * t; /* 900 is the actual position of robot following the y axis */
+                (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
+                ret = Check_angle(t1, t2, t3, t4, t5);
+                if (ret != 0)
+                {
+                    double theta = 0.0;
+                    if (ret == 1) theta = t1;
+                    else if (ret == 2) theta = t2;
+                    else if (ret == 3) theta = t3;
+                    else if (ret == 4) theta = t4;
+                    else if (ret == 5) theta = t5;
+                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
+                    return;
+                }
+                t2 -= 90.0;
+                t3 += 90.0;
+                t4 += 90.0;
+                /* Assign value */
+                angle_array[t, 0] = ((int)t1 + 180) * 100000;
+                angle_array[t, 1] = ((int)t2 + 180) * 100000;
+                angle_array[t, 2] = ((int)t3 + 180) * 100000;
+                angle_array[t, 3] = ((int)t4 + 180) * 100000;
+                //PrintLog("vect", "value", Convert.ToString(angle_array[t, 0]));
+                //PrintLog("vect", "value", Convert.ToString(angle_array[t, 1]));
+                //PrintLog("vect", "value", Convert.ToString(angle_array[t, 2]));
+                //PrintLog("vect", "value", Convert.ToString(angle_array[t, 3]));
+            }
+            for (int j = 0; j < 5; j++)
+            {
+
+                value_angle[8 * j] = Write_Theta(angle_array[j, 0])[0];
+                value_angle[8 * j + 1] = Write_Theta(angle_array[j, 0])[1];
+
+                value_angle[8 * j + 2] = Write_Theta(angle_array[j, 1])[0];
+                value_angle[8 * j + 3] = Write_Theta(angle_array[j, 1])[1];
+
+                value_angle[8 * j + 4] = Write_Theta(angle_array[j, 2])[0];
+                value_angle[8 * j + 5] = Write_Theta(angle_array[j, 2])[1];
+
+                value_angle[8 * j + 6] = Write_Theta(angle_array[j, 3])[0];
+                value_angle[8 * j + 7] = Write_Theta(angle_array[j, 3])[1];
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 1]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 2]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 3]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 4]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 5]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 6]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 7]));
+
+            }
+            plc.WriteDeviceBlock("D1100", 40, ref value_angle[0]);
+            
         }
         #endregion
 
 
 
 
+
+
+        private void test_button_Click(object sender, EventArgs e)
+        {
+            Press_button(MethodBase.GetCurrentMethod().Name, Constants.R_PATH);
+        }
     }
 
 }

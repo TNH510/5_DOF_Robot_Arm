@@ -34,6 +34,7 @@ namespace gui
         public const string R_SERVO_ON = "M516"; /*Address of reg Servo ON*/
         public const string R_SETHOME = "M1999"; /*Address of reg BRAKE*/
         public const string R_STATUS = "M8000"; /*Address of value 17bit contain SERVO, BRAKE, STATUS OF SERVO*/
+        public const string R_PATH = "M529"; /*Address of value 17bit contain SERVO, BRAKE, STATUS OF SERVO*/
 
         #region Angle
         public const string R_POSITION_1 = "D0"; /* Address of angle 1 */
