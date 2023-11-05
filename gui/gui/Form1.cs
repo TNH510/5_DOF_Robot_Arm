@@ -43,15 +43,9 @@ namespace gui
 
         }
         #region Functions
-        private async void Timer1_Tick(object sender, EventArgs e)
+        private void Timer1_Tick(object sender, EventArgs e)
         {
-            if (this.Connect_button.Enabled == false)
-            {
-                await Task.Run(async () =>
-                {
-                    await Forward_Kinematic();
-                });
-            }
+            Forward_Kinematic();
         }
         public void ChangeColorObject(object objectin, Color color_object)
         {
@@ -132,7 +126,7 @@ namespace gui
         {
             return (value_positon2 << 16 | value_positon1) - 18000000;
         }
-        public async Task Forward_Kinematic()
+        public void Forward_Kinematic()
         {
             const int NUM_AFTER_COMMA = 5;
             int t1, t2, t3, t4, t5;
@@ -194,8 +188,8 @@ namespace gui
                 Pitch_curpos.Text = Convert.ToString(Math.Round(t2_out + t3_out + t4_out, NUM_AFTER_COMMA));
                 Roll_curpos.Text = Convert.ToString(Math.Round(t1_out + t5_out, NUM_AFTER_COMMA));
             }
-            await Task.Delay(1);
-            return;
+            //await Task.Delay(1);
+            //return;
         }
         public int Check_angle(double t1, double t2, double t3, double t4, double t5)
         {
@@ -227,6 +221,8 @@ namespace gui
 
         private void Connect_button_Click(object sender, EventArgs e)
         {
+            /* Timer start */
+            Timer1.Start();
             /* Declare the variable(s) */
             int ret;
             /* A logical station number set in Communication Setup Utility - Datasheet - Page 61 */
@@ -602,6 +598,7 @@ namespace gui
 
         }
         #endregion
+
 
 
 

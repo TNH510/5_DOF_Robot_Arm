@@ -681,6 +681,11 @@
             label13.TabIndex = 0;
             label13.Text = "Point to Point";
             // 
+            // Timer1
+            // 
+            Timer1.Interval = 250;
+            Timer1.Tick += Timer1_Tick;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
