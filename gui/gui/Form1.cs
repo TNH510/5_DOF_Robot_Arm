@@ -515,18 +515,18 @@ namespace gui
                 //gamma = double.Parse(Position_G.Text);
                 //velocity = double.Parse(Position_Time.Text);
                 (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
-                //ret = Check_angle(t1, t2, t3, t4, t5);
-                //if (ret != 0)
-                //{
-                //    double theta = 0.0;
-                //    if (ret == 1) theta = t1;
-                //    else if (ret == 2) theta = t2;
-                //    else if (ret == 3) theta = t3;
-                //    else if (ret == 4) theta = t4;
-                //    else if (ret == 5) theta = t5;
-                //    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
-                //    return;
-                //}
+                ret = Check_angle(t1, t2, t3, t4, t5);
+                if (ret != 0)
+                {
+                    double theta = 0.0;
+                    if (ret == 1) theta = t1;
+                    else if (ret == 2) theta = t2;
+                    else if (ret == 3) theta = t3;
+                    else if (ret == 4) theta = t4;
+                    else if (ret == 5) theta = t5;
+                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
+                    return;
+                }
                 t2 -= 90.0;
                 t3 += 90.0;
                 t4 += 90.0;
