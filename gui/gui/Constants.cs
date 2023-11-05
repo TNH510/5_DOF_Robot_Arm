@@ -9,14 +9,11 @@ namespace gui
     static class Constants
     {
         /* Robot Arm */
-        public const double l1 = 240.0;
-        public const double l2 = 150.0;
-        public const double l3 = 450.0;
-        public const double l4 = 200.0;
-        public const double l5 = 500.0;
-        public const double l6 = 50.0;
-        public const double l7 = 100.0;
-        public const double l8 = 0.0;
+        public const double l1 = 690.0;
+        public const double l2 = 440.0;
+        public const double l3 = 500.0;
+        public const double l4 = 0.0;
+        public const double l5 = 230.0;
 
         public const double T1_LU = 110.0;
         public const double T1_LD = -95.0;
