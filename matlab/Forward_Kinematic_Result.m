@@ -5,15 +5,13 @@ syms th1 th2 th3 th4 th5
 th1 = 0;
 th2 = 0;
 th3 = pi/12;
-th4 = -7*pi/12;
+th4 = pi/2;
 
-l1 = 240;
-l4 = 200;
-l2 = 150;
-l3 = 450;
-l5 = 500;
-l6 = 50;
-l7 = 100; l8 = 0;
+l1 = 690.0;
+l2 = 440.0;
+l3 = 500.0;
+l4 = 0.0;
+l5 = 230.0;
 
 px = cos(th1)*(l3*cos(th2 + th3) + l2*cos(th2) + l5*cos(th2 + th3 + th4))
 py = sin(th1)*(l3*cos(th2 + th3) + l2*cos(th2) + l5*cos(th2 + th3 + th4))

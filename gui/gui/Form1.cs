@@ -43,16 +43,16 @@ namespace gui
 
         }
         #region Functions
-        //private async void Timer1_Tick(object sender, EventArgs e)
-        //{
-        //    if (this.Connect_button.Enabled == false)
-        //    {
-        //        await Task.Run(async () =>
-        //        {
-        //            await Forward_Kinematic();
-        //        });
-        //    }
-        //}
+        private async void Timer1_Tick(object sender, EventArgs e)
+        {
+            if (this.Connect_button.Enabled == false)
+            {
+                await Task.Run(async () =>
+                {
+                    await Forward_Kinematic();
+                });
+            }
+        }
         public void ChangeColorObject(object objectin, Color color_object)
         {
             var button = objectin as Button;
@@ -132,55 +132,71 @@ namespace gui
         {
             return (value_positon2 << 16 | value_positon1) - 18000000;
         }
-        //public async Task Forward_Kinematic()
-        //{
-        //    int NUM_AFTER_COMMA = 5;
-        //    int t1, t2, t3, t4, t5;
-        //    int[] value_positon = new int[16];
-        //    double t1_out, t2_out, t3_out, t4_out, t5_out;
-        //    double t1_dh, t2_dh, t3_dh, t4_dh, x, y, z;
-        //    if (this.Connect_button.Enabled == false)
-        //    {
-        //        plc.ReadDeviceBlock(Constants.R_POSITION, 12, out value_positon[0]);
-        //        //plc.ReadDeviceBlock("D8021", 4, out adc_raw[0]);
+        public async Task Forward_Kinematic()
+        {
+            const int NUM_AFTER_COMMA = 5;
+            int t1, t2, t3, t4, t5;
+            int[] value_positon = new int[16];
+            double t1_out, t2_out, t3_out, t4_out, t5_out;
+            double t1_dh, t2_dh, t3_dh, t4_dh, x, y, z;
+            if (this.Connect_button.Enabled == false)
+            {
+                /* Read position of 5 angle */
+                plc.ReadDeviceBlock(Constants.R_POSITION_1, 2, out value_positon[0]);
+                plc.ReadDeviceBlock(Constants.R_POSITION_2, 2, out value_positon[2]);
+                plc.ReadDeviceBlock(Constants.R_POSITION_3, 2, out value_positon[4]);
+                plc.ReadDeviceBlock(Constants.R_POSITION_4, 2, out value_positon[6]);
+                plc.ReadDeviceBlock(Constants.R_POSITION_5, 2, out value_positon[8]);
 
-        //        t1 = Read_Position(value_positon[0], value_positon[1]);
-        //        t2 = Read_Position(value_positon[2], value_positon[3]);
-        //        t3 = Read_Position(value_positon[4], value_positon[5]);
-        //        t4 = Read_Position(value_positon[6], value_positon[7]);
-        //        t5 = Read_Position(value_positon[8], value_positon[9]);
-        //        // MCode.Text = Convert.ToString(value_positon[10]);
+                // Read and convert driver angle value to real position value (was subtracted by 180)
+                t1 = Read_Position(value_positon[0], value_positon[1]);
+                t2 = Read_Position(value_positon[2], value_positon[3]);
+                t3 = Read_Position(value_positon[4], value_positon[5]);
+                t4 = Read_Position(value_positon[6], value_positon[7]);
+                t5 = Read_Position(value_positon[8], value_positon[9]);
 
-        //        t1_out = double.Parse(Convert.ToString(t1)) / 100000;
-        //        t2_out = double.Parse(Convert.ToString(t2)) / 100000;
-        //        t3_out = double.Parse(Convert.ToString(t3)) / 100000;
-        //        t4_out = double.Parse(Convert.ToString(t4)) / 100000;
-        //        t5_out = double.Parse(Convert.ToString(t5)) / 100000;
-        //        /* Transfer the angle value into float */
-        //        t1_out = Math.Round(t1_out, NUM_AFTER_COMMA);
-        //        t2_out = Math.Round(t2_out, NUM_AFTER_COMMA);
-        //        t3_out = Math.Round(t3_out, NUM_AFTER_COMMA);
-        //        t4_out = Math.Round(t4_out, NUM_AFTER_COMMA);
-        //        t5_out = Math.Round(t5_out, NUM_AFTER_COMMA);
-        //        /* Convert the angle from degree to radian */
-        //        t1_dh = t1_out / 180 * Math.PI;
-        //        t2_dh = (t2_out + 90) / 180 * Math.PI;
-        //        t3_dh = (t3_out - 90) / 180 * Math.PI;
-        //        t4_dh = (t4_out - 90) / 180 * Math.PI;
+                // Convert theta read from int to double
+                t1_out = double.Parse(Convert.ToString(t1)) / 100000.0;
+                t2_out = double.Parse(Convert.ToString(t2)) / 100000.0;
+                t3_out = double.Parse(Convert.ToString(t3)) / 100000.0;
+                t4_out = double.Parse(Convert.ToString(t4)) / 100000.0;
+                t5_out = double.Parse(Convert.ToString(t5)) / 100000.0;
 
-        //        x = Math.Cos(t1_dh) * (Constants.l2 * Math.Cos(t2_dh) + Constants.l3 * Math.Cos(t2_dh + t3_dh) + Constants.l4 * Math.Cos(t2_dh + t3_dh + t4_dh));
-        //        y = Math.Sin(t1_dh) * (Constants.l2 * Math.Cos(t2_dh) + Constants.l3 * Math.Cos(t2_dh + t3_dh) + Constants.l4 * Math.Cos(t2_dh + t3_dh + t4_dh));
-        //        z = Constants.l1 + Constants.l2 * Math.Sin(t2_dh) + Constants.l3 * Math.Sin(t2_dh + t3_dh) + Constants.l4 * Math.Sin(t2_dh + t3_dh + t4_dh);
+                /* Transfer the angle value into float */
+                t1_out = Math.Round(t1_out, NUM_AFTER_COMMA);
+                t2_out = Math.Round(t2_out, NUM_AFTER_COMMA);
+                t3_out = Math.Round(t3_out, NUM_AFTER_COMMA);
+                t4_out = Math.Round(t4_out, NUM_AFTER_COMMA);
+                t5_out = Math.Round(t5_out, NUM_AFTER_COMMA);
 
-        //        X_curpos.Text = Convert.ToString(Math.Round(x, NUM_AFTER_COMMA));
-        //        Y_curpos.Text = Convert.ToString(Math.Round(y, NUM_AFTER_COMMA));
-        //        Z_curpos.Text = Convert.ToString(Math.Round(z, NUM_AFTER_COMMA));
-        //        Pitch_curpos.Text = Convert.ToString(Math.Round(t2_out + t3_out + t4_out, NUM_AFTER_COMMA));
-        //        Roll_curpos.Text = Convert.ToString(Math.Round(t1_out + t5_out, NUM_AFTER_COMMA));
-        //    }
-        //    await Task.Delay(1);
-        //    return;
-        //}
+                // Convert the angle from degree to radian and define actual initial position
+                t1_dh = t1_out / 180 * Math.PI;
+                t2_dh = (t2_out + 90) / 180 * Math.PI;
+                t3_dh = (t3_out - 90) / 180 * Math.PI;
+                t4_dh = (t4_out - 90) / 180 * Math.PI;
+
+                /* Test forward kinematic manually 
+                t1_dh = Convert.ToDouble(t1_tb.Text) / 180 * Math.PI;
+                t2_dh = (Convert.ToDouble(t2_tb.Text)) / 180 * Math.PI;
+                t3_dh = (Convert.ToDouble(t3_tb.Text)) / 180 * Math.PI;
+                t4_dh = (Convert.ToDouble(t4_tb.Text)) / 180 * Math.PI;
+                */
+
+                // Caculate Foward Kinematic
+                x = Math.Cos(t1_dh) * (Constants.l2 * Math.Cos(t2_dh) + Constants.l3 * Math.Cos(t2_dh + t3_dh) + Constants.l5 * Math.Cos(t2_dh + t3_dh + t4_dh));
+                y = Math.Sin(t1_dh) * (Constants.l2 * Math.Cos(t2_dh) + Constants.l3 * Math.Cos(t2_dh + t3_dh) + Constants.l5 * Math.Cos(t2_dh + t3_dh + t4_dh));
+                z = Constants.l1 + Constants.l2 * Math.Sin(t2_dh) + Constants.l3 * Math.Sin(t2_dh + t3_dh) + Constants.l5 * Math.Sin(t2_dh + t3_dh + t4_dh);
+
+                // Display position value into screen
+                X_curpos.Text = Convert.ToString(Math.Round(x, NUM_AFTER_COMMA));
+                Y_curpos.Text = Convert.ToString(Math.Round(y, NUM_AFTER_COMMA));
+                Z_curpos.Text = Convert.ToString(Math.Round(z, NUM_AFTER_COMMA));
+                Pitch_curpos.Text = Convert.ToString(Math.Round(t2_out + t3_out + t4_out, NUM_AFTER_COMMA));
+                Roll_curpos.Text = Convert.ToString(Math.Round(t1_out + t5_out, NUM_AFTER_COMMA));
+            }
+            await Task.Delay(1);
+            return;
+        }
         public int Check_angle(double t1, double t2, double t3, double t4, double t5)
         {
             if ((t1 > Constants.T1_LU) || (t1 < Constants.T1_LD) || double.IsNaN(t1))
@@ -415,7 +431,12 @@ namespace gui
             double t1_dh, t2_dh, t3_dh, t4_dh, x, y, z;
             if (this.Connect_button.Enabled == false)
             {
-                plc.ReadDeviceBlock(Constants.R_POSITION, 12, out value_positon[0]);
+                /* Read position of 5 angle */
+                plc.ReadDeviceBlock(Constants.R_POSITION_1, 2, out value_positon[0]);
+                plc.ReadDeviceBlock(Constants.R_POSITION_2, 2, out value_positon[2]);
+                plc.ReadDeviceBlock(Constants.R_POSITION_3, 2, out value_positon[4]);
+                plc.ReadDeviceBlock(Constants.R_POSITION_4, 2, out value_positon[6]);
+                plc.ReadDeviceBlock(Constants.R_POSITION_5, 2, out value_positon[8]);
 
                 // Read and convert driver angle value to real position value (was subtracted by 180)
                 t1 = Read_Position(value_positon[0], value_positon[1]);
@@ -443,6 +464,13 @@ namespace gui
                 t2_dh = (t2_out + 90) / 180 * Math.PI;
                 t3_dh = (t3_out - 90) / 180 * Math.PI;
                 t4_dh = (t4_out - 90) / 180 * Math.PI;
+
+                /* Test forward kinematic manually 
+                t1_dh = Convert.ToDouble(t1_tb.Text) / 180 * Math.PI;
+                t2_dh = (Convert.ToDouble(t2_tb.Text)) / 180 * Math.PI;
+                t3_dh = (Convert.ToDouble(t3_tb.Text)) / 180 * Math.PI;
+                t4_dh = (Convert.ToDouble(t4_tb.Text)) / 180 * Math.PI;
+                */
 
                 // Caculate Foward Kinematic
                 x = Math.Cos(t1_dh) * (Constants.l2 * Math.Cos(t2_dh) + Constants.l3 * Math.Cos(t2_dh + t3_dh) + Constants.l5 * Math.Cos(t2_dh + t3_dh + t4_dh));

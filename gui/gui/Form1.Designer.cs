@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             Connect_Panel = new Panel();
             panel1 = new Panel();
             Disconnect_button = new Button();
@@ -83,6 +84,7 @@
             label11 = new Label();
             X_tb = new TextBox();
             label13 = new Label();
+            Timer1 = new System.Windows.Forms.Timer(components);
             Connect_Panel.SuspendLayout();
             panel1.SuspendLayout();
             panel2.SuspendLayout();
@@ -164,7 +166,7 @@
             ErrorLog.Multiline = true;
             ErrorLog.Name = "ErrorLog";
             ErrorLog.ReadOnly = true;
-            ErrorLog.Size = new Size(432, 238);
+            ErrorLog.Size = new Size(432, 252);
             ErrorLog.TabIndex = 73;
             // 
             // panel2
@@ -417,7 +419,7 @@
             panel10.Controls.Add(label30);
             panel10.Location = new Point(12, 190);
             panel10.Name = "panel10";
-            panel10.Size = new Size(221, 268);
+            panel10.Size = new Size(221, 252);
             panel10.TabIndex = 82;
             // 
             // panel11
@@ -445,7 +447,7 @@
             panel11.Controls.Add(label25);
             panel11.Location = new Point(9, 49);
             panel11.Name = "panel11";
-            panel11.Size = new Size(201, 206);
+            panel11.Size = new Size(201, 192);
             panel11.TabIndex = 81;
             // 
             // Roll_curpos
@@ -771,5 +773,6 @@
         private Label label12;
         private Button Go_button;
         private Button Transmit_button;
+        private System.Windows.Forms.Timer Timer1;
     }
 }

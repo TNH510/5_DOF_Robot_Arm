@@ -2,14 +2,11 @@ clc % clear CW
 syms th1 th2 th3 th4 th5 roll pitch m n px py pz c3 s3 c2 s2 A
 syms l1 l2 l3 l4 l5 l6 l7 l8
 
-l1 = 240; % Used
-l4 = 200;
-l2 = 150; 
-l3 = 450; % Used
-l5 = 500; % Used
-l6 = 50;
-l7 = 100; % Used
-l8 = 0;
+l1 = 690.0;
+l2 = 440.0;
+l3 = 500.0;
+l4 = 0.0;
+l5 = 230.0;
 
 px = 584.6666;
 

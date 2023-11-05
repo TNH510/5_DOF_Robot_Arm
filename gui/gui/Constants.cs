@@ -33,7 +33,15 @@ namespace gui
         public const string R_SERVO_ON = "M516"; /*Address of reg Servo ON*/
         public const string R_SETHOME = "M1999"; /*Address of reg BRAKE*/
         public const string R_STATUS = "M8000"; /*Address of value 17bit contain SERVO, BRAKE, STATUS OF SERVO*/
-        public const string R_POSITION = "D1010"; /* Address of angle */
+
+        #region Angle
+        public const string R_POSITION_1 = "D0"; /* Address of angle 1 */
+        public const string R_POSITION_2 = "D20"; /* Address of angle 2 */
+        public const string R_POSITION_3 = "D40"; /* Address of angle 3 */
+        public const string R_POSITION_4 = "D60"; /* Address of angle 4 */
+        public const string R_POSITION_5 = "D80"; /* Address of angle 5 */
+        #endregion Angle
+
         public const string R_P2P_DATA = "D1000"; /*Address of value 17bit contain SERVO, BRAKE, STATUS OF SERVO*/
         public const string R_P2P_TRIGGER = "M517";
         public const string R_STOP_SERVO = "M4096";
