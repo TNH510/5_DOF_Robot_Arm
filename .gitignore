@@ -4,6 +4,7 @@
 # Folder
 *.gui/gui/bin
 *.gui/gui/obj
+*.gui/gui/.vs
 
 # Object files
 *.o
