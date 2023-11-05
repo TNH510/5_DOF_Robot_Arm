@@ -9,9 +9,9 @@
 *.CoreCompileInputs.cache
 *.FileListAbsolute.txt
 *.genruntimeconfig.cache
-gui/gui/obj/Debug/net6.0-windows/ref/gui.dll
-gui/gui/obj/Debug/net6.0-windows/refint/gui.dll
-gui/gui/obj/Debug/net6.0-windows/apphost.exe
+gui/gui/obj/Debug/
+gui/gui/bin/Debug/
+gui/gui/.vs
 
 # Object files
 *.o
