@@ -379,31 +379,43 @@ namespace gui
 
             value_angle[8] = temp_value_5 & 0xFFFF; //byte high for register
             value_angle[9] = (temp_value_5 >> 16) & 0xFFFF; // byte low for register
-
-            plc.WriteDeviceBlock("D1010", 2, ref value_angle[0]);
-            plc.WriteDeviceBlock("D1012", 2, ref value_angle[2]);
-            plc.WriteDeviceBlock("D1014", 2, ref value_angle[4]);
-            plc.WriteDeviceBlock("D1016", 2, ref value_angle[6]);
-            plc.WriteDeviceBlock("D1018", 2, ref value_angle[8]);
-
-            plc.ReadDeviceBlock("D1010", 2, out value_angle_out[0]);
-            plc.ReadDeviceBlock("D1012", 2, out value_angle_out[2]);
-            plc.ReadDeviceBlock("D1014", 2, out value_angle_out[4]);
-            plc.ReadDeviceBlock("D1016", 2, out value_angle_out[6]);
-            plc.ReadDeviceBlock("D1018", 2, out value_angle_out[8]);
-
-            //PrintLog("Info", "t1", Convert.ToString(t1_out));
-            //PrintLog("Info", "t2", Convert.ToString(t2_out));
-            //PrintLog("Info", "t3", Convert.ToString(t3_out));
-            //PrintLog("Info", "t4", Convert.ToString(t4_out));
-            //PrintLog("Info", "t4", Convert.ToString(t5_out));
+            /* Write the angle */
+            plc.WriteDeviceBlock("D1010", 10, ref value_angle[0]);
         }
         private void Run_button_Click(object sender, EventArgs e)
         {
-
             int ret, run_status;
             string getName = MethodBase.GetCurrentMethod().Name;
             int readbit;
+            int[] value_angle = new int[10];
+            int[] value_angle_out = new int[10];
+
+            /* Run */
+            int temp_value_1 = (int)(Convert.ToDouble(t1_tb.Text) + 180) * 100000;
+            int temp_value_2 = (int)(Convert.ToDouble(t2_tb.Text) + 180) * 100000;
+            int temp_value_3 = (int)(Convert.ToDouble(t3_tb.Text) + 180) * 100000;
+            int temp_value_4 = (int)(Convert.ToDouble(t4_tb.Text) + 180) * 100000;
+            int temp_value_5 = (int)(Convert.ToDouble(t5_tb.Text) + 180) * 100000;
+
+            value_angle[0] = temp_value_1 & 0xFFFF; //byte high for register
+            value_angle[1] = (temp_value_1 >> 16) & 0xFFFF; // byte low for register
+            //t1 = (t1 << 16) & 0xFFFF;
+
+            value_angle[2] = temp_value_2 & 0xFFFF; //byte high for register
+            value_angle[3] = (temp_value_2 >> 16) & 0xFFFF; // byte low for register
+
+            value_angle[4] = temp_value_3 & 0xFFFF; //byte high for register
+            value_angle[5] = (temp_value_3 >> 16) & 0xFFFF; // byte low for register
+
+            value_angle[6] = temp_value_4 & 0xFFFF; //byte high for register
+            value_angle[7] = (temp_value_4 >> 16) & 0xFFFF; // byte low for register
+
+            value_angle[8] = temp_value_5 & 0xFFFF; //byte high for register
+            value_angle[9] = (temp_value_5 >> 16) & 0xFFFF; // byte low for register
+            /* Write the angle */
+            plc.WriteDeviceBlock("D1010", 10, ref value_angle[0]);
+
+            /* Turn on relay */
             /* Read run_status */
             ret = PLCReadbit(Constants.R_RUN, out run_status);
             if (ret != 0)
@@ -430,6 +442,7 @@ namespace gui
             }
             PLCReadbit("M528", out readbit);
             PrintLog("Info", "M528", Convert.ToString(readbit));
+
         }
         private void Start_button_Click(object sender, EventArgs e)
         {
