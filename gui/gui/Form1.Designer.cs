@@ -313,11 +313,10 @@
             // t5_tb
             // 
             t5_tb.BorderStyle = BorderStyle.FixedSingle;
-            t5_tb.Location = new Point(130, 138);
+            t5_tb.Location = new Point(130, 147);
             t5_tb.Margin = new Padding(3, 2, 3, 2);
             t5_tb.Multiline = true;
             t5_tb.Name = "t5_tb";
-            t5_tb.ReadOnly = true;
             t5_tb.Size = new Size(62, 24);
             t5_tb.TabIndex = 82;
             // 
@@ -325,7 +324,7 @@
             // 
             label7.AutoSize = true;
             label7.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
-            label7.Location = new Point(102, 141);
+            label7.Location = new Point(102, 150);
             label7.Name = "label7";
             label7.Size = new Size(22, 19);
             label7.TabIndex = 81;
@@ -334,11 +333,10 @@
             // t4_tb
             // 
             t4_tb.BorderStyle = BorderStyle.FixedSingle;
-            t4_tb.Location = new Point(130, 104);
+            t4_tb.Location = new Point(130, 116);
             t4_tb.Margin = new Padding(3, 2, 3, 2);
             t4_tb.Multiline = true;
             t4_tb.Name = "t4_tb";
-            t4_tb.ReadOnly = true;
             t4_tb.Size = new Size(62, 24);
             t4_tb.TabIndex = 80;
             // 
@@ -346,7 +344,7 @@
             // 
             label5.AutoSize = true;
             label5.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
-            label5.Location = new Point(102, 107);
+            label5.Location = new Point(102, 119);
             label5.Name = "label5";
             label5.Size = new Size(22, 19);
             label5.TabIndex = 79;
@@ -355,11 +353,10 @@
             // t3_tb
             // 
             t3_tb.BorderStyle = BorderStyle.FixedSingle;
-            t3_tb.Location = new Point(130, 75);
+            t3_tb.Location = new Point(130, 84);
             t3_tb.Margin = new Padding(3, 2, 3, 2);
             t3_tb.Multiline = true;
             t3_tb.Name = "t3_tb";
-            t3_tb.ReadOnly = true;
             t3_tb.Size = new Size(62, 24);
             t3_tb.TabIndex = 78;
             // 
@@ -367,7 +364,7 @@
             // 
             label6.AutoSize = true;
             label6.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
-            label6.Location = new Point(102, 77);
+            label6.Location = new Point(102, 86);
             label6.Name = "label6";
             label6.Size = new Size(22, 19);
             label6.TabIndex = 77;
@@ -376,11 +373,10 @@
             // t2_tb
             // 
             t2_tb.BorderStyle = BorderStyle.FixedSingle;
-            t2_tb.Location = new Point(130, 46);
+            t2_tb.Location = new Point(130, 51);
             t2_tb.Margin = new Padding(3, 2, 3, 2);
             t2_tb.Multiline = true;
             t2_tb.Name = "t2_tb";
-            t2_tb.ReadOnly = true;
             t2_tb.Size = new Size(62, 24);
             t2_tb.TabIndex = 76;
             // 
@@ -388,7 +384,7 @@
             // 
             label4.AutoSize = true;
             label4.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
-            label4.Location = new Point(102, 49);
+            label4.Location = new Point(102, 54);
             label4.Name = "label4";
             label4.Size = new Size(22, 19);
             label4.TabIndex = 75;
@@ -401,7 +397,6 @@
             t1_tb.Margin = new Padding(3, 2, 3, 2);
             t1_tb.Multiline = true;
             t1_tb.Name = "t1_tb";
-            t1_tb.ReadOnly = true;
             t1_tb.Size = new Size(62, 24);
             t1_tb.TabIndex = 74;
             // 
@@ -422,7 +417,7 @@
             panel10.Controls.Add(label30);
             panel10.Location = new Point(12, 190);
             panel10.Name = "panel10";
-            panel10.Size = new Size(221, 238);
+            panel10.Size = new Size(221, 268);
             panel10.TabIndex = 82;
             // 
             // panel11
@@ -450,13 +445,13 @@
             panel11.Controls.Add(label25);
             panel11.Location = new Point(9, 49);
             panel11.Name = "panel11";
-            panel11.Size = new Size(201, 174);
+            panel11.Size = new Size(201, 206);
             panel11.TabIndex = 81;
             // 
             // Roll_curpos
             // 
             Roll_curpos.BorderStyle = BorderStyle.FixedSingle;
-            Roll_curpos.Location = new Point(31, 136);
+            Roll_curpos.Location = new Point(31, 147);
             Roll_curpos.Margin = new Padding(3, 2, 3, 2);
             Roll_curpos.Multiline = true;
             Roll_curpos.Name = "Roll_curpos";
@@ -468,7 +463,7 @@
             // 
             label21.AutoSize = true;
             label21.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
-            label21.Location = new Point(5, 138);
+            label21.Location = new Point(5, 149);
             label21.Name = "label21";
             label21.Size = new Size(18, 19);
             label21.TabIndex = 81;
@@ -477,7 +472,7 @@
             // Pitch_curpos
             // 
             Pitch_curpos.BorderStyle = BorderStyle.FixedSingle;
-            Pitch_curpos.Location = new Point(31, 107);
+            Pitch_curpos.Location = new Point(31, 116);
             Pitch_curpos.Margin = new Padding(3, 2, 3, 2);
             Pitch_curpos.Multiline = true;
             Pitch_curpos.Name = "Pitch_curpos";
@@ -489,7 +484,7 @@
             // 
             label22.AutoSize = true;
             label22.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
-            label22.Location = new Point(3, 107);
+            label22.Location = new Point(3, 116);
             label22.Name = "label22";
             label22.Size = new Size(20, 19);
             label22.TabIndex = 79;
@@ -498,7 +493,7 @@
             // Z_curpos
             // 
             Z_curpos.BorderStyle = BorderStyle.FixedSingle;
-            Z_curpos.Location = new Point(31, 75);
+            Z_curpos.Location = new Point(31, 84);
             Z_curpos.Margin = new Padding(3, 2, 3, 2);
             Z_curpos.Multiline = true;
             Z_curpos.Name = "Z_curpos";
@@ -510,7 +505,7 @@
             // 
             label23.AutoSize = true;
             label23.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
-            label23.Location = new Point(3, 77);
+            label23.Location = new Point(3, 86);
             label23.Name = "label23";
             label23.Size = new Size(18, 19);
             label23.TabIndex = 77;
@@ -519,7 +514,7 @@
             // Y_curpos
             // 
             Y_curpos.BorderStyle = BorderStyle.FixedSingle;
-            Y_curpos.Location = new Point(31, 46);
+            Y_curpos.Location = new Point(31, 51);
             Y_curpos.Margin = new Padding(3, 2, 3, 2);
             Y_curpos.Multiline = true;
             Y_curpos.Name = "Y_curpos";
@@ -531,7 +526,7 @@
             // 
             label24.AutoSize = true;
             label24.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
-            label24.Location = new Point(3, 49);
+            label24.Location = new Point(3, 54);
             label24.Name = "label24";
             label24.Size = new Size(18, 19);
             label24.TabIndex = 75;

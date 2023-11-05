@@ -105,20 +105,20 @@ namespace gui
         public static (double, double, double, double, double) convert_position_angle(double x, double y, double z)
         {
             double t1, t2, t3, t4, t5, s2, c2, s3, c3, m, n;
-            double alpha, gamma;
-            alpha = 0.0;
-            gamma = -Math.PI / 2;
+            double roll, pitch;
+            roll = 0.0;
+            pitch = -Math.PI / 2;
             t1 = Math.Atan2(y, x);
-            t5 = alpha - t1;
-            m = Math.Sqrt(x * x + y * y) - Constants.l4 * Math.Cos(gamma);
-            n = z - Constants.l1 - Constants.l4 * Math.Sin(gamma);
+            t5 = roll - t1;
+            m = Math.Sqrt(x * x + y * y);
+            n = z - Constants.l1 + Constants.l5;
             c3 = (m * m + n * n - Constants.l2 * Constants.l2 - Constants.l3 * Constants.l3) / (2 * Constants.l2 * Constants.l3);
             s3 = -1 * Math.Sqrt(1 - c3 * c3);
             t3 = Math.Atan2(s3, c3);
             c2 = m * (Constants.l3 * c3 + Constants.l2) + n * (Constants.l3 * s3);
             s2 = n * (Constants.l3 * c3 + Constants.l2) - m * (Constants.l3 * s3);
             t2 = Math.Atan2(s2, c2);
-            t4 = gamma - t2 - t3;
+            t4 = pitch - t2 - t3;
             t1 = t1 / Math.PI * 180.0;
             t2 = t2 / Math.PI * 180.0;
             t3 = t3 / Math.PI * 180.0;
@@ -447,14 +447,23 @@ namespace gui
                 t3_out = Math.Round(t3_out, diginumber_display);
                 t4_out = Math.Round(t4_out, diginumber_display);
                 t5_out = Math.Round(t5_out, diginumber_display);
+                ///* Convert the angle from degree to radian */
+                //t1_dh = t1_out / 180 * Math.PI;
+                //t2_dh = (t2_out + 90) / 180 * Math.PI;
+                //t3_dh = (t3_out - 90) / 180 * Math.PI;
+                //t4_dh = (t4_out - 90) / 180 * Math.PI;
                 /* Convert the angle from degree to radian */
-                t1_dh = t1_out / 180 * Math.PI;
-                t2_dh = (t2_out + 90) / 180 * Math.PI;
+                t1_dh = Convert.ToInt32(t1_tb.Text) / 180 * Math.PI;
+                t2_dh = (Convert.ToInt32(t2_tb.Text) + 90) / 180 * Math.PI;
                 t3_dh = (t3_out - 90) / 180 * Math.PI;
                 t4_dh = (t4_out - 90) / 180 * Math.PI;
-
-                x = Math.Cos(t1_dh) * (Constants.l2 * Math.Cos(t2_dh) + Constants.l3 * Math.Cos(t2_dh + t3_dh) + Constants.l4 * Math.Cos(t2_dh + t3_dh + t4_dh));
-                y = Math.Sin(t1_dh) * (Constants.l2 * Math.Cos(t2_dh) + Constants.l3 * Math.Cos(t2_dh + t3_dh) + Constants.l4 * Math.Cos(t2_dh + t3_dh + t4_dh));
+                /*
+                px = cos(th1)*(l3*cos(th2 + th3) + l2*cos(th2) + l5*cos(th2 + th3 + th4))
+                py = sin(th1)*(l3*cos(th2 + th3) + l2*cos(th2) + l5*cos(th2 + th3 + th4))
+                pz = l1 + l3*sin(th2 + th3) + l2*sin(th2) + l5*sin(th2 + th3 + th4)
+                */
+                x = Math.Cos(t1_dh) * (Constants.l2 * Math.Cos(t2_dh) + Constants.l3 * Math.Cos(t2_dh + t3_dh) + Constants.l5 * Math.Cos(t2_dh + t3_dh + t4_dh));
+                y = Math.Sin(t1_dh) * (Constants.l2 * Math.Cos(t2_dh) + Constants.l3 * Math.Cos(t2_dh + t3_dh) + Constants.l5 * Math.Cos(t2_dh + t3_dh + t4_dh));
                 z = Constants.l1 + Constants.l2 * Math.Sin(t2_dh) + Constants.l3 * Math.Sin(t2_dh + t3_dh) + Constants.l4 * Math.Sin(t2_dh + t3_dh + t4_dh);
 
                 X_curpos.Text = Convert.ToString(Math.Round(x, diginumber_display));
