@@ -3,6 +3,7 @@
 
 # Folder
 *.gui/gui/bin
+*.gui/gui/obj
 
 # Object files
 *.o
