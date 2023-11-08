@@ -1,0 +1,120 @@
+# Prerequisites
+*.d
+
+# C# project
+*.suo
+*.dll
+*.exe
+*.pdb
+*.CoreCompileInputs.cache
+*.FileListAbsolute.txt
+*.genruntimeconfig.cache
+gui/gui/obj/Debug/
+gui/gui/bin/Debug/
+gui/gui/.vs
+
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
+
+# Linker output
+*.ilk
+*.map
+*.exp
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+# *.lib
+# *.a
+*.la
+*.lo
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+# *.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+# *.hex
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Kernel Module Compile Results
+*.mod*
+*.cmd
+.tmp_versions/
+modules.order
+Module.symvers
+Mkfile.old
+dkms.conf
+
+# Temp files created by most text editors.
+*~
+# Merge files created by git.
+*.orig
+# Reject files created by patch.
+*.rej
+# Byte compiled python modules.
+*.pyc
+venv/
+# vim swap files
+.*.sw?
+.sw?
+
+# Nested build directory
+/build*
+/Debug
+
+# VS2017 config files.
+.vs
+
+# clangd index. (".clangd" is a config file now, thus trailing slash)
+.clangd/
+.cache
+
+# Keil files
+*.uvprojx
+*.uvguix.*
+.uvoptx
+/MDK-ARM/DebugConfig
+*.TMP
+MDK-ARM/EventRecorderStub.scvd
+
+### PSoCCreator ###
+# Modified from https://www.gitignore.io/?templates=psoccreator
+# You may need to add additional directories, e.g. CortexM4/
+
+# Project Settings
+*.cywrk.*
+*.cyprj.*
+
+# Generated Assets and Resources
+Debug/
+Release/
+Export/
+CortexM0/
+CortexM4/
+codegentemp
+# Generated_Source
+# *_datasheet.pdf
+*_timing.html
+*.cycdx
+*.cyfit
+*.rpt
+*.svd
+*.log
