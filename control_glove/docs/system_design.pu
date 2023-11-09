@@ -1,0 +1,9 @@
+@startuml
+
+STM32F4 <- MPU6050_1: theta_1
+STM32F4 <- MPU6050_2: theta_2
+STM32F4 <- HMC5883L: theta_3
+
+STM32F4 -> PC: UART
+
+@enduml
