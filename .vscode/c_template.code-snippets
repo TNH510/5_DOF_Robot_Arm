@@ -1,0 +1,83 @@
+{
+	// Place your global snippets here. Each snippet is defined under a snippet name and has a scope, prefix, body and 
+	// description. Add comma separated ids of the languages where the snippet is applicable in the scope field. If scope 
+	// is left empty or omitted, the snippet gets applied to all languages. The prefix is what is 
+	// used to trigger the snippet and the body will be expanded and inserted. Possible variables are: 
+	// $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders. 
+	// Placeholders with the same ids are connected.
+
+	// Copyright (C) 2023 ITR. All rights reserved.
+	// This project is released under the ITR License.
+	"comment header" : {
+		"prefix": "cmt",
+		"body": "/* $1 ----------------------------------------------------------------- */"
+	},
+	"C Header Template" : {
+		"prefix": "hieu-header",
+		"body": [
+			 "/**"
+			," * @file       $1.h"
+			," * @copyright  Copyright (C) $5 TNH510"
+			," * @version    1.0.0"
+			," * @date       $5-$6"
+			," * @author     $4"
+			," * @brief      $3"
+			," * @note       None"
+			," */"
+			,"/* Define to prevent recursive inclusion ------------------------------------ */"
+			,"#ifndef __$2_H"
+			,"#define __$2_H"
+			,""
+			,"#ifdef __cplusplus"
+			,"extern \"C\" {"
+			,"#endif"
+			,""
+			,"/* Includes ----------------------------------------------------------------- */"
+			,"#include <stdint.h>"
+			,""
+			,"/* Public defines ----------------------------------------------------------- */"
+			,"/* Public enumerate/structure ----------------------------------------------- */"
+			,"/* Public macros ------------------------------------------------------------ */"
+			,"/* Public variables --------------------------------------------------------- */"
+			,"/* Public APIs -------------------------------------------------------------- */"
+			,"\n"
+			,"/* -------------------------------------------------------------------------- */"
+			,"#ifdef __cplusplus"
+			,"} /* extern \"C\" { */"
+			,"#endif"
+			,""
+			,"#endif /* __$2_H */"
+			,""
+			,"/* End of file -------------------------------------------------------------- */\n"
+		]
+	},
+	"C Source Template" : {
+		"prefix": "hieu-src",
+		"body": [
+			 "/**"
+			," * @file       $1.c"
+			," * @copyright  Copyright (C) $5 TNH510"
+			," * @version    1.0.0"
+			," * @date       $4-$5"
+			," * @author     $3"
+			," * @brief      $2"
+			," * @note       None"
+			," */"
+			,"/* Public includes ---------------------------------------------------------- */"
+			,"#include \"$1.h\"\n"
+			,"/* Private includes --------------------------------------------------------- */"
+			,"/* Private defines ---------------------------------------------------------- */"
+			,"/* Private enumerate/structure ---------------------------------------------- */"
+			,"/* Private macros ----------------------------------------------------------- */"
+			,"/* Public variables --------------------------------------------------------- */"
+			,"/* Private variables -------------------------------------------------------- */"
+			,"/* Private prototypes ------------------------------------------------------- */"
+			,"/* Public implementations --------------------------------------------------- */"
+			,"\n"
+			,"/* Private implementations -------------------------------------------------- */"
+			,"\n"
+			,"/* End of file -------------------------------------------------------------- */\n"
+		]
+	},
+
+}
