@@ -19,27 +19,12 @@
 #include <stdbool.h>
 #include <stdint.h>
 /* Public defines ----------------------------------------------------- */
-#define BUTTON_1_Pin       GPIO_PIN_15
-#define BUTTON_1_GPIO_Port GPIOA
-#define BUTTON_1_EXTI_IRQn EXTI15_10_IRQn
-#define BUTTON_4_Pin       GPIO_PIN_10
-#define BUTTON_4_GPIO_Port GPIOC
-#define BUTTON_4_EXTI_IRQn EXTI15_10_IRQn
-#define BUTTON_5_Pin       GPIO_PIN_12
-#define BUTTON_5_GPIO_Port GPIOC
-#define BUTTON_5_EXTI_IRQn EXTI15_10_IRQn
-#define BUTTON_2_Pin       GPIO_PIN_7
-#define BUTTON_2_GPIO_Port GPIOB
-#define BUTTON_2_EXTI_IRQn EXTI9_5_IRQn
-#define BUTTON_3_Pin       GPIO_PIN_2
-#define BUTTON_3_GPIO_Port GPIOC
-#define BUTTON_3_EXTI_IRQn EXTI2_IRQn
-#define BUTTON_6_Pin       GPIO_PIN_3
-#define BUTTON_6_GPIO_Port GPIOC
-#define BUTTON_6_EXTI_IRQn EXTI3_IRQn
+#define USER_BUTTON_Pin GPIO_PIN_14
+#define USER_BUTTON_GPIO_Port GPIOC
+#define USER_BUTTON_EXTI_IRQn EXTI15_10_IRQn
 
 /* Number of button */
-#define BUTTON_MAX         (6)
+#define BUTTON_MAX         (1)
 /* Public enumerate/structure ----------------------------------------- */
 /**
  * @brief Enum for button events

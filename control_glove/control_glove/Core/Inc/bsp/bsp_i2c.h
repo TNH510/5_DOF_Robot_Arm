@@ -23,7 +23,7 @@
 #include <stdio.h>
 /* Public defines ----------------------------------------------------- */
 #define BSP_I2C1    1
-#define BSP_I2C3    1
+#define BSP_I2C2    1
 #define BSP_I2C_DMA 1
 /* Public enumerate/structure ----------------------------------------- */
 
