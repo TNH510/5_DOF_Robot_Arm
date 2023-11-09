@@ -54,12 +54,12 @@ void drv_button_check_event(button_name_t *button_state)
     /* Export state to global variable */
     if (drv_button.button_event_button_1 == CLICK_EVENT)  // Right
     {
-        *button_state = CLICK_RIGHT_BUTTON;
+        *button_state = CLICK_SELECT_BUTTON;
     }
 
     else if (drv_button.button_event_button_1 == HOLD_EVENT)
     {
-        *button_state = HOLD_RIGHT_BUTTON;
+        *button_state = HOLD_SELECT_BUTTON;
     }
 
     if (drv_button.button_event_button_1 == INVALID_EVENT)
