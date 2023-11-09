@@ -56,7 +56,7 @@
 		"body": [
 			 "/**"
 			," * @file       $1.c"
-			," * @copyright  Copyright (C) $5 TNH510"
+			," * @copyright  Copyright (C) $4 TNH510"
 			," * @version    1.0.0"
 			," * @date       $4-$5"
 			," * @author     $3"

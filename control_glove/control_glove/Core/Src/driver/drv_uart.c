@@ -21,7 +21,7 @@
 /* Private macros ----------------------------------------------------- */
 
 /* Public variables --------------------------------------------------- */
-extern UART_HandleTypeDef huart2;
+extern UART_HandleTypeDef huart1;
 extern uint8_t rx_buffer_user[RX_BUFFER_SIZE];
 extern cbuffer_t cb;
 /* Private variables -------------------------------------------------- */
@@ -38,13 +38,13 @@ drv_uart_error_t drv_uart_init(void)
 
 drv_uart_error_t drv_uart_printf(uint8_t *string)
 {
-    bsp_uart_printf(&huart2, string);
+    bsp_uart_printf(&huart1, string);
     return DRV_UART_OK;
 }
 
 drv_uart_error_t drv_uart_receive(void)
 {
-    bsp_uart_receive_to_idle_dma(&huart2, rx_buffer_user, RX_BUFFER_SIZE);
+    bsp_uart_receive_to_idle_dma(&huart1, rx_buffer_user, RX_BUFFER_SIZE);
 }
 
 uint32_t drv_uart_num_unread_cb_data(void)
