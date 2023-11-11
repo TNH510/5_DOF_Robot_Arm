@@ -72,6 +72,11 @@
             label30 = new Label();
             panel6 = new Panel();
             panel7 = new Panel();
+            Trasmit_1 = new Button();
+            Test_run = new Button();
+            Speed_button = new Button();
+            label14 = new Label();
+            Speed_tb = new TextBox();
             label3 = new Label();
             Z2_tb = new TextBox();
             label9 = new Label();
@@ -164,11 +169,11 @@
             // ErrorLog
             // 
             ErrorLog.BorderStyle = BorderStyle.FixedSingle;
-            ErrorLog.Location = new Point(299, 199);
+            ErrorLog.Location = new Point(492, 199);
             ErrorLog.Multiline = true;
             ErrorLog.Name = "ErrorLog";
             ErrorLog.ReadOnly = true;
-            ErrorLog.Size = new Size(371, 256);
+            ErrorLog.Size = new Size(528, 256);
             ErrorLog.TabIndex = 73;
             // 
             // panel2
@@ -258,7 +263,7 @@
             // 
             panel4.BorderStyle = BorderStyle.FixedSingle;
             panel4.Controls.Add(test_button);
-            panel4.Location = new Point(936, 12);
+            panel4.Location = new Point(1041, 12);
             panel4.Name = "panel4";
             panel4.Size = new Size(314, 269);
             panel4.TabIndex = 2;
@@ -275,7 +280,7 @@
             // 
             // Run_button
             // 
-            Run_button.Location = new Point(229, 51);
+            Run_button.Location = new Point(451, 51);
             Run_button.Name = "Run_button";
             Run_button.Size = new Size(113, 29);
             Run_button.TabIndex = 74;
@@ -380,7 +385,7 @@
             panel10.Controls.Add(label30);
             panel10.Location = new Point(11, 199);
             panel10.Name = "panel10";
-            panel10.Size = new Size(281, 256);
+            panel10.Size = new Size(475, 256);
             panel10.TabIndex = 82;
             // 
             // panel11
@@ -528,12 +533,17 @@
             panel6.Controls.Add(label13);
             panel6.Location = new Point(425, 12);
             panel6.Name = "panel6";
-            panel6.Size = new Size(465, 181);
+            panel6.Size = new Size(595, 181);
             panel6.TabIndex = 75;
             // 
             // panel7
             // 
             panel7.BorderStyle = BorderStyle.FixedSingle;
+            panel7.Controls.Add(Trasmit_1);
+            panel7.Controls.Add(Test_run);
+            panel7.Controls.Add(Speed_button);
+            panel7.Controls.Add(label14);
+            panel7.Controls.Add(Speed_tb);
             panel7.Controls.Add(label3);
             panel7.Controls.Add(Z2_tb);
             panel7.Controls.Add(label9);
@@ -551,8 +561,57 @@
             panel7.Controls.Add(X_tb);
             panel7.Location = new Point(11, 49);
             panel7.Name = "panel7";
-            panel7.Size = new Size(436, 127);
+            panel7.Size = new Size(579, 127);
             panel7.TabIndex = 1;
+            // 
+            // Trasmit_1
+            // 
+            Trasmit_1.Location = new Point(334, 18);
+            Trasmit_1.Name = "Trasmit_1";
+            Trasmit_1.Size = new Size(113, 29);
+            Trasmit_1.TabIndex = 95;
+            Trasmit_1.Text = "Transmit_pos2";
+            Trasmit_1.UseVisualStyleBackColor = true;
+            Trasmit_1.Click += Trasmit_1_Click;
+            // 
+            // Test_run
+            // 
+            Test_run.Location = new Point(215, 79);
+            Test_run.Name = "Test_run";
+            Test_run.Size = new Size(113, 29);
+            Test_run.TabIndex = 94;
+            Test_run.Text = "Run_2_pos";
+            Test_run.UseVisualStyleBackColor = true;
+            Test_run.Click += Test_run_Click;
+            // 
+            // Speed_button
+            // 
+            Speed_button.Location = new Point(215, 47);
+            Speed_button.Name = "Speed_button";
+            Speed_button.Size = new Size(113, 29);
+            Speed_button.TabIndex = 93;
+            Speed_button.Text = "Speed";
+            Speed_button.UseVisualStyleBackColor = true;
+            Speed_button.Click += Speed_button_Click;
+            // 
+            // label14
+            // 
+            label14.AutoSize = true;
+            label14.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
+            label14.Location = new Point(209, 20);
+            label14.Name = "label14";
+            label14.Size = new Size(51, 19);
+            label14.TabIndex = 92;
+            label14.Text = "Speed";
+            // 
+            // Speed_tb
+            // 
+            Speed_tb.Location = new Point(266, 19);
+            Speed_tb.Multiline = true;
+            Speed_tb.Name = "Speed_tb";
+            Speed_tb.Size = new Size(62, 24);
+            Speed_tb.TabIndex = 91;
+            Speed_tb.Text = "0";
             // 
             // label3
             // 
@@ -613,7 +672,7 @@
             // 
             // pRu_button
             // 
-            pRu_button.Location = new Point(229, 86);
+            pRu_button.Location = new Point(451, 83);
             pRu_button.Name = "pRu_button";
             pRu_button.Size = new Size(113, 29);
             pRu_button.TabIndex = 84;
@@ -623,7 +682,7 @@
             // 
             // Transmit_button
             // 
-            Transmit_button.Location = new Point(229, 18);
+            Transmit_button.Location = new Point(451, 18);
             Transmit_button.Name = "Transmit_button";
             Transmit_button.Size = new Size(113, 29);
             Transmit_button.TabIndex = 75;
@@ -798,5 +857,10 @@
         private TextBox Y2_tb;
         private Label label10;
         private TextBox X2_tb;
+        private Label label14;
+        private TextBox Speed_tb;
+        private Button Speed_button;
+        private Button Test_run;
+        private Button Trasmit_1;
     }
 }

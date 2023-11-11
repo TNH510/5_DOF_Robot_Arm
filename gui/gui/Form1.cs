@@ -504,6 +504,7 @@ namespace gui
                 x = double.Parse(X_tb.Text);
                 y = double.Parse(Y_tb.Text);
                 z = double.Parse(Z_tb.Text);
+
                 //alpha = double.Parse(Position_P.Text);
                 //gamma = double.Parse(Position_G.Text);
                 //velocity = double.Parse(Position_Time.Text);
@@ -703,18 +704,186 @@ namespace gui
                 value_angle[8 * j + 6] = Write_Theta(angle_array[j, 3])[0];
                 value_angle[8 * j + 7] = Write_Theta(angle_array[j, 3])[1];
 
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 1]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 2]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 3]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 4]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 5]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 6]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 7]));
+                PrintLog("vect", "value" + 8 + j, Convert.ToString(value_angle[8 * j]));
+                PrintLog("vect", "value" + (8 * j + 1), Convert.ToString(value_angle[8 * j + 1]));
+                PrintLog("vect", "value" + (8 * j + 2), Convert.ToString(value_angle[8 * j + 2]));
+                PrintLog("vect", "value" + (8 * j + 3), Convert.ToString(value_angle[8 * j + 3]));
+                PrintLog("vect", "value" + (8 * j + 4), Convert.ToString(value_angle[8 * j + 4]));
+                PrintLog("vect", "value" + (8 * j + 5), Convert.ToString(value_angle[8 * j + 5]));
+                PrintLog("vect", "value" + (8 * j + 6), Convert.ToString(value_angle[8 * j + 6]));
+                PrintLog("vect", "value" + (8 * j + 7), Convert.ToString(value_angle[8 * j + 7]));
 
             }
             plc.WriteDeviceBlock("D1010", 16, ref value_angle[0]);
 
+        }
+
+        private void Speed_button_Click(object sender, EventArgs e)
+        {
+            int speed = 0;
+            speed = Convert.ToInt32(Speed_tb.Text) * 1000;
+            int[] value_speed = new int[2];
+            value_speed[0] = speed & 0xFFFF; //byte high for register
+            value_speed[1] = (speed >> 16) & 0xFFFF; // byte low for register
+            /* Write the angle */
+            plc.WriteDeviceBlock("D1008", 2, ref value_speed[0]);
+        }
+
+        private void Test_run_Click(object sender, EventArgs e)
+        {
+            int ret, run_status;
+            string getName = MethodBase.GetCurrentMethod().Name;
+            int readbit;
+            int[] value_angle = new int[20];
+
+            /* Run */
+            int temp_value_1 = (int)(Convert.ToDouble(t1_tb.Text) + 180) * 100000;
+            int temp_value_2 = (int)(Convert.ToDouble(t2_tb.Text) + 180) * 100000;
+            int temp_value_3 = (int)(Convert.ToDouble(t3_tb.Text) + 180) * 100000;
+            int temp_value_4 = (int)(Convert.ToDouble(t4_tb.Text) + 180) * 100000;
+            int temp_value_5 = (int)(Convert.ToDouble(t5_tb.Text) + 180) * 100000;
+
+            value_angle[0] = temp_value_1 & 0xFFFF; //byte high for register
+            value_angle[1] = (temp_value_1 >> 16) & 0xFFFF; // byte low for register
+            //t1 = (t1 << 16) & 0xFFFF;
+
+            value_angle[2] = temp_value_2 & 0xFFFF; //byte high for register
+            value_angle[3] = (temp_value_2 >> 16) & 0xFFFF; // byte low for register
+
+            value_angle[4] = temp_value_3 & 0xFFFF; //byte high for register
+            value_angle[5] = (temp_value_3 >> 16) & 0xFFFF; // byte low for register
+
+            value_angle[6] = temp_value_4 & 0xFFFF; //byte high for register
+            value_angle[7] = (temp_value_4 >> 16) & 0xFFFF; // byte low for register
+
+            value_angle[8] = temp_value_5 & 0xFFFF; //byte high for register
+            value_angle[9] = (temp_value_5 >> 16) & 0xFFFF; // byte low for register
+            /* Write the angle */
+            plc.WriteDeviceBlock("D1010", 10, ref value_angle[0]);
+        }
+
+        private void Trasmit_1_Click(object sender, EventArgs e)
+        {
+            double x, y, z, alpha, gamma;
+            double x2, y2, z2;
+            double t1 = 0, t2 = 0, t3 = 0, t4 = 0, t5 = 0;
+            double t12 = 0, t22 = 0, t32 = 0, t42 = 0, t52 = 0;
+            double t1_current, t2_current, t3_current, t4_current, t5_current;
+            double delta_theta1, delta_theta2, delta_theta3, delta_theta4, delta_theta5;
+            double delta_theta_max = -1.0;
+            int t1_out, t2_out, t3_out, t4_out, t5_out, v1_out, v2_out, v3_out, v4_out, v5_out;
+            int[] arr = new int[100];
+            int ret, ret2;
+            int run_status;
+            string getName = MethodBase.GetCurrentMethod().Name;
+            int readbit;
+            int[] value_angle = new int[20];
+            int[] value_angle_out = new int[20];
+
+            try
+            {
+                x = double.Parse(X_tb.Text);
+                y = double.Parse(Y_tb.Text);
+                z = double.Parse(Z_tb.Text);
+
+                x2 = double.Parse(X2_tb.Text);
+                y2 = double.Parse(Y2_tb.Text);
+                z2 = double.Parse(Z2_tb.Text);
+
+                //alpha = double.Parse(Position_P.Text);
+                //gamma = double.Parse(Position_G.Text);
+                //velocity = double.Parse(Position_Time.Text);
+                (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
+                (t12, t22, t32, t42, t52) = convert_position_angle(x2, y2, z2);
+                ret = Check_angle(t1, t2, t3, t4, t5);
+
+                ret2 = Check_angle(t12, t22, t32, t42, t52);
+                if (ret2 != 0)
+                {
+                    double theta = 0.0;
+                    if (ret2 == 1) theta = t12;
+                    else if (ret2 == 2) theta = t22;
+                    else if (ret2 == 3) theta = t32;
+                    else if (ret2 == 4) theta = t42;
+                    else if (ret2 == 5) theta = t52;
+                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret2, theta));
+                    return;
+                }
+
+                if (ret != 0)
+                {
+                    double theta = 0.0;
+                    if (ret == 1) theta = t1;
+                    else if (ret == 2) theta = t2;
+                    else if (ret == 3) theta = t3;
+                    else if (ret == 4) theta = t4;
+                    else if (ret == 5) theta = t5;
+                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
+                    return;
+                }
+                t2 -= 90.0;
+                t3 += 90.0;
+                t4 += 90.0;
+
+                t22 -= 90.0;
+                t32 += 90.0;
+                t42 += 90.0;
+
+            }
+            catch (Exception er)
+            {
+                PrintLog("Bug", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", er));
+            }
+
+
+
+            /* Run */
+            int temp_value_1 = ((int)t1 + 180) * 100000;
+            int temp_value_2 = (int)(t2 + 180) * 100000;
+            int temp_value_3 = (int)(t3 + 180) * 100000;
+            int temp_value_4 = (int)(t4 + 180) * 100000;
+            int temp_value_5 = (int)(t5 + 180) * 100000;
+
+            int temp_value_12 = (int)(t12 + 180) * 100000;
+            int temp_value_22 = (int)(t22 + 180) * 100000;
+            int temp_value_32 = (int)(t32 + 180) * 100000;
+            int temp_value_42 = (int)(t42 + 180) * 100000;
+            int temp_value_52 = (int)(t52 + 180) * 100000;
+
+            value_angle[0] = temp_value_1 & 0xFFFF; //byte high for register
+            value_angle[1] = (temp_value_1 >> 16) & 0xFFFF; // byte low for register
+            //t1 = (t1 << 16) & 0xFFFF;
+
+            value_angle[2] = temp_value_2 & 0xFFFF; //byte high for register
+            value_angle[3] = (temp_value_2 >> 16) & 0xFFFF; // byte low for register
+
+            value_angle[4] = temp_value_3 & 0xFFFF; //byte high for register
+            value_angle[5] = (temp_value_3 >> 16) & 0xFFFF; // byte low for register
+
+            value_angle[6] = temp_value_4 & 0xFFFF; //byte high for register
+            value_angle[7] = (temp_value_4 >> 16) & 0xFFFF; // byte low for register
+
+            //value_angle[8] = temp_value_5 & 0xFFFF; //byte high for register
+            //value_angle[9] = (temp_value_5 >> 16) & 0xFFFF; // byte low for register
+
+            value_angle[8] = temp_value_12 & 0xFFFF; //byte high for register
+            value_angle[9] = (temp_value_12 >> 16) & 0xFFFF; // byte low for register
+            //t1 = (t1 << 16) & 0xFFFF;
+
+            value_angle[10] = temp_value_22 & 0xFFFF; //byte high for register
+            value_angle[11] = (temp_value_22 >> 16) & 0xFFFF; // byte low for register
+
+            value_angle[12] = temp_value_32 & 0xFFFF; //byte high for register
+            value_angle[13] = (temp_value_32 >> 16) & 0xFFFF; // byte low for register
+
+            value_angle[14] = temp_value_42 & 0xFFFF; //byte high for register
+            value_angle[15] = (temp_value_42 >> 16) & 0xFFFF; // byte low for register
+
+            //value_angle[18] = temp_value_52 & 0xFFFF; //byte high for register
+            //value_angle[19] = (temp_value_52 >> 16) & 0xFFFF; // byte low for register
+
+            /* Write the angle */
+            plc.WriteDeviceBlock("D1010", 16, ref value_angle[0]);
         }
     }
 
