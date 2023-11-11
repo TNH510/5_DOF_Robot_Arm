@@ -544,16 +544,16 @@ namespace gui
             int[,] angle_array = new int[10, 4];
             double x, y, z;
             int ret;
-            int[] value_angle = new int[40];
+            int[] value_angle = new int[80];
 
             /* Assign corrdination for each array */
             curr_pos[0] = Convert.ToDouble(X_curpos.Text);
             curr_pos[1] = Convert.ToDouble(Y_curpos.Text);
             curr_pos[2] = Convert.ToDouble(Z_curpos.Text);
 
-            targ_pos[0] = Convert.ToDouble(X_tb.Text);
-            targ_pos[1] = Convert.ToDouble(Y_tb.Text);
-            targ_pos[2] = Convert.ToDouble(Z_tb.Text);
+            targ_pos[0] = Convert.ToDouble(X2_tb.Text);
+            targ_pos[1] = Convert.ToDouble(Y2_tb.Text);
+            targ_pos[2] = Convert.ToDouble(Z2_tb.Text);
 
             /* Referred vector */
             for (int i = 0; i < 3; i++)
