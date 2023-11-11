@@ -563,7 +563,7 @@ namespace gui
             }
 
             /* Linear Equation */
-            for (int t = 0; t < 5; t++)
+            for (int t = 0; t < 10; t++)
             {
                 x = 500 + vect_u[0] * t; /* 500 is the actual position of robot following the x axis */
                 y = 0 + vect_u[1] * t; /* 0 is the actual position of robot following the y axis */
@@ -589,12 +589,8 @@ namespace gui
                 angle_array[t, 1] = ((int)t2 + 180) * 100000;
                 angle_array[t, 2] = ((int)t3 + 180) * 100000;
                 angle_array[t, 3] = ((int)t4 + 180) * 100000;
-                //PrintLog("vect", "value", Convert.ToString(angle_array[t, 0]));
-                //PrintLog("vect", "value", Convert.ToString(angle_array[t, 1]));
-                //PrintLog("vect", "value", Convert.ToString(angle_array[t, 2]));
-                //PrintLog("vect", "value", Convert.ToString(angle_array[t, 3]));
             }
-            for (int j = 0; j < 5; j++)
+            for (int j = 0; j < 10; j++)
             {
 
                 value_angle[8 * j] = Write_Theta(angle_array[j, 0])[0];
@@ -619,7 +615,7 @@ namespace gui
                 PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 7]));
 
             }
-            plc.WriteDeviceBlock("D1100", 40, ref value_angle[0]);
+            plc.WriteDeviceBlock("D1010", 80, ref value_angle[0]);
 
         }
         #endregion
