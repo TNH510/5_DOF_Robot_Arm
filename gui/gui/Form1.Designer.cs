@@ -45,6 +45,7 @@
             ResetError_button = new Button();
             Control_Label = new Label();
             panel4 = new Panel();
+            test_button = new Button();
             Run_button = new Button();
             t5_tb = new TextBox();
             label7 = new Label();
@@ -71,6 +72,12 @@
             label30 = new Label();
             panel6 = new Panel();
             panel7 = new Panel();
+            label3 = new Label();
+            Z2_tb = new TextBox();
+            label9 = new Label();
+            Y2_tb = new TextBox();
+            label10 = new Label();
+            X2_tb = new TextBox();
             pRu_button = new Button();
             Transmit_button = new Button();
             label12 = new Label();
@@ -81,7 +88,6 @@
             X_tb = new TextBox();
             label13 = new Label();
             Timer1 = new System.Windows.Forms.Timer(components);
-            test_button = new Button();
             Connect_Panel.SuspendLayout();
             panel1.SuspendLayout();
             panel2.SuspendLayout();
@@ -252,14 +258,24 @@
             // 
             panel4.BorderStyle = BorderStyle.FixedSingle;
             panel4.Controls.Add(test_button);
-            panel4.Location = new Point(677, 12);
+            panel4.Location = new Point(936, 12);
             panel4.Name = "panel4";
             panel4.Size = new Size(314, 269);
             panel4.TabIndex = 2;
             // 
+            // test_button
+            // 
+            test_button.Location = new Point(3, 9);
+            test_button.Name = "test_button";
+            test_button.Size = new Size(113, 29);
+            test_button.TabIndex = 85;
+            test_button.Text = "Exe";
+            test_button.UseVisualStyleBackColor = true;
+            test_button.Click += test_button_Click;
+            // 
             // Run_button
             // 
-            Run_button.Location = new Point(99, 51);
+            Run_button.Location = new Point(229, 51);
             Run_button.Name = "Run_button";
             Run_button.Size = new Size(113, 29);
             Run_button.TabIndex = 74;
@@ -512,12 +528,18 @@
             panel6.Controls.Add(label13);
             panel6.Location = new Point(425, 12);
             panel6.Name = "panel6";
-            panel6.Size = new Size(247, 181);
+            panel6.Size = new Size(465, 181);
             panel6.TabIndex = 75;
             // 
             // panel7
             // 
             panel7.BorderStyle = BorderStyle.FixedSingle;
+            panel7.Controls.Add(label3);
+            panel7.Controls.Add(Z2_tb);
+            panel7.Controls.Add(label9);
+            panel7.Controls.Add(Y2_tb);
+            panel7.Controls.Add(label10);
+            panel7.Controls.Add(X2_tb);
             panel7.Controls.Add(pRu_button);
             panel7.Controls.Add(Transmit_button);
             panel7.Controls.Add(Run_button);
@@ -529,12 +551,69 @@
             panel7.Controls.Add(X_tb);
             panel7.Location = new Point(11, 49);
             panel7.Name = "panel7";
-            panel7.Size = new Size(220, 127);
+            panel7.Size = new Size(436, 127);
             panel7.TabIndex = 1;
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
+            label3.Location = new Point(115, 20);
+            label3.Name = "label3";
+            label3.Size = new Size(26, 19);
+            label3.TabIndex = 90;
+            label3.Text = "X2";
+            // 
+            // Z2_tb
+            // 
+            Z2_tb.Location = new Point(141, 79);
+            Z2_tb.Multiline = true;
+            Z2_tb.Name = "Z2_tb";
+            Z2_tb.Size = new Size(62, 24);
+            Z2_tb.TabIndex = 89;
+            Z2_tb.Text = "0";
+            // 
+            // label9
+            // 
+            label9.AutoSize = true;
+            label9.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
+            label9.Location = new Point(115, 83);
+            label9.Name = "label9";
+            label9.Size = new Size(26, 19);
+            label9.TabIndex = 88;
+            label9.Text = "Z2";
+            // 
+            // Y2_tb
+            // 
+            Y2_tb.Location = new Point(141, 48);
+            Y2_tb.Multiline = true;
+            Y2_tb.Name = "Y2_tb";
+            Y2_tb.Size = new Size(62, 24);
+            Y2_tb.TabIndex = 87;
+            Y2_tb.Text = "0";
+            // 
+            // label10
+            // 
+            label10.AutoSize = true;
+            label10.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
+            label10.Location = new Point(115, 51);
+            label10.Name = "label10";
+            label10.Size = new Size(26, 19);
+            label10.TabIndex = 86;
+            label10.Text = "Y2";
+            // 
+            // X2_tb
+            // 
+            X2_tb.Location = new Point(141, 19);
+            X2_tb.Multiline = true;
+            X2_tb.Name = "X2_tb";
+            X2_tb.Size = new Size(62, 24);
+            X2_tb.TabIndex = 85;
+            X2_tb.Text = "0";
             // 
             // pRu_button
             // 
-            pRu_button.Location = new Point(99, 86);
+            pRu_button.Location = new Point(229, 86);
             pRu_button.Name = "pRu_button";
             pRu_button.Size = new Size(113, 29);
             pRu_button.TabIndex = 84;
@@ -544,7 +623,7 @@
             // 
             // Transmit_button
             // 
-            Transmit_button.Location = new Point(99, 18);
+            Transmit_button.Location = new Point(229, 18);
             Transmit_button.Name = "Transmit_button";
             Transmit_button.Size = new Size(113, 29);
             Transmit_button.TabIndex = 75;
@@ -558,9 +637,9 @@
             label12.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
             label12.Location = new Point(5, 20);
             label12.Name = "label12";
-            label12.Size = new Size(18, 19);
+            label12.Size = new Size(26, 19);
             label12.TabIndex = 83;
-            label12.Text = "X";
+            label12.Text = "X1";
             // 
             // Z_tb
             // 
@@ -577,9 +656,9 @@
             label8.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
             label8.Location = new Point(5, 83);
             label8.Name = "label8";
-            label8.Size = new Size(18, 19);
+            label8.Size = new Size(26, 19);
             label8.TabIndex = 81;
-            label8.Text = "Z";
+            label8.Text = "Z1";
             // 
             // Y_tb
             // 
@@ -596,9 +675,9 @@
             label11.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
             label11.Location = new Point(5, 51);
             label11.Name = "label11";
-            label11.Size = new Size(18, 19);
+            label11.Size = new Size(26, 19);
             label11.TabIndex = 75;
-            label11.Text = "Y";
+            label11.Text = "Y1";
             // 
             // X_tb
             // 
@@ -624,21 +703,11 @@
             Timer1.Interval = 250;
             Timer1.Tick += Timer1_Tick;
             // 
-            // test_button
-            // 
-            test_button.Location = new Point(3, 9);
-            test_button.Name = "test_button";
-            test_button.Size = new Size(113, 29);
-            test_button.TabIndex = 85;
-            test_button.Text = "Exe";
-            test_button.UseVisualStyleBackColor = true;
-            test_button.Click += test_button_Click;
-            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1000, 565);
+            ClientSize = new Size(1367, 565);
             Controls.Add(panel6);
             Controls.Add(panel10);
             Controls.Add(panel4);
@@ -723,5 +792,11 @@
         private System.Windows.Forms.Timer Timer1;
         private Button pRu_button;
         private Button test_button;
+        private Label label3;
+        private TextBox Z2_tb;
+        private Label label9;
+        private TextBox Y2_tb;
+        private Label label10;
+        private TextBox X2_tb;
     }
 }

@@ -607,6 +607,7 @@ namespace gui
 
                 value_angle[8 * j + 6] = Write_Theta(angle_array[j, 3])[0];
                 value_angle[8 * j + 7] = Write_Theta(angle_array[j, 3])[1];
+
                 PrintLog("vect", "value", Convert.ToString(value_angle[8 * j]));
                 PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 1]));
                 PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 2]));
@@ -618,7 +619,7 @@ namespace gui
 
             }
             plc.WriteDeviceBlock("D1100", 40, ref value_angle[0]);
-            
+
         }
         #endregion
 
@@ -629,7 +630,91 @@ namespace gui
 
         private void test_button_Click(object sender, EventArgs e)
         {
-            Press_button(MethodBase.GetCurrentMethod().Name, Constants.R_PATH);
+            double[] vect_u = new double[3];
+            double[] curr_pos = new double[3];
+            double[] targ_pos = new double[3];
+            double t1, t2, t3, t4, t5;
+            int[,] angle_array = new int[10, 4];
+            double x, y, z;
+            int ret;
+            int[] value_angle = new int[40];
+
+            /* Assign corrdination for each array */
+            curr_pos[0] = Convert.ToDouble(X_tb.Text);
+            curr_pos[1] = Convert.ToDouble(Y_tb.Text);
+            curr_pos[2] = Convert.ToDouble(Z_tb.Text);
+
+            targ_pos[0] = Convert.ToDouble(X2_tb.Text);
+            targ_pos[1] = Convert.ToDouble(Y2_tb.Text);
+            targ_pos[2] = Convert.ToDouble(Z2_tb.Text);
+
+            /* Referred vector */
+            for (int i = 0; i < 3; i++)
+            {
+                vect_u[i] = targ_pos[i] - curr_pos[i];
+                //PrintLog("vect", "value", Convert.ToString(vect_u[i]));
+            }
+
+            /* Linear Equation */
+            for (int t = 0; t < 2; t++)
+            {
+                x = 500 + vect_u[0] * t; /* 500 is the actual position of robot following the x axis */
+                y = 0 + vect_u[1] * t; /* 0 is the actual position of robot following the y axis */
+                z = 900 + vect_u[2] * t; /* 900 is the actual position of robot following the y axis */
+                (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
+                ret = Check_angle(t1, t2, t3, t4, t5);
+                if (ret != 0)
+                {
+                    double theta = 0.0;
+                    if (ret == 1) theta = t1;
+                    else if (ret == 2) theta = t2;
+                    else if (ret == 3) theta = t3;
+                    else if (ret == 4) theta = t4;
+                    else if (ret == 5) theta = t5;
+                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
+                    return;
+                }
+                /* Set to the actual position of robot */
+                t2 -= 90.0;
+                t3 += 90.0;
+                t4 += 90.0;
+                /* Assign value */
+                angle_array[t, 0] = ((int)t1 + 180) * 100000;
+                angle_array[t, 1] = ((int)t2 + 180) * 100000;
+                angle_array[t, 2] = ((int)t3 + 180) * 100000;
+                angle_array[t, 3] = ((int)t4 + 180) * 100000;
+                //PrintLog("vect", "value", Convert.ToString(angle_array[t, 0]));
+                //PrintLog("vect", "value", Convert.ToString(angle_array[t, 1]));
+                //PrintLog("vect", "value", Convert.ToString(angle_array[t, 2]));
+                //PrintLog("vect", "value", Convert.ToString(angle_array[t, 3]));
+            }
+            for (int j = 0; j < 2; j++)
+            {
+
+                value_angle[8 * j] = Write_Theta(angle_array[j, 0])[0];
+                value_angle[8 * j + 1] = Write_Theta(angle_array[j, 0])[1];
+
+                value_angle[8 * j + 2] = Write_Theta(angle_array[j, 1])[0];
+                value_angle[8 * j + 3] = Write_Theta(angle_array[j, 1])[1];
+
+                value_angle[8 * j + 4] = Write_Theta(angle_array[j, 2])[0];
+                value_angle[8 * j + 5] = Write_Theta(angle_array[j, 2])[1];
+
+                value_angle[8 * j + 6] = Write_Theta(angle_array[j, 3])[0];
+                value_angle[8 * j + 7] = Write_Theta(angle_array[j, 3])[1];
+
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 1]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 2]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 3]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 4]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 5]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 6]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 7]));
+
+            }
+            plc.WriteDeviceBlock("D1010", 16, ref value_angle[0]);
+
         }
     }
 
