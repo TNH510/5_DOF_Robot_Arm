@@ -966,13 +966,13 @@ function startAutoMoveLTimer(hObject, eventdata, handles)
     b = 0;
     a = 1;
     % Create a timer object
-    tm = timer('ExecutionMode', 'fixedRate', 'Period', 1, 'TimerFcn', @(src, event) MoveL_btn_Callback(hObject, eventdata, handles));
+    tm = timer('ExecutionMode', 'fixedRate', 'Period', 10, 'TimerFcn', @(src, event) MoveL_btn_Callback(hObject, eventdata, handles));
 
     % Start the timer
     start(tm);
 
     % Wait for a specified duration (or perform other tasks)
-    pause(3);  % Pause for 10 seconds, for example
+    pause(10);  % Pause for 10 seconds, for example
 
     % Stop the timer
     stop(tm);
@@ -987,17 +987,12 @@ function MoveL_btn_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 global b;
 if b == 0
-    startAutoMoveLTimer(hObject, eventdata, handles)
     b = 1;
-end
+else
+    startAutoMoveLTimer(hObject, eventdata, handles)
+  
 global a;
-% Update counter if a is less than or equal to 9
-if a <= 9
-    a = a + 1;
-
-    % Display the counter (optional)
-    disp(['Counter a: ', num2str(a)]);
-end
+a = a + 1
 % tar_pos = zeros(1, 3);  % Initializing vect_u array with zeros
 % cur_pos = zeros(1, 3);  % Initializing vect_u array with zeros
 % % Referred vector
