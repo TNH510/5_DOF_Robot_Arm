@@ -22,7 +22,7 @@ function varargout = GUI_robot(varargin)
 
 % Edit the above text to modify the response to help GUI_robot
 
-% Last Modified by GUIDE v2.5 04-Nov-2023 15:17:40
+% Last Modified by GUIDE v2.5 11-Nov-2023 16:31:14
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -884,3 +884,26 @@ function edit8_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in com_draw.
+function com_draw_Callback(hObject, eventdata, handles)
+
+s = serial('COM37'); 
+set(s, 'BaudRate', 9600); 
+fopen(s); 
+
+figure;
+plotData = []; 
+while true
+    if s.BytesAvailable > 0 
+        data = fread(s, s.BytesAvailable);
+        data_ok = typecast(data, 'double');
+        set_param('Complete/Slider Gain','Gain',num2str(data_ok));
+        break;
+    end
+end
+
+% ?�ng k?t n?i COM
+fclose(s); % ?�ng k?t n?i COM
+delete(s); % X�a ??i t??ng COM
