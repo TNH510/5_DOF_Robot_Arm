@@ -36,6 +36,27 @@ namespace gui
         public const string R_STATUS = "M8000"; /*Address of value 17bit contain SERVO, BRAKE, STATUS OF SERVO*/
         public const string R_PATH = "M529"; /*Address of value 17bit contain SERVO, BRAKE, STATUS OF SERVO*/
 
+        public const string R_JOGGINGFORWARD1 = "M550";
+        public const string R_JOGGINGINVERSE1 = "M551";
+        public const string R_JOGGINGFORWARD2 = "M552";
+        public const string R_JOGGINGINVERSE2 = "M553";
+        public const string R_JOGGINGFORWARD3 = "M554";
+        public const string R_JOGGINGINVERSE3 = "M555";
+        public const string R_JOGGINGFORWARD4 = "M556";
+        public const string R_JOGGINGINVERSE4 = "M557";
+        public const string R_JOGGINGFORWARD5 = "M558";
+        public const string R_JOGGINGINVERSE5 = "M559";
+        public const string R_VELOCITYJOGGING1_L = "D640";
+        public const string R_VELOCITYJOGGING1_H = "D641";
+        public const string R_VELOCITYJOGGING2_L = "D642";
+        public const string R_VELOCITYJOGGING2_H = "D643";
+        public const string R_VELOCITYJOGGING3_L = "D644";
+        public const string R_VELOCITYJOGGING3_H = "D645";
+        public const string R_VELOCITYJOGGING4_L = "D646";
+        public const string R_VELOCITYJOGGING4_H = "D647";
+        public const string R_VELOCITYJOGGING5_L = "D648";
+        public const string R_VELOCITYJOGGING5_H = "D649";
+
         #region Angle
         public const string R_POSITION_1 = "D0"; /* Address of angle 1 */
         public const string R_POSITION_2 = "D20"; /* Address of angle 2 */

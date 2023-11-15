@@ -8,25 +8,23 @@
     "net6.0-windows7.0": []
   },
   "packageFolders": {
-    "C:\\Users\\Hieu\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {},
-    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
+    "C:\\Users\\daveb\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "H:\\OneDrive - hcmute.edu.vn\\Desktop\\5_DOF_Robot_Arm\\gui\\gui\\gui.csproj",
+      "projectUniqueName": "C:\\Users\\daveb\\OneDrive\\Máy tính\\Capstone Project\\5_DOF_Robot_Arm\\gui\\gui\\gui.csproj",
       "projectName": "gui",
-      "projectPath": "H:\\OneDrive - hcmute.edu.vn\\Desktop\\5_DOF_Robot_Arm\\gui\\gui\\gui.csproj",
-      "packagesPath": "C:\\Users\\Hieu\\.nuget\\packages\\",
-      "outputPath": "H:\\OneDrive - hcmute.edu.vn\\Desktop\\5_DOF_Robot_Arm\\gui\\gui\\obj\\",
+      "projectPath": "C:\\Users\\daveb\\OneDrive\\Máy tính\\Capstone Project\\5_DOF_Robot_Arm\\gui\\gui\\gui.csproj",
+      "packagesPath": "C:\\Users\\daveb\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\daveb\\OneDrive\\Máy tính\\Capstone Project\\5_DOF_Robot_Arm\\gui\\gui\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\Hieu\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\daveb\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -35,6 +33,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -71,7 +70,7 @@
             "privateAssets": "none"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.403\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.306\\RuntimeIdentifierGraph.json"
       }
     }
   }

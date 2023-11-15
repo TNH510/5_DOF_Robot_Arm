@@ -22,7 +22,7 @@ function varargout = GUI_robot(varargin)
 
 % Edit the above text to modify the response to help GUI_robot
 
-% Last Modified by GUIDE v2.5 04-Nov-2023 15:17:40
+% Last Modified by GUIDE v2.5 12-Nov-2023 16:44:50
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -884,3 +884,305 @@ function edit8_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in com_draw.
+function com_draw_Callback(hObject, eventdata, handles)
+
+s = serial('COM37'); 
+set(s, 'BaudRate', 9600); 
+fopen(s); 
+
+figure;
+plotData = []; 
+while true
+    if s.BytesAvailable > 0 
+        data = fread(s, s.BytesAvailable);
+        data_ok = typecast(data, 'double');
+        set_param('Complete/Slider Gain','Gain',num2str(data_ok));
+        break;
+    end
+end
+
+% ?�ng k?t n?i COM
+fclose(s); % ?�ng k?t n?i COM
+delete(s); % X�a ??i t??ng COM
+
+function ret = Check_angle(t1, t2, t3, t4, t5)
+    if ((t1 > 115.0) || (t1 < -95.0) || isnan(t1))
+        ret = 1;
+    elseif ((t2 > 110.0) || (t2 < 30.0) || isnan(t2))
+        ret = 2;
+    elseif ((t3 > -10.0) || (t3 < -120.0) || isnan(t3))
+        ret = 3;
+    elseif ((t4 > 5.0) || (t4 < -105.0) || isnan(t4))
+        ret = 4;
+    elseif ((t5 > 179.999) || (t5 < -180.0) || isnan(t5))
+        ret = 5;
+    else
+        ret = 0;
+    end
+
+
+function angles = convert_position_angle(x, y, z)
+    l1 = 690.0;
+    l2 = 440.0;
+    l3 = 500.0;
+    l4 = 0.0;
+    l5 = 230.0;
+    t1 = atan2(y, x);
+    roll = 0.0;
+    pitch = -pi / 2;
+    t5 = roll - t1;
+    m = sqrt(x^2 + y^2);
+    n = z - l1 + l5;
+    c3 = double((m^2 + n^2 - l2^2 - l3^2) / (2 * l2 * l3));
+    s3 = double(sqrt(1 - c3^2));
+    t3 = atan2(s3, c3);
+    if t3 >= -pi / 6 && t3 <= (4 * pi) / 9
+        % Do nothing
+    else
+        s3 = -sqrt(1 - c3^2);
+        t3 = atan2(s3, c3);
+    end
+    c2 = m * (l3 * c3 + l2) + n * (l3 * s3);
+    s2 = n * (l3 * c3 + l2) - m * (l3 * s3);
+    t2 = atan2(s2, c2);
+   
+    % Angle 4
+    t4 = pitch - t2 - t3;
+    
+    t1 = t1 / pi * 180.0;
+    t2 = t2 / pi * 180.0;
+    t3 = t3 / pi * 180.0;
+    t4 = t4 / pi * 180.0;
+    t5 = t5 / pi * 180.0;
+    
+    angles = [t1, t2, t3, t4, t5];  
+
+function startAutoMoveLTimer(hObject, eventdata, handles)
+    global a;
+    global b;
+    b = 0;
+    a = 1;
+    % Create a timer object
+    tm = timer('ExecutionMode', 'fixedRate', 'Period', 10, 'TimerFcn', @(src, event) MoveL_btn_Callback(hObject, eventdata, handles));
+
+    % Start the timer
+    start(tm);
+
+    % Wait for a specified duration (or perform other tasks)
+    pause(10);  % Pause for 10 seconds, for example
+
+    % Stop the timer
+    stop(tm);
+
+    % Delete the timer object
+    delete(tm);
+    
+% --- Executes on button press in MoveL_btn.
+function MoveL_btn_Callback(hObject, eventdata, handles)
+% hObject    handle to MoveL_btn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global b;
+if b == 0
+    b = 1;
+else
+    startAutoMoveLTimer(hObject, eventdata, handles)
+  
+global a;
+a = a + 1
+% tar_pos = zeros(1, 3);  % Initializing vect_u array with zeros
+% cur_pos = zeros(1, 3);  % Initializing vect_u array with zeros
+% % Referred vector
+% vect_u = zeros(1, 3);  % Initializing vect_u array with zeros
+% 
+% tar_pos(1,1) = str2double(get(handles.MvLx_tb,'String'));
+% tar_pos(1,2) = str2double(get(handles.MvLy_tb,'String'));
+% tar_pos(1,3) = str2double(get(handles.MvLz_tb,'String'));
+% 
+% cur_pos(1,1) = str2double(get(handles.edit1,'String'));
+% cur_pos(1,2) = str2double(get(handles.edit2,'String'));
+% cur_pos(1,3) = str2double(get(handles.edit3,'String'));
+% 
+% % value_angles = convert_position_angle(x, y, z)
+% 
+% for i = 1:3
+%     vect_u(1,i) = tar_pos(1,i) - cur_pos(1,i);
+%     % Uncomment the following line if you want to print the values
+%     % disp(['vect_u(', num2str(i), ') = ', num2str(vect_u(i))]);
+% end
+% 
+% vect_u
+% 
+% for t = 1:10
+%     drawnow;
+%     x = cur_pos(1,1) + (vect_u(1,1) / 10) * t;
+%     y = cur_pos(1,2) + (vect_u(1,2) / 10) * t;
+%     z = cur_pos(1,3) + (vect_u(1,3) / 10) * t;
+%     value_angles = convert_position_angle(x, y, z)
+%     t1 = value_angles(1,1);
+%     t2 = value_angles(1,2);
+%     t3 = value_angles(1,3);
+%     t4 = value_angles(1,4);
+%     t5 = value_angles(1,5);
+%     
+%     ret = Check_angle(t1, t2, t3, t4, t5);
+%     if ret ~= 0
+%         theta = 0.0;
+%         if ret == 1
+%             theta = t1;
+%         elseif ret == 2
+%             theta = t2;
+%         elseif ret == 3
+%             theta = t3;
+%         elseif ret == 4
+%             theta = t4;
+%         elseif ret == 5
+%             theta = t5;
+%         end
+%         disp(['Error: P2P: theta', num2str(ret), ' = ', num2str(theta), ' out of range']);
+%         return;
+%     end
+% %     t2 = t2 - 90.0;
+% %     t3 = t3 + 90.0;
+% %     t4 = t4 + 90.0;
+% %     angle_arr(t, 1) = t1;
+% %     angle_arr(t, 2) = t2;
+% %     angle_arr(t, 3) = t3;
+% %     angle_arr(t, 4) = t4;
+% %     angle_arr(t, 5) = t5;
+%     
+%     guidata(hObject,handles);
+%     set(handles.edit4,'String',num2str(t1));
+%     set(handles.edit5,'String',num2str(t2 - 90.0));
+%     set(handles.edit6,'String',num2str(t3 + 90.0));
+%     set(handles.edit7,'String',num2str(t4 + 90.0));
+%     set(handles.edit8,'String',num2str(t5));
+% 
+%     set(handles.slider2,'Value',round(t1,2));
+%     set(handles.slider1,'Value',round(t2 - 90.0,2));
+%     set(handles.slider3,'Value',round(t3 + 90.0,2));
+%     set(handles.slider4,'Value',round(t4 + 90.0,2));
+%     set(handles.slider5,'Value',round(t5,2));
+% 
+%     set_param('Complete/Slider Gain','Gain',num2str(t1));
+%     set_param('Complete/Slider Gain1','Gain',num2str(t2));
+%     set_param('Complete/Slider Gain2','Gain',num2str(t3));
+%     set_param('Complete/Slider Gain3','Gain',num2str(t4));
+%     set_param('Complete/Slider Gain4','Gain',num2str(t5));
+%     
+%     pause(0.2); 
+% end
+
+
+
+
+function MvLx_tb_Callback(hObject, eventdata, handles)
+% hObject    handle to MvLx_tb (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of MvLx_tb as text
+%        str2double(get(hObject,'String')) returns contents of MvLx_tb as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function MvLx_tb_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to MvLx_tb (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function MvLy_tb_Callback(hObject, eventdata, handles)
+% hObject    handle to MvLy_tb (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of MvLy_tb as text
+%        str2double(get(hObject,'String')) returns contents of MvLy_tb as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function MvLy_tb_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to MvLy_tb (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function MvLz_tb_Callback(hObject, eventdata, handles)
+% hObject    handle to MvLz_tb (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of MvLz_tb as text
+%        str2double(get(hObject,'String')) returns contents of MvLz_tb as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function MvLz_tb_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to MvLz_tb (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on key press with focus on slider5 and none of its controls.
+function slider5_KeyPressFcn(hObject, eventdata, handles)
+% hObject    handle to slider5 (see GCBO)
+% eventdata  structure with the following fields (see MATLAB.UI.CONTROL.UICONTROL)
+%	Key: name of the key that was pressed, in lower case
+%	Character: character interpretation of the key(s) that was pressed
+%	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on key press with focus on figure1 and none of its controls.
+function figure1_KeyPressFcn(hObject, eventdata, handles)
+% hObject    handle to figure1 (see GCBO)
+% eventdata  structure with the following fields (see MATLAB.UI.FIGURE)
+%	Key: name of the key that was pressed, in lower case
+%	Character: character interpretation of the key(s) that was pressed
+%	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
+% handles    structure with handles and user data (see GUIDATA)
+
+
+
+% --- Executes on key press with focus on edit6 and none of its controls.
+function edit6_KeyPressFcn(hObject, eventdata, handles)
+% hObject    handle to edit6 (see GCBO)
+% eventdata  structure with the following fields (see MATLAB.UI.CONTROL.UICONTROL)
+%	Key: name of the key that was pressed, in lower case
+%	Character: character interpretation of the key(s) that was pressed
+%	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on key press with focus on slider2 and none of its controls.
+function slider2_KeyPressFcn(hObject, eventdata, handles)
+% hObject    handle to slider2 (see GCBO)
+% eventdata  structure with the following fields (see MATLAB.UI.CONTROL.UICONTROL)
+%	Key: name of the key that was pressed, in lower case
+%	Character: character interpretation of the key(s) that was pressed
+%	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
+% handles    structure with handles and user data (see GUIDATA)
