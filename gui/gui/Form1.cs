@@ -201,6 +201,7 @@ namespace gui
                 Z_curpos.Text = Convert.ToString(Math.Round(z, NUM_AFTER_COMMA));
                 Pitch_curpos.Text = Convert.ToString(Math.Round(t2_out + t3_out + t4_out, NUM_AFTER_COMMA));
                 Roll_curpos.Text = Convert.ToString(Math.Round(t1_out + t5_out, NUM_AFTER_COMMA));
+
             }
             //await Task.Delay(1);
             //return;
@@ -789,7 +790,9 @@ namespace gui
 
         private void test_button_Click(object sender, EventArgs e)
         {
-            write_d_mem_32_bit(2000, 170);
+            // write_d_mem_32_bit(2000, 170);
+            turn_on_1_pulse_relay(444);
+
         }
         private void Speed_button_Click(object sender, EventArgs e)
         {
@@ -989,6 +992,7 @@ namespace gui
             double x, y, z;
             double t1, t2, t3, t4, t5;
             int ret;
+            int[] temp_value = new int[5];
             try
             {
                 x = double.Parse(MvJx_tb.Text);
@@ -1016,6 +1020,21 @@ namespace gui
                 t3_tb.Text = t3.ToString("0.####");
                 t4_tb.Text = t4.ToString("0.####");
                 t5_tb.Text = t5.ToString("0.####");
+
+                int run_status;
+                int[] value_angle = new int[10];
+                /* Run */
+                temp_value[0] = (int)(Convert.ToDouble(t1_tb.Text) + 180) * 100000;
+                temp_value[1] = (int)(Convert.ToDouble(t2_tb.Text) + 180) * 100000;
+                temp_value[2] = (int)(Convert.ToDouble(t3_tb.Text) + 180) * 100000;
+                temp_value[3] = (int)(Convert.ToDouble(t4_tb.Text) + 180) * 100000;
+                temp_value[4] = (int)(Convert.ToDouble(t5_tb.Text) + 180) * 100000;
+                /* Write the angle */
+                for (int ind = 0; ind < 5; ind++)
+                {
+                    write_d_mem_32_bit(1010 + 2 * ind, temp_value[ind]);
+                }
+
             }
             catch (Exception er)
             {
@@ -1122,7 +1141,7 @@ namespace gui
 
         private void Tsm_moveC_btn_Click(object sender, EventArgs e)
         {
-                        double[] vect_u = new double[3];
+            double[] vect_u = new double[3];
             double[] curr_pos = new double[3];
             double[] targ_pos = new double[3];
             double t1, t2, t3, t4, t5;
@@ -1159,7 +1178,7 @@ namespace gui
                 ret = Check_angle(t1, t2, t3, t4, t5);
                 if (ret != 0)
                 {
-                    double theta = 0.0;
+                    theta = 0.0;
                     if (ret == 1) theta = t1;
                     else if (ret == 2) theta = t2;
                     else if (ret == 3) theta = t3;
@@ -1209,6 +1228,75 @@ namespace gui
                 value_angle_t5[2 * j + 1] = Write_Theta(angle_array[j, 4])[1];
             }
             //plc.WriteDeviceBlock("D2000", 20, ref value_angle_t5[0]);
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Cvt_Trajectory_Click(object sender, EventArgs e)
+        {
+            double x, y, z;
+            double t1, t2, t3, t4, t5;
+            int ret;
+            int[] temp_value = new int[5];
+            try
+            {
+                x = double.Parse(MvJx_tb.Text);
+                y = double.Parse(MvJy_tb.Text);
+                z = double.Parse(MvJz_tb.Text);
+
+                (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
+                ret = Check_angle(t1, t2, t3, t4, t5);
+                if (ret != 0)
+                {
+                    double theta = 0.0;
+                    if (ret == 1) theta = t1;
+                    else if (ret == 2) theta = t2;
+                    else if (ret == 3) theta = t3;
+                    else if (ret == 4) theta = t4;
+                    else if (ret == 5) theta = t5;
+                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
+                    return;
+                }
+                t2 -= 90.0;
+                t3 += 90.0;
+                t4 += 90.0;
+                /* Calculate the desired speed */
+
+
+
+                t1_tb.Text = t1.ToString("0.####");
+                t2_tb.Text = t2.ToString("0.####");
+                t3_tb.Text = t3.ToString("0.####");
+                t4_tb.Text = t4.ToString("0.####");
+                t5_tb.Text = t5.ToString("0.####");
+
+                int run_status;
+                int[] value_angle = new int[10];
+                /* Run */
+                temp_value[0] = (int)(Convert.ToDouble(t1_tb.Text) + 180) * 100000;
+                temp_value[1] = (int)(Convert.ToDouble(t2_tb.Text) + 180) * 100000;
+                temp_value[2] = (int)(Convert.ToDouble(t3_tb.Text) + 180) * 100000;
+                temp_value[3] = (int)(Convert.ToDouble(t4_tb.Text) + 180) * 100000;
+                temp_value[4] = (int)(Convert.ToDouble(t5_tb.Text) + 180) * 100000;
+                /* Write the angle */
+                for (int ind = 0; ind < 5; ind++)
+                {
+                    write_d_mem_32_bit(1010 + 2 * ind, temp_value[ind]);
+                }
+
+            }
+            catch (Exception er)
+            {
+                PrintLog("Bug", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", er));
+            }
+        }
+
+        private void spd_tb_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 

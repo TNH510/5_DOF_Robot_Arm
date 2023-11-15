@@ -43,6 +43,7 @@
             ResetError_button = new Button();
             Control_Label = new Label();
             panel4 = new Panel();
+            Cvt_Trajectory = new Button();
             test_button = new Button();
             Run_button = new Button();
             t5_tb = new TextBox();
@@ -116,6 +117,14 @@
             panel5 = new Panel();
             set_speed_btn = new Button();
             panel8 = new Panel();
+            Tsm_moveC_btn = new Button();
+            MvCz_tb = new TextBox();
+            label36 = new Label();
+            label37 = new Label();
+            label38 = new Label();
+            MvCy_tb = new TextBox();
+            label39 = new Label();
+            MvCx_tb = new TextBox();
             Tsm_moveL_btn = new Button();
             MvLz_tb = new TextBox();
             label27 = new Label();
@@ -136,14 +145,6 @@
             label1 = new Label();
             spd_tb = new TextBox();
             label34 = new Label();
-            MvCz_tb = new TextBox();
-            label36 = new Label();
-            label37 = new Label();
-            label38 = new Label();
-            MvCy_tb = new TextBox();
-            label39 = new Label();
-            MvCx_tb = new TextBox();
-            Tsm_moveC_btn = new Button();
             Connect_Panel.SuspendLayout();
             panel1.SuspendLayout();
             panel2.SuspendLayout();
@@ -305,21 +306,33 @@
             // panel4
             // 
             panel4.BorderStyle = BorderStyle.FixedSingle;
+            panel4.Controls.Add(Cvt_Trajectory);
             panel4.Controls.Add(test_button);
             panel4.Location = new Point(10, 364);
             panel4.Margin = new Padding(3, 2, 3, 2);
             panel4.Name = "panel4";
-            panel4.Size = new Size(288, 43);
+            panel4.Size = new Size(288, 92);
             panel4.TabIndex = 2;
+            // 
+            // Cvt_Trajectory
+            // 
+            Cvt_Trajectory.Location = new Point(3, 33);
+            Cvt_Trajectory.Margin = new Padding(3, 2, 3, 2);
+            Cvt_Trajectory.Name = "Cvt_Trajectory";
+            Cvt_Trajectory.Size = new Size(153, 22);
+            Cvt_Trajectory.TabIndex = 86;
+            Cvt_Trajectory.Text = "Trajectory_Convert";
+            Cvt_Trajectory.UseVisualStyleBackColor = true;
+            Cvt_Trajectory.Click += Cvt_Trajectory_Click;
             // 
             // test_button
             // 
             test_button.Location = new Point(3, 7);
             test_button.Margin = new Padding(3, 2, 3, 2);
             test_button.Name = "test_button";
-            test_button.Size = new Size(99, 22);
+            test_button.Size = new Size(153, 22);
             test_button.TabIndex = 85;
-            test_button.Text = "Exe";
+            test_button.Text = "Trajectory_Planning";
             test_button.UseVisualStyleBackColor = true;
             test_button.Click += test_button_Click;
             // 
@@ -843,6 +856,7 @@
             textBox1.ReadOnly = true;
             textBox1.Size = new Size(357, 192);
             textBox1.TabIndex = 84;
+            textBox1.TextChanged += textBox1_TextChanged;
             // 
             // label15
             // 
@@ -1133,6 +1147,87 @@
             panel8.Size = new Size(543, 94);
             panel8.TabIndex = 1;
             // 
+            // Tsm_moveC_btn
+            // 
+            Tsm_moveC_btn.Location = new Point(318, 66);
+            Tsm_moveC_btn.Margin = new Padding(3, 2, 3, 2);
+            Tsm_moveC_btn.Name = "Tsm_moveC_btn";
+            Tsm_moveC_btn.Size = new Size(107, 22);
+            Tsm_moveC_btn.TabIndex = 113;
+            Tsm_moveC_btn.Text = "Transmit MoveC";
+            Tsm_moveC_btn.UseVisualStyleBackColor = true;
+            Tsm_moveC_btn.Click += Tsm_moveC_btn_Click;
+            // 
+            // MvCz_tb
+            // 
+            MvCz_tb.Location = new Point(249, 68);
+            MvCz_tb.Margin = new Padding(3, 2, 3, 2);
+            MvCz_tb.Multiline = true;
+            MvCz_tb.Name = "MvCz_tb";
+            MvCz_tb.Size = new Size(55, 19);
+            MvCz_tb.TabIndex = 112;
+            MvCz_tb.Text = "0";
+            // 
+            // label36
+            // 
+            label36.AutoSize = true;
+            label36.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
+            label36.Location = new Point(11, 71);
+            label36.Name = "label36";
+            label36.Size = new Size(44, 13);
+            label36.TabIndex = 111;
+            label36.Text = "MoveC";
+            // 
+            // label37
+            // 
+            label37.AutoSize = true;
+            label37.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
+            label37.Location = new Point(67, 72);
+            label37.Name = "label37";
+            label37.Size = new Size(14, 13);
+            label37.TabIndex = 110;
+            label37.Text = "X";
+            // 
+            // label38
+            // 
+            label38.AutoSize = true;
+            label38.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
+            label38.Location = new Point(228, 71);
+            label38.Name = "label38";
+            label38.Size = new Size(14, 13);
+            label38.TabIndex = 109;
+            label38.Text = "Z";
+            // 
+            // MvCy_tb
+            // 
+            MvCy_tb.Location = new Point(169, 68);
+            MvCy_tb.Margin = new Padding(3, 2, 3, 2);
+            MvCy_tb.Multiline = true;
+            MvCy_tb.Name = "MvCy_tb";
+            MvCy_tb.Size = new Size(55, 19);
+            MvCy_tb.TabIndex = 108;
+            MvCy_tb.Text = "0";
+            // 
+            // label39
+            // 
+            label39.AutoSize = true;
+            label39.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
+            label39.Location = new Point(148, 71);
+            label39.Name = "label39";
+            label39.Size = new Size(14, 13);
+            label39.TabIndex = 107;
+            label39.Text = "Y";
+            // 
+            // MvCx_tb
+            // 
+            MvCx_tb.Location = new Point(88, 68);
+            MvCx_tb.Margin = new Padding(3, 2, 3, 2);
+            MvCx_tb.Multiline = true;
+            MvCx_tb.Name = "MvCx_tb";
+            MvCx_tb.Size = new Size(55, 19);
+            MvCx_tb.TabIndex = 106;
+            MvCx_tb.Text = "0";
+            // 
             // Tsm_moveL_btn
             // 
             Tsm_moveL_btn.Location = new Point(318, 40);
@@ -1325,6 +1420,7 @@
             spd_tb.Size = new Size(55, 19);
             spd_tb.TabIndex = 96;
             spd_tb.Text = "0";
+            spd_tb.TextChanged += spd_tb_TextChanged;
             // 
             // label34
             // 
@@ -1335,87 +1431,6 @@
             label34.Size = new Size(60, 30);
             label34.TabIndex = 0;
             label34.Text = "Path";
-            // 
-            // MvCz_tb
-            // 
-            MvCz_tb.Location = new Point(249, 68);
-            MvCz_tb.Margin = new Padding(3, 2, 3, 2);
-            MvCz_tb.Multiline = true;
-            MvCz_tb.Name = "MvCz_tb";
-            MvCz_tb.Size = new Size(55, 19);
-            MvCz_tb.TabIndex = 112;
-            MvCz_tb.Text = "0";
-            // 
-            // label36
-            // 
-            label36.AutoSize = true;
-            label36.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
-            label36.Location = new Point(11, 71);
-            label36.Name = "label36";
-            label36.Size = new Size(44, 13);
-            label36.TabIndex = 111;
-            label36.Text = "MoveC";
-            // 
-            // label37
-            // 
-            label37.AutoSize = true;
-            label37.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
-            label37.Location = new Point(67, 72);
-            label37.Name = "label37";
-            label37.Size = new Size(14, 13);
-            label37.TabIndex = 110;
-            label37.Text = "X";
-            // 
-            // label38
-            // 
-            label38.AutoSize = true;
-            label38.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
-            label38.Location = new Point(228, 71);
-            label38.Name = "label38";
-            label38.Size = new Size(14, 13);
-            label38.TabIndex = 109;
-            label38.Text = "Z";
-            // 
-            // MvCy_tb
-            // 
-            MvCy_tb.Location = new Point(169, 68);
-            MvCy_tb.Margin = new Padding(3, 2, 3, 2);
-            MvCy_tb.Multiline = true;
-            MvCy_tb.Name = "MvCy_tb";
-            MvCy_tb.Size = new Size(55, 19);
-            MvCy_tb.TabIndex = 108;
-            MvCy_tb.Text = "0";
-            // 
-            // label39
-            // 
-            label39.AutoSize = true;
-            label39.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
-            label39.Location = new Point(148, 71);
-            label39.Name = "label39";
-            label39.Size = new Size(14, 13);
-            label39.TabIndex = 107;
-            label39.Text = "Y";
-            // 
-            // MvCx_tb
-            // 
-            MvCx_tb.Location = new Point(88, 68);
-            MvCx_tb.Margin = new Padding(3, 2, 3, 2);
-            MvCx_tb.Multiline = true;
-            MvCx_tb.Name = "MvCx_tb";
-            MvCx_tb.Size = new Size(55, 19);
-            MvCx_tb.TabIndex = 106;
-            MvCx_tb.Text = "0";
-            // 
-            // Tsm_moveC_btn
-            // 
-            Tsm_moveC_btn.Location = new Point(318, 66);
-            Tsm_moveC_btn.Margin = new Padding(3, 2, 3, 2);
-            Tsm_moveC_btn.Name = "Tsm_moveC_btn";
-            Tsm_moveC_btn.Size = new Size(107, 22);
-            Tsm_moveC_btn.TabIndex = 113;
-            Tsm_moveC_btn.Text = "Transmit MoveC";
-            Tsm_moveC_btn.UseVisualStyleBackColor = true;
-            Tsm_moveC_btn.Click += Tsm_moveC_btn_Click;
             // 
             // Form1
             // 
@@ -1596,5 +1611,6 @@
         private TextBox MvCy_tb;
         private Label label39;
         private TextBox MvCx_tb;
+        private Button Cvt_Trajectory;
     }
 }
