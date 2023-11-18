@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "stm32f4xx_hal.h": "c",
+        "bsp_button.h": "c",
+        "system_manager.h": "c",
+        "system_test.h": "c",
+        "drv_uart.h": "c"
+    }
+}
