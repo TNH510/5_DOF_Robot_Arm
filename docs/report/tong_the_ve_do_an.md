@@ -60,55 +60,53 @@
   
 + Các ràng buộc giới hạn về đầu vào:
   + Không gian hoạt động:
-    + Góc khớp 1: 
-    + Góc khớp 2: 
-    + Góc khớp 3:
-    + Góc khớp 4:
-    + Góc khớp 5:
-    + Độ dài khâu 0:
-    + Độ dài khâu 1:
-    + Độ dài khâu 2:
-    + Độ dài khâu 3:
-    + Độ dài khâu 4:
-    + Độ dài khâu 5:
+    + Góc khớp 1: 85.0 -> 295.0 (degrees)
+    + Góc khớp 2: 120.0 -> 200.0 (degrees)
+    + Góc khớp 3: 150.0 -> 260.0 (degrees)
+    + Góc khớp 4: 165.0 -> 275.0 (degrees)
+    + Góc khớp 5: 0.0 -> 359.9 (degrees)
+    + Khoảng cách l1: 690.0 (mm)
+    + Khoảng cách l2: 440.0 (mm)
+    + Khoảng cách l3: 500.0 (mm)
+    + Khoảng cách l4: 0.0 (mm)
+    + Khoảng cách l5: ... (mm)
     + Miền hoạt động trong không gian:
   + Khối lượng các khâu:
-    + Khâu 0:
-    + Khâu 1:
-    + Khâu 2:
-    + Khâu 3:
-    + Khâu 4:
-    + Khâu 5:
+    + Khối lượng riêng vật liệu: ... Kg/m^3
+    + Khâu 1: 20.0 ~ 27.5 (Kg)
+    + Khâu 2: 21.0 ~ 24.0 (Kg)
+    + Khâu 3: 19.0 ~ 25.1 (Kg)
+    + Khâu 4: 2.0 ~ 3.0 (Kg)
+    + Khâu 5: ~ 0.5 (Kg)
   + Moment quán tính các khâu:
-    + Khâu 0:
-    + Khâu 1:
-    + Khâu 2:
-    + Khâu 3:
-    + Khâu 4:
-    + Khâu 5:
-  + Moment MAX của động cơ:
+    + Khâu 1: Ixx ~ 461147 Nmm^2, Iyy ~ 299920 Nmm^2
+    + Khâu 2: Ixx ~ 0 Nmm^2, Iyy ~ 803322 Nmm^2
+    + Khâu 3: Ixx ~ 0 Nmm^2, Iyy ~ 1604504 Nmm^2
+    + Khâu 4: Ixx ~ 0 Nmm^2, Iyy ~ 6328 Nmm^2
+    + Khâu 5: Ixx ~ ... Nmm^2, Iyy ~ ... Nmm^2
+  + Công suất 5 động cơ của 5 khớp:
+    - Động cơ 1: 750W
+    - Động cơ 2: 750W
+    - Động cơ 3: 750W
+    - Động cơ 4: 200W
+    - Động cơ 5: 200W
   + Các bộ truyền tại các khớp:
     + Bộ truyền 1: 
       - Loại bộ truyền: Bánh răng
-      - Tỉ số truyền: 1:1?
-      - Thông số kích thước: ???
+      - Tỉ số truyền: 1:165.306
 
     + Bộ truyền 2: 
       - Loại bộ truyền: Bánh răng
-      - Tỉ số truyền: 1:180 ?
-      - Thông số kích thước: (số răng, số răng)
+      - Tỉ số truyền: 1:180
 
     + Bộ truyền 3: Đai (1:1) và bánh răng (?)
       - Loại bộ truyền: 
-      - Tỉ số truyền: 1:180 ?
-      - Thông số kích thước: (số răng, số răng)
+      - Tỉ số truyền: 1:180
 
     + Bộ truyền 4: Đai (1:1) + Bánh răng(1:80) + Xích (1:1)
       - Loại bộ truyền: 
       - Tỉ số truyền: 1:80
-      - Thông số kích thước: (số răng, số răng)
 
     + Bộ truyền 5: Đai(1:1) + Bánh răng(1:80)
       - Loại bộ truyền: 
-      - Tỉ số truyền: 1:80 ?
-      - Thông số kích thước: (số răng, số răng)
+      - Tỉ số truyền: 1:73.3
