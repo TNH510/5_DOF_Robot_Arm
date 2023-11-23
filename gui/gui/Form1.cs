@@ -1298,6 +1298,15 @@ namespace gui
         {
 
         }
+
+        private void bt_MATLAB_Click(object sender, EventArgs e)
+        {
+            MLApp.MLApp matlab = new MLApp.MLApp();
+
+            matlab.Execute("disp('Hello from MATLAB');");
+
+            Console.ReadLine();
+        }
     }
 
 }
