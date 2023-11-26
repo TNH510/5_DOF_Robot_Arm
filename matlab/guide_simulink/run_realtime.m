@@ -1,4 +1,4 @@
-s = serial('COM25'); 
+s = serial('COM1'); 
 set(s, 'BaudRate', 115200); 
 fopen(s); 
 
@@ -26,11 +26,15 @@ while true
         byte_9 = dataBytes(9);
         byte_10 = dataBytes(10);
 
-        t1 = bitor(bitshift(byte_1, 8), byte_2) / 100
-        t2 = bitor(bitshift(byte_3, 8), byte_4) / 100
-        t3 = bitor(bitshift(byte_5, 8), byte_6) / 100
-        t4 = bitor(bitshift(byte_7, 8), byte_8) / 100
-        t5 = bitor(bitshift(byte_9, 8), byte_10) / 100
+        t1 = bitor(bitshift(byte_1, 8), byte_2) / 100 - 180
+        t2 = bitor(bitshift(byte_3, 8), byte_4) / 100 - 180 + 90
+        t3 = bitor(bitshift(byte_5, 8), byte_6) / 100 - 180 - 90
+        t4 = bitor(bitshift(byte_7, 8), byte_8) / 100 - 180 - 90
+        t5 = bitor(bitshift(byte_9, 8), byte_10) / 100 - 180
+
+        if t1 == 65535
+            break;
+        end
         
         set_param('Complete/Slider Gain','Gain',num2str(t1));
         set_param('Complete/Slider Gain1','Gain',num2str(t2));

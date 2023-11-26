@@ -259,11 +259,11 @@ namespace GUI
                 t5_mat = Convert.ToUInt16((t5 + 18000000) / 1000);
 
                 // Convert theta read from int to double
-                t1_out = double.Parse(Convert.ToString(t1)) / 100000.0;
-                t2_out = double.Parse(Convert.ToString(t2)) / 100000.0;
-                t3_out = double.Parse(Convert.ToString(t3)) / 100000.0;
-                t4_out = double.Parse(Convert.ToString(t4)) / 100000.0;
-                t5_out = double.Parse(Convert.ToString(t5)) / 100000.0;
+                t1_out = double.Parse(Convert.ToString((int) t1)) / 100000.0;
+                t2_out = double.Parse(Convert.ToString((int) t2)) / 100000.0;
+                t3_out = double.Parse(Convert.ToString((int) t3)) / 100000.0;
+                t4_out = double.Parse(Convert.ToString((int) t4)) / 100000.0;
+                t5_out = double.Parse(Convert.ToString((int) t5)) / 100000.0;
 
                 /* Transfer the angle value into float */
                 t1_out = Math.Round(t1_out, NUM_AFTER_COMMA);
@@ -677,7 +677,7 @@ namespace GUI
         private void bt_on_matlab_Click(object sender, EventArgs e)
         {
             // Execute MATLAB Robot Simulink
-            matlab.Execute(@"cd 'H:\OneDrive - hcmute.edu.vn\Desktop\5_DOF_Robot_Arm\matlab\guide_simulink'");
+            matlab.Execute(@"cd 'C:\Users\daveb\OneDrive\Máy tính\Capstone Project\5_DOF_Robot_Arm\matlab\guide_simulink'");
             matlab.Execute(@"open_system('Complete.slx');");
             matlab.Execute(@"sim('Complete');");
         }
