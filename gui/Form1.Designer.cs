@@ -87,6 +87,7 @@
             this.label27 = new System.Windows.Forms.Label();
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.panel6 = new System.Windows.Forms.Panel();
+            this.bt_on_matlab = new System.Windows.Forms.Button();
             this.cBoxParityBits = new System.Windows.Forms.ComboBox();
             this.label24 = new System.Windows.Forms.Label();
             this.cBoxStopBits = new System.Windows.Forms.ComboBox();
@@ -101,6 +102,7 @@
             this.label19 = new System.Windows.Forms.Label();
             this.label17 = new System.Windows.Forms.Label();
             this.label20 = new System.Windows.Forms.Label();
+            this.bt_off_matlab = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -678,6 +680,8 @@
             // panel6
             // 
             this.panel6.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel6.Controls.Add(this.bt_off_matlab);
+            this.panel6.Controls.Add(this.bt_on_matlab);
             this.panel6.Controls.Add(this.cBoxParityBits);
             this.panel6.Controls.Add(this.label24);
             this.panel6.Controls.Add(this.cBoxStopBits);
@@ -694,8 +698,18 @@
             this.panel6.Controls.Add(this.label20);
             this.panel6.Location = new System.Drawing.Point(656, 14);
             this.panel6.Name = "panel6";
-            this.panel6.Size = new System.Drawing.Size(266, 287);
+            this.panel6.Size = new System.Drawing.Size(489, 287);
             this.panel6.TabIndex = 3;
+            // 
+            // bt_on_matlab
+            // 
+            this.bt_on_matlab.Location = new System.Drawing.Point(289, 50);
+            this.bt_on_matlab.Name = "bt_on_matlab";
+            this.bt_on_matlab.Size = new System.Drawing.Size(158, 41);
+            this.bt_on_matlab.TabIndex = 20;
+            this.bt_on_matlab.Text = "Turn ON MATLAB";
+            this.bt_on_matlab.UseVisualStyleBackColor = true;
+            this.bt_on_matlab.Click += new System.EventHandler(this.bt_on_matlab_Click);
             // 
             // cBoxParityBits
             // 
@@ -846,11 +860,21 @@
             this.label20.TabIndex = 26;
             this.label20.Text = "COM PORT";
             // 
+            // bt_off_matlab
+            // 
+            this.bt_off_matlab.Location = new System.Drawing.Point(289, 117);
+            this.bt_off_matlab.Name = "bt_off_matlab";
+            this.bt_off_matlab.Size = new System.Drawing.Size(158, 41);
+            this.bt_off_matlab.TabIndex = 38;
+            this.bt_off_matlab.Text = "Turn OFF MATLAB";
+            this.bt_off_matlab.UseVisualStyleBackColor = true;
+            this.bt_off_matlab.Click += new System.EventHandler(this.bt_off_matlab_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(934, 414);
+            this.ClientSize = new System.Drawing.Size(1229, 409);
             this.Controls.Add(this.panel6);
             this.Controls.Add(this.panel5);
             this.Controls.Add(this.panel4);
@@ -951,6 +975,8 @@
         private System.Windows.Forms.ComboBox cBoxStopBits;
         private System.Windows.Forms.Label label22;
         private System.Windows.Forms.ComboBox cBoxDataBits;
+        private System.Windows.Forms.Button bt_on_matlab;
+        private System.Windows.Forms.Button bt_off_matlab;
     }
 }
 

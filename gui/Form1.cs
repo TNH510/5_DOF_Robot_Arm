@@ -36,6 +36,8 @@ namespace GUI
         int move = 0; /* move = 1 -> MoveJ, move = 2 -> MoveL */ 
         UInt16 t1_mat, t2_mat,t3_mat,t4_mat,t5_mat;
         byte[] frame_prepare_to_send = new byte[10];
+
+        MLApp.MLApp matlab = new MLApp.MLApp();
         public Form1()
         {
             InitializeComponent();
@@ -122,6 +124,7 @@ namespace GUI
 
                 frame_prepare_to_send[8] = (byte)((t5_mat >> 8) & 0xFF);
                 frame_prepare_to_send[9] = (byte)(t5_mat & 0xFF);
+
                 serialPort1.Write(frame_prepare_to_send, 0, frame_prepare_to_send.Length);
             }
         }
@@ -669,6 +672,23 @@ namespace GUI
                 turn_on_1_pulse_relay(530);
             }
             move = 0;
+        }
+
+        private void bt_on_matlab_Click(object sender, EventArgs e)
+        {
+            // Execute MATLAB Robot Simulink
+            matlab.Execute(@"cd 'H:\OneDrive - hcmute.edu.vn\Desktop\5_DOF_Robot_Arm\matlab\guide_simulink'");
+            matlab.Execute(@"open_system('Complete.slx');");
+            matlab.Execute(@"sim('Complete');");
+        }
+
+        private void bt_off_matlab_Click(object sender, EventArgs e)
+        {
+            // Close System
+            matlab.Execute(@"close_system('Complete.slx');");
+
+            // Close MATLAB
+            //matlab.Quit();
         }
 
         private void Tsm_moveL_btn_Click(object sender, EventArgs e)

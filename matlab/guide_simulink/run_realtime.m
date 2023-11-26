@@ -26,11 +26,11 @@ while true
         byte_9 = dataBytes(9);
         byte_10 = dataBytes(10);
 
-        t1 = bitor(bitshift(byte_1, 8), byte_2)
-        t2 = bitor(bitshift(byte_3, 8), byte_4)
-        t3 = bitor(bitshift(byte_5, 8), byte_6)
-        t4 = bitor(bitshift(byte_7, 8), byte_8)
-        t5 = bitor(bitshift(byte_9, 8), byte_10)
+        t1 = bitor(bitshift(byte_1, 8), byte_2) / 100
+        t2 = bitor(bitshift(byte_3, 8), byte_4) / 100
+        t3 = bitor(bitshift(byte_5, 8), byte_6) / 100
+        t4 = bitor(bitshift(byte_7, 8), byte_8) / 100
+        t5 = bitor(bitshift(byte_9, 8), byte_10) / 100
         
         set_param('Complete/Slider Gain','Gain',num2str(t1));
         set_param('Complete/Slider Gain1','Gain',num2str(t2));
