@@ -1298,6 +1298,11 @@ namespace gui
         {
 
         }
+
+        private void Jog1F_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 
 }
