@@ -22,6 +22,9 @@ using static System.Net.WebRequestMethods;
 using System.Data.SqlTypes;
 using System.Security.AccessControl;
 using System.Security.Cryptography.X509Certificates;
+using System.IO.Ports;
+using System.Data;
+using System.Linq;
 
 namespace GUI
 {
@@ -29,11 +32,16 @@ namespace GUI
     {
         public ActUtlType plc = new();
         int run_test = 0;
-        public int move = 0; /* move = 1 -> MoveJ, move = 2 -> MoveL */ 
+        string dataOUT;
+        int move = 0; /* move = 1 -> MoveJ, move = 2 -> MoveL */ 
+        UInt16 t1_mat, t2_mat,t3_mat,t4_mat,t5_mat;
+        byte[] frame_prepare_to_send = new byte[10];
         public Form1()
         {
             InitializeComponent();
             GUI.Form1.CheckForIllegalCrossThreadCalls = false;
+            string[] ports = SerialPort.GetPortNames(); //Gan gia tri cac port co trong may
+            cBoxPort.Items.AddRange(ports); //Hien thi len cBoxPort
         }
 
         private void Connect_btn_Click(object sender, EventArgs e)
@@ -94,6 +102,28 @@ namespace GUI
         private void Timer1_Tick(object sender, EventArgs e)
         {
             Forward_Kinematic();
+            send_data();
+        }
+        private void send_data()
+        {
+            if (serialPort1.IsOpen)
+            {
+                frame_prepare_to_send[0] = (byte) ((t1_mat >> 8) & 0xFF);
+                frame_prepare_to_send[1] = (byte) (t1_mat & 0xFF);
+
+                frame_prepare_to_send[2] = (byte) ((t2_mat >> 8) & 0xFF);
+                frame_prepare_to_send[3] = (byte) (t2_mat & 0xFF);
+
+                frame_prepare_to_send[4] = (byte) ((t3_mat >> 8) & 0xFF);
+                frame_prepare_to_send[5] = (byte)(t3_mat & 0xFF);
+
+                frame_prepare_to_send[6] = (byte)((t4_mat >> 8) & 0xFF);
+                frame_prepare_to_send[7] = (byte)(t4_mat & 0xFF);
+
+                frame_prepare_to_send[8] = (byte)((t5_mat >> 8) & 0xFF);
+                frame_prepare_to_send[9] = (byte)(t5_mat & 0xFF);
+                serialPort1.Write(frame_prepare_to_send, 0, frame_prepare_to_send.Length);
+            }
         }
         public void ChangeColorObject(object objectin, Color color_object)
         {
@@ -183,7 +213,7 @@ namespace GUI
         }
 
         // Convert value read from PLC to int value
-        public int Read_Position(int value_positon1, int value_positon2)
+        public uint Read_Position(uint value_positon1, uint value_positon2)
         {
             return (value_positon2 << 16 | value_positon1) - 18000000;
         }
@@ -198,7 +228,7 @@ namespace GUI
         public void Forward_Kinematic()
         {
             const int NUM_AFTER_COMMA = 5;
-            int t1, t2, t3, t4, t5;
+            uint t1 = 0 , t2 = 0, t3 = 0, t4 = 0, t5 = 0;
             int[] value_positon = new int[16];
             double t1_out, t2_out, t3_out, t4_out, t5_out;
             double t1_dh, t2_dh, t3_dh, t4_dh, x, y, z;
@@ -211,12 +241,19 @@ namespace GUI
                 plc.ReadDeviceBlock(Constants.R_POSITION_4, 2, out value_positon[6]);
                 plc.ReadDeviceBlock(Constants.R_POSITION_5, 2, out value_positon[8]);
 
+
                 // Read and convert driver angle value to real position value (was subtracted by 180)
-                t1 = Read_Position(value_positon[0], value_positon[1]);
-                t2 = Read_Position(value_positon[2], value_positon[3]);
-                t3 = Read_Position(value_positon[4], value_positon[5]);
-                t4 = Read_Position(value_positon[6], value_positon[7]);
-                t5 = Read_Position(value_positon[8], value_positon[9]);
+                t1 = Read_Position((uint)value_positon[0], (uint)value_positon[1]);
+                t2 = Read_Position((uint)value_positon[2], (uint)value_positon[3]);
+                t3 = Read_Position((uint)value_positon[4], (uint)value_positon[5]);
+                t4 = Read_Position((uint)value_positon[6], (uint)value_positon[7]);
+                t5 = Read_Position((uint)value_positon[8], (uint)value_positon[9]);
+
+                t1_mat = Convert.ToUInt16((t1 + 18000000) / 1000);
+                t2_mat = Convert.ToUInt16((t2 + 18000000) / 1000);
+                t3_mat = Convert.ToUInt16((t3 + 18000000) / 1000);
+                t4_mat = Convert.ToUInt16((t4 + 18000000) / 1000);
+                t5_mat = Convert.ToUInt16((t5 + 18000000) / 1000);
 
                 // Convert theta read from int to double
                 t1_out = double.Parse(Convert.ToString(t1)) / 100000.0;
@@ -736,6 +773,42 @@ namespace GUI
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void bOpen_Click(object sender, EventArgs e)
+        {
+            try
+            {   //Set up parameter for COM port
+                serialPort1.PortName = cBoxPort.Text;
+                serialPort1.BaudRate = Convert.ToInt32(cBoxBaudRate.Text);
+                serialPort1.DataBits = Convert.ToInt32(cBoxDataBits.Text);
+                serialPort1.StopBits = (StopBits)Enum.Parse(typeof(StopBits), cBoxStopBits.Text);
+                serialPort1.Parity = (Parity)Enum.Parse(typeof(Parity), cBoxParityBits.Text);
+                serialPort1.Open();
+                progressBar1.Value = 100;
+                bOpen.Enabled = false;
+                bClose.Enabled = true;
+            }
+
+            catch (Exception err)
+            {
+                MessageBox.Show(err.Message, "Error :))", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                bOpen.Enabled = true;
+                bClose.Enabled = false;
+
+            }
+        }
+
+        private void bClose_Click(object sender, EventArgs e)
+        {
+            if (serialPort1.IsOpen)
+            {
+                serialPort1.Close();
+                bOpen.Enabled = true;
+                bClose.Enabled = false;
+                progressBar1.Value = 0;
+
             }
         }
     }

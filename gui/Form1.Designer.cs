@@ -40,13 +40,13 @@
             this.OnServo_button = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.panel3 = new System.Windows.Forms.Panel();
+            this.jog_speed_tb = new System.Windows.Forms.TextBox();
             this.joint_tb = new System.Windows.Forms.TextBox();
+            this.Jog_set_speed = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
             this.Backward_btn = new System.Windows.Forms.Button();
             this.Forward_btn = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
-            this.Jog_set_speed = new System.Windows.Forms.Button();
-            this.jog_speed_tb = new System.Windows.Forms.TextBox();
             this.ErrorLog = new System.Windows.Forms.TextBox();
             this.panel4 = new System.Windows.Forms.Panel();
             this.t5_tb = new System.Windows.Forms.TextBox();
@@ -72,6 +72,9 @@
             this.label8 = new System.Windows.Forms.Label();
             this.Timer1 = new System.Windows.Forms.Timer(this.components);
             this.panel5 = new System.Windows.Forms.Panel();
+            this.label4 = new System.Windows.Forms.Label();
+            this.spd_tb = new System.Windows.Forms.TextBox();
+            this.set_const_speed_btn = new System.Windows.Forms.Button();
             this.run_btn = new System.Windows.Forms.Button();
             this.Tsm_moveL_btn = new System.Windows.Forms.Button();
             this.Tsm_moveJ_btn = new System.Windows.Forms.Button();
@@ -82,14 +85,28 @@
             this.Mvx_tb = new System.Windows.Forms.TextBox();
             this.label25 = new System.Windows.Forms.Label();
             this.label27 = new System.Windows.Forms.Label();
-            this.spd_tb = new System.Windows.Forms.TextBox();
-            this.set_const_speed_btn = new System.Windows.Forms.Button();
-            this.label4 = new System.Windows.Forms.Label();
+            this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
+            this.panel6 = new System.Windows.Forms.Panel();
+            this.cBoxParityBits = new System.Windows.Forms.ComboBox();
+            this.label24 = new System.Windows.Forms.Label();
+            this.cBoxStopBits = new System.Windows.Forms.ComboBox();
+            this.label22 = new System.Windows.Forms.Label();
+            this.cBoxDataBits = new System.Windows.Forms.ComboBox();
+            this.cBoxBaudRate = new System.Windows.Forms.ComboBox();
+            this.cBoxPort = new System.Windows.Forms.ComboBox();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.label18 = new System.Windows.Forms.Label();
+            this.bClose = new System.Windows.Forms.Button();
+            this.bOpen = new System.Windows.Forms.Button();
+            this.label19 = new System.Windows.Forms.Label();
+            this.label17 = new System.Windows.Forms.Label();
+            this.label20 = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
             this.panel4.SuspendLayout();
             this.panel5.SuspendLayout();
+            this.panel6.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
@@ -214,6 +231,14 @@
             this.panel3.Size = new System.Drawing.Size(378, 89);
             this.panel3.TabIndex = 5;
             // 
+            // jog_speed_tb
+            // 
+            this.jog_speed_tb.Location = new System.Drawing.Point(170, 11);
+            this.jog_speed_tb.Name = "jog_speed_tb";
+            this.jog_speed_tb.Size = new System.Drawing.Size(65, 22);
+            this.jog_speed_tb.TabIndex = 6;
+            this.jog_speed_tb.Text = "300";
+            // 
             // joint_tb
             // 
             this.joint_tb.Location = new System.Drawing.Point(60, 52);
@@ -221,6 +246,16 @@
             this.joint_tb.Size = new System.Drawing.Size(59, 22);
             this.joint_tb.TabIndex = 8;
             this.joint_tb.Text = "1";
+            // 
+            // Jog_set_speed
+            // 
+            this.Jog_set_speed.Location = new System.Drawing.Point(254, 9);
+            this.Jog_set_speed.Name = "Jog_set_speed";
+            this.Jog_set_speed.Size = new System.Drawing.Size(113, 26);
+            this.Jog_set_speed.TabIndex = 5;
+            this.Jog_set_speed.Text = "Set speed";
+            this.Jog_set_speed.UseVisualStyleBackColor = true;
+            this.Jog_set_speed.Click += new System.EventHandler(this.Jog_set_speed_Click);
             // 
             // label5
             // 
@@ -264,31 +299,13 @@
             this.label3.TabIndex = 1;
             this.label3.Text = "Jogging";
             // 
-            // Jog_set_speed
-            // 
-            this.Jog_set_speed.Location = new System.Drawing.Point(254, 9);
-            this.Jog_set_speed.Name = "Jog_set_speed";
-            this.Jog_set_speed.Size = new System.Drawing.Size(113, 26);
-            this.Jog_set_speed.TabIndex = 5;
-            this.Jog_set_speed.Text = "Set speed";
-            this.Jog_set_speed.UseVisualStyleBackColor = true;
-            this.Jog_set_speed.Click += new System.EventHandler(this.Jog_set_speed_Click);
-            // 
-            // jog_speed_tb
-            // 
-            this.jog_speed_tb.Location = new System.Drawing.Point(170, 11);
-            this.jog_speed_tb.Name = "jog_speed_tb";
-            this.jog_speed_tb.Size = new System.Drawing.Size(65, 22);
-            this.jog_speed_tb.TabIndex = 6;
-            this.jog_speed_tb.Text = "0";
-            // 
             // ErrorLog
             // 
             this.ErrorLog.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.ErrorLog.Location = new System.Drawing.Point(656, 13);
+            this.ErrorLog.Location = new System.Drawing.Point(303, 238);
             this.ErrorLog.Multiline = true;
             this.ErrorLog.Name = "ErrorLog";
-            this.ErrorLog.Size = new System.Drawing.Size(401, 218);
+            this.ErrorLog.Size = new System.Drawing.Size(347, 166);
             this.ErrorLog.TabIndex = 6;
             // 
             // panel4
@@ -512,6 +529,7 @@
             // 
             // Timer1
             // 
+            this.Timer1.Interval = 500;
             this.Timer1.Tick += new System.EventHandler(this.Timer1_Tick);
             // 
             // panel5
@@ -534,6 +552,34 @@
             this.panel5.Name = "panel5";
             this.panel5.Size = new System.Drawing.Size(285, 167);
             this.panel5.TabIndex = 26;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold);
+            this.label4.Location = new System.Drawing.Point(13, 127);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(21, 19);
+            this.label4.TabIndex = 19;
+            this.label4.Text = "ω";
+            // 
+            // spd_tb
+            // 
+            this.spd_tb.Location = new System.Drawing.Point(42, 125);
+            this.spd_tb.Name = "spd_tb";
+            this.spd_tb.Size = new System.Drawing.Size(59, 22);
+            this.spd_tb.TabIndex = 9;
+            this.spd_tb.Text = "0";
+            // 
+            // set_const_speed_btn
+            // 
+            this.set_const_speed_btn.Location = new System.Drawing.Point(129, 123);
+            this.set_const_speed_btn.Name = "set_const_speed_btn";
+            this.set_const_speed_btn.Size = new System.Drawing.Size(146, 26);
+            this.set_const_speed_btn.TabIndex = 9;
+            this.set_const_speed_btn.Text = "Set const speed";
+            this.set_const_speed_btn.UseVisualStyleBackColor = true;
+            this.set_const_speed_btn.Click += new System.EventHandler(this.set_const_speed_btn_Click);
             // 
             // run_btn
             // 
@@ -629,39 +675,183 @@
             this.label27.TabIndex = 1;
             this.label27.Text = "Path";
             // 
-            // spd_tb
+            // panel6
             // 
-            this.spd_tb.Location = new System.Drawing.Point(42, 125);
-            this.spd_tb.Name = "spd_tb";
-            this.spd_tb.Size = new System.Drawing.Size(59, 22);
-            this.spd_tb.TabIndex = 9;
-            this.spd_tb.Text = "0";
+            this.panel6.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel6.Controls.Add(this.cBoxParityBits);
+            this.panel6.Controls.Add(this.label24);
+            this.panel6.Controls.Add(this.cBoxStopBits);
+            this.panel6.Controls.Add(this.label22);
+            this.panel6.Controls.Add(this.cBoxDataBits);
+            this.panel6.Controls.Add(this.cBoxBaudRate);
+            this.panel6.Controls.Add(this.cBoxPort);
+            this.panel6.Controls.Add(this.progressBar1);
+            this.panel6.Controls.Add(this.label18);
+            this.panel6.Controls.Add(this.bClose);
+            this.panel6.Controls.Add(this.bOpen);
+            this.panel6.Controls.Add(this.label19);
+            this.panel6.Controls.Add(this.label17);
+            this.panel6.Controls.Add(this.label20);
+            this.panel6.Location = new System.Drawing.Point(656, 14);
+            this.panel6.Name = "panel6";
+            this.panel6.Size = new System.Drawing.Size(266, 287);
+            this.panel6.TabIndex = 3;
             // 
-            // set_const_speed_btn
+            // cBoxParityBits
             // 
-            this.set_const_speed_btn.Location = new System.Drawing.Point(129, 123);
-            this.set_const_speed_btn.Name = "set_const_speed_btn";
-            this.set_const_speed_btn.Size = new System.Drawing.Size(146, 26);
-            this.set_const_speed_btn.TabIndex = 9;
-            this.set_const_speed_btn.Text = "Set const speed";
-            this.set_const_speed_btn.UseVisualStyleBackColor = true;
-            this.set_const_speed_btn.Click += new System.EventHandler(this.set_const_speed_btn_Click);
+            this.cBoxParityBits.FormattingEnabled = true;
+            this.cBoxParityBits.Items.AddRange(new object[] {
+            "None",
+            "Odd",
+            "Even"});
+            this.cBoxParityBits.Location = new System.Drawing.Point(102, 181);
+            this.cBoxParityBits.Name = "cBoxParityBits";
+            this.cBoxParityBits.Size = new System.Drawing.Size(99, 24);
+            this.cBoxParityBits.TabIndex = 37;
+            this.cBoxParityBits.Text = "None";
             // 
-            // label4
+            // label24
             // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold);
-            this.label4.Location = new System.Drawing.Point(13, 127);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(21, 19);
-            this.label4.TabIndex = 19;
-            this.label4.Text = "ω";
+            this.label24.AutoSize = true;
+            this.label24.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold);
+            this.label24.Location = new System.Drawing.Point(5, 184);
+            this.label24.Name = "label24";
+            this.label24.Size = new System.Drawing.Size(90, 19);
+            this.label24.TabIndex = 36;
+            this.label24.Text = "PARITY BITS";
+            // 
+            // cBoxStopBits
+            // 
+            this.cBoxStopBits.FormattingEnabled = true;
+            this.cBoxStopBits.Items.AddRange(new object[] {
+            "1",
+            "2"});
+            this.cBoxStopBits.Location = new System.Drawing.Point(102, 152);
+            this.cBoxStopBits.Name = "cBoxStopBits";
+            this.cBoxStopBits.Size = new System.Drawing.Size(99, 24);
+            this.cBoxStopBits.TabIndex = 35;
+            this.cBoxStopBits.Text = "1";
+            // 
+            // label22
+            // 
+            this.label22.AutoSize = true;
+            this.label22.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold);
+            this.label22.Location = new System.Drawing.Point(5, 155);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(77, 19);
+            this.label22.TabIndex = 34;
+            this.label22.Text = "STOP BITS";
+            // 
+            // cBoxDataBits
+            // 
+            this.cBoxDataBits.FormattingEnabled = true;
+            this.cBoxDataBits.Items.AddRange(new object[] {
+            "7",
+            "8",
+            "9"});
+            this.cBoxDataBits.Location = new System.Drawing.Point(102, 123);
+            this.cBoxDataBits.Name = "cBoxDataBits";
+            this.cBoxDataBits.Size = new System.Drawing.Size(99, 24);
+            this.cBoxDataBits.TabIndex = 33;
+            this.cBoxDataBits.Text = "8";
+            // 
+            // cBoxBaudRate
+            // 
+            this.cBoxBaudRate.FormattingEnabled = true;
+            this.cBoxBaudRate.Items.AddRange(new object[] {
+            "115200",
+            "9600",
+            "4800"});
+            this.cBoxBaudRate.Location = new System.Drawing.Point(102, 95);
+            this.cBoxBaudRate.Name = "cBoxBaudRate";
+            this.cBoxBaudRate.Size = new System.Drawing.Size(99, 24);
+            this.cBoxBaudRate.TabIndex = 32;
+            this.cBoxBaudRate.Text = "9600";
+            // 
+            // cBoxPort
+            // 
+            this.cBoxPort.FormattingEnabled = true;
+            this.cBoxPort.Location = new System.Drawing.Point(102, 67);
+            this.cBoxPort.Name = "cBoxPort";
+            this.cBoxPort.Size = new System.Drawing.Size(99, 24);
+            this.cBoxPort.TabIndex = 31;
+            // 
+            // progressBar1
+            // 
+            this.progressBar1.Location = new System.Drawing.Point(16, 252);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(236, 23);
+            this.progressBar1.TabIndex = 3;
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold);
+            this.label18.Location = new System.Drawing.Point(5, 126);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(78, 19);
+            this.label18.TabIndex = 30;
+            this.label18.Text = "DATA BITS";
+            // 
+            // bClose
+            // 
+            this.bClose.BackColor = System.Drawing.Color.Red;
+            this.bClose.Location = new System.Drawing.Point(137, 220);
+            this.bClose.Name = "bClose";
+            this.bClose.Size = new System.Drawing.Size(115, 26);
+            this.bClose.TabIndex = 2;
+            this.bClose.Text = "CLOSE";
+            this.bClose.UseVisualStyleBackColor = false;
+            this.bClose.Click += new System.EventHandler(this.bClose_Click);
+            // 
+            // bOpen
+            // 
+            this.bOpen.BackColor = System.Drawing.Color.Lime;
+            this.bOpen.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.bOpen.Location = new System.Drawing.Point(16, 220);
+            this.bOpen.Name = "bOpen";
+            this.bOpen.Size = new System.Drawing.Size(115, 26);
+            this.bOpen.TabIndex = 1;
+            this.bOpen.Text = "OPEN";
+            this.bOpen.UseVisualStyleBackColor = false;
+            this.bOpen.Click += new System.EventHandler(this.bOpen_Click);
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold);
+            this.label19.Location = new System.Drawing.Point(5, 98);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(85, 19);
+            this.label19.TabIndex = 28;
+            this.label19.Text = "BAUD RATE";
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Font = new System.Drawing.Font("Segoe UI", 16.2F, System.Drawing.FontStyle.Bold);
+            this.label17.Location = new System.Drawing.Point(-1, 0);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(247, 38);
+            this.label17.TabIndex = 1;
+            this.label17.Text = "Real-time Display";
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold);
+            this.label20.Location = new System.Drawing.Point(5, 70);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(83, 19);
+            this.label20.TabIndex = 26;
+            this.label20.Text = "COM PORT";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1380, 632);
+            this.ClientSize = new System.Drawing.Size(934, 414);
+            this.Controls.Add(this.panel6);
             this.Controls.Add(this.panel5);
             this.Controls.Add(this.panel4);
             this.Controls.Add(this.ErrorLog);
@@ -680,6 +870,8 @@
             this.panel4.PerformLayout();
             this.panel5.ResumeLayout(false);
             this.panel5.PerformLayout();
+            this.panel6.ResumeLayout(false);
+            this.panel6.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -743,6 +935,22 @@
         private System.Windows.Forms.TextBox spd_tb;
         private System.Windows.Forms.Button set_const_speed_btn;
         private System.Windows.Forms.Label label4;
+        private System.IO.Ports.SerialPort serialPort1;
+        private System.Windows.Forms.Panel panel6;
+        private System.Windows.Forms.Button bClose;
+        private System.Windows.Forms.Button bOpen;
+        private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.ProgressBar progressBar1;
+        private System.Windows.Forms.ComboBox cBoxBaudRate;
+        private System.Windows.Forms.ComboBox cBoxPort;
+        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.Label label19;
+        private System.Windows.Forms.Label label20;
+        private System.Windows.Forms.ComboBox cBoxParityBits;
+        private System.Windows.Forms.Label label24;
+        private System.Windows.Forms.ComboBox cBoxStopBits;
+        private System.Windows.Forms.Label label22;
+        private System.Windows.Forms.ComboBox cBoxDataBits;
     }
 }
 
