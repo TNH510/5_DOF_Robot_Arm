@@ -398,12 +398,15 @@ namespace GUI
 
         private void Jog_set_speed_Click(object sender, EventArgs e)
         {
-            int velocity;
+            int velocity = 0;
             try
             {
                 velocity = Convert.ToInt32(jog_speed_tb.Text) * 1000;
-                write_d_mem_32_bit(1008, velocity);
-                PrintLog("Info", MethodBase.GetCurrentMethod().Name, "Set Velocity successfully");
+                for (int ind = 0; ind < 5; ind++)
+                {
+                    write_d_mem_32_bit(640 + 2 * ind, velocity);
+                }
+
             }
             catch (Exception ex)
             {
@@ -718,6 +721,21 @@ namespace GUI
             {
                 value_angle_t5[2 * j] = Write_Theta(angle_array[j, 4])[0];
                 value_angle_t5[2 * j + 1] = Write_Theta(angle_array[j, 4])[1];
+            }
+        }
+
+        private void set_const_speed_btn_Click(object sender, EventArgs e)
+        {
+            int velocity;
+            try
+            {
+                velocity = Convert.ToInt32(spd_tb.Text) * 1000;
+                write_d_mem_32_bit(1008, velocity);
+                PrintLog("Info", MethodBase.GetCurrentMethod().Name, "Set Velocity successfully");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
             }
         }
     }

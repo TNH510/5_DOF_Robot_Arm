@@ -42,11 +42,11 @@
             this.panel3 = new System.Windows.Forms.Panel();
             this.joint_tb = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
-            this.Jog_set_speed = new System.Windows.Forms.Button();
-            this.jog_speed_tb = new System.Windows.Forms.TextBox();
             this.Backward_btn = new System.Windows.Forms.Button();
             this.Forward_btn = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
+            this.Jog_set_speed = new System.Windows.Forms.Button();
+            this.jog_speed_tb = new System.Windows.Forms.TextBox();
             this.ErrorLog = new System.Windows.Forms.TextBox();
             this.panel4 = new System.Windows.Forms.Panel();
             this.t5_tb = new System.Windows.Forms.TextBox();
@@ -72,6 +72,9 @@
             this.label8 = new System.Windows.Forms.Label();
             this.Timer1 = new System.Windows.Forms.Timer(this.components);
             this.panel5 = new System.Windows.Forms.Panel();
+            this.run_btn = new System.Windows.Forms.Button();
+            this.Tsm_moveL_btn = new System.Windows.Forms.Button();
+            this.Tsm_moveJ_btn = new System.Windows.Forms.Button();
             this.Mvz_tb = new System.Windows.Forms.TextBox();
             this.label21 = new System.Windows.Forms.Label();
             this.Mvy_tb = new System.Windows.Forms.TextBox();
@@ -79,17 +82,14 @@
             this.Mvx_tb = new System.Windows.Forms.TextBox();
             this.label25 = new System.Windows.Forms.Label();
             this.label27 = new System.Windows.Forms.Label();
-            this.panel6 = new System.Windows.Forms.Panel();
+            this.spd_tb = new System.Windows.Forms.TextBox();
+            this.set_const_speed_btn = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
-            this.Tsm_moveJ_btn = new System.Windows.Forms.Button();
-            this.Tsm_moveL_btn = new System.Windows.Forms.Button();
-            this.run_btn = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
             this.panel4.SuspendLayout();
             this.panel5.SuspendLayout();
-            this.panel6.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
@@ -202,7 +202,9 @@
             // panel3
             // 
             this.panel3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel3.Controls.Add(this.jog_speed_tb);
             this.panel3.Controls.Add(this.joint_tb);
+            this.panel3.Controls.Add(this.Jog_set_speed);
             this.panel3.Controls.Add(this.label5);
             this.panel3.Controls.Add(this.Backward_btn);
             this.panel3.Controls.Add(this.Forward_btn);
@@ -229,24 +231,6 @@
             this.label5.Size = new System.Drawing.Size(41, 19);
             this.label5.TabIndex = 7;
             this.label5.Text = "Joint";
-            // 
-            // Jog_set_speed
-            // 
-            this.Jog_set_speed.Location = new System.Drawing.Point(5, 74);
-            this.Jog_set_speed.Name = "Jog_set_speed";
-            this.Jog_set_speed.Size = new System.Drawing.Size(113, 26);
-            this.Jog_set_speed.TabIndex = 5;
-            this.Jog_set_speed.Text = "Set speed";
-            this.Jog_set_speed.UseVisualStyleBackColor = true;
-            this.Jog_set_speed.Click += new System.EventHandler(this.Jog_set_speed_Click);
-            // 
-            // jog_speed_tb
-            // 
-            this.jog_speed_tb.Location = new System.Drawing.Point(8, 46);
-            this.jog_speed_tb.Name = "jog_speed_tb";
-            this.jog_speed_tb.Size = new System.Drawing.Size(65, 22);
-            this.jog_speed_tb.TabIndex = 6;
-            this.jog_speed_tb.Text = "0";
             // 
             // Backward_btn
             // 
@@ -279,6 +263,24 @@
             this.label3.Size = new System.Drawing.Size(122, 38);
             this.label3.TabIndex = 1;
             this.label3.Text = "Jogging";
+            // 
+            // Jog_set_speed
+            // 
+            this.Jog_set_speed.Location = new System.Drawing.Point(254, 9);
+            this.Jog_set_speed.Name = "Jog_set_speed";
+            this.Jog_set_speed.Size = new System.Drawing.Size(113, 26);
+            this.Jog_set_speed.TabIndex = 5;
+            this.Jog_set_speed.Text = "Set speed";
+            this.Jog_set_speed.UseVisualStyleBackColor = true;
+            this.Jog_set_speed.Click += new System.EventHandler(this.Jog_set_speed_Click);
+            // 
+            // jog_speed_tb
+            // 
+            this.jog_speed_tb.Location = new System.Drawing.Point(170, 11);
+            this.jog_speed_tb.Name = "jog_speed_tb";
+            this.jog_speed_tb.Size = new System.Drawing.Size(65, 22);
+            this.jog_speed_tb.TabIndex = 6;
+            this.jog_speed_tb.Text = "0";
             // 
             // ErrorLog
             // 
@@ -515,6 +517,9 @@
             // panel5
             // 
             this.panel5.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel5.Controls.Add(this.label4);
+            this.panel5.Controls.Add(this.spd_tb);
+            this.panel5.Controls.Add(this.set_const_speed_btn);
             this.panel5.Controls.Add(this.run_btn);
             this.panel5.Controls.Add(this.Tsm_moveL_btn);
             this.panel5.Controls.Add(this.Tsm_moveJ_btn);
@@ -527,8 +532,38 @@
             this.panel5.Controls.Add(this.label27);
             this.panel5.Location = new System.Drawing.Point(12, 237);
             this.panel5.Name = "panel5";
-            this.panel5.Size = new System.Drawing.Size(285, 136);
+            this.panel5.Size = new System.Drawing.Size(285, 167);
             this.panel5.TabIndex = 26;
+            // 
+            // run_btn
+            // 
+            this.run_btn.Location = new System.Drawing.Point(127, 11);
+            this.run_btn.Name = "run_btn";
+            this.run_btn.Size = new System.Drawing.Size(117, 26);
+            this.run_btn.TabIndex = 18;
+            this.run_btn.Text = "Run";
+            this.run_btn.UseVisualStyleBackColor = true;
+            this.run_btn.Click += new System.EventHandler(this.run_btn_Click);
+            // 
+            // Tsm_moveL_btn
+            // 
+            this.Tsm_moveL_btn.Location = new System.Drawing.Point(127, 85);
+            this.Tsm_moveL_btn.Name = "Tsm_moveL_btn";
+            this.Tsm_moveL_btn.Size = new System.Drawing.Size(148, 26);
+            this.Tsm_moveL_btn.TabIndex = 17;
+            this.Tsm_moveL_btn.Text = "Transmit MoveL";
+            this.Tsm_moveL_btn.UseVisualStyleBackColor = true;
+            this.Tsm_moveL_btn.Click += new System.EventHandler(this.Tsm_moveL_btn_Click);
+            // 
+            // Tsm_moveJ_btn
+            // 
+            this.Tsm_moveJ_btn.Location = new System.Drawing.Point(127, 53);
+            this.Tsm_moveJ_btn.Name = "Tsm_moveJ_btn";
+            this.Tsm_moveJ_btn.Size = new System.Drawing.Size(148, 26);
+            this.Tsm_moveJ_btn.TabIndex = 8;
+            this.Tsm_moveJ_btn.Text = "Transmit MoveJ";
+            this.Tsm_moveJ_btn.UseVisualStyleBackColor = true;
+            this.Tsm_moveJ_btn.Click += new System.EventHandler(this.Tsm_moveJ_btn_Click);
             // 
             // Mvz_tb
             // 
@@ -594,63 +629,39 @@
             this.label27.TabIndex = 1;
             this.label27.Text = "Path";
             // 
-            // panel6
+            // spd_tb
             // 
-            this.panel6.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel6.Controls.Add(this.label4);
-            this.panel6.Controls.Add(this.jog_speed_tb);
-            this.panel6.Controls.Add(this.Jog_set_speed);
-            this.panel6.Location = new System.Drawing.Point(303, 237);
-            this.panel6.Name = "panel6";
-            this.panel6.Size = new System.Drawing.Size(125, 136);
-            this.panel6.TabIndex = 26;
+            this.spd_tb.Location = new System.Drawing.Point(42, 125);
+            this.spd_tb.Name = "spd_tb";
+            this.spd_tb.Size = new System.Drawing.Size(59, 22);
+            this.spd_tb.TabIndex = 9;
+            this.spd_tb.Text = "0";
+            // 
+            // set_const_speed_btn
+            // 
+            this.set_const_speed_btn.Location = new System.Drawing.Point(129, 123);
+            this.set_const_speed_btn.Name = "set_const_speed_btn";
+            this.set_const_speed_btn.Size = new System.Drawing.Size(146, 26);
+            this.set_const_speed_btn.TabIndex = 9;
+            this.set_const_speed_btn.Text = "Set const speed";
+            this.set_const_speed_btn.UseVisualStyleBackColor = true;
+            this.set_const_speed_btn.Click += new System.EventHandler(this.set_const_speed_btn_Click);
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Segoe UI", 16.2F, System.Drawing.FontStyle.Bold);
-            this.label4.Location = new System.Drawing.Point(-1, -1);
+            this.label4.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold);
+            this.label4.Location = new System.Drawing.Point(13, 127);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(97, 38);
-            this.label4.TabIndex = 7;
-            this.label4.Text = "Speed";
-            // 
-            // Tsm_moveJ_btn
-            // 
-            this.Tsm_moveJ_btn.Location = new System.Drawing.Point(127, 53);
-            this.Tsm_moveJ_btn.Name = "Tsm_moveJ_btn";
-            this.Tsm_moveJ_btn.Size = new System.Drawing.Size(148, 26);
-            this.Tsm_moveJ_btn.TabIndex = 8;
-            this.Tsm_moveJ_btn.Text = "Transmit MoveJ";
-            this.Tsm_moveJ_btn.UseVisualStyleBackColor = true;
-            this.Tsm_moveJ_btn.Click += new System.EventHandler(this.Tsm_moveJ_btn_Click);
-            // 
-            // Tsm_moveL_btn
-            // 
-            this.Tsm_moveL_btn.Location = new System.Drawing.Point(127, 85);
-            this.Tsm_moveL_btn.Name = "Tsm_moveL_btn";
-            this.Tsm_moveL_btn.Size = new System.Drawing.Size(148, 26);
-            this.Tsm_moveL_btn.TabIndex = 17;
-            this.Tsm_moveL_btn.Text = "Transmit MoveL";
-            this.Tsm_moveL_btn.UseVisualStyleBackColor = true;
-            this.Tsm_moveL_btn.Click += new System.EventHandler(this.Tsm_moveL_btn_Click);
-            // 
-            // run_btn
-            // 
-            this.run_btn.Location = new System.Drawing.Point(127, 11);
-            this.run_btn.Name = "run_btn";
-            this.run_btn.Size = new System.Drawing.Size(117, 26);
-            this.run_btn.TabIndex = 18;
-            this.run_btn.Text = "Run";
-            this.run_btn.UseVisualStyleBackColor = true;
-            this.run_btn.Click += new System.EventHandler(this.run_btn_Click);
+            this.label4.Size = new System.Drawing.Size(21, 19);
+            this.label4.TabIndex = 19;
+            this.label4.Text = "ω";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1380, 632);
-            this.Controls.Add(this.panel6);
             this.Controls.Add(this.panel5);
             this.Controls.Add(this.panel4);
             this.Controls.Add(this.ErrorLog);
@@ -669,8 +680,6 @@
             this.panel4.PerformLayout();
             this.panel5.ResumeLayout(false);
             this.panel5.PerformLayout();
-            this.panel6.ResumeLayout(false);
-            this.panel6.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -728,11 +737,12 @@
         private System.Windows.Forms.TextBox Mvx_tb;
         private System.Windows.Forms.Label label25;
         private System.Windows.Forms.Label label27;
-        private System.Windows.Forms.Panel panel6;
-        private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button Tsm_moveJ_btn;
         private System.Windows.Forms.Button Tsm_moveL_btn;
         private System.Windows.Forms.Button run_btn;
+        private System.Windows.Forms.TextBox spd_tb;
+        private System.Windows.Forms.Button set_const_speed_btn;
+        private System.Windows.Forms.Label label4;
     }
 }
 
