@@ -72,6 +72,15 @@
             this.label8 = new System.Windows.Forms.Label();
             this.Timer1 = new System.Windows.Forms.Timer(this.components);
             this.panel5 = new System.Windows.Forms.Panel();
+            this.MvCy2_tb = new System.Windows.Forms.TextBox();
+            this.label29 = new System.Windows.Forms.Label();
+            this.MvCx2_tb = new System.Windows.Forms.TextBox();
+            this.label30 = new System.Windows.Forms.Label();
+            this.MvCy1_tb = new System.Windows.Forms.TextBox();
+            this.label26 = new System.Windows.Forms.Label();
+            this.MvCx1_tb = new System.Windows.Forms.TextBox();
+            this.label28 = new System.Windows.Forms.Label();
+            this.Tsm_moveC_btn = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.spd_tb = new System.Windows.Forms.TextBox();
             this.set_const_speed_btn = new System.Windows.Forms.Button();
@@ -537,6 +546,15 @@
             // panel5
             // 
             this.panel5.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel5.Controls.Add(this.MvCy2_tb);
+            this.panel5.Controls.Add(this.label29);
+            this.panel5.Controls.Add(this.MvCx2_tb);
+            this.panel5.Controls.Add(this.label30);
+            this.panel5.Controls.Add(this.MvCy1_tb);
+            this.panel5.Controls.Add(this.label26);
+            this.panel5.Controls.Add(this.MvCx1_tb);
+            this.panel5.Controls.Add(this.label28);
+            this.panel5.Controls.Add(this.Tsm_moveC_btn);
             this.panel5.Controls.Add(this.label4);
             this.panel5.Controls.Add(this.spd_tb);
             this.panel5.Controls.Add(this.set_const_speed_btn);
@@ -552,14 +570,96 @@
             this.panel5.Controls.Add(this.label27);
             this.panel5.Location = new System.Drawing.Point(12, 237);
             this.panel5.Name = "panel5";
-            this.panel5.Size = new System.Drawing.Size(285, 167);
+            this.panel5.Size = new System.Drawing.Size(285, 272);
             this.panel5.TabIndex = 26;
+            // 
+            // MvCy2_tb
+            // 
+            this.MvCy2_tb.Location = new System.Drawing.Point(136, 155);
+            this.MvCy2_tb.Name = "MvCy2_tb";
+            this.MvCy2_tb.Size = new System.Drawing.Size(59, 22);
+            this.MvCy2_tb.TabIndex = 28;
+            this.MvCy2_tb.Text = "0";
+            // 
+            // label29
+            // 
+            this.label29.AutoSize = true;
+            this.label29.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold);
+            this.label29.Location = new System.Drawing.Point(107, 156);
+            this.label29.Name = "label29";
+            this.label29.Size = new System.Drawing.Size(26, 19);
+            this.label29.TabIndex = 27;
+            this.label29.Text = "Y2";
+            // 
+            // MvCx2_tb
+            // 
+            this.MvCx2_tb.Location = new System.Drawing.Point(136, 127);
+            this.MvCx2_tb.Name = "MvCx2_tb";
+            this.MvCx2_tb.Size = new System.Drawing.Size(59, 22);
+            this.MvCx2_tb.TabIndex = 26;
+            this.MvCx2_tb.Text = "0";
+            // 
+            // label30
+            // 
+            this.label30.AutoSize = true;
+            this.label30.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold);
+            this.label30.Location = new System.Drawing.Point(107, 128);
+            this.label30.Name = "label30";
+            this.label30.Size = new System.Drawing.Size(26, 19);
+            this.label30.TabIndex = 25;
+            this.label30.Text = "X2";
+            // 
+            // MvCy1_tb
+            // 
+            this.MvCy1_tb.Location = new System.Drawing.Point(42, 155);
+            this.MvCy1_tb.Name = "MvCy1_tb";
+            this.MvCy1_tb.Size = new System.Drawing.Size(59, 22);
+            this.MvCy1_tb.TabIndex = 24;
+            this.MvCy1_tb.Text = "0";
+            // 
+            // label26
+            // 
+            this.label26.AutoSize = true;
+            this.label26.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold);
+            this.label26.Location = new System.Drawing.Point(13, 156);
+            this.label26.Name = "label26";
+            this.label26.Size = new System.Drawing.Size(26, 19);
+            this.label26.TabIndex = 23;
+            this.label26.Text = "Y1";
+            // 
+            // MvCx1_tb
+            // 
+            this.MvCx1_tb.Location = new System.Drawing.Point(42, 127);
+            this.MvCx1_tb.Name = "MvCx1_tb";
+            this.MvCx1_tb.Size = new System.Drawing.Size(59, 22);
+            this.MvCx1_tb.TabIndex = 22;
+            this.MvCx1_tb.Text = "0";
+            // 
+            // label28
+            // 
+            this.label28.AutoSize = true;
+            this.label28.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold);
+            this.label28.Location = new System.Drawing.Point(13, 128);
+            this.label28.Name = "label28";
+            this.label28.Size = new System.Drawing.Size(26, 19);
+            this.label28.TabIndex = 21;
+            this.label28.Text = "X1";
+            // 
+            // Tsm_moveC_btn
+            // 
+            this.Tsm_moveC_btn.Location = new System.Drawing.Point(201, 128);
+            this.Tsm_moveC_btn.Name = "Tsm_moveC_btn";
+            this.Tsm_moveC_btn.Size = new System.Drawing.Size(74, 49);
+            this.Tsm_moveC_btn.TabIndex = 20;
+            this.Tsm_moveC_btn.Text = "Transmit MoveC";
+            this.Tsm_moveC_btn.UseVisualStyleBackColor = true;
+            this.Tsm_moveC_btn.Click += new System.EventHandler(this.Tsm_moveC_btn_Click);
             // 
             // label4
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold);
-            this.label4.Location = new System.Drawing.Point(13, 127);
+            this.label4.Location = new System.Drawing.Point(13, 187);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(21, 19);
             this.label4.TabIndex = 19;
@@ -567,7 +667,7 @@
             // 
             // spd_tb
             // 
-            this.spd_tb.Location = new System.Drawing.Point(42, 125);
+            this.spd_tb.Location = new System.Drawing.Point(42, 185);
             this.spd_tb.Name = "spd_tb";
             this.spd_tb.Size = new System.Drawing.Size(59, 22);
             this.spd_tb.TabIndex = 9;
@@ -575,7 +675,7 @@
             // 
             // set_const_speed_btn
             // 
-            this.set_const_speed_btn.Location = new System.Drawing.Point(129, 123);
+            this.set_const_speed_btn.Location = new System.Drawing.Point(129, 183);
             this.set_const_speed_btn.Name = "set_const_speed_btn";
             this.set_const_speed_btn.Size = new System.Drawing.Size(146, 26);
             this.set_const_speed_btn.TabIndex = 9;
@@ -874,7 +974,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1229, 409);
+            this.ClientSize = new System.Drawing.Size(1158, 568);
             this.Controls.Add(this.panel6);
             this.Controls.Add(this.panel5);
             this.Controls.Add(this.panel4);
@@ -977,6 +1077,15 @@
         private System.Windows.Forms.ComboBox cBoxDataBits;
         private System.Windows.Forms.Button bt_on_matlab;
         private System.Windows.Forms.Button bt_off_matlab;
+        private System.Windows.Forms.Button Tsm_moveC_btn;
+        private System.Windows.Forms.TextBox MvCy2_tb;
+        private System.Windows.Forms.Label label29;
+        private System.Windows.Forms.TextBox MvCx2_tb;
+        private System.Windows.Forms.Label label30;
+        private System.Windows.Forms.TextBox MvCy1_tb;
+        private System.Windows.Forms.Label label26;
+        private System.Windows.Forms.TextBox MvCx1_tb;
+        private System.Windows.Forms.Label label28;
     }
 }
 

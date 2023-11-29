@@ -101,6 +101,8 @@ namespace GUI
             }
         }
         #region Functions
+
+
         private void Timer1_Tick(object sender, EventArgs e)
         {
             Forward_Kinematic();
@@ -641,11 +643,11 @@ namespace GUI
 
                 int[] value_angle = new int[10];
                 /* Run */
-                temp_value[0] = (int)(Convert.ToDouble(t1_tb.Text) + 180) * 100000;
-                temp_value[1] = (int)(Convert.ToDouble(t2_tb.Text) + 180) * 100000;
-                temp_value[2] = (int)(Convert.ToDouble(t3_tb.Text) + 180) * 100000;
-                temp_value[3] = (int)(Convert.ToDouble(t4_tb.Text) + 180) * 100000;
-                temp_value[4] = (int)(Convert.ToDouble(t5_tb.Text) + 180) * 100000;
+                temp_value[0] = (int)(Convert.ToDouble(t1_tb.Text) * 100000 + 18000000);
+                temp_value[1] = (int)(Convert.ToDouble(t2_tb.Text) * 100000 + 18000000);
+                temp_value[2] = (int)(Convert.ToDouble(t3_tb.Text) * 100000 + 18000000);
+                temp_value[3] = (int)(Convert.ToDouble(t4_tb.Text) * 100000 + 18000000);
+                temp_value[4] = (int)(Convert.ToDouble(t5_tb.Text) * 100000 + 18000000);
                 /* Write the angle */
                 for (int ind = 0; ind < 5; ind++)
                 {
@@ -671,6 +673,12 @@ namespace GUI
                 /* Turn on relay */
                 turn_on_1_pulse_relay(530);
             }
+            else if (move == 3)
+            {
+                /* Turn on relay */
+                turn_on_1_pulse_relay(530);
+            }
+
             move = 0;
         }
 
@@ -689,6 +697,115 @@ namespace GUI
 
             // Close MATLAB
             //matlab.Quit();
+        }
+
+        private void Tsm_moveC_btn_Click(object sender, EventArgs e)
+        {
+            move = 3;
+            double x1, y1, x2, y2, x_cur, y_cur, z_cur;
+            double[] vect_u = new double[3];
+            double[] curr_pos = new double[3];
+            double[] targ_pos = new double[3];
+            double t1, t2, t3, t4, t5;
+            int[,] angle_array = new int[10, 5];
+            double x, y, z;
+            int ret;
+            int[] value_angle = new int[80];
+            int[] value_angle_t5 = new int[20];
+            x_cur = Convert.ToDouble(X_curpos.Text);
+            y_cur = Convert.ToDouble(Y_curpos.Text);
+            z_cur = Convert.ToDouble(Z_curpos.Text);
+
+            x1 = Convert.ToDouble(MvCx1_tb.Text);
+            y1 = Convert.ToDouble(MvCy1_tb.Text);
+
+            x2 = Convert.ToDouble(MvCx2_tb.Text);
+            y2 = Convert.ToDouble(MvCy2_tb.Text);
+            // Tạo các điểm (x, y)
+            Point point1 = new Point(x_cur, y_cur);
+            Point point2 = new Point(x1, y1);
+            Point point3 = new Point(x2, y2);
+
+            // Tính toán quỹ đạo đường tròn
+            Circle circle = CalculateCircle(point1, point2, point3);
+
+            // In kết quả
+            Console.WriteLine($"Tâm đường tròn: ({circle.Center.X}, {circle.Center.Y})");
+            Console.WriteLine($"Bán kính đường tròn: {circle.Radius}");
+
+            double R = circle.Radius;
+            double a = circle.Center.X;
+            double b = circle.Center.Y;
+            /* Linear Equation */
+            for (int t = 0; t < 9; t++)
+            {
+                x = R * Math.Sin(2*Math.PI * t / 9) + a;
+                y = R * Math.Cos(2*Math.PI * t / 9) + b;
+                z = z_cur;
+                (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
+                ret = Check_angle(t1, t2, t3, t4, t5);
+                if (ret != 0)
+                {
+                    double theta = 0.0;
+                    if (ret == 1) theta = t1;
+                    else if (ret == 2) theta = t2;
+                    else if (ret == 3) theta = t3;
+                    else if (ret == 4) theta = t4;
+                    else if (ret == 5) theta = t5;
+                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
+                    return;
+                }
+                t2 -= 90.0;
+                t3 += 90.0;
+                t4 += 90.0;
+                /* Assign value */
+                angle_array[t, 0] = (int)(t1 * 100000 + 18000000);
+                angle_array[t, 1] = (int)(t2 * 100000 + 18000000);
+                angle_array[t, 2] = (int)(t3 * 100000 + 18000000);
+                angle_array[t, 3] = (int)(t4 * 100000 + 18000000);
+                angle_array[t, 4] = (int)(t5 * 100000 + 18000000);
+            }
+            for (int j = 0; j < 9; j++)
+            {
+                value_angle[8 * j] = Write_Theta(angle_array[j, 0])[0];
+                value_angle[8 * j + 1] = Write_Theta(angle_array[j, 0])[1];
+
+                value_angle[8 * j + 2] = Write_Theta(angle_array[j, 1])[0];
+                value_angle[8 * j + 3] = Write_Theta(angle_array[j, 1])[1];
+
+                value_angle[8 * j + 4] = Write_Theta(angle_array[j, 2])[0];
+                value_angle[8 * j + 5] = Write_Theta(angle_array[j, 2])[1];
+
+                value_angle[8 * j + 6] = Write_Theta(angle_array[j, 3])[0];
+                value_angle[8 * j + 7] = Write_Theta(angle_array[j, 3])[1];
+
+                PrintLog("vect", "value:", Convert.ToString(value_angle[8 * j]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 1]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 2]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 3]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 4]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 5]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 6]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 7]));
+            }
+            value_angle[8 * 9] = Write_Theta(angle_array[0, 0])[0];
+            value_angle[8 * 9 + 1] = Write_Theta(angle_array[0, 0])[1];
+
+            value_angle[8 * 9 + 2] = Write_Theta(angle_array[0, 1])[0];
+            value_angle[8 * 9 + 3] = Write_Theta(angle_array[0, 1])[1];
+
+            value_angle[8 * 9 + 4] = Write_Theta(angle_array[0, 2])[0];
+            value_angle[8 * 9 + 5] = Write_Theta(angle_array[0, 2])[1];
+
+            value_angle[8 * 9 + 6] = Write_Theta(angle_array[0, 3])[0];
+            value_angle[8 * 9 + 7] = Write_Theta(angle_array[0, 3])[1];
+
+            plc.WriteDeviceBlock("D1010", 80, ref value_angle[0]);
+            for (int j = 0; j < 10; j++)
+            {
+                value_angle_t5[2 * j] = Write_Theta(angle_array[j, 4])[0];
+                value_angle_t5[2 * j + 1] = Write_Theta(angle_array[j, 4])[1];
+            }
         }
 
         private void Tsm_moveL_btn_Click(object sender, EventArgs e)
@@ -831,5 +948,69 @@ namespace GUI
 
             }
         }
+        class Point
+        {
+            public double X { get; set; }
+            public double Y { get; set; }
+
+            public Point(double x, double y)
+            {
+                X = x;
+                Y = y;
+            }
+        }
+
+        class Circle
+        {
+            public Point Center { get; set; }
+            public double Radius { get; set; }
+
+            public Circle(Point center, double radius)
+            {
+                Center = center;
+                Radius = radius;
+            }
+        }
+        static Circle CalculateCircle(Point point1, Point point2, Point point3)
+        {
+            double x1 = point1.X;
+            double y1 = point1.Y;
+            double x2 = point2.X;
+            double y2 = point2.Y;
+            double x3 = point3.X;
+            double y3 = point3.Y;
+
+            double x12 = x1 - x2;
+            double x13 = x1 - x3;
+
+            double y12 = y1 - y2;
+            double y13 = y1 - y3;
+
+            double y31 = y3 - y1;
+            double y21 = y2 - y1;
+
+            double x31 = x3 - x1;
+            double x21 = x2 - x1;
+
+            double sx13 = Math.Pow(x1, 2) - Math.Pow(x3, 2);
+            double sy13 = Math.Pow(y1, 2) - Math.Pow(y3, 2);
+
+            double sx21 = Math.Pow(x2, 2) - Math.Pow(x1, 2);
+            double sy21 = Math.Pow(y2, 2) - Math.Pow(y1, 2);
+
+            double f = ((sx13) * (x12) + (sy13) * (x12) + (sx21) * (x13) + (sy21) * (x13)) / (2 * ((y31) * (x12) - (y21) * (x13)));
+            double g = ((sx13) * (y12) + (sy13) * (y12) + (sx21) * (y13) + (sy21) * (y13)) / (2 * ((x31) * (y12) - (x21) * (y13)));
+
+            double c = -Math.Pow(x1, 2) - Math.Pow(y1, 2) - 2 * g * x1 - 2 * f * y1;
+
+            double h = -g;
+            double k = -f;
+            double sqr_of_r = h * h + k * k - c;
+
+            double r = Math.Sqrt(sqr_of_r);
+
+            return new Circle(new Point(h, k), r);
+        }
     }
 }
+
