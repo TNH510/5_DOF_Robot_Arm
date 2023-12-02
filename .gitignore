@@ -1,6 +1,9 @@
 # Prerequisites
 *.d
 
+# AutoCAD
+*.bak
+
 # C# project
 *.suo
 *.dll
