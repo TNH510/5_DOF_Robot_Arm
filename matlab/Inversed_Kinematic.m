@@ -38,6 +38,3 @@ m1 = simplify(T12T23T34T45(1,4));
 m2 = simplify(T12T23T34T45(2,4));
 m3 = simplify(T12T23T34T45(3,4));
 
-
-
-
