@@ -46,3 +46,11 @@ Jw2 = [0 sin(t1) 0 0 0; 0 -cos(t1) 0 0 0; 1 0 0 0 0]
 Jw3 = [0 sin(t1) sin(t1) 0 0; 0 -cos(t1) -cos(t1) 0 0; 1 0 0 0 0]
 Jw4 = [0 sin(t1) sin(t1) sin(t1) 0; 0 -cos(t1) -cos(t1) -cos(t1) 0; 1 0 0 0 0]
 Jw5 = [0 sin(t1) sin(t1) sin(t1) cos(t2 + t3 + t4)*cos(t1); 0 -cos(t1) -cos(t1) -cos(t1) cos(t2 + t3 + t4)*sin(t1); 1 0 0 0 sin(t2 + t3 + t4)]
+
+%% MA TRAN JACOBI VAN TOC DAI (Jv)
+syms Jv1 Jv2 Jv3 Jv4 Jv5
+Jv1 = [diff(pc1(1),t1) 0 0 0 0 ; diff(pc1(2),t1) 0 0 0 0; diff(pc1(3),t1) 0 0 0 0]
+Jv2 = [diff(pc2(1),t1) diff(pc2(1),t2) 0 0 0 ; diff(pc2(2),t1) diff(pc2(2),t2) 0 0 0; diff(pc2(3),t1) diff(pc2(3),t2) 0 0 0]
+Jv3 = [diff(pc3(1),t1) diff(pc3(1),t2) diff(pc3(1),t3) 0 0 ; diff(pc3(2),t1) diff(pc3(2),t2) diff(pc3(2),t3) 0 0; diff(pc3(3),t1) diff(pc3(3),t2) diff(pc3(3),t3) 0 0]
+Jv4 = [diff(pc4(1),t1) diff(pc4(1),t2) diff(pc4(1),t3) diff(pc4(1),t4) 0 ; diff(pc4(2),t1) diff(pc4(2),t2) diff(pc4(2),t3) diff(pc4(2),t4) 0; diff(pc4(3),t1) diff(pc4(3),t2) diff(pc4(3),t3) diff(pc4(3),t4) 0]
+Jv4 = [diff(pc5(1),t1) diff(pc5(1),t2) diff(pc5(1),t3) diff(pc5(1),t4) diff(pc5(1),t5) ; diff(pc5(2),t1) diff(pc5(2),t2) diff(pc5(2),t3) diff(pc5(2),t4) diff(pc5(2),t5); diff(pc5(3),t1) diff(pc5(3),t2) diff(pc5(3),t3) diff(pc5(3),t4) diff(pc5(3),t5)]
