@@ -63,7 +63,8 @@ sub_ady = [];
 sub_qdz = [];
 sub_vdz = [];
 sub_adz = [];
-for traj_loop = 1:3
+point = input('Enter the desired point(s):');
+for traj_loop = 1:point
     % Input initial data for x, y, and z
     dx = input('initial data for x = [q0x, v0x, q1x, v1x]');
     dy = input('initial data for y = [q0y, v0y, q1y, v1y]');
