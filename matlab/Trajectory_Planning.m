@@ -49,20 +49,20 @@ clc
 syms traj_loop
 
 tf_old = 0;
-num_points = 100;  % Number of points for linspace
+t0_old = 0;
+tf_final = 0;
 % Initialize qdx, vdx, and adx
-% Initialize qdx to an empty matrix
-qdx_expand = [];
-vdx_expand = [];
-adx_expand = [];
+sub_qdx = [];
+sub_vdx = [];
+sub_adx = [];
 
-qdy_expand = [];
-vdy_expand = [];
-ady_expand = [];
+sub_qdy = [];
+sub_vdy = [];
+sub_ady = [];
 
-qdz_expand = [];
-vdz_expand = [];
-adz_expand = [];
+sub_qdz = [];
+sub_vdz = [];
+sub_adz = [];
 for traj_loop = 1:3
     % Input initial data for x, y, and z
     dx = input('initial data for x = [q0x, v0x, q1x, v1x]');
@@ -75,8 +75,7 @@ for traj_loop = 1:3
     q0y = dy(1); v0y = dy(2); q1y = dy(3); v1y = dy(4);
     q0z = dz(1); v0z = dz(2); q1z = dz(3); v1z = dz(4);
     t0 = dt(1); tf = dt(2);
-    
-    % Generate time vector
+   
     t = linspace(t0, tf, 100*(tf - t0));
     c = ones(size(t));
 
@@ -102,203 +101,90 @@ for traj_loop = 1:3
     qdz = az(1).*c + az(2).*t + az(3).*t.^2 + az(4).*t.^3;
     vdz = az(2).*c + 2*az(3).*t + 3*az(4).*t.^2;
     adz = 2*az(3).*c + 6*az(4).*t;
-
-    % Update old values for the next iteration
-    tf_old = tf;
     
-    % Assuming qdx_expand is a 1x500 matrix and qdx is a 1x300 matrix
-    num_columns_needed = max(size(qdx_expand, 2), size(qdx, 2));
-    % Pad qdx_expand with zeros if needed
-    qdx_expand = [qdx_expand, zeros(size(qdx_expand, 1), num_columns_needed - size(qdx_expand, 2))];
-    % Pad qdx with zeros if needed
-    qdx = [qdx, zeros(size(qdx, 1), num_columns_needed - size(qdx, 2))];
-    % Assuming qdx_expand is a 1x500 matrix and qdx is a 1x300 matrix
-    num_columns_needed2 = max(size(vdx_expand, 2), size(vdx, 2));
-    % Pad qdx_expand with zeros if needed
-    vdx_expand = [vdx_expand, zeros(size(vdx_expand, 1), num_columns_needed - size(vdx_expand, 2))];
-    % Pad qdx with zeros if needed
-    vdx = [vdx, zeros(size(vdx, 1), num_columns_needed - size(vdx, 2))];
-    % Assuming qdx_expand is a 1x500 matrix and qdx is a 1x300 matrix
-    num_columns_needed3 = max(size(adx_expand, 2), size(adx, 2));
-    % Pad dx_expand with zeros if needed
-    adx_expand = [adx_expand, zeros(size(adx_expand, 1), num_columns_needed - size(adx_expand, 2))];
-    % Pad adx with zeros if needed
-    adx = [adx, zeros(size(adx, 1), num_columns_needed - size(adx, 2))];
-    % Expand the matrix A to store more data
-    qdx_expand = [qdx_expand; qdx];
-    vdx_expand = [vdx_expand; vdx];
-    adx_expand = [adx_expand; adx];
-
-    % Assuming qdx_expand is a 1x500 matrix and qdx is a 1x300 matrix
-    num_columns_needed4 = max(size(qdy_expand, 2), size(qdy, 2));
-    % Pad qdx_expand with zeros if needed
-    qdy_expand = [qdy_expand, zeros(size(qdy_expand, 1), num_columns_needed - size(qdy_expand, 2))];
-    % Pad qdx with zeros if needed
-    qdy = [qdy, zeros(size(qdy, 1), num_columns_needed - size(qdy, 2))];
-    % Assuming qdy_expand is a 1x500 matrix and qdy is a 1x300 matrix
-    num_columns_needed5 = max(size(vdy_expand, 2), size(vdy, 2));
-    % Pad qdy_expand with zeros if needed
-    vdy_expand = [vdy_expand, zeros(size(vdy_expand, 1), num_columns_needed - size(vdy_expand, 2))];
-    % Pad qdy with zeros if needed
-    vdy = [vdy, zeros(size(vdy, 1), num_columns_needed - size(vdy, 2))];
-    % Assuming qdy_expand is a 1x500 matrix and qdy is a 1x300 matrix
-    num_columns_needed6 = max(size(ady_expand, 2), size(ady, 2));
-    % Pad dx_expand with zeros if needed
-    ady_expand = [ady_expand, zeros(size(ady_expand, 1), num_columns_needed - size(ady_expand, 2))];
-    % Pad ady with zeros if needed
-    ady = [ady, zeros(size(ady, 1), num_columns_needed - size(ady, 2))];    
-    % Expand the matrix A to store more data
-    qdy_expand = [qdy_expand; qdy];
-    vdy_expand = [vdy_expand; vdy];
-    ady_expand = [ady_expand; ady];
-   
+    sub_qdx = [sub_qdx, qdx];
+    sub_vdx = [sub_vdx, vdx];
+    sub_adx = [sub_adx, adx];
     
-    % Assuming qdx_expand is a 1x500 matrix and qdx is a 1x300 matrix
-    num_columns_needed7 = max(size(qdz_expand, 2), size(qdz, 2));
-    % Pad qdx_expand with zeros if needed
-    qdz_expand = [qdz_expand, zeros(size(qdz_expand, 1), num_columns_needed - size(qdz_expand, 2))];
-    % Pad qdx with zeros if needed
-    qdz = [qdz, zeros(size(qdz, 1), num_columns_needed - size(qdz, 2))];
-    % Assuming qdy_expand is a 1x500 matrix and qdy is a 1x300 matrix
-    num_columns_needed8 = max(size(vdz_expand, 2), size(vdz, 2));
-    % Pad qdy_expand with zeros if needed
-    vdz_expand = [vdz_expand, zeros(size(vdz_expand, 1), num_columns_needed - size(vdz_expand, 2))];
-    % Pad qdy with zeros if needed
-    vdz = [vdz, zeros(size(vdz, 1), num_columns_needed - size(vdz, 2))];
-    % Assuming qdy_expand is a 1x500 matrix and qdy is a 1x300 matrix
-    num_columns_needed9 = max(size(adz_expand, 2), size(adz, 2));
-    % Pad dx_expand with zeros if needed
-    adz_expand = [adz_expand, zeros(size(adz_expand, 1), num_columns_needed - size(adz_expand, 2))];
-    % Pad ady with zeros if needed
-    adz = [adz, zeros(size(adz, 1), num_columns_needed - size(adz, 2))];    
-    % Expand the matrix A to store more data
-    qdz_expand = [qdz_expand; qdz];
-    vdz_expand = [vdz_expand; vdz];
-    adz_expand = [adz_expand; adz];
+    sub_qdy = [sub_qdy, qdy];
+    sub_vdy = [sub_vdy, vdy];
+    sub_ady = [sub_ady, ady];
     
+    sub_qdz = [sub_qdz, qdz];
+    sub_vdz = [sub_vdz, vdz];
+    sub_adz = [sub_adz, adz];
+    
+    tf_final = tf_final + tf;
 end
-% qdx_reshaped = reshape(qdx_expand, 1, []);
 
-% % Plot all three functions for x
 figure;
-for n = 0:2
-    % Assuming qdx_expand is a 3x500 matrix
-    [~, num_columns] = size(qdx_expand);
-    % Assuming qdx_expand is a 3x500 matrix
-    t = linspace(t0 + n*tf, tf + n*tf, num_columns);
-    subplot(3, 1, 1);
-    plot(t, qdx_expand((n+1), :));
-    xlabel('Time (t)');
-    ylabel('qdx');
-    title('Position (qdx)');
-    hold on
-    grid on
-    
-    subplot(3, 1, 2);
-    plot(t, vdx_expand((n+1), :));
-    xlabel('Time (t)');
-    ylabel('vdx');
-    title('Velocity (vdx)');
-    hold on
-    grid on
-    
-    subplot(3, 1, 3);
-    plot(t, adx_expand((n+1), :));
-    xlabel('Time (t)');
-    ylabel('adx');
-    title('Acceleration (adx)');
-    hold on
-    grid on
-end
-suptitle('Plot of qdx, vdx, and adx');
-% Plot all three functions for y
-figure;
-for n = 0:2
-    % Assuming qdy_expand is a 3x500 matrix
-    [~, num_columns] = size(qdy_expand);
-    % Assuming qdy_expand is a 3x500 matrix
-    t = linspace(t0 + n*tf, tf + n*tf, num_columns);
-    subplot(3, 1, 1);
-    plot(t, qdy_expand((n+1), :));
-    xlabel('Time (t)');
-    ylabel('qdy');
-    title('Position (qdy)');
-    hold on
-    grid on
-    
-    subplot(3, 1, 2);
-    plot(t, vdy_expand((n+1), :));
-    xlabel('Time (t)');
-    ylabel('vdy');
-    title('Velocity (vdy)');
-    hold on
-    grid on
-    
-    subplot(3, 1, 3);
-    plot(t, ady_expand((n+1), :));
-    xlabel('Time (t)');
-    ylabel('ady');
-    title('Acceleration (ady)');
-    hold on
-    grid on
-end
-suptitle('Plot of qdy, vdy, and ady');
+timestamp = linspace(t0, tf_final, 100*(tf_final - t0));
+subplot(3, 1, 1);
+plot(timestamp, sub_qdy);
+xlabel('Time (t)');
+ylabel('qdy');
+title('Position (qdy)');
+grid on
 
-% Plot all three functions for y
-figure;
-for n = 0:2
-    % Assuming qdy_expand is a 3x500 matrix
-    [~, num_columns] = size(qdz_expand);
-    % Assuming qdy_expand is a 3x500 matrix
-    t = linspace(t0 + n*tf, tf + n*tf, num_columns);
-    subplot(3, 1, 1);
-    plot(t, qdz_expand((n+1), :));
-    xlabel('Time (t)');
-    ylabel('qdz');
-    title('Position (qdz)');
-    hold on
-    grid on
-    
-    subplot(3, 1, 2);
-    plot(t, vdz_expand((n+1), :));
-    xlabel('Time (t)');
-    ylabel('vdz');
-    title('Velocity (vdz)');
-    hold on
-    grid on
-    
-    subplot(3, 1, 3);
-    plot(t, adz_expand((n+1), :));
-    xlabel('Time (t)');
-    ylabel('adz');
-    title('Acceleration (adz)');
-    hold on
-    grid on
-end
-suptitle('Plot of qdz, vdz, and adz');
+subplot(3, 1, 2);
+plot(timestamp, sub_vdy);
+xlabel('Time (t)');
+ylabel('vdy');
+title('Velocity (vdy)');
+grid on
 
-% % Plot all three functions for z
-% figure;
-% 
-% subplot(3, 1, 1);
-% plot(t, qdz);
-% xlabel('Time (t)');
-% ylabel('qdz');
-% title('Position (qdz)');
-% 
-% subplot(3, 1, 2);
-% plot(t, vdz);
-% xlabel('Time (t)');
-% ylabel('vdz');
-% title('Velocity (vdz)');
-% 
-% subplot(3, 1, 3);
-% plot(t, adz);
-% xlabel('Time (t)');
-% ylabel('adz');
-% title('Acceleration (adz)');
-% 
-% suptitle('Plot of qdz, vdz, and adz');
+subplot(3, 1, 3);
+plot(timestamp, sub_ady);
+xlabel('Time (t)');
+ylabel('ady');
+title('Acceleration (ady)');
+grid on
+
+figure;
+timestamp = linspace(t0, tf_final, 100*(tf_final - t0));
+subplot(3, 1, 1);
+plot(timestamp, sub_qdx);
+xlabel('Time (t)');
+ylabel('qdx');
+title('Position (qdx)');
+grid on
+
+subplot(3, 1, 2);
+plot(timestamp, sub_vdx);
+xlabel('Time (t)');
+ylabel('vdx');
+title('Velocity (vdx)');
+grid on
+
+subplot(3, 1, 3);
+plot(timestamp, sub_adx);
+xlabel('Time (t)');
+ylabel('adx');
+title('Acceleration (adx)');
+grid on
+
+figure;
+timestamp = linspace(t0, tf_final, 100*(tf_final - t0));
+subplot(3, 1, 1);
+plot(timestamp, sub_qdz);
+xlabel('Time (t)');
+ylabel('qdz');
+title('Position (qdz)');
+grid on
+
+subplot(3, 1, 2);
+plot(timestamp, sub_vdz);
+xlabel('Time (t)');
+ylabel('vdz');
+title('Velocity (vdz)');
+grid on
+
+subplot(3, 1, 3);
+plot(timestamp, sub_adz);
+xlabel('Time (t)');
+ylabel('adz');
+title('Acceleration (adz)');
+grid on
 
 
 
