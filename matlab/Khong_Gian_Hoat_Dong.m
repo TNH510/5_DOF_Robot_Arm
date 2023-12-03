@@ -1,4 +1,4 @@
-t1_values = pi*17/36:0.05:pi*59/36; 
+t1_values = pi*17/36:0.1:pi*59/36; 
 t2_values = pi*2/3:0.2:pi*10/9;  
 t3_values = pi*5/6:0.2:pi*55/36;
 t4_values = 0:0.5:2*pi;
@@ -11,7 +11,7 @@ l5 = 100.0;
 
 x = [];
 y = [];
-%z = [];
+z = [];
 
 for t1 = t1_values - pi
     for t2 = t2_values - pi
@@ -20,22 +20,22 @@ for t1 = t1_values - pi
 
                 x_value = cos(t1)*(l3*cos(t2 + t3) + l2*cos(t2) + l5*cos(t2 + t3 + t4));
                 y_value = sin(t1)*(l3*cos(t2 + t3) + l2*cos(t2) + l5*cos(t2 + t3 + t4));
-                %z_value = l1 + l3*sin(t2 + t3) + l2*sin(t2) + l5*sin(t2 + t3 + t4);
+                z_value = l1 + l3*sin(t2 + t3) + l2*sin(t2) + l5*sin(t2 + t3 + t4);
 
                 x = [x, x_value];
                 y = [y, y_value];
-                %z = [z, z_value];
+                z = [z, z_value];
 
             end
         end
     end
 end
 
-scatter(x,y,'filled');
+scatter3(x,y,z);
 
 xlabel('X');
 ylabel('Y');
-%zlabel('Z');
+zlabel('Z');
 
 grid on;
 
