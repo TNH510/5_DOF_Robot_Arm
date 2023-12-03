@@ -38,3 +38,11 @@ pc2 = [lc2*cos(t1)*cos(t2) ; lc2*sin(t1)*cos(t2) ; (l1 + lc2*sin(t2))]
 pc3 = [(cos(t1)*(lc3*cos(t2 + t3) + l2*cos(t2))) ; (sin(t1)*(lc3*cos(t2 + t3) + l2*cos(t2))) ; (l1 + lc3*sin(t2 + t3) + l2*sin(t2))]
 pc4 = [(cos(t1)*(l3*cos(t2 + t3) + l2*cos(t2) + lc4*cos(t2 + t3 +t4))) ; (sin(t1)*(l3*cos(t2 + t3) + l2*cos(t2) + lc4*cos(t2 + t3 +t4))) ; (l1 + l3*sin(t2 + t3) + l2*sin(t2) + lc4*sin(t2 + t3 +t4))]
 pc5 = [(cos(t1)*(l3*cos(t2 + t3) + l2*cos(t2) + lc5*cos(t2 + t3 +t4))) ; (sin(t1)*(l3*cos(t2 + t3) + l2*cos(t2) + lc5*cos(t2 + t3 +t4))) ; (l1 + l3*sin(t2 + t3) + l2*sin(t2) + lc5*sin(t2 + t3 +t4))]
+
+%% MA TRAN JACOBI KHAU (Jw)
+syms Jw1 Jw2 Jw3 Jw4 Jw5
+Jw1 = [0 0 0 0 0; 0 0 0 0 0; 1 0 0 0 0]
+Jw2 = [0 sin(t1) 0 0 0; 0 -cos(t1) 0 0 0; 1 0 0 0 0]
+Jw3 = [0 sin(t1) sin(t1) 0 0; 0 -cos(t1) -cos(t1) 0 0; 1 0 0 0 0]
+Jw4 = [0 sin(t1) sin(t1) sin(t1) 0; 0 -cos(t1) -cos(t1) -cos(t1) 0; 1 0 0 0 0]
+Jw5 = [0 sin(t1) sin(t1) sin(t1) cos(t2 + t3 + t4)*cos(t1); 0 -cos(t1) -cos(t1) -cos(t1) cos(t2 + t3 + t4)*sin(t1); 1 0 0 0 sin(t2 + t3 + t4)]
