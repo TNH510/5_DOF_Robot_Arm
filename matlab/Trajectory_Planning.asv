@@ -154,23 +154,23 @@ for traj_loop = 1:3
    
     
     % Assuming qdx_expand is a 1x500 matrix and qdx is a 1x300 matrix
-    num_columns_needed7 = max(size(qdz_expand, 2), size(qdz, 2));
+    num_columns_needed7 = max(size(qdz_expand, 2), size(qdy, 2));
     % Pad qdx_expand with zeros if needed
-    qdz_expand = [qdz_expand, zeros(size(qdz_expand, 1), num_columns_needed - size(qdz_expand, 2))];
+    qdy_expand = [qdy_expand, zeros(size(qdy_expand, 1), num_columns_needed - size(qdy_expand, 2))];
     % Pad qdx with zeros if needed
-    qdz = [qdz, zeros(size(qdz, 1), num_columns_needed - size(qdz, 2))];
+    qdy = [qdy, zeros(size(qdy, 1), num_columns_needed - size(qdy, 2))];
     % Assuming qdy_expand is a 1x500 matrix and qdy is a 1x300 matrix
-    num_columns_needed8 = max(size(vdz_expand, 2), size(vdz, 2));
+    num_columns_needed8 = max(size(vdy_expand, 2), size(vdy, 2));
     % Pad qdy_expand with zeros if needed
-    vdz_expand = [vdz_expand, zeros(size(vdz_expand, 1), num_columns_needed - size(vdz_expand, 2))];
+    vdy_expand = [vdy_expand, zeros(size(vdy_expand, 1), num_columns_needed - size(vdy_expand, 2))];
     % Pad qdy with zeros if needed
-    vdz = [vdz, zeros(size(vdz, 1), num_columns_needed - size(vdz, 2))];
+    vdy = [vdy, zeros(size(vdy, 1), num_columns_needed - size(vdy, 2))];
     % Assuming qdy_expand is a 1x500 matrix and qdy is a 1x300 matrix
-    num_columns_needed9 = max(size(adz_expand, 2), size(adz, 2));
+    num_columns_needed9 = max(size(ady_expand, 2), size(ady, 2));
     % Pad dx_expand with zeros if needed
-    adz_expand = [adz_expand, zeros(size(adz_expand, 1), num_columns_needed - size(adz_expand, 2))];
+    ady_expand = [ady_expand, zeros(size(ady_expand, 1), num_columns_needed - size(ady_expand, 2))];
     % Pad ady with zeros if needed
-    adz = [adz, zeros(size(adz, 1), num_columns_needed - size(adz, 2))];    
+    ady = [ady, zeros(size(ady, 1), num_columns_needed - size(ady, 2))];    
     % Expand the matrix A to store more data
     qdz_expand = [qdz_expand; qdz];
     vdz_expand = [vdz_expand; vdz];
@@ -210,73 +210,31 @@ for n = 0:2
     hold on
     grid on
 end
+
 suptitle('Plot of qdx, vdx, and adx');
-% Plot all three functions for y
-figure;
-for n = 0:2
-    % Assuming qdy_expand is a 3x500 matrix
-    [~, num_columns] = size(qdy_expand);
-    % Assuming qdy_expand is a 3x500 matrix
-    t = linspace(t0 + n*tf, tf + n*tf, num_columns);
-    subplot(3, 1, 1);
-    plot(t, qdy_expand((n+1), :));
-    xlabel('Time (t)');
-    ylabel('qdy');
-    title('Position (qdy)');
-    hold on
-    grid on
-    
-    subplot(3, 1, 2);
-    plot(t, vdy_expand((n+1), :));
-    xlabel('Time (t)');
-    ylabel('vdy');
-    title('Velocity (vdy)');
-    hold on
-    grid on
-    
-    subplot(3, 1, 3);
-    plot(t, ady_expand((n+1), :));
-    xlabel('Time (t)');
-    ylabel('ady');
-    title('Acceleration (ady)');
-    hold on
-    grid on
-end
-suptitle('Plot of qdy, vdy, and ady');
-
-% Plot all three functions for y
-figure;
-for n = 0:2
-    % Assuming qdy_expand is a 3x500 matrix
-    [~, num_columns] = size(qdz_expand);
-    % Assuming qdy_expand is a 3x500 matrix
-    t = linspace(t0 + n*tf, tf + n*tf, num_columns);
-    subplot(3, 1, 1);
-    plot(t, qdz_expand((n+1), :));
-    xlabel('Time (t)');
-    ylabel('qdz');
-    title('Position (qdz)');
-    hold on
-    grid on
-    
-    subplot(3, 1, 2);
-    plot(t, vdz_expand((n+1), :));
-    xlabel('Time (t)');
-    ylabel('vdz');
-    title('Velocity (vdz)');
-    hold on
-    grid on
-    
-    subplot(3, 1, 3);
-    plot(t, adz_expand((n+1), :));
-    xlabel('Time (t)');
-    ylabel('adz');
-    title('Acceleration (adz)');
-    hold on
-    grid on
-end
-suptitle('Plot of qdz, vdz, and adz');
-
+% % Plot all three functions for y
+% figure;
+% 
+% subplot(3, 1, 1);
+% plot(t, qdy);
+% xlabel('Time (t)');
+% ylabel('qdy');
+% title('Position (qdy)');
+% 
+% subplot(3, 1, 2);
+% plot(t, vdy);
+% xlabel('Time (t)');
+% ylabel('vdy');
+% title('Velocity (vdy)');
+% 
+% subplot(3, 1, 3);
+% plot(t, ady);
+% xlabel('Time (t)');
+% ylabel('ady');
+% title('Acceleration (ady)');
+% 
+% suptitle('Plot of qdy, vdy, and ady');
+% 
 % % Plot all three functions for z
 % figure;
 % 
