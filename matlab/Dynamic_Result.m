@@ -81,6 +81,12 @@ D3 = m3*(Jv3')*Jv3 + (Jw3')*R3*I3*(R3')*Jw3;
 D4 = m4*(Jv4')*Jv4 + (Jw4')*R4*I4*(R4')*Jw4;
 D5 = m5*(Jv5')*Jv5 + (Jw5')*R5*I5*(R5')*Jw5;
 
+D1 = simplify(D1)
+D2 = simplify(D2)
+D3 = simplify(D3)
+D4 = simplify(D4)
+D5 = simplify(D5)
+
 D = D1 + D2 + D3 + D4 + D5;
 
 %% VECTOR HUONG TAM
@@ -130,6 +136,8 @@ V3
 V4
 V5
 
+V = [V1 ; V2 ; V3 ; V4 ; V5];
+
 %% VECTOR TRONG LUC
 
 gT =  [0 , 0, -9.8]
@@ -139,3 +147,33 @@ G2 = - (m(1) * gT * Jv1(:, 2) + m(2) * gT * Jv2(:, 2) + m(3) * gT * Jv3(:, 2) + 
 G3 = - (m(1) * gT * Jv1(:, 3) + m(2) * gT * Jv2(:, 3) + m(3) * gT * Jv3(:, 3) + m(4) * gT * Jv4(:, 3) + m(5) * gT * Jv5(:, 3))
 G4 = - (m(1) * gT * Jv1(:, 4) + m(2) * gT * Jv2(:, 4) + m(3) * gT * Jv3(:, 4) + m(4) * gT * Jv4(:, 4) + m(5) * gT * Jv5(:, 4))
 G5 = - (m(1) * gT * Jv1(:, 5) + m(2) * gT * Jv2(:, 5) + m(3) * gT * Jv3(:, 5) + m(4) * gT * Jv4(:, 5) + m(5) * gT * Jv5(:, 5))
+
+G = [G1 ; G2 ; G3 ; G4 ; G5]
+
+%% KET QUA TINH DONG LUC HOC
+syms t1_dd t2_dd t3_dd t4_dd t5_dd
+q_dd = [t1_dd ; t2_dd ; t3_dd ; t4_dd ; t5_dd];
+
+%D(q)*q_dd + V(q, q_d) + G(q) = tau
+%(5x5)(5x1) + (5x1) + (5x1)
+
+tau = D * q_dd  + V + G
+
+t1 = 1
+t2 = 1
+t3 = 1
+t4 = 1
+t5 = 1
+
+t1_d = 0
+t2_d = 0
+t3_d = 0
+t4_d = 0
+t5_d = 0
+
+t1_dd = 0
+t2_dd = 0
+t3_dd = 0
+t4_dd = 0
+t5_dd = 0
+
