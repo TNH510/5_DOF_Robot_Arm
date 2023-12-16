@@ -807,7 +807,7 @@
             this.bt_off_matlab.Name = "bt_off_matlab";
             this.bt_off_matlab.Size = new System.Drawing.Size(158, 41);
             this.bt_off_matlab.TabIndex = 38;
-            this.bt_off_matlab.Text = "Turn OFF MATLAB";
+            this.bt_off_matlab.Text = "Start Realtime";
             this.bt_off_matlab.UseVisualStyleBackColor = true;
             this.bt_off_matlab.Click += new System.EventHandler(this.bt_off_matlab_Click);
             // 
