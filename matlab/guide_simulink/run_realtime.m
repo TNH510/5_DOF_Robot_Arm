@@ -1,12 +1,12 @@
-s = serial('COM1'); 
-set(s, 'BaudRate', 115200); 
+s = serial('COM3');
+set(s, 'BaudRate', 962500); 
 fopen(s); 
 
 % tm = timer('ExecutionMode', 'FixedRate', 'Period', 0.1, 'TimerFcn', {@update, handles});
 % start(tm);
 
 while true
-    pause(0.1);
+    pause(0.01);
     if s.BytesAvailable > 0 
         dataBytes = fread(s, s.BytesAvailable); 
         % dataBytes = [01, 01];

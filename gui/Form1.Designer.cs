@@ -540,7 +540,7 @@
             // 
             // Timer1
             // 
-            this.Timer1.Interval = 200;
+            this.Timer1.Interval = 10;
             this.Timer1.Tick += new System.EventHandler(this.Timer1_Tick);
             // 
             // panel5
@@ -883,6 +883,7 @@
             // 
             this.cBoxBaudRate.FormattingEnabled = true;
             this.cBoxBaudRate.Items.AddRange(new object[] {
+            "962500",
             "115200",
             "9600",
             "4800"});

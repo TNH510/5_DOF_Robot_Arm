@@ -48,8 +48,7 @@ namespace GUI
 
         private void Connect_btn_Click(object sender, EventArgs e)
         {
-            /* Timer start */
-            Timer1.Start();
+
             /* Declare the variable(s) */
             int ret;
             /* A logical station number set in Communication Setup Utility - Datasheet - Page 61 */
@@ -685,7 +684,7 @@ namespace GUI
         private void bt_on_matlab_Click(object sender, EventArgs e)
         {
             // Execute MATLAB Robot Simulink
-            matlab.Execute(@"cd 'C:\Users\daveb\OneDrive\Máy tính\Capstone Project\5_DOF_Robot_Arm\matlab\guide_simulink'");
+            matlab.Execute(@"cd 'C:\Users\daveb\Desktop\5_DOF_Robot_Arm\matlab\guide_simulink'");
             matlab.Execute(@"open_system('Complete.slx');");
             matlab.Execute(@"sim('Complete');");
         }
@@ -915,6 +914,8 @@ namespace GUI
 
         private void bOpen_Click(object sender, EventArgs e)
         {
+            /* Timer start */
+            Timer1.Start();
             try
             {   //Set up parameter for COM port
                 serialPort1.PortName = cBoxPort.Text;
@@ -939,6 +940,8 @@ namespace GUI
 
         private void bClose_Click(object sender, EventArgs e)
         {
+            /* Timer start */
+            Timer1.Stop();
             if (serialPort1.IsOpen)
             {
                 serialPort1.Close();
