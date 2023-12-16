@@ -30,13 +30,16 @@ namespace GUI
 {
     public partial class Form1 : Form
     {
+
+
         public ActUtlType plc = new();
         int run_test = 0;
         string dataOUT;
         int move = 0; /* move = 1 -> MoveJ, move = 2 -> MoveL */ 
         UInt16 t1_mat, t2_mat,t3_mat,t4_mat,t5_mat;
         byte[] frame_prepare_to_send = new byte[10];
-
+        string currentDirectory;
+        string TargetDirectory;
         MLApp.MLApp matlab = new MLApp.MLApp();
         public Form1()
         {
@@ -44,6 +47,29 @@ namespace GUI
             GUI.Form1.CheckForIllegalCrossThreadCalls = false;
             string[] ports = SerialPort.GetPortNames(); //Gan gia tri cac port co trong may
             cBoxPort.Items.AddRange(ports); //Hien thi len cBoxPort
+
+            // Get the directory of the currently executing assembly
+            currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+            // String to remove
+            string substringToRemove = "gui\\bin\\Debug\\";
+
+            // Remove the specified substring from the end of the path
+            if (currentDirectory.EndsWith(substringToRemove, StringComparison.OrdinalIgnoreCase))
+            {
+                currentDirectory = currentDirectory.Substring(0, currentDirectory.Length - substringToRemove.Length);
+
+                // Optionally, trim trailing directory separator
+                currentDirectory = currentDirectory.TrimEnd('\\');
+
+                TargetDirectory = currentDirectory + "\\matlab\\guide_simulink";
+
+                Console.WriteLine("Modified Path: " + TargetDirectory);
+            }
+            else
+            {
+                Console.WriteLine("The specified substring is not at the end of the path.");
+            }
         }
 
         private void Connect_btn_Click(object sender, EventArgs e)
@@ -684,7 +710,8 @@ namespace GUI
         private void bt_on_matlab_Click(object sender, EventArgs e)
         {
             // Execute MATLAB Robot Simulink
-            matlab.Execute(@"cd 'C:\Users\daveb\Desktop\5_DOF_Robot_Arm\matlab\guide_simulink'");
+            // matlab.Execute(@"cd 'C:\Users\daveb\Desktop\5_DOF_Robot_Arm\matlab\guide_simulink'");
+            matlab.Execute($"cd '{TargetDirectory}'");
             matlab.Execute(@"open_system('Complete.slx');");
             matlab.Execute(@"sim('Complete');");
         }
