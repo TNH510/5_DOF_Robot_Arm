@@ -10,11 +10,15 @@ l1=690;
 l2=440;
 l3=500;
 l5=230;
+filename = 'data_robot.csv';
+fileID = fopen(filename, 'a');
+tic;
 
 while true
     pause(0.01);
-    dt = 0.01;
-    t = t + 0.01;
+    dt = toc;
+    t = t + dt;
+    tic;
     if s.BytesAvailable > 0 
         dataBytes = fread(s, s.BytesAvailable); 
 
@@ -38,6 +42,9 @@ while true
         t3 = bitor(bitshift(byte_5, 8), byte_6) / 100 - 180 - 90
         t4 = bitor(bitshift(byte_7, 8), byte_8) / 100 - 180 - 90
         t5 = bitor(bitshift(byte_9, 8), byte_10) / 100 - 180
+
+        % Ghi giá trị vào tệp tin
+        fprintf(fileID, '%f,%f,%f,%f,%f,%f\n', t, t1, t2, t3, t4, t5);
 
         if t1 == 65535
             break;
@@ -65,27 +72,27 @@ while true
         
         %Plot for drawing
         subplot(3,2,1);
-        plot(t,t1,'.r'); xlabel('time'); ylabel('angle 1'); title('Graph of theta1');
-        xlim([t-2, t]); 
+        plot(t,t1,'.r'); xlabel('Time (s)'); ylabel('Theta 1 (Degrees)'); title('Graph of theta1');
+        xlim([t-10, t]); 
         hold on
         grid on
         %Plot for drawing
         subplot(3,2,2);
-        plot(t,t2,'.g'); xlabel('time'); ylabel('angle 2'); title('Graph of theta2');
-        xlim([t-2, t]); 
+        plot(t,t2,'.g'); xlabel('Time (s)'); ylabel('Theta 2 (Degrees)'); title('Graph of theta2');
+        xlim([t-10, t]); 
         hold on
         grid on
         %Plot for drawing
         subplot(3,2,3);
-        plot(t,t3,'.b'); xlabel('time'); ylabel('angle 3'); title('Graph of theta3');
-        xlim([t-2, t]); 
+        plot(t,t3,'.b'); xlabel('Time (s)'); ylabel('Theta 3 (Degrees)'); title('Graph of theta3');
+        xlim([t-10, t]); 
         hold on
         grid on
         
         %Plot for drawing
         subplot(3,2,4);
-        plot(t,t4,'.r'); xlabel('time'); ylabel('angle 4'); title('Graph of theta4');
-        xlim([t-2, t]); 
+        plot(t,t4,'.r'); xlabel('Time (s)'); ylabel('Theta 4 (Degrees)'); title('Graph of theta4');
+        xlim([t-10, t]); 
         hold on
         grid on
 
@@ -107,3 +114,4 @@ end
 
 fclose(s);
 delete(s);
+fclose(fileID);
