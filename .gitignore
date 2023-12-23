@@ -7,7 +7,6 @@
 # C# project
 *.suo
 *.dll
-*.exe
 *.pdb
 *.CoreCompileInputs.cache
 *.FileListAbsolute.txt
