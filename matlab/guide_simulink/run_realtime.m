@@ -1,4 +1,4 @@
-s = serial('COM3');
+s = serial('COM17');
 set(s, 'BaudRate', 962500); 
 fopen(s); 
 t = 0.0;
@@ -6,6 +6,10 @@ t1_pre = -1;
 t2_pre = -1; 
 t3_pre = -1;
 t4_pre = -1;
+l1=690;
+l2=440;
+l3=500;
+l5=230;
 
 while true
     pause(0.01);
@@ -13,7 +17,6 @@ while true
     t = t + 0.01;
     if s.BytesAvailable > 0 
         dataBytes = fread(s, s.BytesAvailable); 
-        % dataBytes = [01, 01];
 
         byte_1 = dataBytes(1);
         byte_2 = dataBytes(2);
@@ -55,51 +58,46 @@ while true
         t2_pre = t2;
         t3_pre = t3;
         t4_pre = t4;
+
+        px=cosd(t1)*(l3*cosd(t2+t3)+l2*cosd(t2)+l5*cosd(-90));
+        py=sind(t1)*(l3*cosd(t2+t3)+l2*cosd(t2)+l5*cosd(-90));
+        pz=l1+l3*sind(t2+t3)+l2*sind(t2)+l5*sind(-90);
         
-        
         %Plot for drawing
-        subplot(4,2,1);
-        plot(t,t1,'.'); xlabel('time'); ylabel('angle 1'); title('Graph of theta1')
+        subplot(3,2,1);
+        plot(t,t1,'.r'); xlabel('time'); ylabel('angle 1'); title('Graph of theta1');
+        xlim([t-2, t]); 
         hold on
         grid on
         %Plot for drawing
-        subplot(4,2,2);
-        plot(t,t2,'.'); xlabel('time'); ylabel('angle 2'); title('Graph of theta2')
+        subplot(3,2,2);
+        plot(t,t2,'.g'); xlabel('time'); ylabel('angle 2'); title('Graph of theta2');
+        xlim([t-2, t]); 
         hold on
         grid on
         %Plot for drawing
-        subplot(4,2,3);
-        plot(t,t3,'.'); xlabel('time'); ylabel('angle 3'); title('Graph of theta3')
-        hold on
-        grid on
-        %Plot for drawing
-        subplot(4,2,4);
-        plot(t,t4,'.'); xlabel('time'); ylabel('angle 4'); title('Graph of theta4')
+        subplot(3,2,3);
+        plot(t,t3,'.b'); xlabel('time'); ylabel('angle 3'); title('Graph of theta3');
+        xlim([t-2, t]); 
         hold on
         grid on
         
-        if (t1_pre ~= -1)
-            %Plot for drawing
-            subplot(4,2,5);
-            plot(t,w1,'.'); xlabel('time'); ylabel('omega 1'); title('Graph of omega1')
-            hold on
-            grid on
-            %Plot for drawing
-            subplot(4,2,6);
-            plot(t,w2,'.'); xlabel('time'); ylabel('omega 2'); title('Graph of omega2')
-            hold on
-            grid on
-            %Plot for drawing
-            subplot(4,2,7);
-            plot(t,w3,'.'); xlabel('time'); ylabel('omega 3'); title('Graph of omega3')
-            hold on
-            grid on
-            %Plot for drawing
-            subplot(4,2,8);
-            plot(t,w4,'.'); xlabel('time'); ylabel('omega 4'); title('Graph of omega4')
-            hold on
-            grid on
-        end
+        %Plot for drawing
+        subplot(3,2,4);
+        plot(t,t4,'.r'); xlabel('time'); ylabel('angle 4'); title('Graph of theta4');
+        xlim([t-2, t]); 
+        hold on
+        grid on
+
+        subplot(3,2,5);
+        plot(px,py,'.k'); xlabel('x'); ylabel('y'); title('Graph of Oxy')
+        hold on
+        grid on
+
+        subplot(3,2,6);
+        plot3(px,py, pz,'.m'); xlabel('x'); ylabel('y'); zlabel('z'); title('Graph of Oxyz')
+        hold on
+        grid on
     end
 end
 
