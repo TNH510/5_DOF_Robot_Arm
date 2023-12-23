@@ -38,12 +38,23 @@ namespace GUI
         int move = 0; /* move = 1 -> MoveJ, move = 2 -> MoveL */ 
         UInt16 t1_mat, t2_mat,t3_mat,t4_mat,t5_mat;
         byte[] frame_prepare_to_send = new byte[10];
+        byte[] frame_off_matlab = new byte[10];
+        byte[] frame_stop_record = new byte[10];
+        byte[] frame_start_record = new byte[10];
+
+
         string currentDirectory;
         string TargetDirectory;
         MLApp.MLApp matlab = new MLApp.MLApp();
         public Form1()
         {
             InitializeComponent();
+            bt_off_matlab.Enabled = false;
+            bt_stop_record.Enabled = false;
+            bt_start_record.Enabled = false;
+            bt_start_timer.Enabled = true;
+            bt_stop_timer.Enabled = false;
+
             GUI.Form1.CheckForIllegalCrossThreadCalls = false;
             string[] ports = SerialPort.GetPortNames(); //Gan gia tri cac port co trong may
             cBoxPort.Items.AddRange(ports); //Hien thi len cBoxPort
@@ -718,11 +729,25 @@ namespace GUI
 
         private void bt_off_matlab_Click(object sender, EventArgs e)
         {
-            // Close System
-            matlab.Execute(@"close_system('Complete.slx');");
+            frame_off_matlab[0] = (byte)(0xFF);
+            frame_off_matlab[1] = (byte)(0xFF);
 
-            // Close MATLAB
-            //matlab.Quit();
+            frame_off_matlab[2] = (byte)(0x00);
+            frame_off_matlab[3] = (byte)(0x00);
+
+            frame_off_matlab[4] = (byte)(0xFF);
+            frame_off_matlab[5] = (byte)(0xFF);
+
+            frame_off_matlab[6] = (byte)(0xFF);
+            frame_off_matlab[7] = (byte)(0xFF);
+
+            frame_off_matlab[8] = (byte)(0xFF);
+            frame_off_matlab[9] = (byte)(0xFF);
+
+            for (int i = 0; i < 5; i++)
+            {
+                serialPort1.Write(frame_off_matlab, 0, frame_off_matlab.Length);
+            }
         }
 
         private void Tsm_moveC_btn_Click(object sender, EventArgs e)
@@ -941,8 +966,6 @@ namespace GUI
 
         private void bOpen_Click(object sender, EventArgs e)
         {
-            /* Timer start */
-            Timer1.Start();
             try
             {   //Set up parameter for COM port
                 serialPort1.PortName = cBoxPort.Text;
@@ -952,6 +975,14 @@ namespace GUI
                 serialPort1.Parity = (Parity)Enum.Parse(typeof(Parity), cBoxParityBits.Text);
                 serialPort1.Open();
                 progressBar1.Value = 100;
+
+                if (bt_start_timer.Enabled == true)
+                {
+                    bt_off_matlab.Enabled = true;
+                    bt_stop_record.Enabled = true;
+                    bt_start_record.Enabled = true;
+                }
+
                 bOpen.Enabled = false;
                 bClose.Enabled = true;
             }
@@ -965,10 +996,86 @@ namespace GUI
             }
         }
 
-        private void bClose_Click(object sender, EventArgs e)
+        private void bt_start_record_Click(object sender, EventArgs e)
+        {
+            frame_start_record[0] = (byte) (0xFF);
+            frame_start_record[1] = (byte) (0xFF);
+
+            frame_start_record[2] = (byte) (0x01);
+            frame_start_record[3] = (byte) (0x01);
+
+            frame_start_record[4] = (byte) (0xFF);
+            frame_start_record[5] = (byte) (0xFF);
+
+            frame_start_record[6] = (byte) (0xFF);
+            frame_start_record[7] = (byte) (0xFF);
+
+            frame_start_record[8] = (byte) (0xFF);
+            frame_start_record[9] = (byte) (0xFF);
+
+            for (int i = 0; i < 10; i++)
+            {
+                serialPort1.Write(frame_start_record, 0, frame_start_record.Length);
+            }
+        }
+
+        private void bt_stop_record_Click(object sender, EventArgs e)
+        {
+            frame_stop_record[0] = (byte)(0xFF);
+            frame_stop_record[1] = (byte)(0xFF);
+
+            frame_stop_record[2] = (byte)(0x02);
+            frame_stop_record[3] = (byte)(0x02);
+
+            frame_stop_record[4] = (byte)(0xFF);
+            frame_stop_record[5] = (byte)(0xFF);
+
+            frame_stop_record[6] = (byte)(0xFF);
+            frame_stop_record[7] = (byte)(0xFF);
+
+            frame_stop_record[8] = (byte)(0xFF);
+            frame_stop_record[9] = (byte)(0xFF);
+
+            for (int i = 0; i < 10; i++)
+            {
+                serialPort1.Write(frame_stop_record, 0, frame_stop_record.Length);
+            }
+        }
+
+        private void bt_start_timer_Click(object sender, EventArgs e)
         {
             /* Timer start */
+            Timer1.Start();
+
+            bt_start_record.Enabled = false;
+            bt_stop_record.Enabled = false;
+            bt_off_matlab.Enabled = false;
+            bt_start_timer.Enabled = false;
+            bt_stop_timer.Enabled = true;
+        }
+
+        private void bt_stop_timer_Click(object sender, EventArgs e)
+        {
+            /* Timer stop */
             Timer1.Stop();
+
+            if (bOpen.Enabled == false)
+            {
+                bt_start_record.Enabled = true;
+                bt_stop_record.Enabled = true;
+                bt_off_matlab.Enabled = true;
+            }
+
+            bt_start_timer.Enabled = true;
+            bt_stop_timer.Enabled = false;
+        }
+
+        private void bClose_Click(object sender, EventArgs e)
+        {
+            bt_off_matlab.Enabled = false;
+            bt_stop_record.Enabled = false;
+            bt_start_record.Enabled = false;
+
             if (serialPort1.IsOpen)
             {
                 serialPort1.Close();

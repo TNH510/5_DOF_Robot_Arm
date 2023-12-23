@@ -13,6 +13,7 @@ l5=230;
 filename = 'data_robot.csv';
 fileID = fopen(filename, 'a');
 tic;
+start_record = 0;
 
 while true
     pause(0.01);
@@ -37,17 +38,33 @@ while true
         byte_9 = dataBytes(9);
         byte_10 = dataBytes(10);
 
+        % Handle command not angle data
+        if byte_1 == 255 && byte_2 == 255
+            % Exit run_realtime
+            if byte_3 == 0 && byte_4 == 0
+                break;
+            end
+
+            % Start record data
+            if byte_3 == 1 && byte_4 == 1
+                start_record = 1;
+            end
+
+            % Stop record data
+            if byte_3 == 2 && byte_4 == 2
+                start_record = 0;
+            end
+        end
+
         t1 = bitor(bitshift(byte_1, 8), byte_2) / 100 - 180
         t2 = bitor(bitshift(byte_3, 8), byte_4) / 100 - 180 + 90
         t3 = bitor(bitshift(byte_5, 8), byte_6) / 100 - 180 - 90
         t4 = bitor(bitshift(byte_7, 8), byte_8) / 100 - 180 - 90
         t5 = bitor(bitshift(byte_9, 8), byte_10) / 100 - 180
 
-        % Ghi giá trị vào tệp tin
-        fprintf(fileID, '%f,%f,%f,%f,%f,%f\n', t, t1, t2, t3, t4, t5);
-
-        if t1 == 65535
-            break;
+        if start_record == 1 && t1 <= 360.0
+            % Ghi giá trị vào tệp tin
+            fprintf(fileID, '%f,%f,%f,%f,%f,%f\n', t, t1, t2, t3, t4, t5);
         end
         
         set_param('Complete/Slider Gain','Gain',num2str(t1));

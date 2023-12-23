@@ -96,6 +96,8 @@
             this.label27 = new System.Windows.Forms.Label();
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.panel6 = new System.Windows.Forms.Panel();
+            this.bt_stop_record = new System.Windows.Forms.Button();
+            this.bt_start_record = new System.Windows.Forms.Button();
             this.bt_off_matlab = new System.Windows.Forms.Button();
             this.bt_on_matlab = new System.Windows.Forms.Button();
             this.cBoxParityBits = new System.Windows.Forms.ComboBox();
@@ -112,6 +114,8 @@
             this.label19 = new System.Windows.Forms.Label();
             this.label17 = new System.Windows.Forms.Label();
             this.label20 = new System.Windows.Forms.Label();
+            this.bt_start_timer = new System.Windows.Forms.Button();
+            this.bt_stop_timer = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -313,15 +317,17 @@
             // ErrorLog
             // 
             this.ErrorLog.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.ErrorLog.Location = new System.Drawing.Point(303, 238);
+            this.ErrorLog.Location = new System.Drawing.Point(656, 237);
             this.ErrorLog.Multiline = true;
             this.ErrorLog.Name = "ErrorLog";
-            this.ErrorLog.Size = new System.Drawing.Size(347, 166);
+            this.ErrorLog.Size = new System.Drawing.Size(489, 140);
             this.ErrorLog.TabIndex = 6;
             // 
             // panel4
             // 
             this.panel4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel4.Controls.Add(this.bt_stop_timer);
+            this.panel4.Controls.Add(this.bt_start_timer);
             this.panel4.Controls.Add(this.t5_tb);
             this.panel4.Controls.Add(this.Roll_curpos);
             this.panel4.Controls.Add(this.label15);
@@ -570,12 +576,12 @@
             this.panel5.Controls.Add(this.label27);
             this.panel5.Location = new System.Drawing.Point(12, 237);
             this.panel5.Name = "panel5";
-            this.panel5.Size = new System.Drawing.Size(285, 272);
+            this.panel5.Size = new System.Drawing.Size(638, 140);
             this.panel5.TabIndex = 26;
             // 
             // MvCy2_tb
             // 
-            this.MvCy2_tb.Location = new System.Drawing.Point(136, 155);
+            this.MvCy2_tb.Location = new System.Drawing.Point(423, 82);
             this.MvCy2_tb.Name = "MvCy2_tb";
             this.MvCy2_tb.Size = new System.Drawing.Size(59, 22);
             this.MvCy2_tb.TabIndex = 28;
@@ -585,7 +591,7 @@
             // 
             this.label29.AutoSize = true;
             this.label29.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold);
-            this.label29.Location = new System.Drawing.Point(107, 156);
+            this.label29.Location = new System.Drawing.Point(394, 83);
             this.label29.Name = "label29";
             this.label29.Size = new System.Drawing.Size(26, 19);
             this.label29.TabIndex = 27;
@@ -593,7 +599,7 @@
             // 
             // MvCx2_tb
             // 
-            this.MvCx2_tb.Location = new System.Drawing.Point(136, 127);
+            this.MvCx2_tb.Location = new System.Drawing.Point(423, 54);
             this.MvCx2_tb.Name = "MvCx2_tb";
             this.MvCx2_tb.Size = new System.Drawing.Size(59, 22);
             this.MvCx2_tb.TabIndex = 26;
@@ -603,7 +609,7 @@
             // 
             this.label30.AutoSize = true;
             this.label30.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold);
-            this.label30.Location = new System.Drawing.Point(107, 128);
+            this.label30.Location = new System.Drawing.Point(394, 55);
             this.label30.Name = "label30";
             this.label30.Size = new System.Drawing.Size(26, 19);
             this.label30.TabIndex = 25;
@@ -611,7 +617,7 @@
             // 
             // MvCy1_tb
             // 
-            this.MvCy1_tb.Location = new System.Drawing.Point(42, 155);
+            this.MvCy1_tb.Location = new System.Drawing.Point(329, 82);
             this.MvCy1_tb.Name = "MvCy1_tb";
             this.MvCy1_tb.Size = new System.Drawing.Size(59, 22);
             this.MvCy1_tb.TabIndex = 24;
@@ -621,7 +627,7 @@
             // 
             this.label26.AutoSize = true;
             this.label26.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold);
-            this.label26.Location = new System.Drawing.Point(13, 156);
+            this.label26.Location = new System.Drawing.Point(300, 83);
             this.label26.Name = "label26";
             this.label26.Size = new System.Drawing.Size(26, 19);
             this.label26.TabIndex = 23;
@@ -629,7 +635,7 @@
             // 
             // MvCx1_tb
             // 
-            this.MvCx1_tb.Location = new System.Drawing.Point(42, 127);
+            this.MvCx1_tb.Location = new System.Drawing.Point(329, 54);
             this.MvCx1_tb.Name = "MvCx1_tb";
             this.MvCx1_tb.Size = new System.Drawing.Size(59, 22);
             this.MvCx1_tb.TabIndex = 22;
@@ -639,7 +645,7 @@
             // 
             this.label28.AutoSize = true;
             this.label28.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold);
-            this.label28.Location = new System.Drawing.Point(13, 128);
+            this.label28.Location = new System.Drawing.Point(300, 55);
             this.label28.Name = "label28";
             this.label28.Size = new System.Drawing.Size(26, 19);
             this.label28.TabIndex = 21;
@@ -647,7 +653,7 @@
             // 
             // Tsm_moveC_btn
             // 
-            this.Tsm_moveC_btn.Location = new System.Drawing.Point(201, 128);
+            this.Tsm_moveC_btn.Location = new System.Drawing.Point(488, 55);
             this.Tsm_moveC_btn.Name = "Tsm_moveC_btn";
             this.Tsm_moveC_btn.Size = new System.Drawing.Size(74, 49);
             this.Tsm_moveC_btn.TabIndex = 20;
@@ -659,7 +665,7 @@
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold);
-            this.label4.Location = new System.Drawing.Point(13, 187);
+            this.label4.Location = new System.Drawing.Point(300, 14);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(21, 19);
             this.label4.TabIndex = 19;
@@ -667,7 +673,7 @@
             // 
             // spd_tb
             // 
-            this.spd_tb.Location = new System.Drawing.Point(42, 185);
+            this.spd_tb.Location = new System.Drawing.Point(329, 12);
             this.spd_tb.Name = "spd_tb";
             this.spd_tb.Size = new System.Drawing.Size(59, 22);
             this.spd_tb.TabIndex = 9;
@@ -675,7 +681,7 @@
             // 
             // set_const_speed_btn
             // 
-            this.set_const_speed_btn.Location = new System.Drawing.Point(129, 183);
+            this.set_const_speed_btn.Location = new System.Drawing.Point(416, 12);
             this.set_const_speed_btn.Name = "set_const_speed_btn";
             this.set_const_speed_btn.Size = new System.Drawing.Size(146, 26);
             this.set_const_speed_btn.TabIndex = 9;
@@ -695,7 +701,7 @@
             // 
             // Tsm_moveL_btn
             // 
-            this.Tsm_moveL_btn.Location = new System.Drawing.Point(127, 85);
+            this.Tsm_moveL_btn.Location = new System.Drawing.Point(127, 87);
             this.Tsm_moveL_btn.Name = "Tsm_moveL_btn";
             this.Tsm_moveL_btn.Size = new System.Drawing.Size(148, 26);
             this.Tsm_moveL_btn.TabIndex = 17;
@@ -705,7 +711,7 @@
             // 
             // Tsm_moveJ_btn
             // 
-            this.Tsm_moveJ_btn.Location = new System.Drawing.Point(127, 53);
+            this.Tsm_moveJ_btn.Location = new System.Drawing.Point(127, 55);
             this.Tsm_moveJ_btn.Name = "Tsm_moveJ_btn";
             this.Tsm_moveJ_btn.Size = new System.Drawing.Size(148, 26);
             this.Tsm_moveJ_btn.TabIndex = 8;
@@ -780,6 +786,8 @@
             // panel6
             // 
             this.panel6.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel6.Controls.Add(this.bt_stop_record);
+            this.panel6.Controls.Add(this.bt_start_record);
             this.panel6.Controls.Add(this.bt_off_matlab);
             this.panel6.Controls.Add(this.bt_on_matlab);
             this.panel6.Controls.Add(this.cBoxParityBits);
@@ -796,28 +804,48 @@
             this.panel6.Controls.Add(this.label19);
             this.panel6.Controls.Add(this.label17);
             this.panel6.Controls.Add(this.label20);
-            this.panel6.Location = new System.Drawing.Point(656, 14);
+            this.panel6.Location = new System.Drawing.Point(656, 13);
             this.panel6.Name = "panel6";
-            this.panel6.Size = new System.Drawing.Size(489, 287);
+            this.panel6.Size = new System.Drawing.Size(489, 218);
             this.panel6.TabIndex = 3;
+            // 
+            // bt_stop_record
+            // 
+            this.bt_stop_record.Location = new System.Drawing.Point(349, 91);
+            this.bt_stop_record.Name = "bt_stop_record";
+            this.bt_stop_record.Size = new System.Drawing.Size(115, 30);
+            this.bt_stop_record.TabIndex = 40;
+            this.bt_stop_record.Text = "Stop Record";
+            this.bt_stop_record.UseVisualStyleBackColor = true;
+            this.bt_stop_record.Click += new System.EventHandler(this.bt_stop_record_Click);
+            // 
+            // bt_start_record
+            // 
+            this.bt_start_record.Location = new System.Drawing.Point(228, 92);
+            this.bt_start_record.Name = "bt_start_record";
+            this.bt_start_record.Size = new System.Drawing.Size(102, 30);
+            this.bt_start_record.TabIndex = 39;
+            this.bt_start_record.Text = "Start Record";
+            this.bt_start_record.UseVisualStyleBackColor = true;
+            this.bt_start_record.Click += new System.EventHandler(this.bt_start_record_Click);
             // 
             // bt_off_matlab
             // 
-            this.bt_off_matlab.Location = new System.Drawing.Point(289, 117);
+            this.bt_off_matlab.Location = new System.Drawing.Point(349, 47);
             this.bt_off_matlab.Name = "bt_off_matlab";
-            this.bt_off_matlab.Size = new System.Drawing.Size(158, 41);
+            this.bt_off_matlab.Size = new System.Drawing.Size(115, 30);
             this.bt_off_matlab.TabIndex = 38;
-            this.bt_off_matlab.Text = "Start Realtime";
+            this.bt_off_matlab.Text = "Close Simulink";
             this.bt_off_matlab.UseVisualStyleBackColor = true;
             this.bt_off_matlab.Click += new System.EventHandler(this.bt_off_matlab_Click);
             // 
             // bt_on_matlab
             // 
-            this.bt_on_matlab.Location = new System.Drawing.Point(289, 50);
+            this.bt_on_matlab.Location = new System.Drawing.Point(228, 48);
             this.bt_on_matlab.Name = "bt_on_matlab";
-            this.bt_on_matlab.Size = new System.Drawing.Size(158, 41);
+            this.bt_on_matlab.Size = new System.Drawing.Size(102, 29);
             this.bt_on_matlab.TabIndex = 20;
-            this.bt_on_matlab.Text = "Turn ON MATLAB";
+            this.bt_on_matlab.Text = "Start Simulink";
             this.bt_on_matlab.UseVisualStyleBackColor = true;
             this.bt_on_matlab.Click += new System.EventHandler(this.bt_on_matlab_Click);
             // 
@@ -891,7 +919,7 @@
             this.cBoxBaudRate.Name = "cBoxBaudRate";
             this.cBoxBaudRate.Size = new System.Drawing.Size(99, 24);
             this.cBoxBaudRate.TabIndex = 32;
-            this.cBoxBaudRate.Text = "9600";
+            this.cBoxBaudRate.Text = "962500";
             // 
             // cBoxPort
             // 
@@ -903,7 +931,7 @@
             // 
             // progressBar1
             // 
-            this.progressBar1.Location = new System.Drawing.Point(16, 252);
+            this.progressBar1.Location = new System.Drawing.Point(228, 178);
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(236, 23);
             this.progressBar1.TabIndex = 3;
@@ -921,7 +949,7 @@
             // bClose
             // 
             this.bClose.BackColor = System.Drawing.Color.Red;
-            this.bClose.Location = new System.Drawing.Point(137, 220);
+            this.bClose.Location = new System.Drawing.Point(349, 146);
             this.bClose.Name = "bClose";
             this.bClose.Size = new System.Drawing.Size(115, 26);
             this.bClose.TabIndex = 2;
@@ -933,7 +961,7 @@
             // 
             this.bOpen.BackColor = System.Drawing.Color.Lime;
             this.bOpen.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.bOpen.Location = new System.Drawing.Point(16, 220);
+            this.bOpen.Location = new System.Drawing.Point(228, 146);
             this.bOpen.Name = "bOpen";
             this.bOpen.Size = new System.Drawing.Size(115, 26);
             this.bOpen.TabIndex = 1;
@@ -971,11 +999,33 @@
             this.label20.TabIndex = 26;
             this.label20.Text = "COM PORT";
             // 
+            // bt_start_timer
+            // 
+            this.bt_start_timer.BackColor = System.Drawing.Color.Lime;
+            this.bt_start_timer.Location = new System.Drawing.Point(118, 24);
+            this.bt_start_timer.Name = "bt_start_timer";
+            this.bt_start_timer.Size = new System.Drawing.Size(49, 30);
+            this.bt_start_timer.TabIndex = 41;
+            this.bt_start_timer.Text = "Start";
+            this.bt_start_timer.UseVisualStyleBackColor = false;
+            this.bt_start_timer.Click += new System.EventHandler(this.bt_start_timer_Click);
+            // 
+            // bt_stop_timer
+            // 
+            this.bt_stop_timer.BackColor = System.Drawing.Color.Red;
+            this.bt_stop_timer.Location = new System.Drawing.Point(187, 24);
+            this.bt_stop_timer.Name = "bt_stop_timer";
+            this.bt_stop_timer.Size = new System.Drawing.Size(49, 30);
+            this.bt_stop_timer.TabIndex = 42;
+            this.bt_stop_timer.Text = "Stop";
+            this.bt_stop_timer.UseVisualStyleBackColor = false;
+            this.bt_stop_timer.Click += new System.EventHandler(this.bt_stop_timer_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1158, 568);
+            this.ClientSize = new System.Drawing.Size(1157, 388);
             this.Controls.Add(this.panel6);
             this.Controls.Add(this.panel5);
             this.Controls.Add(this.panel4);
@@ -1087,6 +1137,10 @@
         private System.Windows.Forms.Label label26;
         private System.Windows.Forms.TextBox MvCx1_tb;
         private System.Windows.Forms.Label label28;
+        private System.Windows.Forms.Button bt_start_record;
+        private System.Windows.Forms.Button bt_stop_record;
+        private System.Windows.Forms.Button bt_stop_timer;
+        private System.Windows.Forms.Button bt_start_timer;
     }
 }
 
