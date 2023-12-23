@@ -540,7 +540,7 @@
             // 
             // Timer1
             // 
-            this.Timer1.Interval = 200;
+            this.Timer1.Interval = 10;
             this.Timer1.Tick += new System.EventHandler(this.Timer1_Tick);
             // 
             // panel5
@@ -807,7 +807,7 @@
             this.bt_off_matlab.Name = "bt_off_matlab";
             this.bt_off_matlab.Size = new System.Drawing.Size(158, 41);
             this.bt_off_matlab.TabIndex = 38;
-            this.bt_off_matlab.Text = "Turn OFF MATLAB";
+            this.bt_off_matlab.Text = "Start Realtime";
             this.bt_off_matlab.UseVisualStyleBackColor = true;
             this.bt_off_matlab.Click += new System.EventHandler(this.bt_off_matlab_Click);
             // 
@@ -883,6 +883,7 @@
             // 
             this.cBoxBaudRate.FormattingEnabled = true;
             this.cBoxBaudRate.Items.AddRange(new object[] {
+            "962500",
             "115200",
             "9600",
             "4800"});

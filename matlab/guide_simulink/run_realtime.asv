@@ -2,14 +2,12 @@ s = serial('COM3');
 set(s, 'BaudRate', 962500); 
 fopen(s); 
 t = 0.0;
-t1_pre = -1;
-t2_pre = -1; 
-t3_pre = -1;
-t4_pre = -1;
+t1_pre = 0;
+t2_pre = 0; 
+t3_pre = , t4_pre;
 
 while true
     pause(0.01);
-    dt = 0.01;
     t = t + 0.01;
     if s.BytesAvailable > 0 
         dataBytes = fread(s, s.BytesAvailable); 
@@ -46,10 +44,7 @@ while true
         set_param('Complete/Slider Gain3','Gain',num2str(t4));
         set_param('Complete/Slider Gain4','Gain',num2str(t5));
         
-        w1 = (t1 - t1_pre) / dt;
-        w2 = (t2 - t2_pre) / dt;
-        w3 = (t3 - t3_pre) / dt;
-        w4 = (t4 - t4_pre) / dt;
+        w1 = (t1)
         
         t1_pre = t1;
         t2_pre = t2;
@@ -58,48 +53,28 @@ while true
         
         
         %Plot for drawing
-        subplot(4,2,1);
+        subplot(2,2,1);
         plot(t,t1,'.'); xlabel('time'); ylabel('angle 1'); title('Graph of theta1')
         hold on
         grid on
         %Plot for drawing
-        subplot(4,2,2);
+        subplot(2,2,2);
         plot(t,t2,'.'); xlabel('time'); ylabel('angle 2'); title('Graph of theta2')
         hold on
         grid on
         %Plot for drawing
-        subplot(4,2,3);
+        subplot(2,2,3);
         plot(t,t3,'.'); xlabel('time'); ylabel('angle 3'); title('Graph of theta3')
         hold on
         grid on
         %Plot for drawing
-        subplot(4,2,4);
+        subplot(2,2,4);
         plot(t,t4,'.'); xlabel('time'); ylabel('angle 4'); title('Graph of theta4')
         hold on
         grid on
         
-        if (t1_pre ~= -1)
-            %Plot for drawing
-            subplot(4,2,5);
-            plot(t,w1,'.'); xlabel('time'); ylabel('omega 1'); title('Graph of omega1')
-            hold on
-            grid on
-            %Plot for drawing
-            subplot(4,2,6);
-            plot(t,w2,'.'); xlabel('time'); ylabel('omega 2'); title('Graph of omega2')
-            hold on
-            grid on
-            %Plot for drawing
-            subplot(4,2,7);
-            plot(t,w3,'.'); xlabel('time'); ylabel('omega 3'); title('Graph of omega3')
-            hold on
-            grid on
-            %Plot for drawing
-            subplot(4,2,8);
-            plot(t,w4,'.'); xlabel('time'); ylabel('omega 4'); title('Graph of omega4')
-            hold on
-            grid on
-        end
+        
+        
     end
 end
 
