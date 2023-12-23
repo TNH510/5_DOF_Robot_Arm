@@ -86,42 +86,44 @@ while true
         px=cosd(t1)*(l3*cosd(t2+t3)+l2*cosd(t2)+l5*cosd(-90));
         py=sind(t1)*(l3*cosd(t2+t3)+l2*cosd(t2)+l5*cosd(-90));
         pz=l1+l3*sind(t2+t3)+l2*sind(t2)+l5*sind(-90);
-        
-        %Plot for drawing
-        subplot(3,2,1);
-        plot(t,t1,'.r'); xlabel('Time (s)'); ylabel('Theta 1 (Degrees)'); title('Graph of theta1');
-        xlim([t-10, t]); 
-        hold on
-        grid on
-        %Plot for drawing
-        subplot(3,2,2);
-        plot(t,t2,'.g'); xlabel('Time (s)'); ylabel('Theta 2 (Degrees)'); title('Graph of theta2');
-        xlim([t-10, t]); 
-        hold on
-        grid on
-        %Plot for drawing
-        subplot(3,2,3);
-        plot(t,t3,'.b'); xlabel('Time (s)'); ylabel('Theta 3 (Degrees)'); title('Graph of theta3');
-        xlim([t-10, t]); 
-        hold on
-        grid on
-        
-        %Plot for drawing
-        subplot(3,2,4);
-        plot(t,t4,'.r'); xlabel('Time (s)'); ylabel('Theta 4 (Degrees)'); title('Graph of theta4');
-        xlim([t-10, t]); 
-        hold on
-        grid on
 
-        subplot(3,2,5);
-        plot(px,py,'.k'); xlabel('x'); ylabel('y'); title('Graph of Oxy')
-        hold on
-        grid on
+        if byte_1 ~= 255 && byte_2 ~= 255
+            %Plot for drawing
+            subplot(3,2,1);
+            plot(t,t1,'.r'); xlabel('Time (s)'); ylabel('Theta 1 (Degrees)'); title('Graph of theta1');
+            xlim([t-10, t]); 
+            hold on
+            grid on
+            %Plot for drawing
+            subplot(3,2,2);
+            plot(t,t2,'.g'); xlabel('Time (s)'); ylabel('Theta 2 (Degrees)'); title('Graph of theta2');
+            xlim([t-10, t]); 
+            hold on
+            grid on
+            %Plot for drawing
+            subplot(3,2,3);
+            plot(t,t3,'.b'); xlabel('Time (s)'); ylabel('Theta 3 (Degrees)'); title('Graph of theta3');
+            xlim([t-10, t]); 
+            hold on
+            grid on
 
-        subplot(3,2,6);
-        plot3(px,py, pz,'.m'); xlabel('x'); ylabel('y'); zlabel('z'); title('Graph of Oxyz')
-        hold on
-        grid on
+            %Plot for drawing
+            subplot(3,2,4);
+            plot(t,t4,'.r'); xlabel('Time (s)'); ylabel('Theta 4 (Degrees)'); title('Graph of theta4');
+            xlim([t-10, t]); 
+            hold on
+            grid on
+
+            subplot(3,2,5);
+            plot(px,py,'.k'); xlabel('x'); ylabel('y'); title('Graph of Oxy')
+            hold on
+            grid on
+
+            subplot(3,2,6);
+            plot3(px,py, pz,'.m'); xlabel('x'); ylabel('y'); zlabel('z'); title('Graph of Oxyz')
+            hold on
+            grid on
+        end
     end
 end
 

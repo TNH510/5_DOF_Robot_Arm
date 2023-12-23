@@ -998,6 +998,11 @@ namespace GUI
 
         private void bt_start_record_Click(object sender, EventArgs e)
         {
+            bt_start_record.Enabled = false;
+            bt_stop_record.Enabled = true;
+
+            PrintLog("Info", MethodBase.GetCurrentMethod().Name, "Start Record data");
+
             frame_start_record[0] = (byte) (0xFF);
             frame_start_record[1] = (byte) (0xFF);
 
@@ -1021,6 +1026,11 @@ namespace GUI
 
         private void bt_stop_record_Click(object sender, EventArgs e)
         {
+            bt_stop_record.Enabled = false;
+            bt_start_record.Enabled = true;
+
+            PrintLog("Info", MethodBase.GetCurrentMethod().Name, "Stop Record data");
+
             frame_stop_record[0] = (byte)(0xFF);
             frame_stop_record[1] = (byte)(0xFF);
 
