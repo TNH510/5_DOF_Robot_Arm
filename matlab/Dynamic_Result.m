@@ -94,11 +94,6 @@ D5 = m5*(Jv5')*Jv5 + (Jw5')*R5*I5*(R5')*Jw5;
 % D5 = simplify(D5)
 
 D = D1 + D2 + D3 + D4 + D5;
-D(5,1)
-D(5,2)
-D(5,3)
-D(5,4)
-D(5,5)
 
 %% VECTOR HUONG TAM
 V1 = 0;
@@ -141,11 +136,11 @@ for i = 1:1:5
     end
 end
 
-V1;
-V2;
-V3;
-V4;
-V5;
+V1
+V2
+V3
+V4
+V5
 
 V = [V1 ; V2 ; V3 ; V4 ; V5];
 
@@ -153,16 +148,16 @@ V = [V1 ; V2 ; V3 ; V4 ; V5];
 
 gT =  [0 , 0, -9.8]
 
-G1 = - (m(1) * gT * Jv1(:, 1) + m(2) * gT * Jv2(:, 1) + m(3) * gT * Jv3(:, 1) + m(4) * gT * Jv4(:, 1) + m(5) * gT * Jv5(:, 1))
-G2 = - (m(1) * gT * Jv1(:, 2) + m(2) * gT * Jv2(:, 2) + m(3) * gT * Jv3(:, 2) + m(4) * gT * Jv4(:, 2) + m(5) * gT * Jv5(:, 2))
-G3 = - (m(1) * gT * Jv1(:, 3) + m(2) * gT * Jv2(:, 3) + m(3) * gT * Jv3(:, 3) + m(4) * gT * Jv4(:, 3) + m(5) * gT * Jv5(:, 3))
-G4 = - (m(1) * gT * Jv1(:, 4) + m(2) * gT * Jv2(:, 4) + m(3) * gT * Jv3(:, 4) + m(4) * gT * Jv4(:, 4) + m(5) * gT * Jv5(:, 4))
-G5 = - (m(1) * gT * Jv1(:, 5) + m(2) * gT * Jv2(:, 5) + m(3) * gT * Jv3(:, 5) + m(4) * gT * Jv4(:, 5) + m(5) * gT * Jv5(:, 5))
+G1 = - (m(1) * gT * Jv1(:, 1) + m(2) * gT * Jv2(:, 1) + m(3) * gT * Jv3(:, 1) + m(4) * gT * Jv4(:, 1) + m(5) * gT * Jv5(:, 1));
+G2 = - (m(1) * gT * Jv1(:, 2) + m(2) * gT * Jv2(:, 2) + m(3) * gT * Jv3(:, 2) + m(4) * gT * Jv4(:, 2) + m(5) * gT * Jv5(:, 2));
+G3 = - (m(1) * gT * Jv1(:, 3) + m(2) * gT * Jv2(:, 3) + m(3) * gT * Jv3(:, 3) + m(4) * gT * Jv4(:, 3) + m(5) * gT * Jv5(:, 3));
+G4 = - (m(1) * gT * Jv1(:, 4) + m(2) * gT * Jv2(:, 4) + m(3) * gT * Jv3(:, 4) + m(4) * gT * Jv4(:, 4) + m(5) * gT * Jv5(:, 4));
+G5 = - (m(1) * gT * Jv1(:, 5) + m(2) * gT * Jv2(:, 5) + m(3) * gT * Jv3(:, 5) + m(4) * gT * Jv4(:, 5) + m(5) * gT * Jv5(:, 5));
 
-G = [simplify(G1) ; simplify(G2) ; simplify(G3) ; simplify(G4) ; simplify(G5)]
+G = [simplify(G1) ; simplify(G2) ; simplify(G3) ; simplify(G4) ; simplify(G5)];
 
 %% KET QUA TINH DONG LUC HOC
-syms t1_dd t2_dd t3_dd t4_dd t5_dd
+syms t1_dd t2_dd t3_dd t4_dd t5_dd;
 q_dd = [t1_dd ; t2_dd ; t3_dd ; t4_dd ; t5_dd];
 
 %D(q)*q_dd + V(q, q_d) + G(q) = tau
