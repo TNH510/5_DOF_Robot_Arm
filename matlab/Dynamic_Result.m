@@ -87,11 +87,11 @@ D3 = m3*(Jv3')*Jv3 + (Jw3')*R3*I3*(R3')*Jw3;
 D4 = m4*(Jv4')*Jv4 + (Jw4')*R4*I4*(R4')*Jw4;
 D5 = m5*(Jv5')*Jv5 + (Jw5')*R5*I5*(R5')*Jw5;
 
-D1 = simplify(D1)
-D2 = simplify(D2)
-D3 = simplify(D3)
-D4 = simplify(D4)
-D5 = simplify(D5)
+% D1 = simplify(D1)
+% D2 = simplify(D2)
+% D3 = simplify(D3)
+% D4 = simplify(D4)
+% D5 = simplify(D5)
 
 D = D1 + D2 + D3 + D4 + D5;
 
@@ -193,3 +193,9 @@ tau_2 = (49*m4*(l3*cos(t2 + t3) + l2*cos(t2) + lc4*0))/5 + (49*m5*(l3*cos(t2 + t
 tau_3 = (49*m4*(l3*cos(t2 + t3) + lc4*0))/5 + (49*m5*(l3*cos(t2 + t3) + lc5*0))/5 + (49*lc3*m3*cos(t2 + t3))/5
 tau_4 = (49*0*(lc4*m4 + lc5*m5))/5
 
+for m5 = 1:0.1:30
+    tau_2 = (49*m4*(l3*cos(t2 + t3) + l2*cos(t2) + lc4*0))/5 + (49*m5*(l3*cos(t2 + t3) + l2*cos(t2) + lc5*0))/5 + (49*m3*(lc3*cos(t2 + t3) + l2*cos(t2)))/5 + (49*lc2*m2*cos(t2))/5;
+    plot(m5,tau_2,'.r');xlabel('Khoi luong khau 5 (Kg)'); ylabel('Moment tai khop 2 (Nm)'); title('Bieu do lien he giua khoi luong khau 5 va moment khop 2');
+    hold on
+    grid on
+end
