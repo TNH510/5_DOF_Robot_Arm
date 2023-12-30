@@ -24,18 +24,18 @@ t3 = 0
 t4 = - pi / 2
 t5 = 0
 
-t1_d = 10;
-t2_d = -10;
-t3_d = 10;
-t4_d = -10;
-t5_d = 10;
+t1_d = 0;
+t2_d = 0;
+t3_d = 0;
+t4_d = 0;
+t5_d = 0;
 
 % TAO MA TRAN GIA TOC
-t1_dd = 10;
-t2_dd = 10;
-t3_dd = 10;
-t4_dd = 10;
-t5_dd = 10;
+t1_dd = 0;
+t2_dd = 0;
+t3_dd = 0;
+t4_dd = 0;
+t5_dd = 0;
 
 q_dd = [t1_dd ; t2_dd ; t3_dd ; t4_dd ; t5_dd];
 
