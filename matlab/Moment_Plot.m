@@ -1,4 +1,40 @@
 %% TAO TAP HOP CAC DIEM QUY DAO MO PHONG
+% syms l1 l2 l3 l4 l5 lc1 lc2 lc3 lc4 lc5
+% syms t1 t2 t3 t4 t5
+% syms Ixx1 Iyy1 Iyy2 Iyy3 Iyy4 Iyy5 Izz5
+% syms m1 m2 m3 m4 m5
+
+Ixx1 = 461147
+Iyy1 = 299920
+Iyy2 = 803322
+Iyy3 = 1604504
+Iyy4 = 6328
+Iyy5 = 24861 
+Izz5 = 14388 
+
+m1 = 27.5 %kg
+m2 = 24.0
+m3 = 25.0
+m4 = 3.0
+m5 = 2.0
+
+t1 = 0 %rad
+t2 = 0
+t3 = 0
+t4 = - pi / 2
+t5 = 0
+
+l1 = 0.690 %m
+l2 = 0.440
+l3 = 0.500
+l4 = 0.0
+l5 = 0.230
+
+lc1 = 0.660 %m
+lc2 = 0.255
+lc3 = 0.143
+lc4 = 0.6
+lc5 = 0.143
 
 %% RUT GON KET QUA BIEU THUC G
 G1 = 0
@@ -274,9 +310,28 @@ D53 = 0
 D54 = 0
 
 D55 = Izz5
+
 %% RUT GON KET QUA BIEU THUC V
-V1 = 
-V2 = 
-V3 = 
-V4 = 
-V5 = 
+% V1 = 0
+% V2 = 0
+% V3 = 0
+% V4 = 0
+% V5 = 0
+
+%% TAO MA TRAN GIA TOC
+t1_dd = 1;
+t2_dd = 1;
+t3_dd = 1;
+t4_dd = 1;
+t5_dd = 1;
+
+q_dd = [t1_dd ; t2_dd ; t3_dd ; t4_dd ; t5_dd];
+
+D = [D11 D12 D13 D14 D15;...
+     D21 D22 D23 D24 D25;...
+     D31 D32 D33 D34 D35;...
+     D41 D42 D43 D44 D45;...
+     D51 D52 D53 D54 D55;];
+
+tau = D*q_dd
+
