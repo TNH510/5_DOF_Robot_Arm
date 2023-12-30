@@ -4,8 +4,6 @@
 % syms Ixx1 Iyy1 Iyy2 Iyy3 Iyy4 Iyy5 Izz5
 % syms m1 m2 m3 m4 m5
 
-syms t1_d t2_d t3_d t4_d t5_d
-
 Ixx1 = 461147
 Iyy1 = 299920
 Iyy2 = 803322
@@ -26,6 +24,21 @@ t3 = 0
 t4 = - pi / 2
 t5 = 0
 
+t1_d = 10;
+t2_d = -10;
+t3_d = 10;
+t4_d = -10;
+t5_d = 10;
+
+% TAO MA TRAN GIA TOC
+t1_dd = 10;
+t2_dd = 10;
+t3_dd = 10;
+t4_dd = 10;
+t5_dd = 10;
+
+q_dd = [t1_dd ; t2_dd ; t3_dd ; t4_dd ; t5_dd];
+
 l1 = 0.690 %m
 l2 = 0.440
 l3 = 0.500
@@ -44,6 +57,8 @@ G2 = (49*m4*(l3*cos(t2 + t3) + l2*cos(t2)))/5 + (49*m5*(l3*cos(t2 + t3) + l2*cos
 G3 = (49*l3*m4*cos(t2 + t3))/5 + (49*l3*m5*cos(t2 + t3))/5 + (49*lc3*m3*cos(t2 + t3))/5
 G4 = 0
 G5 = 0
+
+G = [G1; G2; G3; G4; G5;]
 
 %% RUT GON KET QUA BIEU THUC D
 D11 = Iyy1 + Izz5 + Iyy2*cos(t2)*cos(t2) + Iyy3*cos(t2 + t3)*cos(t2 + t3) ...
@@ -898,23 +913,19 @@ l2*cos(t2)))/2 + (m4*sin(t1)*cos(t2 + t3)*l3*cos(t1)*(l3*cos...
 (lc3*m3*cos(t1)*sin(t2 + t3)*sin(t2 + t3)*lc2*sin(t1))/2 - ...
 (lc3*m3*sin(t1)*sin(t2 + t3)*sin(t2 + t3)*lc2*cos(t1))/2)
 
-V4 = 0
-V5 = 0
+V4 = 0;
+V5 = 0;
 
-%% TAO MA TRAN GIA TOC
-% t1_dd = 1;
-% t2_dd = 1;
-% t3_dd = 1;
-% t4_dd = 1;
-% t5_dd = 1;
+% TINH D
+D = [D11 D12 D13 D14 D15;...
+     D21 D22 D23 D24 D25;...
+     D31 D32 D33 D34 D35;...
+     D41 D42 D43 D44 D45;...
+     D51 D52 D53 D54 D55;];
 
-% q_dd = [t1_dd ; t2_dd ; t3_dd ; t4_dd ; t5_dd];
+% TINH V
+V = [V1; V2; V3; V4; V5;]
 
-% D = [D11 D12 D13 D14 D15;...
-%      D21 D22 D23 D24 D25;...
-%      D31 D32 D33 D34 D35;...
-%      D41 D42 D43 D44 D45;...
-%      D51 D52 D53 D54 D55;];
-
-% tau = D*q_dd
+% TINH tau
+tau = D*q_dd + V + G
 
