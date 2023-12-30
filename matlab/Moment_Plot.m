@@ -43,6 +43,11 @@ t2_d_array = data(:, 9)
 t3_d_array = data(:, 10)
 t4_d_array = data(:, 11)
 
+t1_dd_array = data(:, 12)
+t2_dd_array = data(:, 13)
+t3_dd_array = data(:, 14)
+t4_dd_array = data(:, 15)
+
 t1 = 0 %rad
 t2 = 0
 t3 = 0
@@ -64,10 +69,10 @@ for i = 1:1:100
      t5_d = 0;
 
      % TAO MA TRAN GIA TOC
-     t1_dd = 0;
-     t2_dd = 0;
-     t3_dd = 0;
-     t4_dd = 0;
+     t1_dd = t1_dd_array(i) * pi / 180;
+     t2_dd = t2_dd_array(i) * pi / 180;
+     t3_dd = t3_dd_array(i) * pi / 180;
+     t4_dd = t4_dd_array(i) * pi / 180;
      t5_dd = 0;
 
      q_dd = [t1_dd ; t2_dd ; t3_dd ; t4_dd ; t5_dd];
@@ -949,10 +954,14 @@ for i = 1:1:100
 
      % TINH tau
      %tau = D*q_dd + V + G
-     tau = V + G
+     tau = D*q_dd + V + G
 
      % MOMENT PLOT
-     plot(i,tau(3),'.g'); xlabel('Time (s)'); ylabel('Tau (Nm)');
+     plot(i,tau(1),'.r'); xlabel('Time (s)'); ylabel('Tau1 (Nm)');
+     plot(i,tau(2),'.g'); xlabel('Time (s)'); ylabel('Tau2 (Nm)');
+     plot(i,tau(3),'.b'); xlabel('Time (s)'); ylabel('Tau3 (Nm)');
+     plot(i,tau(4),'*r'); xlabel('Time (s)'); ylabel('Tau4 (Nm)');
+     plot(i,tau(5),'.m'); xlabel('Time (s)'); ylabel('Tau5 (Nm)');
      hold on
      grid on
 end
