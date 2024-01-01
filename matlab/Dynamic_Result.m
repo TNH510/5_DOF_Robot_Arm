@@ -96,11 +96,7 @@ D5 = m5*(Jv5')*Jv5 + (Jw5')*R5*I5*(R5')*Jw5;
 D = D1 + D2 + D3 + D4 + D5;
 
 %% VECTOR HUONG TAM
-V1 = 0;
-V2 = 0;
-V3 = 0;
-V4 = 0;
-V5 = 0;
+V1 = 0; V2 = 0; V3 = 0; V4 = 0; V5 = 0;
 syms t1_d t2_d t3_d t4_d t5_d
 
 q_d = [t1_d ; t2_d ; t3_d ; t4_d ; t5_d]
@@ -109,38 +105,12 @@ q   = [t1 ; t2 ; t3 ; t4 ; t5]
 for i = 1:1:5
     for j = 1:1:5
         V1 = V1 + (diff(D(1,j),q(i)) - 1/2 * diff(D(i,j),q(1))) * q_d(i) * q_d(j);
-    end
-end
-
-for i = 1:1:5
-    for j = 1:1:5
         V2 = V2 + (diff(D(2,j),q(i)) - 1/2 * diff(D(i,j),q(2))) * q_d(i) * q_d(j);
-    end
-end
-
-for i = 1:1:5
-    for j = 1:1:5
         V3 = V3 + (diff(D(3,j),q(i)) - 1/2 * diff(D(i,j),q(3))) * q_d(i) * q_d(j);
-    end
-end
-
-for i = 1:1:5
-    for j = 1:1:5
         V4 = V4 + (diff(D(4,j),q(i)) - 1/2 * diff(D(i,j),q(4))) * q_d(i) * q_d(j);
-    end
-end
-
-for i = 1:1:5
-    for j = 1:1:5
         V5 = V5 + (diff(D(5,j),q(i)) - 1/2 * diff(D(i,j),q(5))) * q_d(i) * q_d(j);
     end
 end
-
-V1
-V2
-V3
-V4
-V5
 
 V = [V1 ; V2 ; V3 ; V4 ; V5];
 
