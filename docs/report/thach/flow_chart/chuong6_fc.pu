@@ -1,0 +1,19 @@
+@startuml
+start
+:Initialize COM port parameters;
+:Set up parameters for COM port;
+:Open serial port;
+if (bt_start_timer.Enabled == true) then (yes)
+  :Enable relevant buttons;
+else (no)
+  :Continue without enabling buttons;
+endif
+if ('Open' button is Clicked) then (yes)
+  :Disable 'Open' button;
+  :Enable 'Close' button;
+elseif ('Close' button is Clicked) then (no)
+  :Disable 'Close' button;
+  :Enable 'Open' button;
+endif
+stop
+@enduml

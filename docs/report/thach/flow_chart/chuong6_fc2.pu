@@ -1,0 +1,13 @@
+@startuml
+start
+:Initialize device_str variable;
+:Concatenate "D" with device value;
+:Initialize temp array;
+:Extract lower 16 bits of data;
+:Set temp[0] to extracted value;
+:Shift data right by 16 bits;
+:Extract lower 16 bits of shifted data;
+:Set temp[1] to extracted value;
+:Call WriteDeviceBlock method;
+stop
+@enduml
