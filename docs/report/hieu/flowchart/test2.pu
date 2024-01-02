@@ -1,73 +1,33 @@
 @startuml
 
 start
-:Initialize: s, l1, l2, l3, l5, filename, fileID, t, t1_pre, t2_pre, t3_pre, t4_pre;
-:create serial object;
-:set BaudRate to 962500;
-:fopen(s);
-:t = 0.0;
-:t1_pre = -1;
-:t2_pre = -1;
-:t3_pre = -1;
-:t4_pre = -1;
-:l1=690;
-:l2=440;
-:l3=500;
-:l5=230;
-:filename = 'data_robot.csv';
-:fileID = fopen(filename, 'a');
-:tic;
-:start_record = 0;
+:Khởi tạo các biến cần thiết;
+:Tạo và mở cổng COM ảo có Baudrate 962500;
+:Khởi tạo file .csv để lưu data;
+:Bắt đầu đếm thời gian dùng hàm 'tic';
 
-while (true) is (true)
-    :Loop: Read data from serial port;
-    :Pause(0.01);
-    :dt = toc;
-    :t = t + dt;
-    :tic;
+while (while(true))
+    : Pause(0.01) \n Cập nhật thời gian hiện tại bằng hàm 'toc';
     if (s.BytesAvailable > 0) then (true)
-        :Read 10 bytes of data;
-        :byte_1 = dataBytes(1);
-        :byte_2 = dataBytes(2);
-        :byte_3 = dataBytes(3);
-        :byte_4 = dataBytes(4);
-        :byte_5 = dataBytes(5);
-        :byte_6 = dataBytes(6);
-        :byte_7 = dataBytes(7);
-        :byte_8 = dataBytes(8);
-        :byte_9 = dataBytes(9);
-        :byte_10 = dataBytes(10);
-        if (byte_1 == 255 && byte_2 == 255) then (true)
-            if (byte_3 == 0 && byte_4 == 0) then (true)
-                :Break loop;
-            endif
-            if (byte_3 == 1 && byte_4 == 1) then (true)
-                :start_record = 1;
-            endif
-            if (byte_3 == 2 && byte_4 == 2) then (true)
-                :start_record = 0;
+        :Đọc 10 byte data vừa nhận được;
+        if (byte_1 == 255 and byte_2 == 255) then (true)
+            if (byte_3 == 0 and byte_4 == 0) then (true)
+                :Thoát vòng lặp;
+            else if (byte_3 == 1 and byte_4 == 1) then (true)
+                :Bắt đầu Record data;
+            else if (byte_3 == 2 and byte_4 == 2) then (true)
+                :Dừng Record data;
             endif
         endif
-        :t1 = bitor(bitshift(byte_1, 8), byte_2) / 100 - 180;
-        :t2 = bitor(bitshift(byte_3, 8), byte_4) / 100 - 180 + 90;
-        :t3 = bitor(bitshift(byte_5, 8), byte_6) / 100 - 180 - 90;
-        :t4 = bitor(bitshift(byte_7, 8), byte_8) / 100 - 180 - 90;
-        :t5 = bitor(bitshift(byte_9, 8), byte_10) / 100 - 180;
-        if (start_record == 1 && t1 <= 360.0) then (true)
-            :Write to file;
-        endif
-        :Update Simulink parameters;
-        :Calculate angular velocities (w1 to w4);
-        :Forward Kinematics: Calculate Cartesian coordinates (px, py, pz);
-        if (byte_1 ~= 255 && byte_2 ~= 255) then (true)
-            :Plotting;
-        endif
+        :Convert các giá trị từ 2 byte sang kiểu số thực cho các giá trị góc;
+        :Cập nhật hình dạng của Robot trên Simulink;
+        :Tính động học thuận tìm ra các giá trị vị trí px, py, pz;
+        :Vẽ các đồ thị giá trị góc và tọa độ đầu tay gắp trong không gian;
     endif
-endwhile (false)
+endwhile (break)
 
-:fclose(s);
-:delete(s);
-:fclose(fileID);
+: Close và Delete cổng COM đã khởi tạo;
+: Đóng file .csv;
 
 stop
 
