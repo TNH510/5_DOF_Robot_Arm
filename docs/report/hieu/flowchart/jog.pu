@@ -1,0 +1,8 @@
+@startuml
+
+:Turn On M1528;
+:Start chương trình K2;
+:Dùng lệnh [CPSTART4] cho các khớp từ 1 đến 4\nDùng lệnh [CPSTART1] cho khớp 5;
+:End;
+
+@enduml

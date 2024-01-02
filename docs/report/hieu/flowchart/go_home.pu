@@ -1,0 +1,8 @@
+@startuml
+
+:Turn On M514;
+:Start chương trình K1;
+:Dùng lệnh [ABS-1] cho cả 5 khớp để cùng về vị trí 180 độ;
+:End;
+
+@enduml

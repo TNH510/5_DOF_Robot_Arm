@@ -1,0 +1,8 @@
+@startuml
+
+:Turn On M1999;
+:Start chương trình K0;
+:Dùng lệnh [Zero] cho cả 5 khớp;
+:End;
+
+@enduml
