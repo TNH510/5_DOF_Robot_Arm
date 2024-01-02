@@ -55,7 +55,15 @@ namespace GUI
             bt_start_timer.Enabled = true;
             bt_stop_timer.Enabled = false;
 
-            GUI.Form1.CheckForIllegalCrossThreadCalls = false;
+            //bt_off_matlab.ForeColor = Color.FromArgb(158, 161, 176);
+            //bt_stop_record.ForeColor = Color.FromArgb(158, 161, 176);
+            //bt_start_record.ForeColor = Color.FromArgb(158, 161, 176);
+            //bt_start_timer.ForeColor = Color.FromArgb(158, 161, 176);
+            //bt_stop_timer.ForeColor = Color.FromArgb(158, 161, 176);
+
+
+
+            global::GUI.Form1.CheckForIllegalCrossThreadCalls = false;
             string[] ports = SerialPort.GetPortNames(); //Gan gia tri cac port co trong may
             cBoxPort.Items.AddRange(ports); //Hien thi len cBoxPort
 
@@ -419,7 +427,7 @@ namespace GUI
             {
                 /* Reverse bit: OnServo_status == 1 */
                 OnServo_button.Text = "SERVO: ON";
-                ChangeColorObject(OnServo_button, Constants.OBJECT_GREEN);
+                //ChangeColorObject(OnServo_button, Constants.OBJECT_GREEN);
                 PrintLog("SERVO:", servo_status.ToString(), "ON");
                 ret = PLCWritebit(Constants.R_SERVO_ON, (~servo_status) & 0x01);
                 if (ret != 0)
@@ -432,7 +440,7 @@ namespace GUI
             {
                 /* Reverse bit: OnServo_status == 1 */
                 OnServo_button.Text = "SERVO: OFF";
-                ChangeColorObject(OnServo_button, Constants.OBJECT_RED);
+                //ChangeColorObject(OnServo_button, Constants.OBJECT_RED);
                 PrintLog("SERVO:", servo_status.ToString(), "OFF");
                 ret = PLCWritebit(Constants.R_SERVO_ON, (~servo_status) & 0x01);
                 if (ret != 0)
@@ -448,8 +456,6 @@ namespace GUI
             /* Close the connection between PLC and C# - Datasheet - Page 383 */
             plc.Close();
             /* Change the color of the button when clicked */
-            ChangeColorObject(Connect_button, Constants.OBJECT_WHITE);
-            ChangeColorObject(Disconnect_button, Constants.OBJECT_RED);
             Disconnect_button.Enabled = false;
             Connect_button.Enabled = true;
             /* 
@@ -499,27 +505,32 @@ namespace GUI
             {
                 case 1:
                     PLCWritebit(Constants.R_JOGGINGFORWARD1, 1);
-                    ChangeColorObject(Forward_btn, Constants.OBJECT_GREEN);
+                    ChangeColorObject(Forward_btn, Constants.OBJECT_MODIFIED);
+                    Forward_btn.ForeColor = Color.FromArgb(0, 126, 249);
                     break;
 
                 case 2:
                     PLCWritebit(Constants.R_JOGGINGFORWARD2, 1);
-                    ChangeColorObject(Forward_btn, Constants.OBJECT_GREEN);
+                    ChangeColorObject(Forward_btn, Constants.OBJECT_MODIFIED);
+                    Forward_btn.ForeColor = Color.FromArgb(0, 126, 249);
                     break;
 
                 case 3:
                     PLCWritebit(Constants.R_JOGGINGFORWARD3, 1);
-                    ChangeColorObject(Forward_btn, Constants.OBJECT_GREEN);
+                    ChangeColorObject(Forward_btn, Constants.OBJECT_MODIFIED);
+                    Forward_btn.ForeColor = Color.FromArgb(0, 126, 249);
                     break;
 
                 case 4:
                     PLCWritebit(Constants.R_JOGGINGFORWARD4, 1);
-                    ChangeColorObject(Forward_btn, Constants.OBJECT_GREEN);
+                    ChangeColorObject(Forward_btn, Constants.OBJECT_MODIFIED);
+                    Forward_btn.ForeColor = Color.FromArgb(0, 126, 249);
                     break;
 
                 case 5:
                     PLCWritebit(Constants.R_JOGGINGFORWARD5, 1);
-                    ChangeColorObject(Forward_btn, Constants.OBJECT_GREEN);
+                    ChangeColorObject(Forward_btn, Constants.OBJECT_MODIFIED);
+                    Forward_btn.ForeColor = Color.FromArgb(0, 126, 249);
                     break;
 
                 default:
@@ -539,27 +550,32 @@ namespace GUI
             {
                 case 1:
                     PLCWritebit(Constants.R_JOGGINGFORWARD1, 0);
-                    ChangeColorObject(Forward_btn, Constants.OBJECT_WHITE);
+                    ChangeColorObject(Forward_btn, Constants.OBJECT_MODIFIED1);
+                    Forward_btn.ForeColor = Color.FromArgb(0, 126, 249);
                     break;
 
                 case 2:
                     PLCWritebit(Constants.R_JOGGINGFORWARD2, 0);
-                    ChangeColorObject(Forward_btn, Constants.OBJECT_WHITE);
+                    ChangeColorObject(Forward_btn, Constants.OBJECT_MODIFIED1);
+                    Forward_btn.ForeColor = Color.FromArgb(0, 126, 249);
                     break;
 
                 case 3:
                     PLCWritebit(Constants.R_JOGGINGFORWARD3, 0);
-                    ChangeColorObject(Forward_btn, Constants.OBJECT_WHITE);
+                    ChangeColorObject(Forward_btn, Constants.OBJECT_MODIFIED1);
+                    Forward_btn.ForeColor = Color.FromArgb(0, 126, 249);
                     break;
 
                 case 4:
                     PLCWritebit(Constants.R_JOGGINGFORWARD4, 0);
-                    ChangeColorObject(Forward_btn, Constants.OBJECT_WHITE);
+                    ChangeColorObject(Forward_btn, Constants.OBJECT_MODIFIED1);
+                    Forward_btn.ForeColor = Color.FromArgb(0, 126, 249);
                     break;
 
                 case 5:
                     PLCWritebit(Constants.R_JOGGINGFORWARD5, 0);
-                    ChangeColorObject(Forward_btn, Constants.OBJECT_WHITE);
+                    ChangeColorObject(Forward_btn, Constants.OBJECT_MODIFIED1);
+                    Forward_btn.ForeColor = Color.FromArgb(0, 126, 249);
                     break;
 
                 default:
@@ -576,27 +592,32 @@ namespace GUI
             {
                 case 1:
                     PLCWritebit(Constants.R_JOGGINGINVERSE1, 1);
-                    ChangeColorObject(Backward_btn, Constants.OBJECT_GREEN);
+                    ChangeColorObject(Backward_btn, Constants.OBJECT_MODIFIED);
+                    Backward_btn.ForeColor = Color.FromArgb(0, 126, 249);
                     break;
 
                 case 2:
                     PLCWritebit(Constants.R_JOGGINGINVERSE2, 1);
-                    ChangeColorObject(Backward_btn, Constants.OBJECT_GREEN);
+                    ChangeColorObject(Backward_btn, Constants.OBJECT_MODIFIED);
+                    Backward_btn.ForeColor = Color.FromArgb(0, 126, 249);
                     break;
 
                 case 3:
                     PLCWritebit(Constants.R_JOGGINGINVERSE3, 1);
-                    ChangeColorObject(Backward_btn, Constants.OBJECT_GREEN);
+                    ChangeColorObject(Backward_btn, Constants.OBJECT_MODIFIED);
+                    Backward_btn.ForeColor = Color.FromArgb(0, 126, 249);
                     break;
 
                 case 4:
                     PLCWritebit(Constants.R_JOGGINGINVERSE4, 1);
-                    ChangeColorObject(Backward_btn, Constants.OBJECT_GREEN);
+                    ChangeColorObject(Backward_btn, Constants.OBJECT_MODIFIED);
+                    Backward_btn.ForeColor = Color.FromArgb(0, 126, 249);
                     break;
 
                 case 5:
                     PLCWritebit(Constants.R_JOGGINGINVERSE5, 1);
-                    ChangeColorObject(Backward_btn, Constants.OBJECT_GREEN);
+                    ChangeColorObject(Backward_btn, Constants.OBJECT_MODIFIED);
+                    Backward_btn.ForeColor = Color.FromArgb(0, 126, 249);
                     break;
 
                 default:
@@ -613,27 +634,32 @@ namespace GUI
             {
                 case 1:
                     PLCWritebit(Constants.R_JOGGINGINVERSE1, 0);
-                    ChangeColorObject(Backward_btn, Constants.OBJECT_WHITE);
+                    ChangeColorObject(Backward_btn, Constants.OBJECT_MODIFIED1);
+                    Backward_btn.ForeColor = Color.FromArgb(0, 126, 249);
                     break;
 
                 case 2:
                     PLCWritebit(Constants.R_JOGGINGINVERSE2, 0);
-                    ChangeColorObject(Backward_btn, Constants.OBJECT_WHITE);
+                    ChangeColorObject(Backward_btn, Constants.OBJECT_MODIFIED1);
+                    Backward_btn.ForeColor = Color.FromArgb(0, 126, 249);
                     break;
 
                 case 3:
                     PLCWritebit(Constants.R_JOGGINGINVERSE3, 0);
-                    ChangeColorObject(Backward_btn, Constants.OBJECT_WHITE);
+                    ChangeColorObject(Backward_btn, Constants.OBJECT_MODIFIED1);
+                    Backward_btn.ForeColor = Color.FromArgb(0, 126, 249);
                     break;
 
                 case 4:
                     PLCWritebit(Constants.R_JOGGINGINVERSE4, 0);
-                    ChangeColorObject(Backward_btn, Constants.OBJECT_WHITE);
+                    ChangeColorObject(Backward_btn, Constants.OBJECT_MODIFIED1);
+                    Backward_btn.ForeColor = Color.FromArgb(0, 126, 249);
                     break;
 
                 case 5:
                     PLCWritebit(Constants.R_JOGGINGINVERSE5, 0);
-                    ChangeColorObject(Backward_btn, Constants.OBJECT_WHITE);
+                    ChangeColorObject(Backward_btn, Constants.OBJECT_MODIFIED1);
+                    Backward_btn.ForeColor = Color.FromArgb(0, 126, 249);
                     break;
 
                 default:
@@ -1078,6 +1104,16 @@ namespace GUI
 
             bt_start_timer.Enabled = true;
             bt_stop_timer.Enabled = false;
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Backward_btn_Click(object sender, EventArgs e)
+        {
+
         }
 
         private void bClose_Click(object sender, EventArgs e)
