@@ -14,20 +14,17 @@
       + Jacobi thuận (Xác định được vận tốc của đầu tay gắp)
       + Jacobi nghịch (Điều khiển được vận tốc tay gắp)
     + Tính toán động lực học
-      + Động lực học thuận (xác định moment của đầu tay gắp) (xác định được khối lượng vật lớn nhất có thể chịu được)
-      + Động lực học nghịch (Điều khiển được lực của đầu tay gắp) (xác định được moment lớn nhất mà động cơ phải chịu)
+      + Động lực học thuận (Điều khiển được lực của đầu tay gắp) (xác định được moment va khoi luong mà động cơ phải chịu)
     + Tính toán quỹ đạo chuyển động cho đầu tay gắp
       + Dùng phương pháp quỹ đạo bậc 3 (Vị trí, vận tốc, gia tốc) tính quỹ đạo cho: Đường thẳng, đường tròn
     + Tính toán cho đầu tay gắp
       + Tính toán góc quay cho cơ cấu tay quay, con trượt
       + Tính toán lực kẹp phù hợp thỏa mãn ràng buộc đầu ra
       + Tính toán chọn động cơ phù hợp
-      + Tính toán xung PWM để đạt được lực kẹp mong muốn
   + Về mặt mô phỏng:
-    + Mô phỏng MATLAB:
+    + Ve do thi MATLAB:
       + Mô phỏng vị trí
-      + Mô phỏng vận tốc (nếu được)
-      + Vẽ đồ thị vị trí 
+      + Vẽ đồ thị vị trí
       + Vẽ đồ thị vận tốc
       + Vẽ đồ thị moment
     + Mô phỏng SOLID (Nếu có thể)

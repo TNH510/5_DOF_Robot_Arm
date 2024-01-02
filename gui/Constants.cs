@@ -82,5 +82,7 @@ namespace GUI
         public static readonly Color OBJECT_GREEN = Color.FromArgb(0, 255, 0);
         public static readonly Color OBJECT_RED = Color.FromArgb(255, 0, 0);
         public static readonly Color OBJECT_YELLOW = Color.FromArgb(255, 255, 0);
+        public static readonly Color OBJECT_MODIFIED = Color.FromArgb(0, 126, 249);
+        public static readonly Color OBJECT_MODIFIED1 = Color.FromArgb(24, 30, 54);
     }
 }
