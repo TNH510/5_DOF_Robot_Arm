@@ -1,0 +1,33 @@
+digraph flowchart {
+    start [label="Start"]
+    initialize [label="Initialize: t, start_record, fileID, t1_pre, t2_pre, t3_pre, t4_pre"]
+    loop [label="Loop (Read data from serial port)"]
+    pause [label="Pause(0.01)"]
+    measure_time [label="Measure time elapsed (toc)"]
+    update_t [label="Update t"]
+    start_timer [label="Start timer (tic)"]
+    check_data_availability [label="Check for data availability"]
+    read_data [label="Read 10 bytes of data"]
+    check_command_or_angle [label="Check if it's a command or angle data"]
+    handle_command [label="Command: Check specific commands"]
+    extract_angles [label="Angle data: Extract angles (t1 to t5)"]
+    check_recording [label="Check if recording is started and angles are within range"]
+    write_to_file [label="Yes: Write to file"]
+    update_parameters [label="Update Simulink parameters"]
+    calculate_velocities [label="Calculate angular velocities (w1 to w4)"]
+    forward_kinematics [label="Forward Kinematics: Calculate Cartesian coordinates (px, py, pz)"]
+    plotting [label="Plotting: Plot angle values and Cartesian coordinates"]
+    check_end_command [label="Check for end command"]
+    exit_loop [label="Yes: Exit loop"]
+    stop [label="Stop"]
+
+    start -> initialize -> loop -> pause -> measure_time -> update_t -> start_timer -> check_data_availability
+    check_data_availability -> read_data -> check_command_or_angle
+    check_command_or_angle -> handle_command -> loop
+    check_command_or_angle -> extract_angles -> check_recording
+    check_recording -> write_to_file -> update_parameters -> calculate_velocities
+    calculate_velocities -> forward_kinematics -> plotting
+    check_end_command -> exit_loop -> stop
+    check_recording -> loop
+    check_data_availability -> loop
+}
