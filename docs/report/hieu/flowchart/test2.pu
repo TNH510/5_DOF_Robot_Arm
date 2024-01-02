@@ -27,16 +27,6 @@ while (true) is (true)
     :tic;
     if (s.BytesAvailable > 0) then (true)
         :Read 10 bytes of data;
-        :byte_1 = dataBytes(1);
-        :byte_2 = dataBytes(2);
-        :byte_3 = dataBytes(3);
-        :byte_4 = dataBytes(4);
-        :byte_5 = dataBytes(5);
-        :byte_6 = dataBytes(6);
-        :byte_7 = dataBytes(7);
-        :byte_8 = dataBytes(8);
-        :byte_9 = dataBytes(9);
-        :byte_10 = dataBytes(10);
         if (byte_1 == 255 && byte_2 == 255) then (true)
             if (byte_3 == 0 && byte_4 == 0) then (true)
                 :Break loop;
