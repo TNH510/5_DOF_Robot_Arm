@@ -1,0 +1,16 @@
+@startuml
+start
+:Read position values from PLC into an array (value_position);
+:Convert driver angle values to real position values;
+
+:Calculate and store the angle in an array;
+:Convert angle values to millimeters and degrees;
+
+:Calculate Forward Kinematics;
+:Combine X, Y, and Z coordinates;
+:Display Combined Coordinates on the screen;
+
+:Calculate and Display Pitch angle on the screen;
+:Calculate and Display Roll angle on the screen;
+stop
+@enduml
