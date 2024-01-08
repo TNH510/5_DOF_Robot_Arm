@@ -1,0 +1,8 @@
+@startuml
+
+:Turn On M530;
+:Start chương trình K3;
+:Dùng lệnh [CPSTART4] cho các khớp từ 1 đến 4 lần lượt 10 điểm liên tiếp\nDùng lệnh [CPSTART1] cho khớp 5 lần lượt 10 điểm liên tiếp;
+:End;
+
+@enduml
