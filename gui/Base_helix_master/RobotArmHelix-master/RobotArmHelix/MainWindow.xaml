@@ -70,6 +70,7 @@
         <Label Content="Y" HorizontalAlignment="Left" Margin="90,488,0,0" VerticalAlignment="Top" Width="30" Foreground="Black" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
         <CheckBox x:Name="jointYAxis" Content="" HorizontalAlignment="Left" Margin="120,497,0,0" VerticalAlignment="Top" Checked="CheckBox_StateChanged" Unchecked="CheckBox_StateChanged"/>
         <Label Content="Z" HorizontalAlignment="Left" Margin="168,488,0,0" VerticalAlignment="Top" Width="30" Foreground="Black" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+        <Label Name="coordinatesLabel" Content="Coordinates: (0, 0, 0)" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="40" Foreground="White"/>
         <CheckBox x:Name="jointZAxis" Content="" HorizontalAlignment="Left" Margin="198,497,0,0" VerticalAlignment="Top" Checked="CheckBox_StateChanged" Unchecked="CheckBox_StateChanged"/>
     </Grid>
 </Window>
