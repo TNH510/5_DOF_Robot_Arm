@@ -129,9 +129,9 @@ namespace RobotArmHelix
             viewPort3d.PanGesture = new MouseGesture(MouseAction.LeftClick);
             viewPort3d.Children.Add(visual);
             viewPort3d.Children.Add(RoboticArm);
-            viewPort3d.Camera.LookDirection = new Vector3D(2038, -5200, -2930);
-            viewPort3d.Camera.UpDirection = new Vector3D(-0.145, 0.372, 0.917);
-            viewPort3d.Camera.Position = new Point3D(-1571, 4801, 3774);
+            viewPort3d.Camera.LookDirection = new Vector3D(1948, -4375, -4105);
+            viewPort3d.Camera.UpDirection = new Vector3D(-0.031, 0.07, 0.997);
+            viewPort3d.Camera.Position = new Point3D(-567, 4895, 4620);
 
             double[] angles = { joints[1].angle, joints[2].angle, joints[3].angle, joints[4].angle, joints[5].angle };
             ForwardKinematics(angles);
@@ -836,6 +836,209 @@ namespace RobotArmHelix
             Press_button(MethodBase.GetCurrentMethod().Name, Constants.R_GOHOME);
         }
 
+        private void Jog_set_speed_Click(object sender, RoutedEventArgs e)
+        {
+            int velocity = 0;
+            try
+            {
+                velocity = Convert.ToInt32(jog_speed_tb.Text) * 1000;
+                for (int ind = 0; ind < 5; ind++)
+                {
+                    write_d_mem_32_bit(640 + 2 * ind, velocity);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void Forward_button_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            int joint = Convert.ToInt16(joint_tb.Text);
+            switch (joint)
+            {
+                case 1:
+                    PLCWritebit(Constants.R_JOGGINGFORWARD1, 1);
+                    ChangeColorObjectBackground(Forward_button, Constants.OBJECT_MODIFIED);
+                    ChangeColorObjectForeground(Forward_button, Constants.OBJECT_MODIFIED);
+                    break;
+                    
+                case 2:
+                    PLCWritebit(Constants.R_JOGGINGFORWARD2, 1);
+                    ChangeColorObjectBackground(Forward_button, Constants.OBJECT_MODIFIED);
+                    ChangeColorObjectForeground(Forward_button, Constants.OBJECT_MODIFIED);
+                    break;
+
+                case 3:
+                    PLCWritebit(Constants.R_JOGGINGFORWARD3, 1);
+                    ChangeColorObjectBackground(Forward_button, Constants.OBJECT_MODIFIED);
+                    ChangeColorObjectForeground(Forward_button, Constants.OBJECT_MODIFIED);
+                    break;
+
+                case 4:
+                    PLCWritebit(Constants.R_JOGGINGFORWARD4, 1);
+                    ChangeColorObjectBackground(Forward_button, Constants.OBJECT_MODIFIED);
+                    ChangeColorObjectForeground(Forward_button, Constants.OBJECT_MODIFIED);
+                    break;
+
+                case 5:
+                    PLCWritebit(Constants.R_JOGGINGFORWARD5, 1);
+                    ChangeColorObjectBackground(Forward_button, Constants.OBJECT_MODIFIED);
+                    ChangeColorObjectForeground(Forward_button, Constants.OBJECT_MODIFIED);
+                    break;
+
+                default:
+                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, "Invalid input number");
+                    break;
+            }
+        }
+
+        private void Forward_button_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            int joint = Convert.ToInt16(joint_tb.Text);
+
+            PLCWritebit(Constants.R_JOGGINGFORWARD1, 0);
+            ChangeColorObjectBackground(Forward_button, Constants.OBJECT_WHITE);
+            switch (joint)
+            {
+                case 1:
+                    PLCWritebit(Constants.R_JOGGINGFORWARD1, 0);
+                    ChangeColorObjectBackground(Forward_button, Constants.OBJECT_MODIFIED1);
+                    ChangeColorObjectForeground(Forward_button, Constants.OBJECT_MODIFIED);
+                    break;
+
+                case 2:
+                    PLCWritebit(Constants.R_JOGGINGFORWARD2, 0);
+                    ChangeColorObjectBackground(Forward_button, Constants.OBJECT_MODIFIED1);
+                    ChangeColorObjectForeground(Forward_button, Constants.OBJECT_MODIFIED);
+                    break;
+
+                case 3:
+                    PLCWritebit(Constants.R_JOGGINGFORWARD3, 0);
+                    ChangeColorObjectBackground(Forward_button, Constants.OBJECT_MODIFIED1);
+                    ChangeColorObjectForeground(Forward_button, Constants.OBJECT_MODIFIED);
+                    break;
+
+                case 4:
+                    PLCWritebit(Constants.R_JOGGINGFORWARD4, 0);
+                    ChangeColorObjectBackground(Forward_button, Constants.OBJECT_MODIFIED1);
+                    ChangeColorObjectForeground(Forward_button, Constants.OBJECT_MODIFIED);
+                    break;
+
+                case 5:
+                    PLCWritebit(Constants.R_JOGGINGFORWARD5, 0);
+                    ChangeColorObjectBackground(Forward_button, Constants.OBJECT_MODIFIED1);
+                    ChangeColorObjectForeground(Forward_button, Constants.OBJECT_MODIFIED);
+                    break;
+
+                default:
+                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, "Invalid input number");
+                    break;
+            }
+        }
+
+        private void Backward_button_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            int joint = Convert.ToInt16(joint_tb.Text);
+
+            switch (joint)
+            {
+                case 1:
+                    PLCWritebit(Constants.R_JOGGINGINVERSE1, 1);
+                    ChangeColorObjectBackground(Backward_button, Constants.OBJECT_MODIFIED);
+                    ChangeColorObjectForeground(Backward_button, Constants.OBJECT_MODIFIED);
+                    break;
+
+                case 2:
+                    PLCWritebit(Constants.R_JOGGINGINVERSE2, 1);
+                    ChangeColorObjectBackground(Backward_button, Constants.OBJECT_MODIFIED);
+                    ChangeColorObjectForeground(Backward_button, Constants.OBJECT_MODIFIED);
+                    break;
+
+                case 3:
+                    PLCWritebit(Constants.R_JOGGINGINVERSE3, 1);
+                    ChangeColorObjectBackground(Backward_button, Constants.OBJECT_MODIFIED);
+                    ChangeColorObjectForeground(Backward_button, Constants.OBJECT_MODIFIED);
+                    break;
+
+                case 4:
+                    PLCWritebit(Constants.R_JOGGINGINVERSE4, 1);
+                    ChangeColorObjectBackground(Backward_button, Constants.OBJECT_MODIFIED);
+                    ChangeColorObjectForeground(Backward_button, Constants.OBJECT_MODIFIED);
+                    break;
+
+                case 5:
+                    PLCWritebit(Constants.R_JOGGINGINVERSE5, 1);
+                    ChangeColorObjectBackground(Backward_button, Constants.OBJECT_MODIFIED);
+                    ChangeColorObjectForeground(Backward_button, Constants.OBJECT_MODIFIED);
+                    break;
+
+                default:
+                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, "Invalid input number");
+                    break;
+            }
+        }
+
+        private void Backward_button_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            int joint = Convert.ToInt16(joint_tb.Text);
+
+            switch (joint)
+            {
+                case 1:
+                    PLCWritebit(Constants.R_JOGGINGINVERSE1, 0);
+                    ChangeColorObjectBackground(Backward_button, Constants.OBJECT_MODIFIED1);
+                    ChangeColorObjectForeground(Backward_button, Constants.OBJECT_MODIFIED);
+                    break;
+
+                case 2:
+                    PLCWritebit(Constants.R_JOGGINGINVERSE2, 0);
+                    ChangeColorObjectBackground(Backward_button, Constants.OBJECT_MODIFIED1);
+                    ChangeColorObjectForeground(Backward_button, Constants.OBJECT_MODIFIED);
+                    break;
+
+                case 3:
+                    PLCWritebit(Constants.R_JOGGINGINVERSE3, 0);
+                    ChangeColorObjectBackground(Backward_button, Constants.OBJECT_MODIFIED1);
+                    ChangeColorObjectForeground(Backward_button, Constants.OBJECT_MODIFIED);
+                    break;
+
+                case 4:
+                    PLCWritebit(Constants.R_JOGGINGINVERSE4, 0);
+                    ChangeColorObjectBackground(Backward_button, Constants.OBJECT_MODIFIED1);
+                    ChangeColorObjectForeground(Backward_button, Constants.OBJECT_MODIFIED);
+                    break;
+
+                case 5:
+                    PLCWritebit(Constants.R_JOGGINGINVERSE5, 0);
+                    ChangeColorObjectBackground(Backward_button, Constants.OBJECT_MODIFIED1);
+                    ChangeColorObjectForeground(Backward_button, Constants.OBJECT_MODIFIED);
+                    break;
+
+                default:
+                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, "Invalid input number");
+                    break;
+            }
+        }
+
+        private void set_const_speed_btn_Click(object sender, RoutedEventArgs e)
+        {
+            int velocity;
+            try
+            {
+                velocity = Convert.ToInt32(spd_tb.Text) * 1000;
+                write_d_mem_32_bit(1008, velocity);
+                PrintLog("Info", MethodBase.GetCurrentMethod().Name, "Set Velocity successfully");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+
         private void helixViewport3D_MouseDown(object sender, MouseButtonEventArgs e)
         {
             Point mousePosition = e.GetPosition(viewPort3d);
@@ -938,6 +1141,18 @@ namespace RobotArmHelix
                 return;
             }
         }
+
+        public void write_d_mem_32_bit(int device, int data)
+        {
+            string device_str = "";
+            device_str = "D" + Convert.ToString(device);
+            int[] temp = new int[2];
+            temp[0] = data & 0xFFFF; //byte high for register
+            temp[1] = (data >> 16) & 0xFFFF; // byte low for register
+            /* Write the angle */
+            plc.WriteDeviceBlock(device_str, 2, ref temp[0]);
+        }
+
 
     }
 
