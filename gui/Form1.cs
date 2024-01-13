@@ -150,7 +150,7 @@ namespace GUI
         private void Timer1_Tick(object sender, EventArgs e)
         {
             Forward_Kinematic();
-            send_data();
+            //send_data();
         }
         private void send_data()
         {
@@ -284,11 +284,11 @@ namespace GUI
             if (this.Connect_button.Enabled == false)
             {
                 /* Read position of 5 angle */
-                plc.ReadDeviceBlock(Constants.R_POSITION_1, 2, out value_positon[0]);
-                plc.ReadDeviceBlock(Constants.R_POSITION_2, 2, out value_positon[2]);
-                plc.ReadDeviceBlock(Constants.R_POSITION_3, 2, out value_positon[4]);
-                plc.ReadDeviceBlock(Constants.R_POSITION_4, 2, out value_positon[6]);
-                plc.ReadDeviceBlock(Constants.R_POSITION_5, 2, out value_positon[8]);
+                //plc.ReadDeviceBlock(Constants.R_POSITION_1, 2, out value_positon[0]);
+                //plc.ReadDeviceBlock(Constants.R_POSITION_2, 2, out value_positon[2]);
+                //plc.ReadDeviceBlock(Constants.R_POSITION_3, 2, out value_positon[4]);
+                //plc.ReadDeviceBlock(Constants.R_POSITION_4, 2, out value_positon[6]);
+                //plc.ReadDeviceBlock(Constants.R_POSITION_5, 2, out value_positon[8]);
 
 
                 // Read and convert driver angle value to real position value (was subtracted by 180)

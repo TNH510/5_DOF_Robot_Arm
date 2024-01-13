@@ -1,5 +1,6 @@
 ﻿#define IRB6700
-
+using ActUtlTypeLib; /* The utility setting type control which is used to create a user
+                        program using Communication Setup Utility. */
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using HelixToolkit.Wpf;
 using System.IO;
+using System.Reflection;
+using System.Threading;
+
 
 
 /**
@@ -53,11 +57,14 @@ namespace RobotArmHelix
         //provides functionality to 3d models
         Model3DGroup RA = new Model3DGroup(); //RoboticArm 3d group
         Model3D geom = null; //Debug sphere to check in which point the joint is rotatin
-
+        public ActUtlType plc = new();
         List<Joint> joints = null;
 
         bool switchingJoint = false;
         bool isAnimating = false;
+
+        public bool cn_bttn = true;
+        public bool ds_bttn = false;
 
         Color oldColor = Colors.White;
         GeometryModel3D oldSelectedModel = null;
@@ -129,7 +136,6 @@ namespace RobotArmHelix
             double[] angles = { joints[1].angle, joints[2].angle, joints[3].angle, joints[4].angle, joints[5].angle };
             ForwardKinematics(angles);
 
-            changeSelectedJoint();
 
             timer1 = new System.Windows.Forms.Timer();
             timer1.Interval = 5;
@@ -246,7 +252,7 @@ namespace RobotArmHelix
             try
             {
                 reachingPoint = new Vector3D(Double.Parse(TbX.Text), Double.Parse(TbY.Text), Double.Parse(TbZ.Text));
-                geom.Transform = new TranslateTransform3D(reachingPoint);
+                //geom.Transform = new TranslateTransform3D(reachingPoint);
             }
             catch (Exception exc)
             {
@@ -254,74 +260,6 @@ namespace RobotArmHelix
             }
         }
 
-        private void jointSelector_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            changeSelectedJoint();
-        }
-
-        private void changeSelectedJoint()
-        {
-            if (joints == null)
-                return;
-
-            int sel = ((int)jointSelector.Value) - 1;
-            switchingJoint = true;
-            unselectModel();
-            if(sel < 0)
-            {
-                jointX.IsEnabled = false;
-                jointY.IsEnabled = false;
-                jointZ.IsEnabled = false;
-                jointXAxis.IsEnabled = false;
-                jointYAxis.IsEnabled = false;
-                jointZAxis.IsEnabled = false;
-            }
-            else
-            {
-                if (!jointX.IsEnabled)
-                {
-                    jointX.IsEnabled = true;
-                    jointY.IsEnabled = true;
-                    jointZ.IsEnabled = true;
-                    jointXAxis.IsEnabled = true;
-                    jointYAxis.IsEnabled = true;
-                    jointZAxis.IsEnabled = true;
-                }
-                jointX.Value = joints[sel].rotPointX;
-                jointY.Value = joints[sel].rotPointY;
-                jointZ.Value = joints[sel].rotPointZ;
-                jointXAxis.IsChecked = joints[sel].rotAxisX == 1 ? true : false;
-                jointYAxis.IsChecked = joints[sel].rotAxisY == 1 ? true : false;
-                jointZAxis.IsChecked = joints[sel].rotAxisZ == 1 ? true : false;
-                selectModel(joints[sel].model);
-                updateSpherePosition();
-            }
-            switchingJoint = false;
-        }
-
-        private void rotationPointChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if (switchingJoint)
-                return;
-
-            int sel = ((int)jointSelector.Value) - 1;
-            joints[sel].rotPointX = (int)jointX.Value;
-            joints[sel].rotPointY = (int)jointY.Value;
-            joints[sel].rotPointZ = (int)jointZ.Value;
-            updateSpherePosition();
-        }
-
-        private void updateSpherePosition()
-        {
-            int sel = ((int)jointSelector.Value) - 1;
-            if (sel < 0)
-                return;
-
-            Transform3DGroup F = new Transform3DGroup();
-            F.Children.Add(new TranslateTransform3D(joints[sel].rotPointX, joints[sel].rotPointY, joints[sel].rotPointZ));
-            F.Children.Add(joints[sel].model.Transform);
-            geom.Transform = F;
-        }
 
         private void joint_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -337,17 +275,6 @@ namespace RobotArmHelix
         }
 
 
-        private void CheckBox_StateChanged(object sender, RoutedEventArgs e)
-        {
-            if (switchingJoint)
-                return;
-
-            int sel = ((int)jointSelector.Value) - 1;
-            joints[sel].rotAxisX = jointXAxis.IsChecked.Value ? 1 : 0;
-            joints[sel].rotAxisY = jointYAxis.IsChecked.Value ? 1 : 0;
-            joints[sel].rotAxisZ = jointZAxis.IsChecked.Value ? 1 : 0;
-        }
-
 
         /**
          * This methodes execute the FK (Forward Kinematics). It starts from the first joint, the base.
@@ -356,9 +283,9 @@ namespace RobotArmHelix
         {
             /** Debug sphere, it takes the x,y,z of the textBoxes and update its position
              * This is useful when using x,y,z in the "new Point3D(x,y,z)* when defining a new RotateTransform3D() to check where the joints is actually  rotating */
-            double[] angles = { joints[1].angle, joints[2].angle, joints[3].angle, joints[4].angle, joints[5].angle };
+            double[] angles = { joints[1].angle, joints[2].angle, joints[3].angle, joints[4].angle, joints[5].angle};
             ForwardKinematics(angles);
-            updateSpherePosition();
+            //updateSpherePosition();
         }
 
         private Color changeModelColor(Joint pJoint, Color newColor)
@@ -455,6 +382,28 @@ namespace RobotArmHelix
 
         public void StartInverseKinematics(object sender, RoutedEventArgs e)
         {
+            double x, y, z;
+            double[] angles = { joints[1].angle, joints[2].angle - 90.0, joints[3].angle + 90.0, joints[4].angle + 90.0, joints[5].angle };
+
+            x = Double.Parse(TbX.Text);
+            y = Double.Parse(TbY.Text);
+            z = Double.Parse(TbZ.Text);
+
+            // Assuming convert_position_angle returns a tuple of 5 values
+            (double angle1, double angle2, double angle3, double angle4, double angle5) = convert_position_angle(x, y, z);
+
+            angles[0] = angle1;
+            angles[1] = angle2 - 90.0;
+            angles[2] = angle3 + 90.0;
+            angles[3] = angle4 + 90.0;
+            angles[4] = angle5;
+
+            joint1.Value = joints[1].angle = angles[0];
+            joint2.Value = joints[2].angle = angles[1];
+            joint3.Value = joints[3].angle = angles[2];
+            joint4.Value = joints[4].angle = angles[3];
+            joint5.Value = joints[5].angle = angles[4];
+
             if (timer1.Enabled)
             {
                 button.Content = "Go to position";
@@ -474,20 +423,23 @@ namespace RobotArmHelix
 
         public void timer1_Tick(object sender, EventArgs e)
         {
-            double[] angles = {joints[1].angle, joints[2].angle, joints[3].angle, joints[4].angle, joints[5].angle};
-            angles = InverseKinematics(reachingPoint, angles);
-            joint1.Value = joints[1].angle = angles[0];
-            joint2.Value = joints[2].angle = angles[1];
-            joint3.Value = joints[3].angle = angles[2];
-            joint4.Value = joints[4].angle = angles[3];
-            joint5.Value = joints[5].angle = angles[4];
 
-            if ((--movements) <= 0)
-            {
-                button.Content = "Go to position";
-                isAnimating = false;
-                timer1.Stop();
-            }
+            //double[] angles = {joints[1].angle, joints[2].angle -90.0, joints[3].angle + 90.0, joints[4].angle + 90.0, joints[5].angle};
+            //angles = InverseKinematics(reachingPoint, angles);
+
+
+            //joint1.Value = joints[1].angle = angles[0];
+            //joint2.Value = joints[2].angle = angles[1];
+            //joint3.Value = joints[3].angle = angles[2];
+            //joint4.Value = joints[4].angle = angles[3];
+            //joint5.Value = joints[5].angle = angles[4];
+
+            //if ((--movements) <= 0)
+            //{
+            //    button.Content = "Go to position";
+            //    isAnimating = false;
+            //    timer1.Stop();
+            //}
         }
        
         public double[] InverseKinematics(Vector3D target, double[] angles)
@@ -561,7 +513,15 @@ namespace RobotArmHelix
         
 
         public Vector3D ForwardKinematics(double [] angles)
-        {            
+        {
+
+            /* Variables */
+            const int NUM_AFTER_COMMA = 5;
+            uint t1 = 0, t2 = 0, t3 = 0, t4 = 0, t5 = 0;
+            int[] value_positon = new int[16];
+            double t1_out, t2_out, t3_out, t4_out, t5_out;
+            double t1_dh, t2_dh, t3_dh, t4_dh, x, y, z;
+
             //The base only has rotation and is always at the origin, so the only transform in the transformGroup is the rotation R
             F1 = new Transform3DGroup();
             T = new TranslateTransform3D(0, 0, -276.5);
@@ -586,7 +546,7 @@ namespace RobotArmHelix
             //and again the previous transformation needs to be applied
             F3 = new Transform3DGroup();
             T = new TranslateTransform3D(0, 0, 0);
-            R = new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(joints[2].rotAxisX, joints[2].rotAxisY, joints[2].rotAxisZ), angles[1]), new Point3D(joints[2].rotPointX, joints[2].rotPointY, joints[2].rotPointZ));
+            R = new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(joints[2].rotAxisX, - joints[2].rotAxisY, joints[2].rotAxisZ), (angles[1] + 90.0)), new Point3D(joints[2].rotPointX,  - joints[2].rotPointY, joints[2].rotPointZ));
             F3.Children.Add(T);
             F3.Children.Add(R);
             F3.Children.Add(F2);
@@ -594,7 +554,7 @@ namespace RobotArmHelix
             //as before
             F4 = new Transform3DGroup();
             T = new TranslateTransform3D(0, 0, 0); //1500, 650, 1650
-            R = new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(joints[3].rotAxisX, joints[3].rotAxisY, joints[3].rotAxisZ), angles[2]), new Point3D(joints[3].rotPointX, joints[3].rotPointY, joints[3].rotPointZ));
+            R = new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(joints[3].rotAxisX,  - joints[3].rotAxisY, joints[3].rotAxisZ), (angles[2] - 90.0)), new Point3D(joints[3].rotPointX,  - joints[3].rotPointY, joints[3].rotPointZ));
             F4.Children.Add(T);
             F4.Children.Add(R);
             F4.Children.Add(F3);
@@ -602,7 +562,7 @@ namespace RobotArmHelix
             //as before
             F5 = new Transform3DGroup();
             T = new TranslateTransform3D(0, 0, 0);
-            R = new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(joints[4].rotAxisX, joints[4].rotAxisY, joints[4].rotAxisZ), angles[3]), new Point3D(joints[4].rotPointX, joints[4].rotPointY, joints[4].rotPointZ));
+            R = new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(joints[4].rotAxisX, - joints[4].rotAxisY, joints[4].rotAxisZ), angles[3] - 90.0), new Point3D(joints[4].rotPointX,  - joints[4].rotPointY, joints[4].rotPointZ));
             F5.Children.Add(T);
             F5.Children.Add(R);
             F5.Children.Add(F4);
@@ -623,14 +583,22 @@ namespace RobotArmHelix
             joints[2].model.Transform = F3; //third joint (the "knee" or "elbow")
             joints[3].model.Transform = F4; //the "forearm"
             joints[4].model.Transform = F5; //the tool plate
-            joints[5].model.Transform = F6; //the tool plate
+            joints[5].model.Transform = F6; //the tool
 
-            Tx.Content = joints[5].model.Bounds.Location.X;
-            Ty.Content = joints[5].model.Bounds.Location.Y;
-            Tz.Content = joints[5].model.Bounds.Location.Z;
-            Tx_Copy.Content = geom.Bounds.Location.X;
-            Ty_Copy.Content = geom.Bounds.Location.Y;
-            Tz_Copy.Content = geom.Bounds.Location.Z;
+            // Convert the angle from degree to radian and define actual initial position
+            t1_dh = angles[0] / 180 * Math.PI;
+            t2_dh = (angles[1] + 90.0) / 180 * Math.PI;
+            t3_dh = (angles[2] - 90.0) / 180 * Math.PI;
+            t4_dh = (angles[3] - 90.0) / 180 * Math.PI;
+
+            // Caculate Foward Kinematic
+            x = Math.Cos(t1_dh) * (Constants.l2 * Math.Cos(t2_dh) + Constants.l3 * Math.Cos(t2_dh + t3_dh) + Constants.l5 * Math.Cos(t2_dh + t3_dh + t4_dh));
+            y = Math.Sin(t1_dh) * (Constants.l2 * Math.Cos(t2_dh) + Constants.l3 * Math.Cos(t2_dh + t3_dh) + Constants.l5 * Math.Cos(t2_dh + t3_dh + t4_dh));
+            z = Constants.l1 + Constants.l2 * Math.Sin(t2_dh) + Constants.l3 * Math.Sin(t2_dh + t3_dh) + Constants.l5 * Math.Sin(t2_dh + t3_dh + t4_dh);
+
+            Tx.Content = x;
+            Ty.Content = y;
+            Tz.Content = z;
 
 #if IRB6700
 
@@ -645,6 +613,229 @@ namespace RobotArmHelix
 
             return new Vector3D(joints[5].model.Bounds.Location.X, joints[5].model.Bounds.Location.Y, joints[5].model.Bounds.Location.Z);
         }
+
+        public static (double, double, double, double, double) convert_position_angle(double x, double y, double z)
+        {
+            double t1, t2, t3, t4, t5, s2, c2, s3, c3, m, n;
+            double roll, pitch;
+            roll = 0.0;
+            pitch = -Math.PI / 2;
+            t1 = Math.Atan2(y, x);
+            t5 = roll - t1;
+            m = Math.Sqrt(x * x + y * y);
+            n = z - Constants.l1 + Constants.l5;
+            c3 = (m * m + n * n - Constants.l2 * Constants.l2 - Constants.l3 * Constants.l3) / (2 * Constants.l2 * Constants.l3);
+            /* s3 has 2 value --> take the value of -sin */
+            s3 = Math.Sqrt(1 - c3 * c3);
+            t3 = Math.Atan2(s3, c3);
+            if (t3 >= -Math.PI / 6 && t3 <= (4 * Math.PI) / 9)
+            {
+                /* Do nothing*/
+            }
+            else
+            {
+                s3 = -1 * Math.Sqrt(1 - c3 * c3);
+                t3 = Math.Atan2(s3, c3);
+            }
+            /* Angle 3 */
+            c2 = m * (Constants.l3 * c3 + Constants.l2) + n * (Constants.l3 * s3);
+            s2 = n * (Constants.l3 * c3 + Constants.l2) - m * (Constants.l3 * s3);
+            /* Angle 2 */
+            t2 = Math.Atan2(s2, c2);
+            /* Angle 4 */
+            t4 = pitch - t2 - t3;
+            t1 = t1 / Math.PI * 180.0;
+            t2 = t2 / Math.PI * 180.0;
+            t3 = t3 / Math.PI * 180.0;
+            t4 = t4 / Math.PI * 180.0;
+            t5 = t5 / Math.PI * 180.0;
+            return (t1, t2, t3, t4, t5);
+        }
+        private void ConnectPLC(object sender, RoutedEventArgs e)
+        {
+            /* Disable slider */
+            joint1.IsEnabled = false;
+            joint2.IsEnabled = false;
+            joint3.IsEnabled = false;
+            joint4.IsEnabled = false;
+            joint5.IsEnabled = false;
+
+            //cn_bttn = true;
+            //ds_bttn = false;
+            /* Declare the variable(s) */
+            int ret;
+            /* A logical station number set in Communication Setup Utility - Datasheet - Page 61 */
+            plc.ActLogicalStationNumber = 1;
+            /* Open the connection between PLC and C# - Datasheet - Page 381 */
+            ret = plc.Open();
+            /* Return value
+               Normal termination : 0 is returned.
+               Abnormal termination: Any value other than 0 is returned
+            */
+            if (ret == 0 && cn_bttn == true)
+            {
+                //Connect_button.IsEnabled = false;
+                //Disconnect_button.IsEnabled = true;
+                cn_bttn=false;
+                ds_bttn=true;
+                /* Change the color of the button when clicked */
+                ChangeColorObjectBackground(Connect_button, Constants.OBJECT_MODIFIED);
+                ChangeColorObjectBackground(Disconnect_button, Constants.OBJECT_MODIFIED1);
+                ChangeColorObjectForeground(Connect_button, Constants.OBJECT_MODIFIED1);
+                ChangeColorObjectForeground(Disconnect_button, Constants.OBJECT_MODIFIED);
+                ChangeColorObjectBorderBrush(Disconnect_button, Constants.OBJECT_MODIFIED);
+
+                /* 
+                    Print the log command
+                    MethosBase.GetCurrentMethod returns the action user did.
+                */
+                PrintLog("Info", MethodBase.GetCurrentMethod().Name, "Connect PLC successfully");
+            }
+            else if (ds_bttn == true)
+            {
+                PrintLog("Infor", MethodBase.GetCurrentMethod().Name, "PLC was connected");
+            }
+            else
+            {
+                PrintLog("Error", MethodBase.GetCurrentMethod().Name, "Connect PLC unsuccessfully");
+            }
+            /* Read the servo mode */
+            int servo_status;
+            string getName = MethodBase.GetCurrentMethod().Name;
+            /* Read status of Brake and AC Servo */
+            //ret = PLCReadbit(Constants.R_SERVO_ON, out servo_status);
+            //if (ret != 0)
+            //{
+            //    PrintLog("Error", getName, "Read PLC Fail");
+            //    return;
+            //}
+            //if (servo_status == 0) /* Servo is currently off */
+            //{
+            //    OnServo_button.Text = "SERVO: OFF";
+            //    ChangeColorObject(OnServo_button, Constants.OBJECT_RED);
+            //    PrintLog("SERVO:", servo_status.ToString(), "OFF");
+            //}
+            //else
+            //{
+            //    OnServo_button.Text = "SERVO: ON";
+            //    ChangeColorObject(OnServo_button, Constants.OBJECT_GREEN);
+            //    PrintLog("SERVO:", servo_status.ToString(), "ON");
+            //}
+        }
+
+        private void DisconnectPLC(object sender, RoutedEventArgs e)
+        {
+            /* Enable slider */
+            joint1.IsEnabled = true;
+            joint2.IsEnabled = true;
+            joint3.IsEnabled = true;
+            joint4.IsEnabled = true;
+            joint5.IsEnabled = true;
+            /* Declare the variable(s) */
+            int ret;
+            /* Close the connection between PLC and C# - Datasheet - Page 383 */
+            ret = plc.Close();
+            //cn_bttn = false;
+            //ds_bttn = true;
+            /* Change the color of the button when clicked */
+            //Disconnect_button.Enabled = false;
+            //Connect_button.Enabled = true;
+            /* 
+                Print the log command
+                MethosBase.GetCurrentMethod returns the action user did.
+            */
+            if (ret == 0 && ds_bttn == true)
+            {
+                //Connect_button.IsEnabled = false;
+                //Disconnect_button.IsEnabled = true;
+                cn_bttn = true;
+                ds_bttn = false;
+                /* Change the color of the button when clicked */
+                ChangeColorObjectBackground(Connect_button, Constants.OBJECT_MODIFIED1);
+                ChangeColorObjectBackground(Disconnect_button, Constants.OBJECT_MODIFIED);
+                ChangeColorObjectForeground(Connect_button, Constants.OBJECT_MODIFIED);
+                ChangeColorObjectForeground(Disconnect_button, Constants.OBJECT_MODIFIED1);
+
+                /* 
+                    Print the log command
+                    MethosBase.GetCurrentMethod returns the action user did.
+                */
+                PrintLog("Info", MethodBase.GetCurrentMethod().Name, "Disonnect PLC successfully");
+            }
+            else if (ds_bttn == false)
+            {
+                PrintLog("Infor", MethodBase.GetCurrentMethod().Name, "PLC was disconnected");
+            }
+            else
+            {
+                PrintLog("Error", MethodBase.GetCurrentMethod().Name, "Disconnect PLC unsuccessfully");
+            }
+
+        }
+
+        private void Servo_button_click(object sender, RoutedEventArgs e)
+        {
+            int ret, servo_status;
+            string getName = MethodBase.GetCurrentMethod().Name;
+
+            /* Read status of Brake and AC Servo */
+            ret = PLCReadbit(Constants.R_SERVO_ON, out servo_status);
+            if (ret != 0)
+            {
+                PrintLog("Error", getName, "Read PLC Fail");
+                return;
+            }
+            if (servo_status == 0) // Servo is currently OFF
+            {
+                /* Reverse bit: OnServo_status == 1 */
+                Servo_button.Content = "Servo: on";
+
+                /* Change the color of the button when clicked */
+                ChangeColorObjectBackground(Servo_button, Constants.OBJECT_MODIFIED);
+                ChangeColorObjectForeground(Servo_button, Constants.OBJECT_MODIFIED1);
+
+                PrintLog("SERVO:", servo_status.ToString(), "ON");
+                ret = PLCWritebit(Constants.R_SERVO_ON, (~servo_status) & 0x01);
+                if (ret != 0)
+                {
+                    PrintLog("Error", getName, "Write PLC Fail");
+                    return;
+                }
+            }
+            else
+            {
+                /* Reverse bit: OnServo_status == 1 */
+                Servo_button.Content = "Servo: off";
+
+                /* Change the color of the button when clicked */
+                ChangeColorObjectBackground(Servo_button, Constants.OBJECT_MODIFIED1);
+                ChangeColorObjectForeground(Servo_button, Constants.OBJECT_MODIFIED);
+
+                PrintLog("SERVO:", servo_status.ToString(), "OFF");
+                ret = PLCWritebit(Constants.R_SERVO_ON, (~servo_status) & 0x01);
+                if (ret != 0)
+                {
+                    PrintLog("Error", getName, "Write PLC Fail");
+                    return;
+                }
+            }
+        }
+
+        private void SetHome_button_Click(object sender, RoutedEventArgs e)
+        {
+            Press_button(MethodBase.GetCurrentMethod().Name, Constants.R_SETHOME);
+        }
+
+        private void ResetError_button_Click(object sender, RoutedEventArgs e)
+        {
+            Press_button(MethodBase.GetCurrentMethod().Name, Constants.R_ERR_RESET);
+        }
+
+        private void GoHome_button_Click(object sender, RoutedEventArgs e)
+        {
+            Press_button(MethodBase.GetCurrentMethod().Name, Constants.R_GOHOME);
+        }
+
         private void helixViewport3D_MouseDown(object sender, MouseButtonEventArgs e)
         {
             Point mousePosition = e.GetPosition(viewPort3d);
@@ -665,8 +856,88 @@ namespace RobotArmHelix
             }
         }
 
+        private void Press_button(string name, string adr)
+        {
+            int ret;
+            ret = PLCWritebit(adr, 1);
+            if (ret != 0)
+            {
+                PrintLog("Error", name, string.Format("Set {0} = 1 Failed", adr));
+                return;
+            }
+            Thread.Sleep(1);
+            ret = PLCWritebit(adr, 0);
+            if (ret != 0)
+            {
+                PrintLog("Error", name, string.Format("Set {0} = 0 Failed", adr));
+                return;
+            }
+            PrintLog("Info", name, string.Format("Raise {0} Successfully", adr));
+        }
 
+        public int PLCReadbit(string adr, out int receive)
+        {
+            return plc.GetDevice(adr, out receive);
+        }
+        public int PLCWritebit(string adr, int value)
+        {
+            return plc.SetDevice(adr, value);
+        }
+        public void PrintLog(string level, string namefunction, string msg)
+        {
+            DateTime time = DateTime.Now;
+            ErrorLog.AppendText(time.ToString("h:mm:ss") + " - " + level + " - " + namefunction + ": " + msg);
+            ErrorLog.AppendText(Environment.NewLine);
+        }
+        public void ChangeColorObjectBackground(object objectin, Color color_object)
+        {
+            var button = objectin as Button;
+            if (button != null)
+            {
+                button.Background = new SolidColorBrush(color_object);
+                return;
+            }
 
+            var textbox = objectin as TextBox;
+            if (textbox != null)
+            {
+                textbox.Background = new SolidColorBrush(color_object);
+                return;
+            }
+        }
+        public void ChangeColorObjectForeground(object objectin, Color color_object)
+        {
+            var button = objectin as Button;
+            if (button != null)
+            {
+                button.Foreground = new SolidColorBrush(color_object);
+                return;
+            }
+
+            var textbox = objectin as TextBox;
+            if (textbox != null)
+            {
+                textbox.Foreground = new SolidColorBrush(color_object);
+                return;
+            }
+        }
+
+        public void ChangeColorObjectBorderBrush(object objectin, Color color_object)
+        {
+            var button = objectin as Button;
+            if (button != null)
+            {
+                button.BorderBrush = new SolidColorBrush(color_object);
+                return;
+            }
+
+            var textbox = objectin as TextBox;
+            if (textbox != null)
+            {
+                textbox.BorderBrush = new SolidColorBrush(color_object);
+                return;
+            }
+        }
 
     }
 
