@@ -92,6 +92,7 @@ namespace RobotArmHelix
         Vector3D reachingPoint;
         int movements = 10;
         System.Windows.Forms.Timer timer1;
+        System.Windows.Forms.Timer timer2;
 #if IRB6700
         //directroy of all stl files
         private const string MODEL_PATH0 = "K0.stl";
@@ -149,6 +150,10 @@ namespace RobotArmHelix
             timer1 = new System.Windows.Forms.Timer();
             timer1.Interval = 10;
             timer1.Tick += new System.EventHandler(timer1_Tick);
+
+            timer2 = new System.Windows.Forms.Timer();
+            timer2.Interval = 1000;
+            timer2.Tick += new System.EventHandler(timer2_Tick);
 
         }
 
@@ -510,12 +515,18 @@ namespace RobotArmHelix
         public void timer1_Tick(object sender, EventArgs e)
         {
             execute_fk();
-            // joint1.Value = angles_global[0] ;
-            // joint2.Value = angles_global[1] ;
-            // joint3.Value = angles_global[2] ;
-            // joint4.Value = angles_global[3] ;
-            // joint5.Value = angles_global[4] ;
             
+        }
+
+        public void timer2_Tick(object sender, EventArgs e)
+        {
+            execute_fk();
+            joint1.Value = angles_global[0];
+            joint2.Value = angles_global[1];
+            joint3.Value = angles_global[2];
+            joint4.Value = angles_global[3];
+            joint5.Value = angles_global[4];
+
         }
         public double[] InverseKinematics(Vector3D target, double[] angles)
         {
@@ -730,6 +741,7 @@ namespace RobotArmHelix
         {
             /* Start timer1 */
             timer1.Start();
+            timer2.Start();
 
 
 
@@ -814,6 +826,7 @@ namespace RobotArmHelix
         {
             /* Stop timer1 */
             timer1.Stop();
+            timer2.Stop();
 
             /* Enable slider */
             joint1.IsEnabled = true;
