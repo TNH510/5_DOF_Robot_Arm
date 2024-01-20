@@ -64,6 +64,10 @@ namespace RobotArmHelix
         bool switchingJoint = false;
         bool isAnimating = false;
 
+        public double joint1_value, joint2_value, joint3_value, joint4_value, joint5_value;
+
+        public double[] angles_global = {0, 0, 0, 0, 0};
+
         public bool cn_bttn = true;
         public bool ds_bttn = false;
         public bool testpos_bttn = true;
@@ -88,7 +92,6 @@ namespace RobotArmHelix
         Vector3D reachingPoint;
         int movements = 10;
         System.Windows.Forms.Timer timer1;
-
 #if IRB6700
         //directroy of all stl files
         private const string MODEL_PATH0 = "K0.stl";
@@ -103,6 +106,10 @@ namespace RobotArmHelix
         public MainWindow()
         {
             InitializeComponent();
+            // Tạo và bắt đầu một luồng mới
+            Thread thread1 = new Thread(new ThreadStart(Task1));
+            thread1.Start();
+
             // Attach the event handler to the MouseDown event
             viewPort3d.MouseDown += helixViewport3D_MouseDown;
             basePath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\3D_Models\\";
@@ -140,10 +147,25 @@ namespace RobotArmHelix
 
 
             timer1 = new System.Windows.Forms.Timer();
-            timer1.Interval = 5;
+            timer1.Interval = 10;
             timer1.Tick += new System.EventHandler(timer1_Tick);
+
         }
 
+        public void Task1()
+        {
+
+            // Sử dụng Dispatcher để thay đổi UI element từ một luồng khác
+            Dispatcher.Invoke(() =>
+            {
+                joint1.Value = angles_global[0];
+                joint2.Value = angles_global[1];
+                joint3.Value = angles_global[2];
+                joint4.Value = angles_global[3];
+                joint5.Value = angles_global[4];
+            });
+
+        }
         private Model3DGroup Initialize_Environment(List<string> modelsNames)
         {
             try
@@ -267,12 +289,22 @@ namespace RobotArmHelix
         {
             if (isAnimating)
                 return;
-
-            joints[1].angle = joint1.Value;
-            joints[2].angle = joint2.Value;
-            joints[3].angle = joint3.Value;
-            joints[4].angle = joint4.Value;
-            joints[5].angle = joint5.Value;
+            if(cn_bttn == false)
+            {
+                joints[1].angle = angles_global[0];
+                joints[2].angle = angles_global[1];
+                joints[3].angle = angles_global[2];
+                joints[4].angle = angles_global[3];
+                joints[5].angle = angles_global[4];
+            }
+            else
+            {
+                joints[1].angle = joint1.Value;
+                joints[2].angle = joint2.Value;
+                joints[3].angle = joint3.Value;
+                joints[4].angle = joint4.Value;
+                joints[5].angle = joint5.Value;
+            }
             execute_fk();
         }
 
@@ -317,11 +349,11 @@ namespace RobotArmHelix
                 t5 = Read_Position((uint)value_positon[8], (uint)value_positon[9]);
 
                 // Convert theta read from int to double
-                t1_out = (double.Parse(Convert.ToString((int)t1)) + 18000000) / 100000.0;
-                t2_out = (double.Parse(Convert.ToString((int)t2)) + 18000000) / 100000.0;
-                t3_out = (double.Parse(Convert.ToString((int)t3)) + 18000000) / 100000.0;
-                t4_out = (double.Parse(Convert.ToString((int)t4)) + 18000000) / 100000.0;
-                t5_out = (double.Parse(Convert.ToString((int)t5)) + 18000000) / 100000.0;
+                t1_out = double.Parse(Convert.ToString((int)t1)) / 100000.0;
+                t2_out = double.Parse(Convert.ToString((int)t2)) / 100000.0;
+                t3_out = double.Parse(Convert.ToString((int)t3)) / 100000.0;
+                t4_out = double.Parse(Convert.ToString((int)t4)) / 100000.0;
+                t5_out = double.Parse(Convert.ToString((int)t5)) / 100000.0;
 
                 /* Transfer the angle value into float */
                 t1_out = Math.Round(t1_out, NUM_AFTER_COMMA);
@@ -330,13 +362,12 @@ namespace RobotArmHelix
                 t4_out = Math.Round(t4_out, NUM_AFTER_COMMA);
                 t5_out = Math.Round(t5_out, NUM_AFTER_COMMA);
 
-                double[] angles = { t1_out, t2_out, t3_out, t4_out, t5_out };
-                ForwardKinematics(angles);
-                joint1.Value = angles[0];
-                joint2.Value = angles[1];
-                joint3.Value = angles[2];
-                joint4.Value = angles[3];
-                joint5.Value = angles[4];
+                angles_global[0] = t1_out;
+                angles_global[1] = t2_out;
+                angles_global[2] = t3_out;
+                angles_global[3] = t4_out;
+                angles_global[4] = t5_out;
+                ForwardKinematics(angles_global);
             }
 
 
@@ -479,8 +510,13 @@ namespace RobotArmHelix
         public void timer1_Tick(object sender, EventArgs e)
         {
             execute_fk();
+            // joint1.Value = angles_global[0] ;
+            // joint2.Value = angles_global[1] ;
+            // joint3.Value = angles_global[2] ;
+            // joint4.Value = angles_global[3] ;
+            // joint5.Value = angles_global[4] ;
+            
         }
-       
         public double[] InverseKinematics(Vector3D target, double[] angles)
         {
             if (DistanceFromTarget(target, angles) < DistanceThreshold)
@@ -694,6 +730,8 @@ namespace RobotArmHelix
         {
             /* Start timer1 */
             timer1.Start();
+
+
 
             /* Disable slider */
             joint1.IsEnabled = false;
