@@ -207,7 +207,12 @@ namespace RobotArmHelix
 #endif
 
 #if IRB6700
-                Color cableColor = Colors.DarkSlateGray;
+                changeModelColor(joints[0], Colors.Black);
+                changeModelColor(joints[1], Colors.OrangeRed);
+                changeModelColor(joints[2], Colors.OrangeRed);
+                changeModelColor(joints[3], Colors.OrangeRed);
+                changeModelColor(joints[4], Colors.OrangeRed);
+                changeModelColor(joints[5], Colors.Tomato);
 
                 joints[1].angleMin = -180;
                 joints[1].angleMax = 180;
@@ -323,7 +328,6 @@ namespace RobotArmHelix
             int[] value_positon = new int[16];
             uint t1 = 0, t2 = 0, t3 = 0, t4 = 0, t5 = 0;
             double t1_out, t2_out, t3_out, t4_out, t5_out;
-            const int NUM_AFTER_COMMA = 5;
             /** Debug sphere, it takes the x,y,z of the textBoxes and update its position
              * This is useful when using x,y,z in the "new Point3D(x,y,z)* when defining a new RotateTransform3D() to check where the joints is actually  rotating */
             if (cn_bttn == true)
@@ -373,13 +377,6 @@ namespace RobotArmHelix
                 t3_out = double.Parse(Convert.ToString((int)t3)) / 100000.0;
                 t4_out = double.Parse(Convert.ToString((int)t4)) / 100000.0;
                 t5_out = double.Parse(Convert.ToString((int)t5)) / 100000.0;
-
-                /* Transfer the angle value into float */
-                t1_out = Math.Round(t1_out, NUM_AFTER_COMMA);
-                t2_out = Math.Round(t2_out, NUM_AFTER_COMMA);
-                t3_out = Math.Round(t3_out, NUM_AFTER_COMMA);
-                t4_out = Math.Round(t4_out, NUM_AFTER_COMMA);
-                t5_out = Math.Round(t5_out, NUM_AFTER_COMMA);
 
                 angles_global[0] = t1_out;
                 angles_global[1] = t2_out;
