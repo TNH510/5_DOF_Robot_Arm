@@ -339,11 +339,25 @@ namespace RobotArmHelix
             else
             {
                 /* Read position of 5 angle */
-                plc.ReadDeviceBlock(Constants.R_POSITION_1, 2, out value_positon[0]);
-                plc.ReadDeviceBlock(Constants.R_POSITION_2, 2, out value_positon[2]);
-                plc.ReadDeviceBlock(Constants.R_POSITION_3, 2, out value_positon[4]);
-                plc.ReadDeviceBlock(Constants.R_POSITION_4, 2, out value_positon[6]);
-                plc.ReadDeviceBlock(Constants.R_POSITION_5, 2, out value_positon[8]);
+                int[] temp_angle = new int[90];
+                plc.ReadDeviceBlock(Constants.R_POSITION_1, 82, out temp_angle[0]);
+
+                value_positon[0] = temp_angle[0];
+                value_positon[1] = temp_angle[1];
+
+                value_positon[2] = temp_angle[20];
+                value_positon[3] = temp_angle[21];
+
+                value_positon[4] = temp_angle[40];
+                value_positon[5] = temp_angle[41];
+
+                value_positon[6] = temp_angle[60];
+                value_positon[7] = temp_angle[61];
+
+                value_positon[8] = temp_angle[80];
+                value_positon[9] = temp_angle[81];
+
+
 
 
                 // Read and convert driver angle value to real position value (was subtracted by 180)
@@ -741,7 +755,7 @@ namespace RobotArmHelix
         {
             /* Start timer1 */
             timer1.Start();
-            timer2.Start();
+            //timer2.Start();
 
 
 
