@@ -20,6 +20,7 @@ using HelixToolkit.Wpf;
 using System.IO;
 using System.Reflection;
 using System.Threading;
+using System.Net.Sockets;
 
 
 
@@ -53,7 +54,11 @@ namespace RobotArmHelix
     /// Interaction logic for UserControl1.xaml
     /// </summary>
     public partial class MainWindow : Window
-   { 
+   {
+        //Declaration for connecting TCP/IP
+        private TcpClient tcpClient;
+        private NetworkStream networkStream;
+
         //provides functionality to 3d models
         Model3DGroup RA = new Model3DGroup(); //RoboticArm 3d group
         Model3D geom = null; //Debug sphere to check in which point the joint is rotatin
@@ -1624,6 +1629,60 @@ namespace RobotArmHelix
         {
             return (value_positon2 << 16 | value_positon1) - 18000000;
         }
+
+        private async void TCP_Connect_button_Click(object sender, RoutedEventArgs e)
+        {
+            // Call the StartClient method to initiate the connection and communication with the server
+            StartClient();
+
+        }
+        private void StartClient()
+        {
+            // Create a socket object
+            using (Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+            {
+                // Connect to the server
+                string host = addr_tb.Text;
+                int port = Convert.ToInt16(port_tb.Text);
+
+                try
+                {
+                    clientSocket.Connect(host, port);
+                    //MessageBox.Show($"Connected to {host}:{port}");
+                    PrintLog("Infor", "Connected to", $"{host}:{port}");
+
+                    // Send the command to the server
+                    string commandToSend = "1003I?\r\n";
+                    byte[] commandBytes = Encoding.ASCII.GetBytes(commandToSend);
+                    Console.WriteLine(Encoding.ASCII.GetString(commandBytes));
+                    clientSocket.Send(commandBytes);
+
+                    // Receive the response from the server
+                    byte[] buffer = new byte[1024];
+                    int bytesRead = clientSocket.Receive(buffer);
+                    string response = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                    PrintLog("Infor", "Data received", response);
+                    //// Save each byte of the response to a new text file
+                    //using (System.IO.StreamWriter file = new System.IO.StreamWriter("response_bytes.txt", true))
+                    //{
+                    //    foreach (byte byteValue in buffer)
+                    //    {
+                    //        file.WriteLine(byteValue);
+                    //    }
+                    //}
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error: {ex.Message}");
+                }
+            }
+        }
+
+        private void TCP_sendata_button_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
         public void turn_on_1_pulse_relay(int device)
         {
             string device_str = "M" + Convert.ToString(device);
