@@ -345,6 +345,7 @@
             this.Forward_btn.TabIndex = 1;
             this.Forward_btn.Text = "Forward";
             this.Forward_btn.UseVisualStyleBackColor = true;
+            this.Forward_btn.Click += new System.EventHandler(this.Forward_btn_Click);
             this.Forward_btn.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Forward_btn_MouseDown);
             this.Forward_btn.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Forward_btn_MouseUp);
             // 
