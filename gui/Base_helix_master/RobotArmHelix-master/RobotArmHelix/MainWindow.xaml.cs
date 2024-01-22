@@ -1652,7 +1652,7 @@ namespace RobotArmHelix
                     PrintLog("Infor", "Connected to", $"{host}:{port}");
 
                     // Send the command to the server
-                    string commandToSend = "1003I?\r\n";
+                    string commandToSend = data_tb.Text + "\r\n";
                     byte[] commandBytes = Encoding.ASCII.GetBytes(commandToSend);
                     Console.WriteLine(Encoding.ASCII.GetString(commandBytes));
                     clientSocket.Send(commandBytes);
@@ -1663,13 +1663,13 @@ namespace RobotArmHelix
                     string response = Encoding.ASCII.GetString(buffer, 0, bytesRead);
                     PrintLog("Infor", "Data received", response);
                     //// Save each byte of the response to a new text file
-                    //using (System.IO.StreamWriter file = new System.IO.StreamWriter("response_bytes.txt", true))
-                    //{
-                    //    foreach (byte byteValue in buffer)
-                    //    {
-                    //        file.WriteLine(byteValue);
-                    //    }
-                    //}
+                    using (System.IO.StreamWriter file = new System.IO.StreamWriter("response_bytes.txt", true))
+                    {
+                        foreach (byte byteValue in buffer)
+                        {
+                            file.WriteLine(byteValue);
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
