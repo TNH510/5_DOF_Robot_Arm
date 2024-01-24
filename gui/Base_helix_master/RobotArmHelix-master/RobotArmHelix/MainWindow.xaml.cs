@@ -1661,9 +1661,58 @@ namespace RobotArmHelix
                     byte[] buffer = new byte[1024];
                     int bytesRead = clientSocket.Receive(buffer);
                     string response = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+
+
+                }
+                catch (Exception ex)
+                {
+                    PrintLog("Error", "Unable to connect to", $"{host}:{port}");
+                }
+            }
+        }
+
+        private void TCP_sendata_button_Click(object sender, RoutedEventArgs e)
+        {
+            // Create a socket object
+            using (Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+            {
+                // Connect to the server
+                string host = addr_tb.Text;
+                int port = Convert.ToInt16(port_tb.Text);
+
+                try
+                {
+                    clientSocket.Connect(host, port);
+
+                    // Send the command to the server
+                    string commandToSend = data_tb.Text + "\r\n";
+                    byte[] commandBytes = Encoding.ASCII.GetBytes(commandToSend);
+                    Console.WriteLine(Encoding.ASCII.GetString(commandBytes));
+                    clientSocket.Send(commandBytes);
+
+                    // Receive the response from the server
+                    byte[] buffer = new byte[307200];
+                    int bytesRead = clientSocket.Receive(buffer);
+                    string response = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+
                     PrintLog("Infor", "Data received", response);
-                    //// Save each byte of the response to a new text file
-                    using (System.IO.StreamWriter file = new System.IO.StreamWriter("response_bytes.txt", true))
+                    // Sentences to remove
+                    string[] sentencesToRemove = { "1003000307200", "1003*", "1003?" };
+
+                    // Loop through each sentence and replace it with an empty string
+                    foreach (string sentence in sentencesToRemove)
+                    {
+                        response = response.Replace(sentence, "");
+                    }
+                    
+                    // Specify the folder path where you want to save the file
+                    string folderPath = @"C:\Users\daveb\Desktop\raw_data\";
+
+                    // Construct the full file path using Path.Combine
+                    string filePath = System.IO.Path.Combine(folderPath, "response_bytes.txt");
+
+                    // Save the received data to the byte file
+                    using (StreamWriter file = new StreamWriter(filePath, false)) // Use false to overwrite the file
                     {
                         foreach (byte byteValue in buffer)
                         {
@@ -1673,14 +1722,49 @@ namespace RobotArmHelix
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error: {ex.Message}");
+                    PrintLog("Error", "Unable to connect to", $"{host}:{port}");
                 }
             }
         }
 
-        private void TCP_sendata_button_Click(object sender, RoutedEventArgs e)
+        private void Check_length_button_Click(object sender, RoutedEventArgs e)
         {
+            // Replace "your_file_path.txt" with the actual path to your text file
+            string filePath = "C:\\Users\\daveb\\Desktop\\raw_data\\response_bytes.txt";
 
+            // Read all text from the file using UTF-8 encoding
+            string[] fileline = File.ReadAllLines(filePath);
+
+            // Check if the file contains enough characters for a 640x480 array
+            if (fileline.Length != 307200)
+            {
+                PrintLog("Error", "", "File does not contain enough characters for a 640x480 array.");
+                return;
+            }
+
+            // Create a 2D array with dimensions 640x480
+            byte[,] array2D = new byte[640, 480];
+
+            // Populate the 2D array
+            for (int y = 0; y < 480; y++)
+            {
+                // Convert each line into an array of bytes
+                byte[] lineBytes = new byte[640];
+                for (int x = 0; x < 640; x++)
+                {
+                    lineBytes[x] = Convert.ToByte(fileline[y * 640 + x]);
+                }
+
+                for (int x = 0; x < 640; x++)
+                {
+                    // Assign the byte to the 2D array
+                    array2D[x, y] = lineBytes[x];
+                }
+            }
+
+            // Now you have a 2D array (640x480) containing the characters from the text file
+            PrintLog("Infor", "", "2D Array created successfully.");
+            //Console.WriteLine("2D Array created successfully.");
         }
 
         public void turn_on_1_pulse_relay(int device)
