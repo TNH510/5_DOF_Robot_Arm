@@ -8,7 +8,7 @@
              Title="ROBOT 5DOF CONTROL"
              WindowStartupLocation="CenterScreen"
              Icon="robotarm2.ico">
-    <Grid>
+    <Grid x:Name="mainGrid">
         <h:HelixViewport3D x:Name="viewPort3d" ViewCubeHeight="150" ViewCubeWidth="150" ViewCubeVerticalPosition="Bottom" CoordinateSystemLabelForeground="White" CoordinateSystemVerticalPosition="Center" CoordinateSystemHorizontalPosition="Right" CoordinateSystemHeight="150" CoordinateSystemWidth="150" RenderOptions.BitmapScalingMode="HighQuality" RenderOptions.EdgeMode="Unspecified" BorderBrush="Black" BorderThickness="5" ShowCoordinateSystem="True" ShowFrameRate="True" ShowCameraInfo="True" MouseLeftButtonUp="ViewPort3D_OnMouseLeftButtonUp" MouseLeftButtonDown="ViewPort3D_OnMouseLeftButtonDown" IsManipulationEnabled="True" IsViewCubeEdgeClicksEnabled="True" OpacityMask="#FFC82626" Margin="0,-4,0,4">
             <h:HelixViewport3D.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
@@ -100,5 +100,6 @@
         <TextBox x:Name="data_tb" Text="1003I?\r\n" HorizontalAlignment="Left" Height="24" Margin="389,301,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="203" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Background="{x:Null}" Foreground="#FF007EF9" BorderBrush="{x:Null}" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
         <Label Content="Data" HorizontalAlignment="Left" Margin="318,300,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="23" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
         <Button x:Name="Check_length_button" Content="Check" HorizontalAlignment="Left" Margin="320,373,0,0" VerticalAlignment="Top" Width="123" Height="23" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Check_length_button_Click"/>
+        <Button x:Name="Camera_button" Content="Camera" HorizontalAlignment="Left" Margin="469,373,0,0" VerticalAlignment="Top" Width="123" Height="23" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Camera_button_Click"/>
     </Grid>
 </Window>

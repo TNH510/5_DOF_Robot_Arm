@@ -55,6 +55,8 @@ namespace RobotArmHelix
     /// </summary>
     public partial class MainWindow : Window
    {
+
+        private byte[,] array2D;
         //Declaration for connecting TCP/IP
         private TcpClient tcpClient;
         private NetworkStream networkStream;
@@ -1743,7 +1745,7 @@ namespace RobotArmHelix
             }
 
             // Create a 2D array with dimensions 640x480
-            byte[,] array2D = new byte[640, 480];
+            array2D = new byte[640, 480];
 
             // Populate the 2D array
             for (int y = 0; y < 480; y++)
@@ -1765,6 +1767,31 @@ namespace RobotArmHelix
             // Now you have a 2D array (640x480) containing the characters from the text file
             PrintLog("Infor", "", "2D Array created successfully.");
             //Console.WriteLine("2D Array created successfully.");
+        }
+
+        private void Camera_button_Click(object sender, RoutedEventArgs e)
+        {
+            // Display the image
+            DisplayImage();
+        }
+
+        private void DisplayImage()
+        {
+            // Create a BitmapSource from the 2D byte array
+            BitmapSource bitmapSource = BitmapSource.Create(
+                640, 480,
+                96, 96,
+                PixelFormats.Gray8,
+                null,
+                array2D,
+                640); // Stride = width of the image in bytes
+
+            // Create an Image control
+            Image image = new Image();
+            image.Source = bitmapSource;
+
+            // Add the Image control to your WPF layout (assuming you have a Grid named "mainGrid" in your XAML)
+            mainGrid.Children.Add(image);
         }
 
         public void turn_on_1_pulse_relay(int device)
