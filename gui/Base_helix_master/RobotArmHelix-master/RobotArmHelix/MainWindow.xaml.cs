@@ -1689,37 +1689,62 @@ namespace RobotArmHelix
                     // Send the command to the server
                     string commandToSend = data_tb.Text + "\r\n";
                     byte[] commandBytes = Encoding.ASCII.GetBytes(commandToSend);
-                    Console.WriteLine(Encoding.ASCII.GetString(commandBytes));
                     clientSocket.Send(commandBytes);
 
+
+
                     // Receive the response from the server
-                    byte[] buffer = new byte[307200];
+                    byte[] buffer = new byte[308291];
                     int bytesRead = clientSocket.Receive(buffer);
+
+                    while (bytesRead < 308291)
+                        bytesRead += clientSocket.Receive(buffer, bytesRead, 308291 - bytesRead, SocketFlags.None);
+                    
                     string response = Encoding.ASCII.GetString(buffer, 0, bytesRead);
 
-                    PrintLog("Infor", "Data received", response);
+                    // Specify the folder path where you want to save the file
+                    string folderPath = @"C:\Users\daveb\Desktop\raw_data\";
+
+                    //PrintLog("Infor", "Data received", response);
+                    // Sent the whole response in the text
+
+
                     // Sentences to remove
-                    string[] sentencesToRemove = { "1003000307200", "1003*", "1003?" };
+                    string[] sentencesToRemove = { "1003000308278", "1003*", "1003?", "1003000307200" };
 
                     // Loop through each sentence and replace it with an empty string
                     foreach (string sentence in sentencesToRemove)
                     {
                         response = response.Replace(sentence, "");
                     }
-                    
-                    // Specify the folder path where you want to save the file
-                    string folderPath = @"C:\Users\daveb\Desktop\raw_data\";
 
+                    // Convert the modified response string back to bytes
+                    byte[] modifiedBuffer = Encoding.ASCII.GetBytes(response);
+
+                    
                     // Construct the full file path using Path.Combine
                     string filePath = System.IO.Path.Combine(folderPath, "response_bytes.txt");
 
-                    // Save the received data to the byte file
-                    using (StreamWriter file = new StreamWriter(filePath, false)) // Use false to overwrite the file
+                    // Save the modified data to the byte file
+                    File.WriteAllBytes(filePath, modifiedBuffer);
+
+                    // Read bytes from the file
+                    byte[] bytes = File.ReadAllBytes(filePath);
+
+                    //// Convert each byte to its string representation
+                    string byteString = "";
+                    foreach (byte b in bytes)
                     {
-                        foreach (byte byteValue in buffer)
-                        {
-                            file.WriteLine(byteValue);
-                        }
+                        byteString += b.ToString() + " ";
+                    }
+                    // Remove trailing space
+                    byteString = byteString.Trim();
+                    // Construct the full file path using Path.Combine
+                    string filePath_bmp = System.IO.Path.Combine(folderPath, "response_bmp.txt");
+                    // Save the received data to the byte file
+                    using (StreamWriter file = new StreamWriter(filePath_bmp, false)) // Use false to overwrite the file
+                    {
+                        file.Write(byteString);
                     }
                 }
                 catch (Exception ex)
