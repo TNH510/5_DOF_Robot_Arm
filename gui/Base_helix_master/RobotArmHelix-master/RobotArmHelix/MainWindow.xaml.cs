@@ -71,6 +71,8 @@ namespace RobotArmHelix
         bool switchingJoint = false;
         bool isAnimating = false;
 
+        string response_client;
+
         public double joint1_value, joint2_value, joint3_value, joint4_value, joint5_value;
 
         public double[] angles_global = {0, 0, 0, 0, 0};
@@ -1686,21 +1688,25 @@ namespace RobotArmHelix
                 {
                     clientSocket.Connect(host, port);
 
+                    string sentencetosend = "1003I?\r\n";
+
                     // Send the command to the server
                     string commandToSend = data_tb.Text + "\r\n";
                     byte[] commandBytes = Encoding.ASCII.GetBytes(commandToSend);
                     clientSocket.Send(commandBytes);
 
-
-
                     // Receive the response from the server
-                    byte[] buffer = new byte[308291];
+                    var buffer = new byte[308295];
                     int bytesRead = clientSocket.Receive(buffer);
-
-                    while (bytesRead < 308291)
-                        bytesRead += clientSocket.Receive(buffer, bytesRead, 308291 - bytesRead, SocketFlags.None);
+                    if (commandToSend == sentencetosend)
+                    {
+                        while (bytesRead < 308291)
+                        {
+                            bytesRead += clientSocket.Receive(buffer, bytesRead, 308291 - bytesRead, SocketFlags.None);
+                        }
+                    }
                     
-                    string response = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                    response_client = Encoding.ASCII.GetString(buffer, 0, bytesRead);
 
                     // Specify the folder path where you want to save the file
                     string folderPath = @"C:\Users\daveb\Desktop\raw_data\";
@@ -1708,44 +1714,25 @@ namespace RobotArmHelix
                     //PrintLog("Infor", "Data received", response);
                     // Sent the whole response in the text
 
-
                     // Sentences to remove
                     string[] sentencesToRemove = { "1003000308278", "1003*", "1003?", "1003000307200" };
 
                     // Loop through each sentence and replace it with an empty string
                     foreach (string sentence in sentencesToRemove)
                     {
-                        response = response.Replace(sentence, "");
+                        response_client = response_client.Replace(sentence, "");
                     }
-
-                    // Convert the modified response string back to bytes
-                    byte[] modifiedBuffer = Encoding.ASCII.GetBytes(response);
 
                     
                     // Construct the full file path using Path.Combine
                     string filePath = System.IO.Path.Combine(folderPath, "response_bytes.txt");
 
+                    // Convert the modified response string back to bytes
+                    byte[] modifiedBuffer = Encoding.ASCII.GetBytes(response_client);
                     // Save the modified data to the byte file
                     File.WriteAllBytes(filePath, modifiedBuffer);
 
-                    // Read bytes from the file
-                    byte[] bytes = File.ReadAllBytes(filePath);
-
-                    //// Convert each byte to its string representation
-                    string byteString = "";
-                    foreach (byte b in bytes)
-                    {
-                        byteString += b.ToString() + " ";
-                    }
-                    // Remove trailing space
-                    byteString = byteString.Trim();
-                    // Construct the full file path using Path.Combine
-                    string filePath_bmp = System.IO.Path.Combine(folderPath, "response_bmp.txt");
-                    // Save the received data to the byte file
-                    using (StreamWriter file = new StreamWriter(filePath_bmp, false)) // Use false to overwrite the file
-                    {
-                        file.Write(byteString);
-                    }
+ 
                 }
                 catch (Exception ex)
                 {
@@ -1754,44 +1741,29 @@ namespace RobotArmHelix
             }
         }
 
-        private void Check_length_button_Click(object sender, RoutedEventArgs e)
+        private async void Bitmap_cvt_button_Click(object sender, RoutedEventArgs e)
         {
-            // Replace "your_file_path.txt" with the actual path to your text file
-            string filePath = "C:\\Users\\daveb\\Desktop\\raw_data\\response_bytes.txt";
-
-            // Read all text from the file using UTF-8 encoding
-            string[] fileline = File.ReadAllLines(filePath);
-
-            // Check if the file contains enough characters for a 640x480 array
-            if (fileline.Length != 307200)
+            // Asynchronously convert bytes to string
+            await Task.Run(() =>
             {
-                PrintLog("Error", "", "File does not contain enough characters for a 640x480 array.");
-                return;
-            }
+                // Specify the folder path where you want to save the file
+                string folderPath = @"C:\Users\daveb\Desktop\raw_data\";
+                string test = @"C:\Users\daveb\Desktop\camera_test\aaa.txt";
+                // Construct the full file path using Path.Combine
+                string filePath_bmp = System.IO.Path.Combine(folderPath, "response_bmp.txt");
+                string filePath_bytes = System.IO.Path.Combine(folderPath, "response_bytes.txt");
 
-            // Create a 2D array with dimensions 640x480
-            array2D = new byte[640, 480];
+                // Read binary data from file
+                byte[] modifiedBuffer = File.ReadAllBytes(filePath_bmp);
 
-            // Populate the 2D array
-            for (int y = 0; y < 480; y++)
-            {
-                // Convert each line into an array of bytes
-                byte[] lineBytes = new byte[640];
-                for (int x = 0; x < 640; x++)
-                {
-                    lineBytes[x] = Convert.ToByte(fileline[y * 640 + x]);
-                }
+                // Convert each byte to its string representation
+                string bmpString = string.Join(" ", modifiedBuffer);
 
-                for (int x = 0; x < 640; x++)
-                {
-                    // Assign the byte to the 2D array
-                    array2D[x, y] = lineBytes[x];
-                }
-            }
+                // Write the converted string to a text file
+                File.WriteAllText(filePath_bmp, bmpString);
 
-            // Now you have a 2D array (640x480) containing the characters from the text file
-            PrintLog("Infor", "", "2D Array created successfully.");
-            //Console.WriteLine("2D Array created successfully.");
+            });
+
         }
 
         private void Camera_button_Click(object sender, RoutedEventArgs e)
