@@ -290,12 +290,12 @@ namespace RobotArmHelix
                     //ImageWindow imageWindow = new ImageWindow();
 
                     // Display the image in an Image control
-                    //displayedImage2.Source = bitmapImage;
-                    //displayedImage2.Stretch = System.Windows.Media.Stretch.Fill; // Adjust the stretch mode as needed
-                    //// Make the image visible
-                    //displayedImage2.Visibility = Visibility.Visible;
-                    //await Task.Delay(100);
-                    //}
+                    //SecondWindow.Source = bitmapImage;
+                    ////displayedImage2.Stretch = System.Windows.Media.Stretch.Fill; // Adjust the stretch mode as needed
+                    ////// Make the image visible
+                    ////displayedImage2.Visibility = Visibility.Visible;
+                    ////await Task.Delay(100);
+                    ////}
                 }
                 catch (Exception ex)
                 {
