@@ -23,7 +23,6 @@ using System.Threading;
 using System.Net.Sockets;
 
 
-
 /**
  * Author: Gabriele Marini (Gabryxx7)
  * This class load the 3d models of all the parts of the robotic arms and add them to the viewport
@@ -55,6 +54,8 @@ namespace RobotArmHelix
     /// </summary>
     public partial class MainWindow : Window
    {
+
+
 
         private byte[,] array2D;
         //Declaration for connecting TCP/IP
@@ -102,6 +103,7 @@ namespace RobotArmHelix
         int movements = 10;
         System.Windows.Forms.Timer timer1;
         System.Windows.Forms.Timer timer2;
+        System.Windows.Forms.Timer timer3;
 #if IRB6700
         //directroy of all stl files
         private const string MODEL_PATH0 = "K0.stl";
@@ -119,6 +121,12 @@ namespace RobotArmHelix
             // Tạo và bắt đầu một luồng mới
             Thread thread1 = new Thread(new ThreadStart(Task1));
             thread1.Start();
+
+            Thread thread2 = new Thread(new ThreadStart(Task2));
+            thread2.Start();
+
+            // Set the source of the Image control to display an image file
+            displayedImage.Source = new BitmapImage(new Uri("E://Background_Laptop//test.png"));
 
             // Attach the event handler to the MouseDown event
             viewPort3d.MouseDown += helixViewport3D_MouseDown;
@@ -179,6 +187,13 @@ namespace RobotArmHelix
                 joint5.Value = angles_global[4];
             });
 
+        }
+
+        public void Task2()
+        {
+            timer3 = new System.Windows.Forms.Timer();
+            timer3.Interval = 1;
+            timer3.Tick += new System.EventHandler(timer2_Tick);
         }
         private Model3DGroup Initialize_Environment(List<string> modelsNames)
         {
@@ -1769,28 +1784,9 @@ namespace RobotArmHelix
 
         private void Camera_button_Click(object sender, RoutedEventArgs e)
         {
-            // Display the image
-            DisplayImage();
+            timer3.Start();
         }
 
-        private void DisplayImage()
-        {
-            // Create a BitmapSource from the 2D byte array
-            BitmapSource bitmapSource = BitmapSource.Create(
-                640, 480,
-                96, 96,
-                PixelFormats.Gray8,
-                null,
-                array2D,
-                640); // Stride = width of the image in bytes
-
-            // Create an Image control
-            Image image = new Image();
-            image.Source = bitmapSource;
-
-            // Add the Image control to your WPF layout (assuming you have a Grid named "mainGrid" in your XAML)
-            mainGrid.Children.Add(image);
-        }
 
         public void turn_on_1_pulse_relay(int device)
         {
