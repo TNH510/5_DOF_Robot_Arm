@@ -125,8 +125,6 @@ namespace RobotArmHelix
             Thread thread2 = new Thread(new ThreadStart(Task2));
             thread2.Start();
 
-            // Set the source of the Image control to display an image file
-            displayedImage.Source = new BitmapImage(new Uri("E://Background_Laptop//test.png"));
 
             // Attach the event handler to the MouseDown event
             viewPort3d.MouseDown += helixViewport3D_MouseDown;
@@ -192,9 +190,11 @@ namespace RobotArmHelix
         public void Task2()
         {
             timer3 = new System.Windows.Forms.Timer();
-            timer3.Interval = 1;
-            timer3.Tick += new System.EventHandler(timer2_Tick);
+            timer3.Interval = 1000;
+            timer3.Tick += new System.EventHandler(timer3_Tick);
         }
+
+
         private Model3DGroup Initialize_Environment(List<string> modelsNames)
         {
             try
@@ -561,6 +561,114 @@ namespace RobotArmHelix
             joint4.Value = angles_global[3];
             joint5.Value = angles_global[4];
 
+        }
+
+        public void timer3_Tick(object sender, EventArgs e)
+        {
+            // Create a socket object
+            using (Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+            {
+                // Connect to the server
+                string host = "192.168.0.49";
+                int port = Convert.ToInt16("2011");
+
+                try
+                {
+                    clientSocket.Connect(host, port);
+
+                    string CaptureImageMessage = "1003t\r\n";
+                    byte[] CaptureImageBytes = Encoding.ASCII.GetBytes(CaptureImageMessage);
+                    clientSocket.Send(CaptureImageBytes);
+
+                    string RequestImageMessage = "1003I?\r\n";
+                    // Send the command to the server
+                    byte[] RequestImageBytes = Encoding.ASCII.GetBytes(RequestImageMessage);
+                    clientSocket.Send(RequestImageBytes);
+
+                    string sentencetosend = "1003I?\r\n";
+                    // Receive the response from the server
+                    var buffer = new byte[308295];
+                    int bytesRead = clientSocket.Receive(buffer);
+                    if (RequestImageMessage == sentencetosend)
+                    {
+                        while (bytesRead < 308291)
+                        {
+                            bytesRead += clientSocket.Receive(buffer, bytesRead, 308291 - bytesRead, SocketFlags.None);
+                        }
+                    }
+
+                    response_client = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                    PrintLog("Data received", "", response_client);
+
+                    // Sentences to remove
+                    string[] sentencesToRemove = { "1003000308278", "1003*", "1003?", "1003000307200" };
+
+                    // Loop through each sentence and replace it with an empty string
+                    foreach (string sentence in sentencesToRemove)
+                    {
+                        response_client = response_client.Replace(sentence, "");
+                    }
+
+                    // Convert the modified response string back to bytes
+                    byte[] modifiedBuffer = Encoding.ASCII.GetBytes(response_client);
+
+                    // Convert each byte to its string representation
+                    string bmpString = string.Join(" ", modifiedBuffer);
+                    // Split the byte string into individual byte values
+                    string[] byteValues = bmpString.Split();
+
+                    // Convert each byte value from string to integer
+                    List<byte> byteData = new List<byte>();
+                    foreach (string byteString in byteValues)
+                    {
+                        byteData.Add(Convert.ToByte(byteString));
+                    }
+
+                    // Define the number of bytes to delete from the beginning
+                    int bytesToDelete = 1080; // Adjust this number according to your requirement
+
+                    // Delete the specified number of bytes from the beginning
+                    byteData.RemoveRange(0, bytesToDelete);
+
+                    // Convert the list of bytes back to byte array
+                    byte[] byteArrayModified = byteData.ToArray();
+
+                    // Determine the dimensions of the original image
+                    int width = 640;  // Adjust according to your image width
+                    int height = 480;  // Adjust according to your image height
+
+                    // Calculate the new dimensions of the image after removing bytes
+                    int newWidth = width;  // Since bytes removed from the beginning don't affect width
+                    int newHeight = height - (bytesToDelete / width);  // Adjust height accordingly
+
+                    // Convert byte array to BitmapImage
+                    BitmapImage bitmapImage = ByteArrayToBitmapImage(byteArrayModified);
+                    // Display the image in an Image control
+                    //displayedImage.Source = bitmapImage;
+                    //displayedImage.Stretch = System.Windows.Media.Stretch.Fill; // Adjust the stretch mode as needed
+                                                                                // Set the source of the Image control to display an image file
+                }
+                catch (Exception ex)
+                {
+                    PrintLog("Error", "Unable to connect to", $"{host}:{port}");
+                }
+            }
+
+        }
+
+        // Method to convert byte array to BitmapImage
+        private BitmapImage ByteArrayToBitmapImage(byte[] byteArray)
+        {
+            BitmapImage bitmapImage = new BitmapImage();
+            using (MemoryStream stream = new MemoryStream(byteArray))
+            {
+                stream.Position = 0;
+                bitmapImage.BeginInit();
+                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapImage.StreamSource = stream;
+                bitmapImage.EndInit();
+            }
+            return bitmapImage;
         }
         public double[] InverseKinematics(Vector3D target, double[] angles)
         {
@@ -1649,6 +1757,7 @@ namespace RobotArmHelix
             return (value_positon2 << 16 | value_positon1) - 18000000;
         }
 
+
         private async void TCP_Connect_button_Click(object sender, RoutedEventArgs e)
         {
             // Call the StartClient method to initiate the connection and communication with the server
@@ -1782,9 +1891,133 @@ namespace RobotArmHelix
 
         }
 
-        private void Camera_button_Click(object sender, RoutedEventArgs e)
+        // Helper method to wait for response or timeout
+        static bool WaitForResponse(Socket socket, TimeSpan timeout)
         {
-            timer3.Start();
+            DateTime startTime = DateTime.Now;
+            while ((DateTime.Now - startTime) < timeout)
+            {
+                if (socket.Poll(1000, SelectMode.SelectRead) && socket.Available > 0)
+                {
+                    // Response received before timeout
+                    return true;
+                }
+            }
+            // Timeout occurred
+            return false;
+        }
+
+        private async void Camera_button_Click(object sender, RoutedEventArgs e)
+        {
+            //timer3.Start();
+            // Create a socket object
+            using (Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+            {
+                // Connect to the server
+                string host = "192.168.0.49";
+                int port = Convert.ToInt16("2011");
+
+                //try
+                //{
+                    clientSocket.Connect(host, port);
+
+                    string CaptureImageMessage = "1003t\r\n";
+                    byte[] CaptureImageBytes = Encoding.ASCII.GetBytes(CaptureImageMessage);
+                    clientSocket.Send(CaptureImageBytes);
+                    // Receive the response from the server
+                    var buffer = new byte[308295];
+                    int bytesRead = clientSocket.Receive(buffer);
+
+                    await Task.Delay(100);
+
+                    string RequestImageMessage = "1003I?\r\n";
+                    // Send the command to the server
+                    byte[] RequestImageBytes = Encoding.ASCII.GetBytes(RequestImageMessage);
+                    clientSocket.Send(RequestImageBytes);
+
+                    string sentencetosend = "1003I?\r\n";
+
+                    // Receive the response from the server
+                    buffer = new byte[308295];
+                    bytesRead = clientSocket.Receive(buffer);
+                    Console.WriteLine(Encoding.ASCII.GetString(buffer, 0, bytesRead));
+
+                    if (RequestImageMessage == sentencetosend)
+                    {
+                        response_client = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                        PrintLog("", "", response_client);
+                        //Console.WriteLine(response_client);
+                        while (bytesRead < 308291)
+                        {
+                            bytesRead += clientSocket.Receive(buffer, bytesRead, 308291 - bytesRead, SocketFlags.None);
+                        }
+                    }
+
+                    Console.WriteLine("Im here");
+
+                    response_client = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                    PrintLog("Data received", "", response_client);
+
+                    // Sentences to remove
+                    string[] sentencesToRemove = { "1003000308278", "1003*", "1003?", "1003000307200" };
+
+                    // Loop through each sentence and replace it with an empty string
+                    foreach (string sentence in sentencesToRemove)
+                    {
+                        response_client = response_client.Replace(sentence, "");
+                    }
+
+                    // Convert the modified response string back to bytes
+                    byte[] modifiedBuffer = Encoding.ASCII.GetBytes(response_client);
+                    Console.WriteLine(modifiedBuffer.Length);
+                    // Convert each byte to its string representation
+                    string bmpString = string.Join(" ", modifiedBuffer);
+                    // Split the byte string into individual byte values
+                    string[] byteValues = bmpString.Split();
+
+                    // Convert each byte value from string to integer
+                    List<byte> byteData = new List<byte>();
+
+                    
+                    foreach (string byteString in byteValues)
+                    {
+                        byteData.Add(Convert.ToByte(byteString));
+                    }
+                Console.WriteLine(byteValues[10]);
+                // Define the number of bytes to delete from the beginning
+                int bytesToDelete = 1080; // Adjust this number according to your requirement
+
+                    // Delete the specified number of bytes from the beginning
+                    byteData.RemoveRange(0, bytesToDelete);
+
+                    // Convert the list of bytes back to byte array
+                    byte[] byteArrayModified = byteData.ToArray();
+
+                    // Determine the dimensions of the original image
+                    int width = 640;  // Adjust according to your image width
+                    int height = 480;  // Adjust according to your image height
+
+                    // Calculate the new dimensions of the image after removing bytes
+                    int newWidth = width;  // Since bytes removed from the beginning don't affect width
+                    int newHeight = height - (bytesToDelete / width);  // Adjust height accordingly
+
+                    // Convert byte array to BitmapImage
+                    BitmapImage bitmapImage = ByteArrayToBitmapImage(byteArrayModified);
+
+                    // Create a new instance of the ImageWindow
+                    ImageWindow imageWindow = new ImageWindow();
+
+                    // Display the image in an Image control
+                    imageWindow.displayedImage.Source = bitmapImage;
+                    imageWindow.displayedImage.Stretch = System.Windows.Media.Stretch.Fill; // Adjust the stretch mode as needed
+                                                                                // Set the source of the Image control to display an image file
+                //}
+                //catch (Exception ex)
+                //{
+                //    PrintLog("Error", "Unable to connect to", $"{host}:{port}");
+                //}
+            }
+
         }
 
 
