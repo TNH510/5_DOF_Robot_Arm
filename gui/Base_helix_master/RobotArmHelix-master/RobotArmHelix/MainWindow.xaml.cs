@@ -1707,6 +1707,7 @@ namespace RobotArmHelix
                     }
                     
                     response_client = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                    PrintLog("Data received", "", response_client);
 
                     // Specify the folder path where you want to save the file
                     string folderPath = @"C:\Users\daveb\Desktop\raw_data\";
@@ -1754,7 +1755,7 @@ namespace RobotArmHelix
                 string filePath_bytes = System.IO.Path.Combine(folderPath, "response_bytes.txt");
 
                 // Read binary data from file
-                byte[] modifiedBuffer = File.ReadAllBytes(filePath_bmp);
+                byte[] modifiedBuffer = File.ReadAllBytes(filePath_bytes);
 
                 // Convert each byte to its string representation
                 string bmpString = string.Join(" ", modifiedBuffer);

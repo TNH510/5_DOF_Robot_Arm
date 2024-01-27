@@ -1,8 +1,10 @@
 from PIL import Image
 import numpy as np
 
+#"C:/Users/daveb/Desktop/5_DOF_Robot_Arm/gui/Camera/raw_data/response_bmp.txt"
+#"C:/Users/daveb/Desktop/raw_data/response_bmp.txt"
 # Read the byte string from the file
-with open("C:/Users/daveb/Desktop/5_DOF_Robot_Arm/gui/Camera/raw_data/response_bmp.txt", "r") as file:
+with open("C:/Users/daveb/Desktop/raw_data/response_bmp.txt", "r") as file:
     byte_string = file.read()
 
 # Split the byte string into individual byte values
