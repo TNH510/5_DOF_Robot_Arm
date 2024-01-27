@@ -101,5 +101,6 @@
         <Label Content="Data" HorizontalAlignment="Left" Margin="318,300,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="23" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
         <Button x:Name="Bitmap_cvt_button" Content="Bitmap Convert" HorizontalAlignment="Left" Margin="320,373,0,0" VerticalAlignment="Top" Width="123" Height="23" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Bitmap_cvt_button_Click"/>
         <Button x:Name="Camera_button" Content="Camera" HorizontalAlignment="Left" Margin="469,373,0,0" VerticalAlignment="Top" Width="123" Height="23" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Camera_button_Click"/>
+        <Image x:Name="displayedImage2" Stretch="Uniform" Visibility="Collapsed"/>
     </Grid>
 </Window>
