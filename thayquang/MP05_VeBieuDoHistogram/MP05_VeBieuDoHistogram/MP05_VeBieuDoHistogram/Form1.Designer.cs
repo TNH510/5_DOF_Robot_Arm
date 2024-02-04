@@ -35,7 +35,6 @@
             this.zedGraphHistogram = new ZedGraph.ZedGraphControl();
             this.Connect_btn = new System.Windows.Forms.Button();
             this.Image_btn = new System.Windows.Forms.Button();
-            this.Disconnect_btn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox_Hinhgoc)).BeginInit();
             this.SuspendLayout();
             // 
@@ -99,7 +98,7 @@
             // 
             // Image_btn
             // 
-            this.Image_btn.Location = new System.Drawing.Point(423, 46);
+            this.Image_btn.Location = new System.Drawing.Point(224, 46);
             this.Image_btn.Name = "Image_btn";
             this.Image_btn.Size = new System.Drawing.Size(174, 46);
             this.Image_btn.TabIndex = 13;
@@ -107,22 +106,11 @@
             this.Image_btn.UseVisualStyleBackColor = true;
             this.Image_btn.Click += new System.EventHandler(this.Image_btn_Click);
             // 
-            // Disconnect_btn
-            // 
-            this.Disconnect_btn.Location = new System.Drawing.Point(220, 46);
-            this.Disconnect_btn.Name = "Disconnect_btn";
-            this.Disconnect_btn.Size = new System.Drawing.Size(174, 46);
-            this.Disconnect_btn.TabIndex = 14;
-            this.Disconnect_btn.Text = "Disconnect";
-            this.Disconnect_btn.UseVisualStyleBackColor = true;
-            this.Disconnect_btn.Click += new System.EventHandler(this.Disconnect_btn_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1351, 662);
-            this.Controls.Add(this.Disconnect_btn);
             this.Controls.Add(this.Image_btn);
             this.Controls.Add(this.Connect_btn);
             this.Controls.Add(this.zedGraphHistogram);
@@ -147,7 +135,6 @@
         private ZedGraph.ZedGraphControl zedGraphHistogram;
         private System.Windows.Forms.Button Connect_btn;
         private System.Windows.Forms.Button Image_btn;
-        private System.Windows.Forms.Button Disconnect_btn;
     }
 }
 

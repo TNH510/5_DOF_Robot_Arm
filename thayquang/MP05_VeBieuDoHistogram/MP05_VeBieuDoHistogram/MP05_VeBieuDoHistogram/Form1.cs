@@ -155,7 +155,6 @@ namespace MP03_ChuyenAnhMauRGBsangGrayscale
         private void Connect_btn_Click(object sender, EventArgs e)
         {
             Connect_btn.Enabled = false;
-            Disconnect_btn.Enabled = true;
             // Connect to the server
             string host = "192.168.0.49";
             int port = Convert.ToInt16("2011");
@@ -175,8 +174,6 @@ namespace MP03_ChuyenAnhMauRGBsangGrayscale
         private void Image_btn_Click(object sender, EventArgs e)
         {
             // Perform your desired action here
-            string filepathtosave = @"C:\Users\daveb\Desktop\raw_data\Image\";
-            // Perform your desired action here
             string CaptureImageMessage = "1003t\r\n";
             byte[] CaptureImageBytes = Encoding.ASCII.GetBytes(CaptureImageMessage);
             clientSocket.Send(CaptureImageBytes);
@@ -184,7 +181,7 @@ namespace MP03_ChuyenAnhMauRGBsangGrayscale
             var buffer = new byte[308295];
             int bytesRead = clientSocket.Receive(buffer);
 
-            System.Threading.Thread.Sleep(500); // Simulating a 2-second delay
+            System.Threading.Thread.Sleep(100); // Simulating 100ms delay
 
             string RequestImageMessage = "1003I?\r\n";
             // Send the command to the server
@@ -296,8 +293,6 @@ namespace MP03_ChuyenAnhMauRGBsangGrayscale
             zedGraphHistogram.Width = 640;
             zedGraphHistogram.Width = 480;
             zedGraphHistogram.Refresh();
-
-
         }
 
         public static byte[,] ConvertTo2DArray(byte[] array1D, int rows, int columns)
@@ -318,9 +313,6 @@ namespace MP03_ChuyenAnhMauRGBsangGrayscale
                     }
                     else
                     {
-                        // If there are not enough elements, you may handle this case according to your requirements
-                        // For example, you can fill remaining elements with default values or throw an exception
-                        // Here, I'm filling remaining elements with 0
                         array2D[i, j] = 0;
                     }
                 }
@@ -328,20 +320,5 @@ namespace MP03_ChuyenAnhMauRGBsangGrayscale
             return array2D;
         }
 
-        private void Disconnect_btn_Click(object sender, EventArgs e)
-        {
-            Connect_btn.Enabled = true;
-            Disconnect_btn.Enabled = false;
-            try
-            {
-                clientSocket.Close();
-                Console.WriteLine("Disconnected");
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Unable to disconnect");
-            }
-        }
     }
 }
