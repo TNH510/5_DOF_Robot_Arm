@@ -36,6 +36,10 @@
             this.Connect_btn = new System.Windows.Forms.Button();
             this.Image_btn = new System.Windows.Forms.Button();
             this.Disconnect_btn = new System.Windows.Forms.Button();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox_Hinhgoc)).BeginInit();
             this.SuspendLayout();
             // 
@@ -85,6 +89,7 @@
             this.zedGraphHistogram.ScrollMinY2 = 0D;
             this.zedGraphHistogram.Size = new System.Drawing.Size(640, 480);
             this.zedGraphHistogram.TabIndex = 10;
+            this.zedGraphHistogram.UseExtendedPrintDialog = true;
             this.zedGraphHistogram.Load += new System.EventHandler(this.zedGraph_Load);
             // 
             // Connect_btn
@@ -117,11 +122,58 @@
             this.Disconnect_btn.UseVisualStyleBackColor = true;
             this.Disconnect_btn.Click += new System.EventHandler(this.Disconnect_btn_Click);
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.label3.ForeColor = System.Drawing.Color.Red;
+            this.label3.Location = new System.Drawing.Point(866, 46);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(280, 25);
+            this.label3.TabIndex = 17;
+            this.label3.Text = "Địa chỉ mặc định: 192.168.0.49";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.label4.ForeColor = System.Drawing.Color.Red;
+            this.label4.Location = new System.Drawing.Point(866, 71);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(102, 25);
+            this.label4.TabIndex = 18;
+            this.label4.Text = "Port: 2011";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.label5.ForeColor = System.Drawing.Color.Red;
+            this.label5.Location = new System.Drawing.Point(866, 96);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(205, 25);
+            this.label5.TabIndex = 19;
+            this.label5.Text = "Connect -> Get Image";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.label6.Location = new System.Drawing.Point(790, 46);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(70, 25);
+            this.label6.TabIndex = 20;
+            this.label6.Text = "Chú ý:";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1351, 662);
+            this.Controls.Add(this.label6);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.label3);
             this.Controls.Add(this.Disconnect_btn);
             this.Controls.Add(this.Image_btn);
             this.Controls.Add(this.Connect_btn);
@@ -148,6 +200,10 @@
         private System.Windows.Forms.Button Connect_btn;
         private System.Windows.Forms.Button Image_btn;
         private System.Windows.Forms.Button Disconnect_btn;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label6;
     }
 }
 

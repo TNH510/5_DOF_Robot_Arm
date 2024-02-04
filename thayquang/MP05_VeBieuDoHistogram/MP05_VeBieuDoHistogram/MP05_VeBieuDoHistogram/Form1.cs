@@ -343,5 +343,10 @@ namespace MP03_ChuyenAnhMauRGBsangGrayscale
                 Console.WriteLine("Unable to disconnect");
             }
         }
+
+        private void label3_Click_1(object sender, EventArgs e)
+        {
+
+        }
     }
 }
