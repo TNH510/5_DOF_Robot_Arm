@@ -110,7 +110,7 @@ namespace MP03_ChuyenAnhMauRGBsangGrayscale
             GraphPane gp = new GraphPane();
 
             gp.Title.Text = @"Biểu đồ Histogram";
-            gp.Rect = new Rectangle(0, 0, 700, 500);//Khung chua bieu do
+            gp.Rect = new Rectangle(0, 0, 640, 480);//Khung chua bieu do
 
             //Thiet lap truc ngang
             gp.XAxis.Title.Text = @"Giá trị mức xám của các điểm ảnh";
@@ -184,7 +184,7 @@ namespace MP03_ChuyenAnhMauRGBsangGrayscale
             var buffer = new byte[308295];
             int bytesRead = clientSocket.Receive(buffer);
 
-            System.Threading.Thread.Sleep(1000); // Simulating a 2-second delay
+            System.Threading.Thread.Sleep(500); // Simulating a 2-second delay
 
             string RequestImageMessage = "1003I?\r\n";
             // Send the command to the server
@@ -293,7 +293,10 @@ namespace MP03_ChuyenAnhMauRGBsangGrayscale
 
             //Ve bieu do histogram va cho hien thi
             zedGraphHistogram.GraphPane = BieudoHistogram(points);
+            zedGraphHistogram.Width = 640;
+            zedGraphHistogram.Width = 480;
             zedGraphHistogram.Refresh();
+
 
         }
 
