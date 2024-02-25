@@ -21,6 +21,7 @@ using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Net.Sockets;
+using System.IO.Ports;
 
 
 
@@ -67,6 +68,9 @@ namespace RobotArmHelix
         public ActUtlType plc = new();
         List<Joint> joints = null;
         int move = 0; /* move = 1 -> MoveJ, move = 2 -> MoveL */
+
+        // UART
+        private SerialPort uart = new SerialPort("COM12", 115200);
 
         bool switchingJoint = false;
         bool isAnimating = false;
@@ -961,6 +965,18 @@ namespace RobotArmHelix
         private void GoHome_button_Click(object sender, RoutedEventArgs e)
         {
             Press_button(MethodBase.GetCurrentMethod().Name, Constants.R_GOHOME);
+
+            try
+            {
+                uart.Open();
+                uart.WriteLine("hello");
+                uart.Close();
+                MessageBox.Show("Data sent successfully!");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error sending data: " + ex.Message);
+            }
         }
 
         private void Jog_set_speed_Click(object sender, RoutedEventArgs e)
