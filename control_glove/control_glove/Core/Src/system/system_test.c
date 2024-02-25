@@ -50,8 +50,9 @@ system_test_error_t system_test_polling(void)
 
     drv_magnetic_data_t magnetic_data;
     drv_magnetic_get_data(&magnetic_data);
-    printf(" XAxis %d , YAxis %d , ZAxis %d\r\n",(int)magnetic_data.XAxis*100,(int)magnetic_data.YAxis*100,(int)magnetic_data.ZAxis*100);
-    HAL_Delay(500);
+//    printf(" XAxis %d , YAxis %d , ZAxis %d\r\n",(int)magnetic_data.XAxis,(int)magnetic_data.YAxis,(int)magnetic_data.ZAxis);
+    printf("%d\r\n",(int)magnetic_data.XAxis);
+    HAL_Delay(50);
 
     return SYSTEM_TEST_OK;
 }

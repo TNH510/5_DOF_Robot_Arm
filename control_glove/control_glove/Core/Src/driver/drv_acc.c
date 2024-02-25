@@ -23,6 +23,11 @@ base_status_t drv_acc_init(void)
     return BS_OK;
 }
 
+base_status_t drv_acc_get_data(drv_acc_data_t *acc_data)
+{
+	return BS_OK;
+}
+
 /* Private implementations -------------------------------------------------- */
 
 
