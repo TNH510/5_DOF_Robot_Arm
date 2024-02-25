@@ -11,6 +11,7 @@
 #include "system_test.h"
 #include "drv_uart.h"
 #include "drv_button.h"
+#include "drv_magnetic.h"
 
 /* Private includes --------------------------------------------------------- */
 /* Private defines ---------------------------------------------------------- */
@@ -25,6 +26,7 @@ system_test_error_t system_test_init(void)
 {
     drv_uart_init(); 
     drv_button_init();
+    drv_magnetic_init();
 }
 
 system_test_error_t system_test_general(void)
@@ -35,21 +37,21 @@ system_test_error_t system_test_general(void)
 
 system_test_error_t system_test_polling(void)
 {
-    drv_button_check_event(&button_state);
+    // drv_button_check_event(&button_state);
 
-    if (button_state == CLICK_SELECT_BUTTON)
-    {
-        drv_uart_printf("Clicking...");
-    }
-    else if (button_state == HOLD_SELECT_BUTTON)
-    {
-        drv_uart_printf("Holding...");
-    }
-
-    // if (HAL_GPIO_ReadPin(USER_BUTTON_GPIO_Port, USER_BUTTON_Pin) == 0)
+    // if (button_state == CLICK_SELECT_BUTTON)
     // {
-    // 	HAL_GPIO_TogglePin(USER_LED_GPIO_Port, USER_LED_Pin);
+    //     drv_uart_printf("Clicking...");
     // }
+    // else if (button_state == HOLD_SELECT_BUTTON)
+    // {
+    //     drv_uart_printf("Holding...");
+    // }
+
+    drv_magnetic_data_t magnetic_data;
+    drv_magnetic_get_data(&magnetic_data);
+    printf(" XAxis %d , YAxis %d , ZAxis %d\r\n",(int)magnetic_data.XAxis*100,(int)magnetic_data.YAxis*100,(int)magnetic_data.ZAxis*100);
+    HAL_Delay(500);
 
     return SYSTEM_TEST_OK;
 }

@@ -20,8 +20,25 @@
 /* Public implementations --------------------------------------------------- */
 base_status_t drv_magnetic_init(void)
 {
+    HMC5883L_setRange(HMC5883L_RANGE_1_3GA);
+	HMC5883L_setMeasurementMode(HMC5883L_CONTINOUS);
+	HMC5883L_setDataRate(HMC5883L_DATARATE_15HZ);
+	HMC5883L_setSamples(HMC5883L_SAMPLES_1);
+	HMC5883L_setOffset(0, 0);
+
     return BS_OK;
 }
+
+base_status_t drv_magnetic_get_data(drv_magnetic_data_t *magnetic_data)
+{
+    Vector mag = HMC5883L_readNormalize();
+    magnetic_data->XAxis = mag.XAxis;
+    magnetic_data->YAxis = mag.YAxis;
+    magnetic_data->ZAxis = mag.ZAxis;
+
+    return BS_OK;
+}
+
 
 /* Private implementations -------------------------------------------------- */
 
