@@ -17,13 +17,22 @@ extern "C" {
 
 /* Includes ----------------------------------------------------------------- */
 #include <stdint.h>
+#include "bsp_hmc5883l.h"
 
 /* Public defines ----------------------------------------------------------- */
 /* Public enumerate/structure ----------------------------------------------- */
+typedef struct 
+{
+    float XAxis;
+    float YAxis;
+    float ZAxis;    
+} drv_magnetic_data_t;
+
 /* Public macros ------------------------------------------------------------ */
 /* Public variables --------------------------------------------------------- */
 /* Public APIs -------------------------------------------------------------- */
-
+base_status_t drv_magnetic_init(void);
+base_status_t drv_magnetic_get_data(drv_magnetic_data_t *magnetic_data);
 
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus

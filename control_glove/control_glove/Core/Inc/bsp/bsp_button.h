@@ -18,6 +18,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include "bsp_common.h"
 /* Public defines ----------------------------------------------------- */
 #define USER_BUTTON_Pin GPIO_PIN_14
 #define USER_BUTTON_GPIO_Port GPIOC

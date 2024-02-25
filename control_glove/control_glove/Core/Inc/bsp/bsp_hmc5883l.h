@@ -9,6 +9,7 @@
 
 #include <inttypes.h>
 #include "stm32f4xx_hal.h"
+#include "bsp_common.h"
 
 #ifdef __cplusplus
 extern "C" {

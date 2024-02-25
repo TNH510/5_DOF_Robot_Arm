@@ -18,6 +18,7 @@
 /* Includes ----------------------------------------------------------- */
 #include "main.h"
 #include "stdbool.h"
+#include "bsp_common.h"
 /* Public defines ----------------------------------------------------- */
 
 /* Public enumerate/structure ----------------------------------------- */

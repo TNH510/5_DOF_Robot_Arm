@@ -17,6 +17,7 @@ extern "C" {
 
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_hal_i2c.h"
+#include "bsp_common.h"
 
 /**
  * @defgroup SD_MPU6050_Macros

@@ -19,6 +19,7 @@
 /* Includes ----------------------------------------------------------- */
 #include "cbuffer.h"
 #include "main.h"
+#include "bsp_common.h"
 
 #include <string.h>
 /* Public defines ---------------------------------------------------- */

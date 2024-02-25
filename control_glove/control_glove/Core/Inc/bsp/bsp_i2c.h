@@ -21,6 +21,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include "bsp_common.h"
 /* Public defines ----------------------------------------------------- */
 #define BSP_I2C1    1
 #define BSP_I2C2    1
