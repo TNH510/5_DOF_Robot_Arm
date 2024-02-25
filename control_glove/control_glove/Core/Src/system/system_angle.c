@@ -1,14 +1,14 @@
 /**
- * @file       drv_magnetic.c
+ * @file       system_angle.c
  * @copyright  Copyright (C) 2024 TNH510
  * @version    1.0.0
  * @date       2024-02
  * @author     Hieu Tran
- * @brief      Driver for magetic module
+ * @brief      System module for angle processing       
  * @note       None
  */
 /* Public includes ---------------------------------------------------------- */
-#include "drv_magnetic.h"
+#include "system_angle.h"
 
 /* Private includes --------------------------------------------------------- */
 /* Private defines ---------------------------------------------------------- */
