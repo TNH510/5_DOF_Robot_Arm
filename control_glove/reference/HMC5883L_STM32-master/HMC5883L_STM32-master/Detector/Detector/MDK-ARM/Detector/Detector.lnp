@@ -1,0 +1,26 @@
+--cpu Cortex-M3
+"detector\startup_stm32f103xb.o"
+"detector\hmc5883l.o"
+"detector\main.o"
+"detector\stm32f1xx_it.o"
+"detector\stm32f1xx_hal_msp.o"
+"detector\stm32f1xx_hal_gpio_ex.o"
+"detector\stm32f1xx_hal_i2c.o"
+"detector\stm32f1xx_hal.o"
+"detector\stm32f1xx_hal_rcc.o"
+"detector\stm32f1xx_hal_rcc_ex.o"
+"detector\stm32f1xx_hal_gpio.o"
+"detector\stm32f1xx_hal_dma.o"
+"detector\stm32f1xx_hal_cortex.o"
+"detector\stm32f1xx_hal_pwr.o"
+"detector\stm32f1xx_hal_flash.o"
+"detector\stm32f1xx_hal_flash_ex.o"
+"detector\stm32f1xx_hal_exti.o"
+"detector\stm32f1xx_hal_tim.o"
+"detector\stm32f1xx_hal_tim_ex.o"
+"detector\stm32f1xx_hal_uart.o"
+"detector\system_stm32f1xx.o"
+--library_type=microlib --strict --scatter "Detector\Detector.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "Detector.map" -o Detector\Detector.axf
