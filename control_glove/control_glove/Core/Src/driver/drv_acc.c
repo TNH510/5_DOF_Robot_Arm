@@ -25,7 +25,7 @@ static SD_MPU6050 g_acc;
 base_status_t drv_acc_init(void)
 {
 	SD_MPU6050_Result result;
-	result = SD_MPU6050_Init(&hi2c1,&g_acc,SD_MPU6050_Device_0,SD_MPU6050_Accelerometer_2G,SD_MPU6050_Gyroscope_250s);
+	result = SD_MPU6050_Init(&hi2c1,&g_acc,SD_MPU6050_Device_0,SD_MPU6050_Accelerometer_2G,SD_MPU6050_DataRate_250Hz);
     if(result == SD_MPU6050_Result_Ok)
     {
         return BS_OK;
