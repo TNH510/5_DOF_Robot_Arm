@@ -12,6 +12,7 @@
 #include "drv_uart.h"
 #include "drv_button.h"
 #include "drv_magnetic.h"
+#include "drv_acc.h"
 
 /* Private includes --------------------------------------------------------- */
 /* Private defines ---------------------------------------------------------- */
@@ -27,6 +28,7 @@ system_test_error_t system_test_init(void)
     drv_uart_init(); 
     drv_button_init();
     drv_magnetic_init();
+    drv_acc_init();
 }
 
 system_test_error_t system_test_general(void)
@@ -48,10 +50,10 @@ system_test_error_t system_test_polling(void)
     //     drv_uart_printf("Holding...");
     // }
 
-    drv_magnetic_data_t magnetic_data;
-    drv_magnetic_get_data(&magnetic_data);
-//    printf(" XAxis %d , YAxis %d , ZAxis %d\r\n",(int)magnetic_data.XAxis,(int)magnetic_data.YAxis,(int)magnetic_data.ZAxis);
-    printf("%d,%d,%d\r\n",(int)magnetic_data.XAxis,(int)magnetic_data.YAxis,(int)magnetic_data.ZAxis);
+    drv_acc_data_t acc_data;
+    drv_acc_get_data(&acc_data);
+    // printf("%d,%d,%d\r\n",(int)acc_data.acc_x,(int)acc_data.acc_y,(int)acc_data.acc_z);
+    printf("%d,%d,%d\r\n",(int)acc_data.gy_x,(int)acc_data.gy_y,(int)acc_data.gy_z);
     HAL_Delay(50);
 
     return SYSTEM_TEST_OK;
