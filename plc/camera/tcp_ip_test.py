@@ -12,7 +12,7 @@ def connect_to_device(ip, port):
         print(f"Kết nối thành công tới {ip}:{port}")
         
         # Gửi lệnh tới thiết bị
-        command = "1002V?\r\n"
+        command = "1002D?\r\n"
         sock.sendall(command.encode())
         
         # Nhận phản hồi từ thiết bị
