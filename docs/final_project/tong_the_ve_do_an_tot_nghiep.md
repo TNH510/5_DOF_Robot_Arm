@@ -14,10 +14,18 @@
   
 ![Găng tay điều khiển](gang_tay.svg)
 
-## Các nhiệm vụ cần làm
-+ Thiết kế giải thuật điều khiển robot với quỹ đạo thay đổi liên tục
-+ Thiết kế bộ tay gắp bằng giác hút cho robot
-+ Lập trình giao diện tạo quỹ đạo cho robot và tự động xác định các vùng bị giới hạn hoạt động
-+ Import hệ thống băng tải vào giao diện điều khiển
-+ Clean và review lại giao diện điều khiển và tối ưu hóa lại
-+ Thiết kế mạch, phần cứng, lấy data, giải thuật lọc nhiễu, xử lí góc, send log về máy tính từ găng tay
+## Phân chia nhiệm vụ chung
+
++ Hiểu: Găng tay + quản lí chung
++ Thạch: Tool C# + xử lí ảnh
++ Lộc: Đầu tay gắp + PLC (robot, băng tải)
+  
+## Các nhiệm vụ cần làm 
+
++ Thiết kế bộ tay gắp bằng giác hút cho robot [Loc]
++ Lập trình điều khiển cho PLC [Loc]
++ Lập trình giao diện tạo quỹ đạo cho robot và tự động xác định các vùng bị giới hạn hoạt động [Thach]
++ Import hệ thống băng tải vào giao diện điều khiển [Thach]
++ Clean và review lại giao diện điều khiển và tối ưu hóa lại [Thach]
++ Thiết kế giải thuật điều khiển robot với quỹ đạo thay đổi liên tục [Hieu]
++ Thiết kế mạch, phần cứng, lấy data, giải thuật lọc nhiễu, xử lí góc, send log về máy tính từ găng tay [Hieu]
