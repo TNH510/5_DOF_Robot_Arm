@@ -17,6 +17,7 @@
 /* Private defines ---------------------------------------------------- */
 #define BSP_I2C_TIMEOUT     100
 #define BSP_I2C_TIMEOUT_DMA 50000
+#define BSP_I2C1            1
 
 /* Private enumerate/structure ---------------------------------------- */
 #if BSP_I2C_DMA == 1

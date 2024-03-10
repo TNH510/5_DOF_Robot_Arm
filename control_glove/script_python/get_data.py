@@ -51,6 +51,6 @@ while True:
                 ax.relim()
                 ax.autoscale_view()
 
-                plt.pause(0.001)  # Tạm dừng một chút để đồ thị được cập nhật
+                plt.pause(0.1)  # Tạm dừng một chút để đồ thị được cập nhật
             except ValueError:
                 pass

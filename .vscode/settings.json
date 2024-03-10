@@ -4,6 +4,12 @@
         "bsp_button.h": "c",
         "system_manager.h": "c",
         "system_test.h": "c",
-        "drv_uart.h": "c"
+        "drv_uart.h": "c",
+        "bsp_i2c.h": "c",
+        "math.h": "c",
+        "bsp_mpu6050.h": "c",
+        "drv_acc.h": "c",
+        "*.txt": "c",
+        "stdint.h": "c"
     }
 }
