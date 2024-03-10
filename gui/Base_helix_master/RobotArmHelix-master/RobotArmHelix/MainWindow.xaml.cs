@@ -2144,19 +2144,24 @@ namespace RobotArmHelix
             string data = uart.ReadExisting();
             Dispatcher.Invoke(() =>
             {
-                ErrorLog.Text = data;
-                StartReadingData(data);
-                returnZaxis = Convert.ToDouble(data);
+                try
+                {
+                    ErrorLog.Text = data;
+                    StartReadingData(data);
+                    returnZaxis = Convert.ToDouble(data);
+                }
+                catch
+                {
+
+                }
+
             });
         }
 
         private void Glove_disconnect_button_Click(object sender, RoutedEventArgs e)
         {
-            if (uart.IsOpen)
-            {
-                uart.Close();
-                progressbar1.Value = 0;
-            }
+            uart.Close();
+            progressbar1.Value = 0;
         }
 
 
@@ -2167,7 +2172,7 @@ namespace RobotArmHelix
             double returnZ = 0;
             // Split received data by comma and space, and process each number
             //string[] numbers = receivedData.Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            string numbers = receivedData;
+            string numbers = receivedData.TrimEnd('\r', '\n');
             try
             {
                 //double num1 = double.Parse(numbers[0]);
@@ -2198,6 +2203,10 @@ namespace RobotArmHelix
             PrintLog("Infor", "Data received", receivedData);
         }
 
+        private void spd_tb_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
 
         public void turn_on_1_pulse_relay(int device)
         {
