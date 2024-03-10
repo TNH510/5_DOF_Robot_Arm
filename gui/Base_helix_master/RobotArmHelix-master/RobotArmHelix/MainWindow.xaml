@@ -130,5 +130,7 @@
             <ComboBoxItem>Even</ComboBoxItem>
         </ComboBox>
         <ProgressBar x:Name="progressbar1" HorizontalAlignment="Left" Height="23" Margin="324,614,0,0" VerticalAlignment="Top" Width="270"/>
+        <Rectangle Fill="#FF181E36" HorizontalAlignment="Left" Height="78" Stroke="#FF007EF9" VerticalAlignment="Top" Width="304" StrokeThickness="0.5" Margin="304,652,0,0"/>
+        <Button x:Name="RUN_ALL" Content="RUN" HorizontalAlignment="Left" Margin="349,664,0,0" VerticalAlignment="Top" Width="208" Height="48" FontSize="20" Click="run_all_bttn_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF181E36" FontWeight="Bold" BorderBrush="#FF181E36" Background="#FF007EF9"/>
     </Grid>
 </Window>

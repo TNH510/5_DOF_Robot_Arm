@@ -2198,6 +2198,163 @@ namespace RobotArmHelix
             PrintLog("Infor", "Data received", receivedData);
         }
 
+        private void run_all_bttn_Click(object sender, RoutedEventArgs e)
+        {
+            /* Connect */
+            /* Disable slider */
+            joint1.IsEnabled = false;
+            joint2.IsEnabled = false;
+            joint3.IsEnabled = false;
+            joint4.IsEnabled = false;
+            joint5.IsEnabled = false;
+            /* Disable test position button */
+            testpos_bttn = false;
+            /* Change the color of the button when clicked */
+            ChangeColorObjectBackground(TestPos_bttn, Constants.OBJECT_MODIFIED);
+            ChangeColorObjectForeground(TestPos_bttn, Constants.OBJECT_MODIFIED1);
+            ChangeColorObjectBorderBrush(TestPos_bttn, Constants.OBJECT_MODIFIED);
+
+            /* Declare the variable(s) */
+            int ret;
+            /* A logical station number set in Communication Setup Utility - Datasheet - Page 61 */
+            plc.ActLogicalStationNumber = 1;
+            /* Open the connection between PLC and C# - Datasheet - Page 381 */
+            ret = plc.Open();
+            /* Return value
+               Normal termination : 0 is returned.
+               Abnormal termination: Any value other than 0 is returned
+            */
+            if (ret == 0 && cn_bttn == true)
+            {
+                //Connect_button.IsEnabled = false;
+                //Disconnect_button.IsEnabled = true;
+                cn_bttn = false;
+                ds_bttn = true;
+                /* Change the color of the button when clicked */
+                ChangeColorObjectBackground(Connect_button, Constants.OBJECT_MODIFIED);
+                ChangeColorObjectBackground(Disconnect_button, Constants.OBJECT_MODIFIED1);
+                ChangeColorObjectForeground(Connect_button, Constants.OBJECT_MODIFIED1);
+                ChangeColorObjectForeground(Disconnect_button, Constants.OBJECT_MODIFIED);
+                ChangeColorObjectBorderBrush(Disconnect_button, Constants.OBJECT_MODIFIED);
+                /* 
+                    Print the log command
+                    MethosBase.GetCurrentMethod returns the action user did.
+                */
+                PrintLog("Info", MethodBase.GetCurrentMethod().Name, "Connect PLC successfully");
+            }
+            else if (ds_bttn == true)
+            {
+                PrintLog("Infor", MethodBase.GetCurrentMethod().Name, "PLC was connected");
+            }
+            else
+            {
+                PrintLog("Error", MethodBase.GetCurrentMethod().Name, "Connect PLC unsuccessfully");
+            }
+            /* Read the servo mode */
+            int servo_status;
+            string getName = MethodBase.GetCurrentMethod().Name;
+            /* Read status of Brake and AC Servo */
+            ret = PLCReadbit(Constants.R_SERVO_ON, out servo_status);
+            if (ret != 0)
+            {
+                PrintLog("Error", getName, "Read PLC Fail");
+                return;
+            }
+            if (servo_status == 0) /* Servo is currently off */
+            {
+                Servo_button.Content = "Servo: off";
+                ChangeColorObjectBackground(Servo_button, Constants.OBJECT_MODIFIED1);
+                ChangeColorObjectForeground(Servo_button, Constants.OBJECT_MODIFIED);
+                PrintLog("SERVO:", servo_status.ToString(), "OFF");
+
+                /* Reverse bit: OnServo_status == 1 */
+                Servo_button.Content = "Servo: on";
+
+                /* Change the color of the button when clicked */
+                ChangeColorObjectBackground(Servo_button, Constants.OBJECT_MODIFIED);
+                ChangeColorObjectForeground(Servo_button, Constants.OBJECT_MODIFIED1);
+
+                PrintLog("SERVO:", servo_status.ToString(), "ON");
+                ret = PLCWritebit(Constants.R_SERVO_ON, (~servo_status) & 0x01);
+                if (ret != 0)
+                {
+                    PrintLog("Error", getName, "Write PLC Fail");
+                    return;
+                }
+
+            }
+            else
+            {
+                Servo_button.Content = "Servo: on";
+                ChangeColorObjectBackground(Servo_button, Constants.OBJECT_MODIFIED);
+                ChangeColorObjectForeground(Servo_button, Constants.OBJECT_MODIFIED1);
+                PrintLog("SERVO:", servo_status.ToString(), "ON");
+            }
+            /* End connect */
+            /* Set speed for Servo */
+            int velocity;
+            try
+            {
+                velocity = Convert.ToInt32("300") * 1000;
+                write_d_mem_32_bit(1008, velocity);
+                PrintLog("Info", MethodBase.GetCurrentMethod().Name, "Set Velocity successfully");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            /* End set speed for Servo */
+
+            /* Transfer data to PLC */
+            double x, y, z;
+            double t1, t2, t3, t4, t5;
+            int ret1;
+            int[] temp_value = new int[5];
+            try
+            {
+                x = double.Parse(TbX.Text);
+                y = double.Parse(TbY.Text);
+                z = double.Parse(TbZ.Text);
+
+                (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
+                ret1 = Check_angle(t1, t2, t3, t4, t5);
+                if (ret1 != 0)
+                {
+                    double theta = 0.0;
+                    if (ret1 == 1) theta = t1;
+                    else if (ret1 == 2) theta = t2;
+                    else if (ret1 == 3) theta = t3;
+                    else if (ret1 == 4) theta = t4;
+                    else if (ret1 == 5) theta = t5;
+                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret1, theta));
+                    return;
+                }
+                t2 -= 90.0;
+                t3 += 90.0;
+                t4 += 90.0;
+
+                int[] value_angle = new int[10];
+                /* Run */
+                temp_value[0] = (int)(Convert.ToDouble(t1) * 100000 + 18000000);
+                temp_value[1] = (int)(Convert.ToDouble(t2) * 100000 + 18000000);
+                temp_value[2] = (int)(Convert.ToDouble(t3) * 100000 + 18000000);
+                temp_value[3] = (int)(Convert.ToDouble(t4) * 100000 + 18000000);
+                temp_value[4] = (int)(Convert.ToDouble(t5) * 100000 + 18000000);
+                /* Write the angle */
+                for (int ind = 0; ind < 5; ind++)
+                {
+                    write_d_mem_32_bit(1010 + 2 * ind, temp_value[ind]);
+                }
+                /* End transfer to PLC */
+                /* Run PLC */
+                turn_on_1_pulse_relay(528);
+                /* End Run PLC */
+            }
+            catch (Exception er)
+            {
+                PrintLog("Bug", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", er));
+            }
+        }
 
         public void turn_on_1_pulse_relay(int device)
         {
