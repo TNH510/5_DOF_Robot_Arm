@@ -21,6 +21,7 @@ using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Net.Sockets;
+using System.Windows.Threading;
 /**
  * Author: Gabriele Marini (Gabryxx7)
  * This class load the 3d models of all the parts of the robotic arms and add them to the viewport
@@ -54,6 +55,11 @@ namespace RobotArmHelix
    {
         private System.Timers.Timer timer;
         private int count;
+
+        private Thread subThread1;
+        private Thread subThread2;
+        private bool Thread1isRunning = true;
+        private bool Thread2isRunning = true;
 
         private float elapsedTimeInSeconds = 0; // Track elapsed time in seconds
 
@@ -101,9 +107,8 @@ namespace RobotArmHelix
         TranslateTransform3D T;
         Vector3D reachingPoint;
         int movements = 10;
-        System.Windows.Forms.Timer timer1;
+        //System.Windows.Forms.Timer timer1;
         System.Windows.Forms.Timer timer2;
-        System.Windows.Forms.Timer timer3;
 #if IRB6700
         //directroy of all stl files
         private const string MODEL_PATH0 = "K0.stl";
@@ -118,10 +123,6 @@ namespace RobotArmHelix
         public MainWindow()
         {
             InitializeComponent();
-            // Tạo và bắt đầu một luồng mới
-            Thread thread1 = new Thread(new ThreadStart(Task1));
-            thread1.Start();
-
             // Attach the event handler to the MouseDown event
             viewPort3d.MouseDown += helixViewport3D_MouseDown;
             basePath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\3D_Models\\";
@@ -157,15 +158,59 @@ namespace RobotArmHelix
             double[] angles = { joints[1].angle, joints[2].angle, joints[3].angle, joints[4].angle, joints[5].angle };
             ForwardKinematics(angles);
 
+        }
 
-            timer1 = new System.Windows.Forms.Timer();
-            timer1.Interval = 40;
-            timer1.Tick += new System.EventHandler(timer1_Tick);
+        private void Thread2Start()
+        {
+            Thread2isRunning = true;
+            subThread2 = new Thread(SubThread2Work);
+            subThread2.Start();
+        }
+        private void SubThread2Work()
+        {
+            // Simulated work in the sub-thread
+            while (Thread2isRunning)
+            {
 
-            timer2 = new System.Windows.Forms.Timer();
-            timer2.Interval = 5000;
-            timer2.Tick += new System.EventHandler(timer2_Tick);
+                try
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        joint1.Value = angles_global[0];
+                        joint2.Value = angles_global[1];
+                        joint3.Value = angles_global[2];
+                        joint4.Value = angles_global[3];
+                        joint5.Value = angles_global[4];
+                    });
+                }
+                catch (TaskCanceledException)
+                {
+                    // Ignore the exception
+                }
 
+                // Sleep for a while to simulate the function taking time
+                Thread.Sleep(5000); // Simulate a function execution time of 100 milliseconds
+            }
+        }
+
+        private void Thread1Start()
+        {
+            Thread1isRunning = true;
+            subThread1 = new Thread(SubThread1Work);
+            subThread1.Start();
+        }
+
+        private void SubThread1Work()
+        {
+            // Simulated work in the sub-thread
+            while (Thread1isRunning)
+            {
+                // Execute your function here
+                execute_fk();
+
+                // Sleep for a while to simulate the function taking time
+                Thread.Sleep(1); // Simulate a function execution time of 100 milliseconds
+            }
         }
 
         private void StartTimer(int interval)
@@ -348,20 +393,6 @@ namespace RobotArmHelix
                 encoder.Save(stream);
             }
         }
-        public void Task1()
-        {
-
-            // Sử dụng Dispatcher để thay đổi UI element từ một luồng khác
-            Dispatcher.Invoke(() =>
-            {
-                joint1.Value = angles_global[0];
-                joint2.Value = angles_global[1];
-                joint3.Value = angles_global[2];
-                joint4.Value = angles_global[3];
-                joint5.Value = angles_global[4];
-            });
-
-        }
         public void Task2()
         {
             StartTimer(50);
@@ -514,9 +545,6 @@ namespace RobotArmHelix
             }
             execute_fk();
         }
-
-
-
         /**
          * This methodes execute the FK (Forward Kinematics). It starts from the first joint, the base.
          * */
@@ -525,21 +553,25 @@ namespace RobotArmHelix
             int[] value_positon = new int[16];
             uint t1 = 0, t2 = 0, t3 = 0, t4 = 0, t5 = 0;
             double t1_out, t2_out, t3_out, t4_out, t5_out;
-            /** Debug sphere, it takes the x,y,z of the textBoxes and update its position
-             * This is useful when using x,y,z in the "new Point3D(x,y,z)* when defining a new RotateTransform3D() to check where the joints is actually  rotating */
             if (cn_bttn == true)
             {
                 double[] angles = { joints[1].angle, joints[2].angle, joints[3].angle, joints[4].angle, joints[5].angle };
-                ForwardKinematics(angles);
-                joint1.Value = angles[0];
-                joint2.Value = angles[1];
-                joint3.Value = angles[2];
-                joint4.Value = angles[3];
-                joint5.Value = angles[4];
+                // Update UI asynchronously using Dispatcher
+                Dispatcher.Invoke(() =>
+                {
+                    /* Update position for robot on GUI */
+                    ForwardKinematics(angles);
+                    /* Update data for slider on GUI */
+                    joint1.Value = angles[0];
+                    joint2.Value = angles[1];
+                    joint3.Value = angles[2];
+                    joint4.Value = angles[3];
+                    joint5.Value = angles[4];
+                });
             }
             else
             {
-                /* Read position of 5 angle */
+                /* Read position of 5 angles */
                 int[] temp_angle = new int[90];
                 plc.ReadDeviceBlock(Constants.R_POSITION_1, 82, out temp_angle[0]);
 
@@ -557,9 +589,6 @@ namespace RobotArmHelix
 
                 value_positon[8] = temp_angle[80];
                 value_positon[9] = temp_angle[81];
-
-
-
 
                 // Read and convert driver angle value to real position value (was subtracted by 180)
                 t1 = Read_Position((uint)value_positon[0], (uint)value_positon[1]);
@@ -580,11 +609,20 @@ namespace RobotArmHelix
                 angles_global[2] = t3_out;
                 angles_global[3] = t4_out;
                 angles_global[4] = t5_out;
-                ForwardKinematics(angles_global);
+                try
+                {
+                    // Update UI asynchronously using Dispatcher
+                    Dispatcher.Invoke(() =>
+                    {
+                        /* Update position for robot on GUI */
+                        ForwardKinematics(angles_global);
+                    });
+                }
+                catch (TaskCanceledException)
+                {
+                    // Ignore the exception
+                }
             }
-
-
-
         }
 
         private Color changeModelColor(Joint pJoint, Color newColor)
@@ -679,51 +717,9 @@ namespace RobotArmHelix
             return HitTestResultBehavior.Continue;
         }
 
-        //public void StartInverseKinematics(object sender, RoutedEventArgs e)
-        //{
-        //    double x, y, z;
-        //    double[] angles = { joints[1].angle, joints[2].angle - 90.0, joints[3].angle + 90.0, joints[4].angle + 90.0, joints[5].angle };
-
-        //    x = Double.Parse(TbX.Text);
-        //    y = Double.Parse(TbY.Text);
-        //    z = Double.Parse(TbZ.Text);
-
-        //    // Assuming convert_position_angle returns a tuple of 5 values
-        //    (double angle1, double angle2, double angle3, double angle4, double angle5) = convert_position_angle(x, y, z);
-
-        //    angles[0] = angle1;
-        //    angles[1] = angle2 - 90.0;
-        //    angles[2] = angle3 + 90.0;
-        //    angles[3] = angle4 + 90.0;
-        //    angles[4] = angle5;
-
-        //    joint1.Value = joints[1].angle = angles[0];
-        //    joint2.Value = joints[2].angle = angles[1];
-        //    joint3.Value = joints[3].angle = angles[2];
-        //    joint4.Value = joints[4].angle = angles[3];
-        //    joint5.Value = joints[5].angle = angles[4];
-
-        //    if (timer1.Enabled)
-        //    {
-        //        button.Content = "Go to position";
-        //        isAnimating = false;
-        //        timer1.Stop();
-        //        movements = 0;
-        //    }
-        //    else
-        //    {
-        //        geom.Transform = new TranslateTransform3D(reachingPoint);
-        //        movements = 5000;
-        //        button.Content = "STOP";
-        //        isAnimating = true;
-        //        timer1.Start();
-        //    }
-        //}
-
         public void timer1_Tick(object sender, EventArgs e)
         {
             execute_fk();
-            
         }
 
         public void timer2_Tick(object sender, EventArgs e)
@@ -974,19 +970,12 @@ namespace RobotArmHelix
         }
         private void ConnectPLC(object sender, RoutedEventArgs e)
         {
-            /* Start timer1 */
-            timer1.Start();
-            timer2.Start();
-
-
-
             /* Disable slider */
             joint1.IsEnabled = false;
             joint2.IsEnabled = false;
             joint3.IsEnabled = false;
             joint4.IsEnabled = false;
             joint5.IsEnabled = false;
-
             /* Disable test position button */
             testpos_bttn = false;
             /* Change the color of the button when clicked */
@@ -1016,7 +1005,6 @@ namespace RobotArmHelix
                 ChangeColorObjectForeground(Connect_button, Constants.OBJECT_MODIFIED1);
                 ChangeColorObjectForeground(Disconnect_button, Constants.OBJECT_MODIFIED);
                 ChangeColorObjectBorderBrush(Disconnect_button, Constants.OBJECT_MODIFIED);
-
                 /* 
                     Print the log command
                     MethosBase.GetCurrentMethod returns the action user did.
@@ -1055,13 +1043,17 @@ namespace RobotArmHelix
                 ChangeColorObjectForeground(Servo_button, Constants.OBJECT_MODIFIED1);
                 PrintLog("SERVO:", servo_status.ToString(), "ON");
             }
+            /* Start timer1 and timer2 */
+            // timer1.Start();
+            Thread1Start();
+            Thread2Start();
         }
 
         private void DisconnectPLC(object sender, RoutedEventArgs e)
         {
-            /* Stop timer1 */
-            timer1.Stop();
-            timer2.Stop();
+            /* Stop thread */
+            Thread1isRunning = false;
+            Thread2isRunning = false;
 
             /* Enable slider */
             joint1.IsEnabled = true;
@@ -1182,6 +1174,7 @@ namespace RobotArmHelix
         private void Jog_set_speed_Click(object sender, RoutedEventArgs e)
         {
             int velocity = 0;
+            string getName = MethodBase.GetCurrentMethod().Name;
             try
             {
                 velocity = Convert.ToInt32(jog_speed_tb.Text) * 1000;
@@ -1189,6 +1182,7 @@ namespace RobotArmHelix
                 {
                     write_d_mem_32_bit(640 + 2 * ind, velocity);
                 }
+                PrintLog("Infor", getName, "Write velocity to PLC successfully");
 
             }
             catch (Exception ex)
@@ -2006,6 +2000,10 @@ namespace RobotArmHelix
             thread2.Start();
         }
 
+        private void Forward_button_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
 
         public void turn_on_1_pulse_relay(int device)
         {
