@@ -61,6 +61,9 @@ namespace RobotArmHelix
     /// </summary>
     public partial class MainWindow : Window
    {
+
+        private double returnZaxis = 0;
+        private int servo_status_timer = 0;
         private System.Timers.Timer timer;
         private int count;
 
@@ -121,6 +124,7 @@ namespace RobotArmHelix
         TranslateTransform3D T;
         Vector3D reachingPoint;
         int movements = 10;
+        System.Windows.Forms.Timer timer1;
         System.Windows.Forms.Timer timer2;
 
 #if IRB6700
@@ -141,6 +145,10 @@ namespace RobotArmHelix
             string[] ports = SerialPort.GetPortNames();
             com_port_list1.ItemsSource = ports;
             uart.DataReceived += SerialPort_DataReceived;
+
+            /* Temporary for test automation */
+            move = 1; /* moveJ */
+
 
             // Attach the event handler to the MouseDown event
             viewPort3d.MouseDown += helixViewport3D_MouseDown;
@@ -176,6 +184,10 @@ namespace RobotArmHelix
 
             double[] angles = { joints[1].angle, joints[2].angle, joints[3].angle, joints[4].angle, joints[5].angle };
             ForwardKinematics(angles);
+
+            timer1 = new System.Windows.Forms.Timer();
+            timer1.Interval = 500;
+            timer1.Tick += new System.EventHandler(timer1_Tick);
 
         }
 
@@ -349,17 +361,6 @@ namespace RobotArmHelix
                     var bitmapImage = ByteArrayToBitmapSource(byteArrayModified, newWidth, newHeight);
 
                     SaveImageWithAutoName(bitmapImage, filepathtosave, ".png");
-
-                    //// Create a new instance of the ImageWindow
-                    //ImageWindow imageWindow = new ImageWindow();
-
-                    // Display the image in an Image control
-                    //SecondWindow.Source = bitmapImage;
-                    ////displayedImage2.Stretch = System.Windows.Media.Stretch.Fill; // Adjust the stretch mode as needed
-                    ////// Make the image visible
-                    ////displayedImage2.Visibility = Visibility.Visible;
-                    ////await Task.Delay(100);
-                    ////}
                 }
                 catch (Exception ex)
                 {
@@ -738,8 +739,53 @@ namespace RobotArmHelix
 
         public void timer1_Tick(object sender, EventArgs e)
         {
-            string data = uart.ReadLine();
-            ErrorLog.Text = data;
+            double x, y, z;
+            double t1, t2, t3, t4, t5;
+            int ret;
+            int[] temp_value = new int[5];
+            try
+            {
+                x = double.Parse(TbX.Text);
+                y = double.Parse(TbY.Text);
+                //z = double.Parse(TbZ.Text);
+                z = returnZaxis;
+
+                (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
+                ret = Check_angle(t1, t2, t3, t4, t5);
+                if (ret != 0)
+                {
+                    double theta = 0.0;
+                    if (ret == 1) theta = t1;
+                    else if (ret == 2) theta = t2;
+                    else if (ret == 3) theta = t3;
+                    else if (ret == 4) theta = t4;
+                    else if (ret == 5) theta = t5;
+                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
+                    return;
+                }
+                t2 -= 90.0;
+                t3 += 90.0;
+                t4 += 90.0;
+
+                int[] value_angle = new int[10];
+                /* Run */
+                temp_value[0] = (int)(Convert.ToDouble(t1) * 100000 + 18000000);
+                temp_value[1] = (int)(Convert.ToDouble(t2) * 100000 + 18000000);
+                temp_value[2] = (int)(Convert.ToDouble(t3) * 100000 + 18000000);
+                temp_value[3] = (int)(Convert.ToDouble(t4) * 100000 + 18000000);
+                temp_value[4] = (int)(Convert.ToDouble(t5) * 100000 + 18000000);
+                /* Write the angle */
+                for (int ind = 0; ind < 5; ind++)
+                {
+                    write_d_mem_32_bit(1010 + 2 * ind, temp_value[ind]);
+                }
+
+            }
+            catch (Exception er)
+            {
+                PrintLog("Bug", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", er));
+            }
+            turn_on_1_pulse_relay(528);
         }
 
         public void timer2_Tick(object sender, EventArgs e)
@@ -1067,6 +1113,7 @@ namespace RobotArmHelix
             // timer1.Start();
             Thread1Start();
             Thread2Start();
+            //timer1.Start();
         }
 
         private void DisconnectPLC(object sender, RoutedEventArgs e)
@@ -1703,7 +1750,8 @@ namespace RobotArmHelix
             if (move == 1)
             {
                 /* Turn on relay */
-                turn_on_1_pulse_relay(528);
+                timer1.Start();
+                //turn_on_1_pulse_relay(528);
             }
             else if (move == 2)
             {
@@ -2097,6 +2145,8 @@ namespace RobotArmHelix
             Dispatcher.Invoke(() =>
             {
                 ErrorLog.Text = data;
+                StartReadingData(data);
+                returnZaxis = Convert.ToDouble(data);
             });
         }
 
@@ -2112,32 +2162,28 @@ namespace RobotArmHelix
 
 
         // Initialize SerialPort and start reading data
-        public void StartReadingData()
+        double StartReadingData(string receivedData)
         {
-            if (uart.BytesToRead > 0)
+            double returnZ = 0;
+            // Split received data by comma and space, and process each number
+            //string[] numbers = receivedData.Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            string numbers = receivedData;
+            try
             {
-                receivedData = uart.ReadExisting();
+                //double num1 = double.Parse(numbers[0]);
+                //double num2 = double.Parse(numbers[1]);
+                //double num3 = double.Parse(numbers[2]);
+                //double num4 = double.Parse(numbers[3]);
+                returnZ = double.Parse(numbers);
 
-                // Split received data by comma and space, and process each number
-                string[] numbers = receivedData.Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                if (numbers.Length == 4)
-                {
-                    try
-                    {
-                        double num1 = double.Parse(numbers[0]);
-                        double num2 = double.Parse(numbers[1]);
-                        double num3 = double.Parse(numbers[2]);
-                        double num4 = double.Parse(numbers[3]);
-
-                    }
-                    catch (FormatException)
-                    {
-                        // Handle invalid data format
-                        // For example: Show a message box
-                        MessageBox.Show("Invalid data format received.");
-                    }
-                }
             }
+            catch (FormatException)
+            {
+                // Handle invalid data format
+                // For example: Show a message box
+                MessageBox.Show("Invalid data format received.");
+            }
+            return returnZ;
         }
 
         private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
