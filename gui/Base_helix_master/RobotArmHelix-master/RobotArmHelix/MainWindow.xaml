@@ -102,5 +102,33 @@
         <Button x:Name="Bitmap_cvt_button" Content="Bitmap Convert" HorizontalAlignment="Left" Margin="320,373,0,0" VerticalAlignment="Top" Width="123" Height="23" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Bitmap_cvt_button_Click"/>
         <Button x:Name="Camera_button" Content="Camera" HorizontalAlignment="Left" Margin="469,373,0,0" VerticalAlignment="Top" Width="123" Height="23" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Camera_button_Click"/>
         <Image x:Name="displayedImage2" Stretch="Uniform" Visibility="Collapsed"/>
+        <Rectangle Fill="#FF181E36" HorizontalAlignment="Left" Height="233" Stroke="#FF007EF9" VerticalAlignment="Top" Width="304" StrokeThickness="0.5" Margin="304,419,0,0"/>
+        <Label Content="GLOVE" HorizontalAlignment="Left" Margin="415,426,0,0" VerticalAlignment="Top" Width="84" Foreground="#FF9EA1B0" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif"/>
+        <Label Content="COM PORT" HorizontalAlignment="Left" Margin="318,454,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+        <ComboBox x:Name="com_port_list1" SelectedIndex="0" HorizontalAlignment="Left" Margin="406,456,0,0" VerticalAlignment="Top" Width="70"/>
+        <Label Content="BAUD RATE" HorizontalAlignment="Left" Margin="318,486,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+        <ComboBox x:Name="com_port_list2" SelectedIndex="0" HorizontalAlignment="Left" Margin="406,488,0,0" VerticalAlignment="Top" Width="70">
+            <ComboBoxItem>115200</ComboBoxItem>
+            <ComboBoxItem>9600</ComboBoxItem>
+        </ComboBox>
+        <Button x:Name="Connect_glove_btn" Content="Connect" HorizontalAlignment="Left" Margin="494,456,0,0" VerticalAlignment="Top" Width="100" Height="63" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_connect_button_Click"/>
+        <Button x:Name="Disconnect_glove_btn" Content="Disconnect" HorizontalAlignment="Left" Margin="492,540,0,0" VerticalAlignment="Top" Width="100" Height="64" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_disconnect_button_Click" RenderTransformOrigin="0.48,1.838"/>
+        <Label Content="DATA BITS" HorizontalAlignment="Left" Margin="318,517,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+        <ComboBox x:Name="com_port_list3" SelectedIndex="0" HorizontalAlignment="Left" Margin="406,519,0,0" VerticalAlignment="Top" Width="70">
+            <ComboBoxItem>8</ComboBoxItem>
+            <ComboBoxItem>1</ComboBoxItem>
+        </ComboBox>
+        <Label Content="STOP BITS" HorizontalAlignment="Left" Margin="318,549,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+        <ComboBox x:Name="com_port_list4" SelectedIndex="0" HorizontalAlignment="Left" Margin="406,551,0,0" VerticalAlignment="Top" Width="70">
+            <ComboBoxItem>1</ComboBoxItem>
+            <ComboBoxItem>2</ComboBoxItem>
+        </ComboBox>
+        <Label Content="PARITY BITS" HorizontalAlignment="Left" Margin="318,582,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+        <ComboBox x:Name="com_port_list5" SelectedIndex="0" HorizontalAlignment="Left" Margin="406,584,0,0" VerticalAlignment="Top" Width="70">
+            <ComboBoxItem>None</ComboBoxItem>
+            <ComboBoxItem>Odd</ComboBoxItem>
+            <ComboBoxItem>Even</ComboBoxItem>
+        </ComboBox>
+        <ProgressBar x:Name="progressbar1" HorizontalAlignment="Left" Height="23" Margin="324,614,0,0" VerticalAlignment="Top" Width="270"/>
     </Grid>
 </Window>

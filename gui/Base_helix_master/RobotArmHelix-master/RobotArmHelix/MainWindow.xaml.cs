@@ -26,11 +26,15 @@ using System.IO.Ports;
 
 
 using System.Windows.Threading;
+using System.Data;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolTip;
+using RobotArmHelix.Properties;
+using System.Windows.Markup;
 /**
- * Author: Gabriele Marini (Gabryxx7)
- * This class load the 3d models of all the parts of the robotic arms and add them to the viewport
- * It also defines the relations among the joints of the robotic arms in order to reflect the movement of the robot in the real world
- * **/
+* Author: Gabriele Marini (Gabryxx7)
+* This class load the 3d models of all the parts of the robotic arms and add them to the viewport
+* It also defines the relations among the joints of the robotic arms in order to reflect the movement of the robot in the real world
+* **/
 namespace RobotArmHelix
 {
     class Joint
@@ -60,6 +64,10 @@ namespace RobotArmHelix
         private System.Timers.Timer timer;
         private int count;
 
+        private SerialPort uart = new SerialPort();
+        string receivedData;
+
+
         private Thread subThread1;
         private Thread subThread2;
         private bool Thread1isRunning = true;
@@ -79,8 +87,7 @@ namespace RobotArmHelix
         List<Joint> joints = null;
         int move = 0; /* move = 1 -> MoveJ, move = 2 -> MoveL */
 
-        // UART
-        private SerialPort uart = new SerialPort("COM12", 115200);
+
 
         bool switchingJoint = false;
         bool isAnimating = false;
@@ -114,8 +121,8 @@ namespace RobotArmHelix
         TranslateTransform3D T;
         Vector3D reachingPoint;
         int movements = 10;
-        //System.Windows.Forms.Timer timer1;
         System.Windows.Forms.Timer timer2;
+
 #if IRB6700
         //directroy of all stl files
         private const string MODEL_PATH0 = "K0.stl";
@@ -130,6 +137,11 @@ namespace RobotArmHelix
         public MainWindow()
         {
             InitializeComponent();
+            //UART
+            string[] ports = SerialPort.GetPortNames();
+            com_port_list1.ItemsSource = ports;
+            uart.DataReceived += SerialPort_DataReceived;
+
             // Attach the event handler to the MouseDown event
             viewPort3d.MouseDown += helixViewport3D_MouseDown;
             basePath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\3D_Models\\";
@@ -726,7 +738,8 @@ namespace RobotArmHelix
 
         public void timer1_Tick(object sender, EventArgs e)
         {
-            execute_fk();
+            string data = uart.ReadLine();
+            ErrorLog.Text = data;
         }
 
         public void timer2_Tick(object sender, EventArgs e)
@@ -1177,17 +1190,17 @@ namespace RobotArmHelix
         {
             Press_button(MethodBase.GetCurrentMethod().Name, Constants.R_GOHOME);
 
-            try
-            {
-                uart.Open();
-                uart.WriteLine("hello");
-                uart.Close();
-                MessageBox.Show("Data sent successfully!");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error sending data: " + ex.Message);
-            }
+            //try
+            //{
+            //    uart.Open();
+            //    uart.WriteLine("hello");
+            //    uart.Close();
+            //    MessageBox.Show("Data sent successfully!");
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show("Error sending data: " + ex.Message);
+            //}
         }
 
         private void Jog_set_speed_Click(object sender, RoutedEventArgs e)
@@ -2023,6 +2036,122 @@ namespace RobotArmHelix
         {
 
         }
+
+        private async void Glove_connect_button_Click(object sender, RoutedEventArgs e)
+        {
+            uart = new SerialPort();
+            uart.PortName = com_port_list1.Text;
+            // Set baud rate
+            int baudRate;
+            if (int.TryParse(com_port_list2.Text, out baudRate))
+            {
+                uart.BaudRate = baudRate;
+            }
+            else
+            {
+                // Handle invalid baud rate input
+                MessageBox.Show("Invalid baud rate input.");
+            }
+            // Set data bit
+            int databit;
+            if (int.TryParse(com_port_list3.Text, out databit))
+            {
+                uart.DataBits = databit;
+            }
+            else
+            {
+                // Handle invalid baud rate input
+                MessageBox.Show("Invalid data bit input.");
+            }
+
+            // Set stop bits
+            if (Enum.TryParse<StopBits>(com_port_list4.Text, out StopBits stopBits))
+            {
+                uart.StopBits = stopBits;
+            }
+            else
+            {
+                // Handle invalid stop bits input
+                // For example: Display a message box informing the user
+                MessageBox.Show("Invalid stop bits input.");
+            }
+            // Set parity
+            if (Enum.TryParse<Parity>(com_port_list5.Text, out Parity parity))
+            {
+                uart.Parity = parity;
+            }
+            else
+            {
+                // Handle invalid parity input
+                MessageBox.Show("Invalid parity input.");
+            }
+            progressbar1.Value = 100;
+            uart.Open();
+            uart.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(Receive);
+        }
+
+        private void Receive(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
+        {
+            // Collecting the characters received to our 'buffer' (string).
+            string data = uart.ReadExisting();
+            Dispatcher.Invoke(() =>
+            {
+                ErrorLog.Text = data;
+            });
+        }
+
+        private void Glove_disconnect_button_Click(object sender, RoutedEventArgs e)
+        {
+            if (uart.IsOpen)
+            {
+                uart.Close();
+                progressbar1.Value = 0;
+            }
+        }
+
+
+
+        // Initialize SerialPort and start reading data
+        public void StartReadingData()
+        {
+            if (uart.BytesToRead > 0)
+            {
+                receivedData = uart.ReadExisting();
+
+                // Split received data by comma and space, and process each number
+                string[] numbers = receivedData.Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                if (numbers.Length == 4)
+                {
+                    try
+                    {
+                        double num1 = double.Parse(numbers[0]);
+                        double num2 = double.Parse(numbers[1]);
+                        double num3 = double.Parse(numbers[2]);
+                        double num4 = double.Parse(numbers[3]);
+
+                    }
+                    catch (FormatException)
+                    {
+                        // Handle invalid data format
+                        // For example: Show a message box
+                        MessageBox.Show("Invalid data format received.");
+                    }
+                }
+            }
+        }
+
+        private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            // Read data from the serial port
+            string data = uart.ReadLine();
+            PrintLog("Infor", "Data received", data);
+        }
+
+        private void ShowData(object sender, EventArgs e)
+        {
+            PrintLog("Infor", "Data received", receivedData);
+        }
+
 
         public void turn_on_1_pulse_relay(int device)
         {
