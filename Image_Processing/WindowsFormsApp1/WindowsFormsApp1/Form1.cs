@@ -14,17 +14,17 @@ namespace WindowsFormsApp1
     public partial class Form1 : Form
     {
         Bitmap Import_picture;
-        Bitmap Gray_picture; 
-        Bitmap Sharp_picture;
         string link_picture = @"C:\Users\Loc\Desktop\XLA.jpg";
         public Form1()
         {
             Import_picture = new Bitmap(link_picture);
+            
             InitializeComponent();
+            Original_picture.Image = RBGtoGray(Import_picture);
         }
         public Bitmap RBGtoGray(Bitmap Import_picture)
         {
-            Gray_picture = new Bitmap(Import_picture.Width, Import_picture.Height);
+            Bitmap Gray_picture = new Bitmap(Import_picture.Width, Import_picture.Height);
             for (int x = 0; x < Import_picture.Width; x++)
                 for (int y = 0; y < Import_picture.Height; y++)
                 { 
@@ -37,40 +37,6 @@ namespace WindowsFormsApp1
                     Gray_picture.SetPixel(x, y, Color.FromArgb(gray, gray, gray));
                 }    
             return Gray_picture;
-        }
-        public Bitmap Sharppicture(Bitmap Gray_picture)
-        {
-            int[,] mash = { { 0, -1, 0 }, { -1, -4, -1 }, { 0, -1, 0 } };
-            Sharp_picture = new Bitmap(Gray_picture.Width, Gray_picture.Height);
-            for (int x = 1; x < Gray_picture.Width - 1; x++)
-                for (int y = 1; y < Gray_picture.Height-1; y++)
-                {
-                    //các biến cộng dồn giá trị điểm ảnh
-                    int Rs = 0;
-                    int SharpR = 0;
-                    //quét các điểm trong mặt nạ
-                    //các biến cộng dồn giá trị điểm ảnh
-                    for (int i = x - 1; i <= x + 1; i++)
-                        for (int j = y - 1; j <= y + 1; j++)
-                        {
-                            Color color = Gray_picture.GetPixel(i, j);
-                            int R = color.R;
-                            // nhân ma trận điểm ảnh với hệ số C
-                            Rs += R * mash[i - x + 1, j - y + 1];
-
-                        }
-                    Color color1 = Gray_picture.GetPixel(x, y);
-                    int R1 = color1.R; 
-
-                    SharpR = R1 + Rs; 
-
-                    if (SharpR < 0)
-                        SharpR = 0;
-                    else if (SharpR > 255)
-                        SharpR = 255;
-                    Sharp_picture.SetPixel(x, y, Color.FromArgb(SharpR, SharpR, SharpR));
-                }
-            return Sharp_picture;
         }
         public Bitmap ColorImageSharpening(Bitmap hinhgoc)
         {
@@ -123,10 +89,63 @@ namespace WindowsFormsApp1
                 }
             return imgsharpe;
         }
-            private void button1_Click(object sender, EventArgs e)
+        public Bitmap ColorImageBorderline(Bitmap Import_picture)
         {
-            Original_picture.Image = RBGtoGray(Import_picture);
-            Processed_picture.Image = ColorImageSharpening(RBGtoGray(Import_picture));
+            //tạo biến ngưỡng để xét với giá trị 
+            int nguong = Convert.ToInt16(text_Threshold.Text);
+            //tạo biến chứa hình mức xám
+            //Bitmap hinhxam = ChuyenhinhRGBsanghinhxamLightness();
+            //tạo ma trận sobel theo phương x
+            int[,] ngang = { { -1, -2, -1  },
+                             {  0,  0,  0  },
+                             {  1,  2,  1  } };
+            //tạo ma trận sobel theo phương y
+            int[,] doc = { { -1, 0, 1 },
+                             { -2, 0, 2 },
+                             { -1, 0, 1 } };
+            //tạo ma trận sobel theo phương x
+            Bitmap imgboderline = new Bitmap(Import_picture.Width, Import_picture.Height);
+            // dùng vòng for để đọc điểm ảnh ở dạng 2 chiều, bỏ viền ngoài của ảnh vì là mặt nạ 3x3
+            for (int x = 1; x < Import_picture.Width - 1; x++)
+                for (int y = 1; y < Import_picture.Height - 1; y++)
+                {
+                    //các biến cộng dồn giá trị điểm ảnh
+                    int Gx = 0, Gy = 0;
+                    int gray = 0;
+
+                    //quét các điểm trong mặt nạ
+                    for (int i = x - 1; i <= x + 1; i++)
+                        for (int j = y - 1; j <= y + 1; j++)
+                        {
+                            Color color = Import_picture.GetPixel(i, j);
+                            //lấy giá trị xám
+                            gray = color.R;
+                            // nhân ma trận điểm ảnh với hệ số C
+                            Gx += gray * ngang[i - x + 1, j - y + 1];
+                            Gy += gray * doc[i - x + 1, j - y + 1];
+
+                        }
+                    int M = Math.Abs(Gx) + Math.Abs(Gy);
+                    if (M <= nguong)
+                        gray = 0;
+                    else
+                        gray = 255;
+                    //set các điểm ảnh vào biến
+                    imgboderline.SetPixel(x, y, Color.FromArgb(gray, gray, gray));
+
+
+                }
+            return imgboderline;
+
+        }
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Processed_picture.Image = ColorImageBorderline(RBGtoGray(Import_picture));
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

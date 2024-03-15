@@ -30,7 +30,7 @@
         {
             this.Original_picture = new System.Windows.Forms.PictureBox();
             this.Processed_picture = new System.Windows.Forms.PictureBox();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.text_Threshold = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.Original_picture)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Processed_picture)).BeginInit();
@@ -56,12 +56,13 @@
             this.Processed_picture.TabIndex = 1;
             this.Processed_picture.TabStop = false;
             // 
-            // textBox1
+            // text_Threshold
             // 
-            this.textBox1.Location = new System.Drawing.Point(1037, 13);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(129, 22);
-            this.textBox1.TabIndex = 2;
+            this.text_Threshold.Location = new System.Drawing.Point(1037, 13);
+            this.text_Threshold.Name = "text_Threshold";
+            this.text_Threshold.Size = new System.Drawing.Size(129, 22);
+            this.text_Threshold.TabIndex = 2;
+            this.text_Threshold.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
             // button1
             // 
@@ -79,7 +80,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1193, 396);
             this.Controls.Add(this.button1);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.text_Threshold);
             this.Controls.Add(this.Processed_picture);
             this.Controls.Add(this.Original_picture);
             this.Name = "Form1";
@@ -95,7 +96,7 @@
 
         private System.Windows.Forms.PictureBox Original_picture;
         private System.Windows.Forms.PictureBox Processed_picture;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox text_Threshold;
         private System.Windows.Forms.Button button1;
     }
 }
