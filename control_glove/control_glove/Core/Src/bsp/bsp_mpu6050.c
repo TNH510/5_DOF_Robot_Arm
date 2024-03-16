@@ -490,8 +490,26 @@ base_status_t bsp_mpu6050_filter_task(void)
     // Value of Roll, Pitch, Yaw
     mpu6050_getRollPitchYaw();
 
-    // Print Roll, Pitch, Yaw to Serial Monitor
-    printf("%0.3f, %0.3f, %0.3f, 0 \r\n", roll, pitch, yaw);
+    // Caculate z pos
+    uint16_t z_pos = 600;
+    if (pitch >= 0.0f && pitch <= 60.0f)
+    {
+        z_pos = (uint16_t)(pitch * 10.0f / 3.0f + 500.0f);
+    }
+    else
+    {   
+        if (pitch >= 60.0f)
+        {
+            z_pos = 700;
+        }
+        else if (pitch <= 0.0)
+        {
+            z_pos = 500;
+        }
+        
+    }
+
+    printf("500,0,%d\r\n", z_pos);
 
 	HAL_Delay(100);
 

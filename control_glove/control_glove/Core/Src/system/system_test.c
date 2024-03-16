@@ -42,7 +42,7 @@ system_test_error_t system_test_init(void)
 
 system_test_error_t system_test_general(void)
 {
-    drv_uart_printf("Hello, this is Smart Glove");
+    // drv_uart_printf("Hello, this is Smart Glove");
     return SYSTEM_TEST_OK;
 }
 
