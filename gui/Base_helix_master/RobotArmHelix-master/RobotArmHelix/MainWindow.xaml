@@ -111,7 +111,7 @@
             <ComboBoxItem>115200</ComboBoxItem>
             <ComboBoxItem>9600</ComboBoxItem>
         </ComboBox>
-        <Button x:Name="Connect_glove_btn" Content="Connect" HorizontalAlignment="Left" Margin="494,456,0,0" VerticalAlignment="Top" Width="100" Height="63" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_connect_button_Click"/>
+        <Button x:Name="Connect_glove_btn" Content="Connect" HorizontalAlignment="Left" Margin="492,456,0,0" VerticalAlignment="Top" Width="100" Height="63" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_connect_button_Click"/>
         <Button x:Name="Disconnect_glove_btn" Content="Disconnect" HorizontalAlignment="Left" Margin="492,540,0,0" VerticalAlignment="Top" Width="100" Height="64" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_disconnect_button_Click" RenderTransformOrigin="0.48,1.838"/>
         <Label Content="DATA BITS" HorizontalAlignment="Left" Margin="318,517,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
         <ComboBox x:Name="com_port_list3" SelectedIndex="0" HorizontalAlignment="Left" Margin="406,519,0,0" VerticalAlignment="Top" Width="70">
@@ -131,5 +131,10 @@
         </ComboBox>
         <ProgressBar x:Name="progressbar1" HorizontalAlignment="Left" Height="23" Margin="324,614,0,0" VerticalAlignment="Top" Width="270"/>
         <Button x:Name="EStop_btn" Content="E-Stop" HorizontalAlignment="Left" Margin="15,724,0,0" VerticalAlignment="Top" Width="122" Height="24" FontSize="11" Click="EStop_bttn_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF181E36" FontWeight="Bold" BorderBrush="#FF181E36" Background="#FF007EF9"/>
+        <Rectangle Fill="#FF181E36" HorizontalAlignment="Left" Height="104" Stroke="#FF007EF9" VerticalAlignment="Top" Width="304" StrokeThickness="0.5" Margin="304,653,0,0"/>
+        <Label Content="GLOVE" HorizontalAlignment="Left" Margin="415,661,0,0" VerticalAlignment="Top" Width="84" Foreground="#FF9EA1B0" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif"/>
+        <Button x:Name="Enable_glove_btn" Content="ENBALE" HorizontalAlignment="Left" Margin="332,699,0,0" VerticalAlignment="Top" Width="100" Height="42" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_enable_button_Click"/>
+        <Button x:Name="Disble_glove_btn" Content="DISABLE" HorizontalAlignment="Left" Margin="480,699,0,0" VerticalAlignment="Top" Width="100" Height="42" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_disable_button_Click" RenderTransformOrigin="0.48,1.838"/>
+        <Button x:Name="Clear_Trajectory_btn" Content="Clear_Trajectory" HorizontalAlignment="Left" Margin="164,724,0,0" VerticalAlignment="Top" Width="123" Height="23" FontSize="11" Click="Clr_Traj_btn_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36"/>
     </Grid>
 </Window>

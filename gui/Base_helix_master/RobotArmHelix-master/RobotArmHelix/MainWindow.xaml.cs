@@ -69,7 +69,8 @@ namespace RobotArmHelix
 
         private SerialPort uart = new SerialPort();
         string receivedData;
-
+        /* Create the list for later removal */
+        private List<ModelVisual3D> sphereVisuals = new List<ModelVisual3D>();
 
         private Thread subThread1;
         private Thread subThread2;
@@ -146,10 +147,6 @@ namespace RobotArmHelix
             string[] ports = SerialPort.GetPortNames();
             com_port_list1.ItemsSource = ports;
             uart.DataReceived += SerialPort_DataReceived;
-
-            /* Temporary for test automation */
-            move = 1; /* moveJ */
-
 
             // Attach the event handler to the MouseDown event
             viewPort3d.MouseDown += helixViewport3D_MouseDown;
@@ -1058,10 +1055,10 @@ namespace RobotArmHelix
             List<Point3D> trajectoryPoints = new List<Point3D>();
             // Create a debug sphere at the trajectory point
             MeshBuilder buildertest = new MeshBuilder();
-            buildertest.AddSphere(new Point3D(x, y, z), 5, 15, 15); // Adjust the radius as needed
+            buildertest.AddSphere(new Point3D(x + 250, y + 250, z + 250), 5, 15, 15); // Adjust the radius as needed
 
             // Create a GeometryModel3D using the mesh and a blue material
-            GeometryModel3D sphereModel = new GeometryModel3D(buildertest.ToMesh(), Materials.Blue);
+            GeometryModel3D sphereModel = new GeometryModel3D(buildertest.ToMesh(), Materials.Red);
 
             // Create a ModelVisual3D to hold the GeometryModel3D
             ModelVisual3D visualtest = new ModelVisual3D();
@@ -1069,6 +1066,8 @@ namespace RobotArmHelix
 
             // Add the ModelVisual3D to the Viewport3D
             viewPort3d.Children.Add(visualtest);
+            // Add the ModelVisual3D to the list for later removal
+            sphereVisuals.Add(visualtest);
 
 #if IRB6700
 
@@ -1082,6 +1081,16 @@ namespace RobotArmHelix
 #endif
 
             return new Vector3D(joints[5].model.Bounds.Location.X, joints[5].model.Bounds.Location.Y, joints[5].model.Bounds.Location.Z);
+        }
+
+        // Function to remove all sphere visuals from the viewport
+        private void RemoveSphereVisuals()
+        {
+            foreach (ModelVisual3D visual in sphereVisuals)
+            {
+                viewPort3d.Children.Remove(visual);
+            }
+            sphereVisuals.Clear();
         }
 
         public static (double, double, double, double, double) convert_position_angle(double x, double y, double z)
@@ -1786,12 +1795,7 @@ namespace RobotArmHelix
         {
             if (move == 1)
             {
-                /* Reset error */
-                turn_on_1_pulse_relay(515);
-                /* Turn on relay */
-                turn_on_1_pulse_relay(600);
-                timer1.Start();
-                //turn_on_1_pulse_relay(528);
+                turn_on_1_pulse_relay(528);
             }
             else if (move == 2)
             {
@@ -2252,6 +2256,21 @@ namespace RobotArmHelix
         {
             /* Stop command */
             turn_on_1_pulse_relay(3200);
+        }
+
+        private void Glove_enable_button_Click(object sender, RoutedEventArgs e)
+        {
+            
+        }
+
+        private void Glove_disable_button_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Clr_Traj_btn_Click(object sender, RoutedEventArgs e)
+        {
+            RemoveSphereVisuals();
         }
 
         public void turn_on_1_pulse_relay(int device)
