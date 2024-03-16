@@ -1,9 +1,11 @@
 I=imread('XL123.jpg');
+
 L=I(:,:,1);
 phuongphap = 'Canny';
 nguong = [0.2 0.4];
 huong = 'horizontal';
 BW = edge(L, phuongphap, nguong, huong);
+
 figure;
 subplot(1, 2, 1);
 imshow(I);

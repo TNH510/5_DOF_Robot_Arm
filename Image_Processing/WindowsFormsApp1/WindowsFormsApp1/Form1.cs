@@ -17,7 +17,7 @@ namespace WindowsFormsApp1
         Bitmap Import_picture;
         Bitmap Output;
 
-        string link_picture = @"C:\Users\Loc\Desktop\XLA.jpg";
+        string link_picture = @"C:\Users\Loc\Desktop\XL123.jpg";
         public Form1()
         {
             Import_picture = new Bitmap(link_picture);
@@ -141,10 +141,51 @@ namespace WindowsFormsApp1
             return imgboderline;
 
         }
+        public Bitmap ColorImageSmoothing(Bitmap hinhgoc, int point, int level)
+        {
+            //tạo biến để chứa hình được smooth
+            Bitmap pic_smoothed = new Bitmap(hinhgoc.Width, hinhgoc.Height);
+            //tạo vòng lặp để quét hình 
+            // dùng 2 vòng FOR để quét hết ảnh, độ dài và độ rộng phải trừ đi viền của mặt nạ
+            for (int x = point; x < hinhgoc.Width - point; x++)
+                for (int y = point; y < hinhgoc.Height - point; y++)
+                {
+                    //biến cộng dồn cho các giá trị điểm màu trên mặt nạn của từng kênh R-G-B
+                    int Rs = 0, Gs = 0, Bs = 0;
+                    //quét mặt nạ
+                    for (int i = x - point; i <= x + point; i++)
+                        for (int j = y - point; j <= y + point; j++)
+                        {
+                            // đọc giá trị pixel tại điểm  ảnh có vị trí (i,j)
+                            Color pixel = hinhgoc.GetPixel(i, j);
+                            //lấy giá trị màu cảu các kênh
+                            byte R = pixel.R;// giá trị kênh red
+                            byte G = pixel.G;// giá trị kênh green
+                            byte B = pixel.B;// giá trị kênh blue
+                            byte A = pixel.A;// giá trị kênh blue
+                            //cộng dồn giá trị màu của các kênh
+                            Rs += R;
+                            Gs += G;
+                            Bs += B;
+
+
+                        }
+                    //K là số lượng điểm ảnh của mặt nạ
+                    int K = level * level;
+                    //đưa ra giá trị màu trung bình của kênh trong mặt nạ
+                    Rs = (int)(Rs / K);
+                    Gs = (int)(Gs / K);
+                    Bs = (int)(Bs / K);
+                    //gán giá trị màu vào biến bitmap đã tạo
+                    pic_smoothed.SetPixel(x, y, Color.FromArgb(Rs, Gs, Bs));
+                }
+            //trả về giá trị của hàm
+            return pic_smoothed;
+        }
         private void button1_Click(object sender, EventArgs e)
         {
             Output = RBGtoGray(Import_picture);
-            Processed_picture.Image = ColorImageBorderline(RBGtoGray(Import_picture)); ;
+            Processed_picture.Image = ColorImageBorderline(ColorImageSmoothing(RBGtoGray(Import_picture),4,9)); 
             Output.Save(@"C:\Users\Loc\Desktop\XL.jpg");
         }
 
