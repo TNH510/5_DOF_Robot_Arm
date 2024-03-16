@@ -42,7 +42,7 @@ system_test_error_t system_test_init(void)
 
 system_test_error_t system_test_general(void)
 {
-    drv_uart_printf("Hello, this is Smart Glove");
+    //drv_uart_printf("Hello, this is Smart Glove");
     return SYSTEM_TEST_OK;
 }
 
@@ -78,7 +78,9 @@ system_test_error_t system_test_polling(void)
     //  printf("%0.4f,%0.4f,%0.4f,%0.4f\r\n",psi,theta,phi,0);
     // printf("%0.4f\r\n",psi);
     // HAL_Delay(10);
-    bsp_mpu6050_filter_task();
+    // bsp_mpu6050_filter_task();
+//    printf("%d, %d, %d, 0 \r\n", 1, 2, 3);
+//    HAL_Delay(1000);
 
     return SYSTEM_TEST_OK;
 }

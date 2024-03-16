@@ -117,12 +117,33 @@ int main(void)
   /* USER CODE BEGIN 2 */
   /* USER CODE END 2 */
   system_test_general();
+  int z_pos = 800;
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
     /* USER CODE END WHILE */
-    system_test_polling();
+    // system_test_polling();
+
+    if (z_pos >= 800)
+    {
+      for (int i = 800; i > 500; i-=5)
+      {
+        z_pos = z_pos - 5;
+        HAL_Delay(500);
+        printf("%d\r\n",z_pos);
+      }
+    }
+
+    if (z_pos <= 500)
+    {
+      for (int i = 500; i < 800; i+=5)
+      {
+        z_pos = z_pos + 5;
+        HAL_Delay(500);
+        printf("%d\r\n",z_pos);
+      }
+    }
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
