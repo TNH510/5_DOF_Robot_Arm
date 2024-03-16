@@ -20,7 +20,7 @@
             <h:GridLinesVisual3D Width="16000" Length="16000" Thickness="1.5" MinorDistance="100" MajorDistance="400" Fill="#E5CFCECE" />
             <h:DefaultLights/>
         </h:HelixViewport3D>
-        <Rectangle Fill="#FF181E36" HorizontalAlignment="Left" Height="226" Stroke="#FF007EF9" VerticalAlignment="Top" Width="304" StrokeThickness="0.5" Margin="0,504,0,0"/>
+        <Rectangle Fill="#FF181E36" HorizontalAlignment="Left" Height="254" Stroke="#FF007EF9" VerticalAlignment="Top" Width="304" StrokeThickness="0.5" Margin="0,504,0,0"/>
         <Rectangle Fill="#FF181E36" HorizontalAlignment="Left" Height="228" Stroke="#FF007EF9" VerticalAlignment="Top" Width="304" StrokeThickness="0.5"/>
         <Slider x:Name="joint1" HorizontalAlignment="Left" Margin="46,71,0,0" VerticalAlignment="Top" Width="210"  Maximum="180" Minimum="-180" ValueChanged="joint_ValueChanged" LargeChange="0.1" TickFrequency="0.1" Height="22"/>
         <Slider x:Name="joint2" HorizontalAlignment="Left" Margin="46,98,0,0" VerticalAlignment="Top" Width="210" Maximum="180" Minimum="-180" ValueChanged="joint_ValueChanged" LargeChange="0.1" TickFrequency="0.1" Height="22"/>
@@ -130,5 +130,6 @@
             <ComboBoxItem>Even</ComboBoxItem>
         </ComboBox>
         <ProgressBar x:Name="progressbar1" HorizontalAlignment="Left" Height="23" Margin="324,614,0,0" VerticalAlignment="Top" Width="270"/>
+        <Button x:Name="EStop_btn" Content="E-Stop" HorizontalAlignment="Left" Margin="15,724,0,0" VerticalAlignment="Top" Width="122" Height="24" FontSize="11" Click="EStop_bttn_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF181E36" FontWeight="Bold" BorderBrush="#FF181E36" Background="#FF007EF9"/>
     </Grid>
 </Window>
