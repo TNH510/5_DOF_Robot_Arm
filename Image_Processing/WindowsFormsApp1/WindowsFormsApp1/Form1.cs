@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Emgu.CV.Features2D;
 using Emgu.CV.Structure;
 
 namespace WindowsFormsApp1
@@ -14,6 +15,8 @@ namespace WindowsFormsApp1
     public partial class Form1 : Form
     {
         Bitmap Import_picture;
+        Bitmap Output;
+
         string link_picture = @"C:\Users\Loc\Desktop\XLA.jpg";
         public Form1()
         {
@@ -140,7 +143,9 @@ namespace WindowsFormsApp1
         }
         private void button1_Click(object sender, EventArgs e)
         {
-            Processed_picture.Image = ColorImageBorderline(RBGtoGray(Import_picture));
+            Output = RBGtoGray(Import_picture);
+            Processed_picture.Image = ColorImageBorderline(RBGtoGray(Import_picture)); ;
+            Output.Save(@"C:\Users\Loc\Desktop\XL.jpg");
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
