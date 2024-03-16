@@ -62,7 +62,10 @@ namespace RobotArmHelix
     public partial class MainWindow : Window
    {
 
-        private double returnZaxis = 180;
+        private double returnX = 500;
+        private double returnY = 0;
+        private double returnZ = 600;
+
         private int servo_status_timer = 0;
         private System.Timers.Timer timer;
         private int count;
@@ -185,7 +188,7 @@ namespace RobotArmHelix
             ForwardKinematics(angles);
 
             timer1 = new System.Windows.Forms.Timer();
-            timer1.Interval = 500;
+            timer1.Interval = 100;
             timer1.Tick += new System.EventHandler(timer1_Tick);
 
             timer2 = new System.Windows.Forms.Timer();
@@ -749,11 +752,13 @@ namespace RobotArmHelix
             int[] temp_value = new int[5];
             try
             {
-                x = double.Parse(TbX.Text);
-                y = double.Parse(TbY.Text);
-                z = double.Parse(TbZ.Text);
-                // Test to receive theta test
-                theta_test = returnZaxis;
+                //x = double.Parse(TbX.Text);
+                //y = double.Parse(TbY.Text);
+                //z = double.Parse(TbZ.Text);
+
+                x = returnX;
+                y = returnY;
+                z = returnZ;
 
                 (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
                 ret = Check_angle(t1, t2, t3, t4, t5);
@@ -778,21 +783,12 @@ namespace RobotArmHelix
                 temp_value[1] = (int)(Convert.ToDouble(t2) * 100000 + 18000000);
                 temp_value[2] = (int)(Convert.ToDouble(t3) * 100000 + 18000000);
                 temp_value[3] = (int)(Convert.ToDouble(t4) * 100000 + 18000000);
-                temp_value[4] = (int)(Convert.ToDouble(theta_test) * 100000);
+                temp_value[4] = (int)(Convert.ToDouble(t5) * 100000 + 18000000);
                 /* Write the angle */
-                //for (int ind = 0; ind < 4; ind++)
-                //{
-                //    write_d_mem_32_bit(1010 + 2 * ind, temp_value[ind]);
-                //}
-                string device_str = "";
-                device_str = "D" + Convert.ToString(1400);
-                int[] temp = new int[2];
-                temp[0] = temp_value[4] & 0xFFFF; //byte high for register
-                temp[1] = (temp_value[4] >> 16) & 0xFFFF; // byte low for register
-                /* Write the angle */
-                plc.WriteDeviceBlock(device_str, 2, ref temp[0]);
-                /**/
-
+                for (int ind = 0; ind < 5; ind++)
+                {
+                    write_d_mem_32_bit(1400 + 2 * ind, temp_value[ind]);
+                }
             }
             catch (Exception er)
             {
@@ -807,47 +803,6 @@ namespace RobotArmHelix
             //joint3.Value = angles_global[2];
             //joint4.Value = angles_global[3];
             //joint5.Value = angles_global[4];
-            if (testpos_bttn == true)
-            {
-                double x, y, z;
-                double t1, t2, t3, t4, t5;
-                int ret;
-                int[] temp_value = new int[5];
-                try
-                {
-                    x = double.Parse(TbX.Text);
-                    y = double.Parse(TbY.Text);
-                    z = double.Parse(TbZ.Text);
-
-                    (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
-                    ret = Check_angle(t1, t2, t3, t4, t5);
-                    if (ret != 0)
-                    {
-                        double theta = 0.0;
-                        if (ret == 1) theta = t1;
-                        else if (ret == 2) theta = t2;
-                        else if (ret == 3) theta = t3;
-                        else if (ret == 4) theta = t4;
-                        else if (ret == 5) theta = t5;
-                        PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
-                        return;
-                    }
-                    t2 -= 90.0;
-                    t3 += 90.0;
-                    t4 += 90.0;
-                    joint1.Value = t1;
-                    joint2.Value = t2;
-                    joint3.Value = t3;
-                    joint4.Value = t4;
-                    joint5.Value = t5;
-
-                }
-                catch (Exception er)
-                {
-                    PrintLog("Bug", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", er));
-                }
-            }
-
         }
 
         // Method to convert byte array to BitmapImage
@@ -1589,7 +1544,47 @@ namespace RobotArmHelix
         }
         private void TestPos_Click(object sender, RoutedEventArgs e)
         {
-            timer2.Start();
+            //timer2.Start();
+            if (testpos_bttn == true)
+            {
+                double x, y, z;
+                double t1, t2, t3, t4, t5;
+                int ret;
+                int[] temp_value = new int[5];
+                try
+                {
+                    x = double.Parse(TbX.Text);
+                    y = double.Parse(TbY.Text);
+                    z = double.Parse(TbZ.Text);
+
+                    (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
+                    ret = Check_angle(t1, t2, t3, t4, t5);
+                    if (ret != 0)
+                    {
+                        double theta = 0.0;
+                        if (ret == 1) theta = t1;
+                        else if (ret == 2) theta = t2;
+                        else if (ret == 3) theta = t3;
+                        else if (ret == 4) theta = t4;
+                        else if (ret == 5) theta = t5;
+                        PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
+                        return;
+                    }
+                    t2 -= 90.0;
+                    t3 += 90.0;
+                    t4 += 90.0;
+                    joint1.Value = t1;
+                    joint2.Value = t2;
+                    joint3.Value = t3;
+                    joint4.Value = t4;
+                    joint5.Value = t5;
+
+                }
+                catch (Exception er)
+                {
+                    PrintLog("Bug", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", er));
+                }
+            }
         }
 
         private void Tsm_moveL_btn_Click(object sender, RoutedEventArgs e)
@@ -2186,13 +2181,17 @@ namespace RobotArmHelix
         {
             // Collecting the characters received to our 'buffer' (string).
             string data = uart.ReadExisting();
+            double[] received_angle = { 0, 0, 0 };
             Dispatcher.Invoke(() =>
             {
                 try
                 {
-                    ErrorLog.Text = data;
-                    StartReadingData(data);
-                    returnZaxis = Convert.ToDouble(data);
+                    received_angle = StartReadingData(data);
+                    returnX = received_angle[0];
+                    returnY = received_angle[1];
+                    returnZ = received_angle[2];
+                    ErrorLog.Text = returnX.ToString() + "\n" + returnY.ToString() + "\n" + returnZ.ToString();
+
                 }
                 catch
                 {
@@ -2211,28 +2210,23 @@ namespace RobotArmHelix
 
 
         // Initialize SerialPort and start reading data
-        double StartReadingData(string receivedData)
+        double[] StartReadingData(string receivedData)
         {
-            double returnZ = 0;
+            double[] axis = {0,0,0};
             // Split received data by comma and space, and process each number
             //string[] numbers = receivedData.Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            string numbers = receivedData.TrimEnd('\r', '\n');
+            string[] numbers = receivedData.Split(',');
             try
             {
-                //double num1 = double.Parse(numbers[0]);
-                //double num2 = double.Parse(numbers[1]);
-                //double num3 = double.Parse(numbers[2]);
-                //double num4 = double.Parse(numbers[3]);
-                returnZ = double.Parse(numbers);
+                axis[0] = double.Parse(numbers[0]);
+                axis[1] = double.Parse(numbers[1]);
+                axis[2] = double.Parse(numbers[2]);
 
             }
             catch (FormatException)
             {
-                // Handle invalid data format
-                // For example: Show a message box
-                MessageBox.Show("Invalid data format received.");
             }
-            return returnZ;
+            return axis;
         }
 
         private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
@@ -2254,18 +2248,32 @@ namespace RobotArmHelix
 
         private void EStop_bttn_Click(object sender, RoutedEventArgs e)
         {
-            /* Stop command */
+            /* Stop command axis 1 */
             turn_on_1_pulse_relay(3200);
+            /* Stop command axis 2 */
+            turn_on_1_pulse_relay(3220);
+            /* Stop command axis 3 */
+            turn_on_1_pulse_relay(3240);
+            /* Stop command axis 4 */
+            turn_on_1_pulse_relay(3260);
+            /* Stop command axis 5 */
+            turn_on_1_pulse_relay(3280);
         }
 
         private void Glove_enable_button_Click(object sender, RoutedEventArgs e)
         {
-            
+            /* Reset error */
+            turn_on_1_pulse_relay(3200);
+            /* Turn on relay */
+            turn_on_1_pulse_relay(600);
+            /* Timer 1 start */
+            timer1.Start();
         }
 
         private void Glove_disable_button_Click(object sender, RoutedEventArgs e)
         {
-
+            /* Timer 1 start */
+            timer1.Stop();
         }
 
         private void Clr_Traj_btn_Click(object sender, RoutedEventArgs e)
