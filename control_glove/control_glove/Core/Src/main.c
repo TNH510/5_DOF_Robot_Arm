@@ -117,7 +117,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   /* USER CODE END 2 */
   system_test_general();
-  int z_pos = 800;
+  int z_pos = 270;
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
@@ -125,21 +125,21 @@ int main(void)
     /* USER CODE END WHILE */
     // system_test_polling();
 
-    if (z_pos >= 800)
+    if (z_pos >= 270)
     {
-      for (int i = 800; i > 500; i-=5)
+      for (int i = 270; i > 90; i-=10)
       {
-        z_pos = z_pos - 5;
+        z_pos = z_pos - 10;
         HAL_Delay(500);
         printf("%d\r\n",z_pos);
       }
     }
 
-    if (z_pos <= 500)
+    if (z_pos <= 90)
     {
-      for (int i = 500; i < 800; i+=5)
+      for (int i = 90; i < 270; i+=10)
       {
-        z_pos = z_pos + 5;
+        z_pos = z_pos + 10;
         HAL_Delay(500);
         printf("%d\r\n",z_pos);
       }
