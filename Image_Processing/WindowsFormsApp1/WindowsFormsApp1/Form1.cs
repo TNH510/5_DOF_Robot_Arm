@@ -7,8 +7,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Emgu.CV.CvEnum;
+using Emgu.CV;
 using Emgu.CV.Features2D;
 using Emgu.CV.Structure;
+using OpenCvSharp;
+using System.IO;
+using Emgu.CV.CvEnum;
 
 namespace WindowsFormsApp1
 {
@@ -16,82 +21,16 @@ namespace WindowsFormsApp1
     {
         Bitmap Import_picture;
         Bitmap Output;
+        private Image<Bgr, byte> inputImage;
 
         string link_picture = @"C:\Users\Loc\Desktop\XL123.jpg";
         public Form1()
         {
             Import_picture = new Bitmap(link_picture);
-            
             InitializeComponent();
-            Original_picture.Image = RBGtoGray(Import_picture);
+            Original_picture.Image = ConvertToGrayscale(Import_picture);
         }
-        public Bitmap RBGtoGray(Bitmap Import_picture)
-        {
-            Bitmap Gray_picture = new Bitmap(Import_picture.Width, Import_picture.Height);
-            for (int x = 0; x < Import_picture.Width; x++)
-                for (int y = 0; y < Import_picture.Height; y++)
-                { 
-                    Color pixel = Import_picture.GetPixel(x, y);
-                    byte R = pixel.R;
-                    byte G = pixel.G;
-                    byte B = pixel.B;
 
-                    byte gray = (byte)(0.2126 * R + 0.7152 * G + 0.0722 * B);
-                    Gray_picture.SetPixel(x, y, Color.FromArgb(gray, gray, gray));
-                }    
-            return Gray_picture;
-        }
-        public Bitmap ColorImageSharpening(Bitmap hinhgoc)
-        {
-            int[,] c = { { 0, -1, 0 }, { -1, 4, -1 }, { 0, -1, 0 } };
-            Bitmap imgsharpe = new Bitmap(hinhgoc.Width, hinhgoc.Height);
-
-            // dùng vòng for để đọc điểm ảnh ở dạng 2 chiều, bỏ viền ngoài của ảnh vì là mặt nạ 3x3
-            for (int x = 1; x < hinhgoc.Width - 1; x++)
-                for (int y = 1; y < hinhgoc.Height - 1; y++)
-                {
-                    //các biến cộng dồn giá trị điểm ảnh
-                    int Rs = 0, Gs = 0, Bs = 0;
-                    int SharpR = 0, SharpG = 0, SharpB = 0;
-                    //quét các điểm trong mặt nạ
-                    for (int i = x - 1; i <= x + 1; i++)
-                        for (int j = y - 1; j <= y + 1; j++)
-                        {
-                            Color color = hinhgoc.GetPixel(i, j);
-                            int R = color.R; int G = color.G; int B = color.B;
-                            // nhân ma trận điểm ảnh với hệ số C
-                            Rs += R * c[i - x + 1, j - y + 1];
-                            Gs += G * c[i - x + 1, j - y + 1];
-                            Bs += B * c[i - x + 1, j - y + 1];
-
-                        }
-                    //tính điểm sắc nét
-                    Color color1 = hinhgoc.GetPixel(x, y);
-                    int R1 = color1.R; int G1 = color1.G; int B1 = color1.B;
-
-                    SharpR = R1 + Rs; SharpG = G1 + Gs; SharpB = B1 + Bs;
-
-                    if (SharpR < 0)
-                        SharpR = 0;
-                    else if (SharpR > 255)
-                        SharpR = 255;
-
-                    if (SharpG < 0)
-                        SharpG = 0;
-                    else if (SharpG > 255)
-                        SharpG = 255;
-
-                    if (SharpB < 0)
-                        SharpB = 0;
-                    else if (SharpB > 255)
-                        SharpB = 255;
-                    //set các điểm ảnh vào biến
-                    imgsharpe.SetPixel(x, y, Color.FromArgb(SharpR, SharpG, SharpB));
-
-
-                }
-            return imgsharpe;
-        }
         public Bitmap ColorImageBorderline(Bitmap Import_picture)
         {
             //tạo biến ngưỡng để xét với giá trị 
@@ -182,11 +121,164 @@ namespace WindowsFormsApp1
             //trả về giá trị của hàm
             return pic_smoothed;
         }
+
+        // Hàm chuyển đổi ảnh màu sang ảnh xám
+        static Bitmap ConvertToGrayscale(Bitmap inputImage)
+        {
+            Bitmap grayImage = new Bitmap(inputImage.Width, inputImage.Height);
+
+            for (int x = 0; x < inputImage.Width; x++)
+            {
+                for (int y = 0; y < inputImage.Height; y++)
+                {
+                    Color pixel = inputImage.GetPixel(x, y);
+                    int grayValue = (int)(pixel.R * 0.3 + pixel.G * 0.59 + pixel.B * 0.11);
+                    grayImage.SetPixel(x, y, Color.FromArgb(grayValue, grayValue, grayValue));
+                }
+            }
+
+            return grayImage;
+        }
+
+        // Hàm áp dụng bộ lọc Gaussian Blur
+        static double[,] GaussianBlur(Bitmap image)
+        {
+            // Triển khai bộ lọc Gaussian Blur
+            // Trả về ảnh đã được làm mịn dưới dạng một mảng hai chiều
+            int[,] kernel = {
+        {1, 2, 1},
+        {2, 4, 2},
+        {1, 2, 1}
+    };
+
+            int kernelSize = 3;
+            int kernelWeight = 16;
+
+            int width = image.Width;
+            int height = image.Height;
+
+            double[,] blurredImage = new double[width, height];
+
+            // Áp dụng bộ lọc Gaussian Blur
+            for (int x = 1; x < width - 1; x++)
+            {
+                for (int y = 1; y < height - 1; y++)
+                {
+                    double sum = 0;
+                    for (int i = 0; i < kernelSize; i++)
+                    {
+                        for (int j = 0; j < kernelSize; j++)
+                        {
+                            Color pixel = image.GetPixel(x - 1 + i, y - 1 + j);
+                            int grayValue = (int)(pixel.R * 0.3 + pixel.G * 0.59 + pixel.B * 0.11);
+                            sum += kernel[i, j] * grayValue;
+                        }
+                    }
+                    blurredImage[x, y] = sum / kernelWeight;
+                }
+            }
+
+            return blurredImage;
+        }
+
+        // Hàm tính toán gradient của ảnh
+        static double[,] ComputeGradientMagnitudes(double[,] smoothedImage)
+        {
+            // Triển khai tính toán gradient
+            // Trả về gradient magnitudes dưới dạng một mảng hai chiều
+            int width = smoothedImage.GetLength(0);
+            int height = smoothedImage.GetLength(1);
+
+            double[,] gradientMagnitudes = new double[width, height];
+
+            // Tính toán gradient của ảnh
+            for (int x = 1; x < width - 1; x++)
+            {
+                for (int y = 1; y < height - 1; y++)
+                {
+                    double dx = smoothedImage[x + 1, y] - smoothedImage[x - 1, y];
+                    double dy = smoothedImage[x, y + 1] - smoothedImage[x, y - 1];
+                    gradientMagnitudes[x, y] = Math.Sqrt(dx * dx + dy * dy);
+                }
+            }
+
+            return gradientMagnitudes;
+        }
+
+        // Hàm áp dụng ngưỡng Thresholding
+        static double[,] ApplyThreshold(double[,] gradientMagnitudes, double threshold)
+        {
+            // Triển khai ngưỡng hóa
+            // Trả về ảnh nhị phân dưới dạng một mảng hai chiều
+            int width = gradientMagnitudes.GetLength(0);
+            int height = gradientMagnitudes.GetLength(1);
+
+            double[,] thresholdedImage = new double[width, height];
+
+            // Áp dụng ngưỡng Thresholding
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    thresholdedImage[x, y] = gradientMagnitudes[x, y] > threshold ? 255 : 0;
+                }
+            }
+
+            return thresholdedImage;
+        }
+
+        // Hàm chuyển đổi ảnh nhị phân trở lại ảnh màu
+        static Bitmap ConvertToColor(double[,] thresholdedImage)
+        {
+            // Chuyển đổi ảnh nhị phân trở lại ảnh màu
+            // Trả về một Bitmap
+            int width = thresholdedImage.GetLength(0);
+            int height = thresholdedImage.GetLength(1);
+
+            Bitmap outputImage = new Bitmap(width, height);
+
+            // Chuyển đổi ảnh nhị phân trở lại ảnh màu
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    int pixelValue = (int)thresholdedImage[x, y];
+                    Color color = Color.FromArgb(pixelValue, pixelValue, pixelValue);
+                    outputImage.SetPixel(x, y, color);
+                }
+            }
+
+            return outputImage;
+        }
+
+        // Hàm áp dụng thuật toán Canny Edge Detection
+        static Bitmap ApplyCannyEdgeDetection(Bitmap inputImage)
+        {
+
+           // int nguong = Convert.ToInt16(text_Threshold.Text);
+            // Bước 1: Chuyển đổi ảnh màu sang ảnh xám
+            Bitmap grayImage = ConvertToGrayscale(inputImage);
+
+            // Bước 2: Làm mịn ảnh (Gaussian Blur)
+            double[,] smoothedImage = GaussianBlur(grayImage);
+
+            // Bước 3: Tính toán gradient của ảnh
+            double[,] gradientMagnitudes = ComputeGradientMagnitudes(smoothedImage);
+
+            // Bước 4: Áp dụng ngưỡng Thresholding
+            
+            double[,] thresholdedImage = ApplyThreshold(gradientMagnitudes,50);
+
+            // Bước 5: Chuyển đổi ảnh nhị phân trở lại ảnh màu
+            Bitmap outputImage = ConvertToColor(thresholdedImage);
+
+            return outputImage;
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
-            Output = RBGtoGray(Import_picture);
-            Processed_picture.Image = ColorImageBorderline(ColorImageSmoothing(RBGtoGray(Import_picture),4,9)); 
-            Output.Save(@"C:\Users\Loc\Desktop\XL.jpg");
+
+            Processed_picture.Image= ApplyCannyEdgeDetection(Import_picture);
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
