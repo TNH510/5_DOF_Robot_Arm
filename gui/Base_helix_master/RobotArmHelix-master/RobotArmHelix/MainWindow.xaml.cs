@@ -25,11 +25,16 @@ using System.IO.Ports;
 
 
 
+using System.Windows.Threading;
+using System.Data;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolTip;
+using RobotArmHelix.Properties;
+using System.Windows.Markup;
 /**
- * Author: Gabriele Marini (Gabryxx7)
- * This class load the 3d models of all the parts of the robotic arms and add them to the viewport
- * It also defines the relations among the joints of the robotic arms in order to reflect the movement of the robot in the real world
- * **/
+* Author: Gabriele Marini (Gabryxx7)
+* This class load the 3d models of all the parts of the robotic arms and add them to the viewport
+* It also defines the relations among the joints of the robotic arms in order to reflect the movement of the robot in the real world
+* **/
 namespace RobotArmHelix
 {
     class Joint
@@ -57,6 +62,26 @@ namespace RobotArmHelix
     public partial class MainWindow : Window
    {
 
+        private double returnX = 500;
+        private double returnY = 0;
+        private double returnZ = 600;
+
+        private int servo_status_timer = 0;
+        private System.Timers.Timer timer;
+        private int count;
+
+        private SerialPort uart = new SerialPort();
+        string receivedData;
+        /* Create the list for later removal */
+        private List<ModelVisual3D> sphereVisuals = new List<ModelVisual3D>();
+
+        private Thread subThread1;
+        private Thread subThread2;
+        private bool Thread1isRunning = true;
+        private bool Thread2isRunning = true;
+
+        private float elapsedTimeInSeconds = 0; // Track elapsed time in seconds
+
         private byte[,] array2D;
         //Declaration for connecting TCP/IP
         private TcpClient tcpClient;
@@ -65,12 +90,12 @@ namespace RobotArmHelix
         //provides functionality to 3d models
         Model3DGroup RA = new Model3DGroup(); //RoboticArm 3d group
         Model3D geom = null; //Debug sphere to check in which point the joint is rotatin
+        Model3D geomtest = null; //Debug sphere to check in which point the joint is rotatin
         public ActUtlType plc = new();
         List<Joint> joints = null;
         int move = 0; /* move = 1 -> MoveJ, move = 2 -> MoveL */
 
-        // UART
-        private SerialPort uart = new SerialPort("COM12", 115200);
+
 
         bool switchingJoint = false;
         bool isAnimating = false;
@@ -78,6 +103,7 @@ namespace RobotArmHelix
         string response_client;
 
         public double joint1_value, joint2_value, joint3_value, joint4_value, joint5_value;
+        public double[] axis = {0, 0, 0};
 
         public double[] angles_global = {0, 0, 0, 0, 0};
 
@@ -106,6 +132,7 @@ namespace RobotArmHelix
         int movements = 10;
         System.Windows.Forms.Timer timer1;
         System.Windows.Forms.Timer timer2;
+
 #if IRB6700
         //directroy of all stl files
         private const string MODEL_PATH0 = "K0.stl";
@@ -120,9 +147,10 @@ namespace RobotArmHelix
         public MainWindow()
         {
             InitializeComponent();
-            // Tạo và bắt đầu một luồng mới
-            Thread thread1 = new Thread(new ThreadStart(Task1));
-            thread1.Start();
+            //UART
+            string[] ports = SerialPort.GetPortNames();
+            com_port_list1.ItemsSource = ports;
+            // uart.DataReceived += SerialPort_DataReceived;
 
             // Attach the event handler to the MouseDown event
             viewPort3d.MouseDown += helixViewport3D_MouseDown;
@@ -134,6 +162,7 @@ namespace RobotArmHelix
             modelsNames.Add(MODEL_PATH3);
             modelsNames.Add(MODEL_PATH4);
             modelsNames.Add(MODEL_PATH5);
+
 
 #if IRB6700
 #endif
@@ -159,13 +188,12 @@ namespace RobotArmHelix
             double[] angles = { joints[1].angle, joints[2].angle, joints[3].angle, joints[4].angle, joints[5].angle };
             ForwardKinematics(angles);
 
-
             timer1 = new System.Windows.Forms.Timer();
-            timer1.Interval = 40;
+            timer1.Interval = 100;
             timer1.Tick += new System.EventHandler(timer1_Tick);
 
             timer2 = new System.Windows.Forms.Timer();
-            timer2.Interval = 5000;
+            timer2.Interval = 500;
             timer2.Tick += new System.EventHandler(timer2_Tick);
 
         }
@@ -184,6 +212,234 @@ namespace RobotArmHelix
             });
 
         }
+        private void Thread2Start()
+        {
+            Thread2isRunning = true;
+            subThread2 = new Thread(SubThread2Work);
+            subThread2.Start();
+        }
+        private void SubThread2Work()
+        {
+            // Simulated work in the sub-thread
+            while (Thread2isRunning)
+            {
+
+                try
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        joint1.Value = angles_global[0];
+                        joint2.Value = angles_global[1];
+                        joint3.Value = angles_global[2];
+                        joint4.Value = angles_global[3];
+                        joint5.Value = angles_global[4];
+                    });
+                }
+                catch (TaskCanceledException)
+                {
+                    // Ignore the exception
+                }
+
+                // Sleep for a while to simulate the function taking time
+                Thread.Sleep(5000); // Simulate a function execution time of 100 milliseconds
+            }
+        }
+
+        private void Thread1Start()
+        {
+            Thread1isRunning = true;
+            subThread1 = new Thread(SubThread1Work);
+            subThread1.Start();
+        }
+
+        private void SubThread1Work()
+        {
+            // Simulated work in the sub-thread
+            while (Thread1isRunning)
+            {
+                // Execute your function here
+                execute_fk();
+
+                // Sleep for a while to simulate the function taking time
+                Thread.Sleep(1); // Simulate a function execution time of 100 milliseconds
+            }
+        }
+
+        private void StartTimer(int interval)
+        {
+            timer = new System.Timers.Timer(interval);
+            timer.Elapsed += Timer_Elapsed;
+            timer.AutoReset = true; // Set AutoReset to true so that timer can fire multiple times
+            timer.Start();
+        }
+        private async void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            // Increment count
+            count++;
+
+            // Update elapsed time
+            elapsedTimeInSeconds += (float)timer.Interval / 1000;
+
+            // Check if desired time has elapsed
+            if (elapsedTimeInSeconds <= 1.0)
+            {
+                Camera_run();
+                // Introduce a delay without blocking the UI thread
+                await Task.Delay(TimeSpan.FromSeconds(1));
+                // Stop the timer
+                timer.Stop();
+            }
+        }
+        private async void Camera_run()
+        {
+            // Perform your desired action here
+            string filepathtosave = @"C:\Users\daveb\Desktop\raw_data\Image\";
+            // Start the loop until the timer stops
+            using (Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+            {
+                string host = "192.168.0.49";
+                int port = Convert.ToInt16("2011");
+                try
+                {
+                    clientSocket.Connect(host, port);
+                    // Perform your desired action here
+                    string CaptureImageMessage = "1003t\r\n";
+                    byte[] CaptureImageBytes = Encoding.ASCII.GetBytes(CaptureImageMessage);
+                    clientSocket.Send(CaptureImageBytes);
+                    // Receive the response from the server
+                    var buffer = new byte[308295];
+                    int bytesRead = clientSocket.Receive(buffer);
+
+                    await Task.Delay(150);
+
+                    string RequestImageMessage = "1003I?\r\n";
+                    // Send the command to the server
+                    byte[] RequestImageBytes = Encoding.ASCII.GetBytes(RequestImageMessage);
+                    clientSocket.Send(RequestImageBytes);
+
+                    string sentencetosend = "1003I?\r\n";
+
+                    // Receive the response from the server
+                    buffer = new byte[308295];
+                    bytesRead = clientSocket.Receive(buffer);
+
+                    if (RequestImageMessage == sentencetosend)
+                    {
+                        response_client = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                        //PrintLog("", "", response_client);
+                        //Console.WriteLine(response_client);
+                        while (bytesRead < 308291)
+                        {
+                            bytesRead += clientSocket.Receive(buffer, bytesRead, 308291 - bytesRead, SocketFlags.None);
+                        }
+                    }
+
+                    response_client = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                    //PrintLog("Data received", "", response_client);
+
+                    // Sentences to remove
+                    string[] sentencesToRemove = { "1003000308278", "1003*", "1003?", "1003000307200" };
+                    //Console.WriteLine("hello");
+                    // Loop through each sentence and replace it with an empty string
+                    foreach (string sentence in sentencesToRemove)
+                    {
+                        response_client = response_client.Replace(sentence, "");
+                    }
+
+                    // Convert the modified response string back to bytes
+                    byte[] modifiedBuffer = Encoding.ASCII.GetBytes(response_client);
+                    // Convert each byte to its string representation
+                    string bmpString = string.Join(" ", modifiedBuffer);
+                    // Split the byte string into individual byte values
+                    string[] byteValues = bmpString.Split();
+
+                    // Convert each byte value from string to integer
+                    List<byte> byteData = new List<byte>();
+
+
+                    foreach (string byteString in byteValues)
+                    {
+                        byteData.Add(Convert.ToByte(byteString));
+                    }
+                    // Define the number of bytes to delete from the beginning
+                    int bytesToDelete = 1080; // Adjust this number according to your requirement
+
+                    // Delete the specified number of bytes from the beginning
+                    byteData.RemoveRange(0, bytesToDelete);
+
+                    // Convert the list of bytes back to byte array
+                    byte[] byteArrayModified = byteData.ToArray();
+
+                    // Determine the dimensions of the original image
+                    int width = 640;  // Adjust according to your image width
+                    int height = 480;  // Adjust according to your image height
+
+                    // Calculate the new dimensions of the image after removing bytes
+                    int newWidth = width;  // Since bytes removed from the beginning don't affect width
+                    int newHeight = height - (bytesToDelete / width);  // Adjust height accordingly
+
+                    // Convert byte array to BitmapImage
+                    // var bitmapImage = ByteArrayToBitmapSource(byteArrayModified, newWidth, newHeight);
+
+                    // SaveImageWithAutoName(bitmapImage, filepathtosave, ".png");
+                }
+                catch (Exception ex)
+                {
+                    //PrintLog("Error", "Unable to connect to", $"{host}:{port}");
+                }
+            }
+        }
+        // Method to save an image with an automatically generated name based on the current timestamp
+        // Method to save an image with an automatically generated name based on the current timestamp
+        private void SaveImageWithAutoName(BitmapSource bitmapSource, string directoryPath, string fileExtension)
+        {
+            // Generate a unique file name based on the current timestamp
+            string fileName = $"image_{DateTime.Now:yyyyMMddHHmmssfff}.{fileExtension}";
+
+            // Combine the directory path and file name to create the full file path
+            string filePath = System.IO.Path.Combine(directoryPath, fileName);
+
+            // Save the image with the generated file path
+            SaveBitmapSource(bitmapSource, filePath);
+        }
+        // Method to save a BitmapSource as an image file
+        private void SaveBitmapSource(BitmapSource bitmapSource, string filePath)
+        {
+            // Create a BitmapEncoder based on the file extension (e.g., JPEG, PNG)
+            BitmapEncoder encoder = null;
+            string extension = System.IO.Path.GetExtension(filePath).ToLower();
+            switch (extension)
+            {
+                case ".jpg":
+                case ".jpeg":
+                    encoder = new JpegBitmapEncoder();
+                    break;
+                case ".png":
+                    encoder = new PngBitmapEncoder();
+                    break;
+                // Add support for other image formats if needed
+                default:
+                    throw new NotSupportedException("Unsupported image format.");
+            }
+
+            // Convert BitmapSource to BitmapFrame
+            BitmapFrame frame = BitmapFrame.Create(bitmapSource);
+
+            // Add BitmapFrame to the encoder
+            encoder.Frames.Add(frame);
+
+            // Save the image to the specified file path
+            using (FileStream stream = new FileStream(filePath, FileMode.Create))
+            {
+                encoder.Save(stream);
+            }
+        }
+        public void Task2()
+        {
+            StartTimer(50);
+        }
+
+
         private Model3DGroup Initialize_Environment(List<string> modelsNames)
         {
             try
@@ -330,9 +586,6 @@ namespace RobotArmHelix
             }
             execute_fk();
         }
-
-
-
         /**
          * This methodes execute the FK (Forward Kinematics). It starts from the first joint, the base.
          * */
@@ -341,21 +594,25 @@ namespace RobotArmHelix
             int[] value_positon = new int[16];
             uint t1 = 0, t2 = 0, t3 = 0, t4 = 0, t5 = 0;
             double t1_out, t2_out, t3_out, t4_out, t5_out;
-            /** Debug sphere, it takes the x,y,z of the textBoxes and update its position
-             * This is useful when using x,y,z in the "new Point3D(x,y,z)* when defining a new RotateTransform3D() to check where the joints is actually  rotating */
             if (cn_bttn == true)
             {
                 double[] angles = { joints[1].angle, joints[2].angle, joints[3].angle, joints[4].angle, joints[5].angle };
-                ForwardKinematics(angles);
-                joint1.Value = angles[0];
-                joint2.Value = angles[1];
-                joint3.Value = angles[2];
-                joint4.Value = angles[3];
-                joint5.Value = angles[4];
+                // Update UI asynchronously using Dispatcher
+                Dispatcher.Invoke(() =>
+                {
+                    /* Update position for robot on GUI */
+                    ForwardKinematics(angles);
+                    /* Update data for slider on GUI */
+                    joint1.Value = angles[0];
+                    joint2.Value = angles[1];
+                    joint3.Value = angles[2];
+                    joint4.Value = angles[3];
+                    joint5.Value = angles[4];
+                });
             }
             else
             {
-                /* Read position of 5 angle */
+                /* Read position of 5 angles */
                 int[] temp_angle = new int[90];
                 plc.ReadDeviceBlock(Constants.R_POSITION_1, 82, out temp_angle[0]);
 
@@ -373,9 +630,6 @@ namespace RobotArmHelix
 
                 value_positon[8] = temp_angle[80];
                 value_positon[9] = temp_angle[81];
-
-
-
 
                 // Read and convert driver angle value to real position value (was subtracted by 180)
                 t1 = Read_Position((uint)value_positon[0], (uint)value_positon[1]);
@@ -396,11 +650,20 @@ namespace RobotArmHelix
                 angles_global[2] = t3_out;
                 angles_global[3] = t4_out;
                 angles_global[4] = t5_out;
-                ForwardKinematics(angles_global);
+                try
+                {
+                    // Update UI asynchronously using Dispatcher
+                    Dispatcher.Invoke(() =>
+                    {
+                        /* Update position for robot on GUI */
+                        ForwardKinematics(angles_global);
+                    });
+                }
+                catch (TaskCanceledException)
+                {
+                    // Ignore the exception
+                }
             }
-
-
-
         }
 
         private Color changeModelColor(Joint pJoint, Color newColor)
@@ -495,61 +758,66 @@ namespace RobotArmHelix
             return HitTestResultBehavior.Continue;
         }
 
-        //public void StartInverseKinematics(object sender, RoutedEventArgs e)
-        //{
-        //    double x, y, z;
-        //    double[] angles = { joints[1].angle, joints[2].angle - 90.0, joints[3].angle + 90.0, joints[4].angle + 90.0, joints[5].angle };
-
-        //    x = Double.Parse(TbX.Text);
-        //    y = Double.Parse(TbY.Text);
-        //    z = Double.Parse(TbZ.Text);
-
-        //    // Assuming convert_position_angle returns a tuple of 5 values
-        //    (double angle1, double angle2, double angle3, double angle4, double angle5) = convert_position_angle(x, y, z);
-
-        //    angles[0] = angle1;
-        //    angles[1] = angle2 - 90.0;
-        //    angles[2] = angle3 + 90.0;
-        //    angles[3] = angle4 + 90.0;
-        //    angles[4] = angle5;
-
-        //    joint1.Value = joints[1].angle = angles[0];
-        //    joint2.Value = joints[2].angle = angles[1];
-        //    joint3.Value = joints[3].angle = angles[2];
-        //    joint4.Value = joints[4].angle = angles[3];
-        //    joint5.Value = joints[5].angle = angles[4];
-
-        //    if (timer1.Enabled)
-        //    {
-        //        button.Content = "Go to position";
-        //        isAnimating = false;
-        //        timer1.Stop();
-        //        movements = 0;
-        //    }
-        //    else
-        //    {
-        //        geom.Transform = new TranslateTransform3D(reachingPoint);
-        //        movements = 5000;
-        //        button.Content = "STOP";
-        //        isAnimating = true;
-        //        timer1.Start();
-        //    }
-        //}
-
         public void timer1_Tick(object sender, EventArgs e)
         {
-            execute_fk();
-            
+            double x, y, z;
+            double theta_test;
+            double t1, t2, t3, t4, t5;
+            int ret;
+            int[] temp_value = new int[5];
+            try
+            {
+                //x = double.Parse(TbX.Text);
+                //y = double.Parse(TbY.Text);
+                //z = double.Parse(TbZ.Text);
+
+                x = returnX;
+                y = returnY;
+                z = returnZ;
+
+                (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
+                ret = Check_angle(t1, t2, t3, t4, t5);
+                if (ret != 0)
+                {
+                    double theta = 0.0;
+                    if (ret == 1) theta = t1;
+                    else if (ret == 2) theta = t2;
+                    else if (ret == 3) theta = t3;
+                    else if (ret == 4) theta = t4;
+                    else if (ret == 5) theta = t5;
+                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
+                    return;
+                }
+                t2 -= 90.0;
+                t3 += 90.0;
+                t4 += 90.0;
+
+                int[] value_angle = new int[10];
+                /* Run */
+                temp_value[0] = (int)(Convert.ToDouble(t1) * 100000 + 18000000);
+                temp_value[1] = (int)(Convert.ToDouble(t2) * 100000 + 18000000);
+                temp_value[2] = (int)(Convert.ToDouble(t3) * 100000 + 18000000);
+                temp_value[3] = (int)(Convert.ToDouble(t4) * 100000 + 18000000);
+                temp_value[4] = (int)(Convert.ToDouble(t5) * 100000 + 18000000);
+                /* Write the angle */
+                for (int ind = 0; ind < 5; ind++)
+                {
+                    write_d_mem_32_bit(1400 + 2 * ind, temp_value[ind]);
+                }
+            }
+            catch (Exception er)
+            {
+                PrintLog("Bug", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", er));
+            }
         }
 
         public void timer2_Tick(object sender, EventArgs e)
         {
-            joint1.Value = angles_global[0];
-            joint2.Value = angles_global[1];
-            joint3.Value = angles_global[2];
-            joint4.Value = angles_global[3];
-            joint5.Value = angles_global[4];
-
+            //joint1.Value = angles_global[0];
+            //joint2.Value = angles_global[1];
+            //joint3.Value = angles_global[2];
+            //joint4.Value = angles_global[3];
+            //joint5.Value = angles_global[4];
         }
         public double[] InverseKinematics(Vector3D target, double[] angles)
         {
@@ -620,7 +888,23 @@ namespace RobotArmHelix
             return Math.Sqrt(Math.Pow((point.X - target.X), 2.0) + Math.Pow((point.Y - target.Y), 2.0) + Math.Pow((point.Z - target.Z), 2.0));
         }
         
+        // Function to calculate the trajectory points (example)
+        private List<Point3D> CalculateTrajectoryLine()
+        {
+            List<Point3D> trajectoryPoints = new List<Point3D>();
 
+            // Example trajectory calculation (replace with your own logic)
+            for (double t = 0; t <= 500; t += 50)
+            {
+                double x = Math.Cos(t); // Replace with your x-coordinate calculation
+                double y = Math.Sin(t); // Replace with your y-coordinate calculation
+                double z = t;            // Replace with your z-coordinate calculation
+
+                trajectoryPoints.Add(new Point3D(x, y, z));
+            }
+
+            return trajectoryPoints;
+        }
         public Vector3D ForwardKinematics(double [] angles)
         {
 
@@ -709,6 +993,24 @@ namespace RobotArmHelix
             Ty.Content = y;
             Tz.Content = z;
 
+            /* Draw trajectory */
+            List<Point3D> trajectoryPoints = new List<Point3D>();
+            // Create a debug sphere at the trajectory point
+            MeshBuilder buildertest = new MeshBuilder();
+            buildertest.AddSphere(new Point3D(x + 250, y + 250, z + 250), 5, 15, 15); // Adjust the radius as needed
+
+            // Create a GeometryModel3D using the mesh and a blue material
+            GeometryModel3D sphereModel = new GeometryModel3D(buildertest.ToMesh(), Materials.Red);
+
+            // Create a ModelVisual3D to hold the GeometryModel3D
+            ModelVisual3D visualtest = new ModelVisual3D();
+            visualtest.Content = sphereModel;
+
+            // Add the ModelVisual3D to the Viewport3D
+            viewPort3d.Children.Add(visualtest);
+            // Add the ModelVisual3D to the list for later removal
+            sphereVisuals.Add(visualtest);
+
 #if IRB6700
 
 #else
@@ -721,6 +1023,16 @@ namespace RobotArmHelix
 #endif
 
             return new Vector3D(joints[5].model.Bounds.Location.X, joints[5].model.Bounds.Location.Y, joints[5].model.Bounds.Location.Z);
+        }
+
+        // Function to remove all sphere visuals from the viewport
+        private void RemoveSphereVisuals()
+        {
+            foreach (ModelVisual3D visual in sphereVisuals)
+            {
+                viewPort3d.Children.Remove(visual);
+            }
+            sphereVisuals.Clear();
         }
 
         public static (double, double, double, double, double) convert_position_angle(double x, double y, double z)
@@ -762,19 +1074,12 @@ namespace RobotArmHelix
         }
         private void ConnectPLC(object sender, RoutedEventArgs e)
         {
-            /* Start timer1 */
-            timer1.Start();
-            timer2.Start();
-
-
-
             /* Disable slider */
             joint1.IsEnabled = false;
             joint2.IsEnabled = false;
             joint3.IsEnabled = false;
             joint4.IsEnabled = false;
             joint5.IsEnabled = false;
-
             /* Disable test position button */
             testpos_bttn = false;
             /* Change the color of the button when clicked */
@@ -804,7 +1109,6 @@ namespace RobotArmHelix
                 ChangeColorObjectForeground(Connect_button, Constants.OBJECT_MODIFIED1);
                 ChangeColorObjectForeground(Disconnect_button, Constants.OBJECT_MODIFIED);
                 ChangeColorObjectBorderBrush(Disconnect_button, Constants.OBJECT_MODIFIED);
-
                 /* 
                     Print the log command
                     MethosBase.GetCurrentMethod returns the action user did.
@@ -843,13 +1147,18 @@ namespace RobotArmHelix
                 ChangeColorObjectForeground(Servo_button, Constants.OBJECT_MODIFIED1);
                 PrintLog("SERVO:", servo_status.ToString(), "ON");
             }
+            /* Start timer1 and timer2 */
+            // timer1.Start();
+            Thread1Start();
+            Thread2Start();
+            //timer1.Start();
         }
 
         private void DisconnectPLC(object sender, RoutedEventArgs e)
         {
-            /* Stop timer1 */
-            timer1.Stop();
-            timer2.Stop();
+            /* Stop thread */
+            Thread1isRunning = false;
+            Thread2isRunning = false;
 
             /* Enable slider */
             joint1.IsEnabled = true;
@@ -965,23 +1274,12 @@ namespace RobotArmHelix
         private void GoHome_button_Click(object sender, RoutedEventArgs e)
         {
             Press_button(MethodBase.GetCurrentMethod().Name, Constants.R_GOHOME);
-
-            try
-            {
-                uart.Open();
-                uart.WriteLine("hello");
-                uart.Close();
-                MessageBox.Show("Data sent successfully!");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error sending data: " + ex.Message);
-            }
         }
 
         private void Jog_set_speed_Click(object sender, RoutedEventArgs e)
         {
             int velocity = 0;
+            string getName = MethodBase.GetCurrentMethod().Name;
             try
             {
                 velocity = Convert.ToInt32(jog_speed_tb.Text) * 1000;
@@ -989,6 +1287,7 @@ namespace RobotArmHelix
                 {
                     write_d_mem_32_bit(640 + 2 * ind, velocity);
                 }
+                PrintLog("Infor", getName, "Write velocity to PLC successfully");
 
             }
             catch (Exception ex)
@@ -1232,7 +1531,8 @@ namespace RobotArmHelix
         }
         private void TestPos_Click(object sender, RoutedEventArgs e)
         {
-            if(testpos_bttn == true)
+            //timer2.Start();
+            if (testpos_bttn == true)
             {
                 double x, y, z;
                 double t1, t2, t3, t4, t5;
@@ -1331,6 +1631,7 @@ namespace RobotArmHelix
                 angle_array[t, 2] = (int)(t3 * 100000 + 18000000);
                 angle_array[t, 3] = (int)(t4 * 100000 + 18000000);
                 angle_array[t, 4] = (int)(t5 * 100000 + 18000000);
+
             }
             for (int j = 0; j < 10; j++)
             {
@@ -1476,7 +1777,6 @@ namespace RobotArmHelix
         {
             if (move == 1)
             {
-                /* Turn on relay */
                 turn_on_1_pulse_relay(528);
             }
             else if (move == 2)
@@ -1806,6 +2106,173 @@ namespace RobotArmHelix
 
             // Add the Image control to your WPF layout (assuming you have a Grid named "mainGrid" in your XAML)
             mainGrid.Children.Add(image);
+        }
+
+        private void Forward_button_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private async void Glove_connect_button_Click(object sender, RoutedEventArgs e)
+        {
+            uart = new SerialPort();
+            uart.PortName = com_port_list1.Text;
+            // Set baud rate
+            int baudRate;
+            if (int.TryParse(com_port_list2.Text, out baudRate))
+            {
+                uart.BaudRate = baudRate;
+            }
+            else
+            {
+                // Handle invalid baud rate input
+                MessageBox.Show("Invalid baud rate input.");
+            }
+            // Set data bit
+            int databit;
+            if (int.TryParse(com_port_list3.Text, out databit))
+            {
+                uart.DataBits = databit;
+            }
+            else
+            {
+                // Handle invalid baud rate input
+                MessageBox.Show("Invalid data bit input.");
+            }
+
+            // Set stop bits
+            if (Enum.TryParse<StopBits>(com_port_list4.Text, out StopBits stopBits))
+            {
+                uart.StopBits = stopBits;
+            }
+            else
+            {
+                // Handle invalid stop bits input
+                // For example: Display a message box informing the user
+                MessageBox.Show("Invalid stop bits input.");
+            }
+            // Set parity
+            if (Enum.TryParse<Parity>(com_port_list5.Text, out Parity parity))
+            {
+                uart.Parity = parity;
+            }
+            else
+            {
+                // Handle invalid parity input
+                MessageBox.Show("Invalid parity input.");
+            }
+            progressbar1.Value = 100;
+            uart.Open();
+            uart.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(Receive);
+        }
+
+        private void Receive(object sender, SerialDataReceivedEventArgs e)
+        {
+            // Collecting the characters received to our 'buffer' (string).
+            string data = uart.ReadExisting();
+            double[] received_angle = { 180, 180, 180 };
+            Dispatcher.Invoke(() =>
+            {
+                try
+                {
+                    received_angle = StartReadingData(data);
+                    returnX = received_angle[0];
+                    returnY = received_angle[1];
+                    returnZ = received_angle[2];
+                    ErrorLog.Text = returnX.ToString() + "\n" + returnY.ToString() + "\n" + returnZ.ToString();
+
+                }
+                catch
+                {
+
+                }
+
+            });
+        }
+
+        private void Glove_disconnect_button_Click(object sender, RoutedEventArgs e)
+        {
+            uart.Close();
+            progressbar1.Value = 0;
+        }
+
+    double[] StartReadingData(string receivedData)
+    {
+        int endIndex = receivedData.IndexOf("\r\n");
+        if (endIndex != -1)
+        {
+            string dataSubstring = receivedData.Substring(0, endIndex);
+            string[] numbers = dataSubstring.Split(',');
+
+            try
+            {
+                axis[0] = double.Parse(numbers[0]);
+                axis[1] = double.Parse(numbers[1]);
+                axis[2] = double.Parse(numbers[2]);
+            }
+            catch (FormatException)
+            {
+                // Xử lý lỗi định dạng
+            }
+        }
+        else
+        {
+            // Không tìm thấy \r\n trong chuỗi
+        }
+
+        return axis;
+    }
+
+        // private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        // {
+        //     // Read data from the serial port
+        //     string data = uart.ReadLine();
+        //     PrintLog("Infor", "Data received", data);
+        // }
+
+        private void ShowData(object sender, EventArgs e)
+        {
+            PrintLog("Infor", "Data received", receivedData);
+        }
+
+        private void spd_tb_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void EStop_bttn_Click(object sender, RoutedEventArgs e)
+        {
+            /* Stop command axis 1 */
+            turn_on_1_pulse_relay(3200);
+            /* Stop command axis 2 */
+            turn_on_1_pulse_relay(3220);
+            /* Stop command axis 3 */
+            turn_on_1_pulse_relay(3240);
+            /* Stop command axis 4 */
+            turn_on_1_pulse_relay(3260);
+            /* Stop command axis 5 */
+            turn_on_1_pulse_relay(3280);
+        }
+
+        private void Glove_enable_button_Click(object sender, RoutedEventArgs e)
+        {
+            /* Reset error */
+            turn_on_1_pulse_relay(3200);
+            /* Turn on relay */
+            turn_on_1_pulse_relay(600);
+            /* Timer 1 start */
+            timer1.Start();
+        }
+
+        private void Glove_disable_button_Click(object sender, RoutedEventArgs e)
+        {
+            /* Timer 1 start */
+            timer1.Stop();
+        }
+
+        private void Clr_Traj_btn_Click(object sender, RoutedEventArgs e)
+        {
+            RemoveSphereVisuals();
         }
 
         public void turn_on_1_pulse_relay(int device)
