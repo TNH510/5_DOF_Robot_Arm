@@ -61,7 +61,6 @@ namespace RobotArmHelix
     /// </summary>
     public partial class MainWindow : Window
    {
-
         private double returnX = 500;
         private double returnY = 0;
         private double returnZ = 600;
@@ -197,7 +196,7 @@ namespace RobotArmHelix
 
         }
 
-        private void Thread2Start()
+        public void Thread2Start()
         {
             Thread2isRunning = true;
             subThread2 = new Thread(SubThread2Work);
@@ -230,7 +229,7 @@ namespace RobotArmHelix
             }
         }
 
-        private void Thread1Start()
+        public void Thread1Start()
         {
             Thread1isRunning = true;
             subThread1 = new Thread(SubThread1Work);
@@ -2279,6 +2278,12 @@ namespace RobotArmHelix
         private void Clr_Traj_btn_Click(object sender, RoutedEventArgs e)
         {
             RemoveSphereVisuals();
+        }
+
+        private void Open_menu_Click(object sender, RoutedEventArgs e)
+        {
+            Menu_control menuControl = new Menu_control(this);
+            menuControl.Show();
         }
 
         public void turn_on_1_pulse_relay(int device)

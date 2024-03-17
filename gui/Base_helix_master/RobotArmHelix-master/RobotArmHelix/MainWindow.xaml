@@ -136,5 +136,6 @@
         <Button x:Name="Enable_glove_btn" Content="ENBALE" HorizontalAlignment="Left" Margin="332,699,0,0" VerticalAlignment="Top" Width="100" Height="42" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_enable_button_Click"/>
         <Button x:Name="Disble_glove_btn" Content="DISABLE" HorizontalAlignment="Left" Margin="480,699,0,0" VerticalAlignment="Top" Width="100" Height="42" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_disable_button_Click" RenderTransformOrigin="0.48,1.838"/>
         <Button x:Name="Clear_Trajectory_btn" Content="Clear_Trajectory" HorizontalAlignment="Left" Margin="164,724,0,0" VerticalAlignment="Top" Width="123" Height="23" FontSize="11" Click="Clr_Traj_btn_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36"/>
+        <Button x:Name="Open_menu_control" Content="open" HorizontalAlignment="Left" Margin="54,806,0,0" VerticalAlignment="Top" Width="100" Height="42" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Open_menu_Click"/>
     </Grid>
 </Window>
