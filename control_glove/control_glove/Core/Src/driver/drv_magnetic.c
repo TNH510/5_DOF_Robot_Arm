@@ -22,7 +22,7 @@ base_status_t drv_magnetic_init(void)
 {
     HMC5883L_setRange(HMC5883L_RANGE_1_3GA);
 	HMC5883L_setMeasurementMode(HMC5883L_CONTINOUS);
-	HMC5883L_setDataRate(HMC5883L_DATARATE_15HZ);
+	HMC5883L_setDataRate(HMC5883L_DATARATE_75HZ);
 	HMC5883L_setSamples(HMC5883L_SAMPLES_1);
 	HMC5883L_setOffset(0, 0);
 
