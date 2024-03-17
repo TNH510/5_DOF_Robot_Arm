@@ -103,6 +103,7 @@ namespace RobotArmHelix
         string response_client;
 
         public double joint1_value, joint2_value, joint3_value, joint4_value, joint5_value;
+        public double[] axis = {0, 0, 0};
 
         public double[] angles_global = {0, 0, 0, 0, 0};
 
@@ -149,7 +150,7 @@ namespace RobotArmHelix
             //UART
             string[] ports = SerialPort.GetPortNames();
             com_port_list1.ItemsSource = ports;
-            uart.DataReceived += SerialPort_DataReceived;
+            // uart.DataReceived += SerialPort_DataReceived;
 
             // Attach the event handler to the MouseDown event
             viewPort3d.MouseDown += helixViewport3D_MouseDown;
@@ -2180,7 +2181,7 @@ namespace RobotArmHelix
         private void Receive(object sender, SerialDataReceivedEventArgs e)
         {
             // Collecting the characters received to our 'buffer' (string).
-            string data = uart.ReadLine();
+            string data = uart.ReadExisting();
             double[] received_angle = { 180, 180, 180 };
             Dispatcher.Invoke(() =>
             {
@@ -2207,30 +2208,39 @@ namespace RobotArmHelix
             progressbar1.Value = 0;
         }
 
-        // Initialize SerialPort and start reading data
-        double[] StartReadingData(string receivedData)
+    double[] StartReadingData(string receivedData)
+    {
+        int endIndex = receivedData.IndexOf("\r\n");
+        if (endIndex != -1)
         {
-            double[] axis = {0,0,0};
-            string[] numbers = receivedData.Split(',');
+            string dataSubstring = receivedData.Substring(0, endIndex);
+            string[] numbers = dataSubstring.Split(',');
+
             try
             {
                 axis[0] = double.Parse(numbers[0]);
                 axis[1] = double.Parse(numbers[1]);
                 axis[2] = double.Parse(numbers[2]);
-
             }
             catch (FormatException)
             {
+                // Xử lý lỗi định dạng
             }
-            return axis;
+        }
+        else
+        {
+            // Không tìm thấy \r\n trong chuỗi
         }
 
-        private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
-        {
-            // Read data from the serial port
-            string data = uart.ReadLine();
-            PrintLog("Infor", "Data received", data);
-        }
+        return axis;
+    }
+
+        // private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        // {
+        //     // Read data from the serial port
+        //     string data = uart.ReadLine();
+        //     PrintLog("Infor", "Data received", data);
+        // }
 
         private void ShowData(object sender, EventArgs e)
         {
