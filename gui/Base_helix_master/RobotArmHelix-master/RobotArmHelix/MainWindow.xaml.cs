@@ -2211,12 +2211,6 @@ namespace RobotArmHelix
         double[] StartReadingData(string receivedData)
         {
             double[] axis = {0,0,0};
-            // Split received data by comma and space, and process each number
-            var charsToRemove = new string[] { "s", "\r", "\n"};
-            foreach (var c in charsToRemove)
-            {
-                receivedData = receivedData.Replace(c, string.Empty);
-            }
             string[] numbers = receivedData.Split(',');
             try
             {
