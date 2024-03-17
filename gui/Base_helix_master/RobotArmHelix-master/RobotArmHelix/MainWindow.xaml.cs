@@ -2177,11 +2177,11 @@ namespace RobotArmHelix
             uart.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(Receive);
         }
 
-        private void Receive(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
+        private void Receive(object sender, SerialDataReceivedEventArgs e)
         {
             // Collecting the characters received to our 'buffer' (string).
-            string data = uart.ReadExisting();
-            double[] received_angle = { 0, 0, 0 };
+            string data = uart.ReadLine();
+            double[] received_angle = { 180, 180, 180 };
             Dispatcher.Invoke(() =>
             {
                 try
@@ -2207,14 +2207,16 @@ namespace RobotArmHelix
             progressbar1.Value = 0;
         }
 
-
-
         // Initialize SerialPort and start reading data
         double[] StartReadingData(string receivedData)
         {
             double[] axis = {0,0,0};
             // Split received data by comma and space, and process each number
-            //string[] numbers = receivedData.Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            var charsToRemove = new string[] { "s", "\r", "\n"};
+            foreach (var c in charsToRemove)
+            {
+                receivedData = receivedData.Replace(c, string.Empty);
+            }
             string[] numbers = receivedData.Split(',');
             try
             {
