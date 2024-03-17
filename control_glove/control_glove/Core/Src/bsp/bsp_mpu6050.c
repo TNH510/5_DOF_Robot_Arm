@@ -509,7 +509,7 @@ base_status_t bsp_mpu6050_filter_task(void)
         
     }
 
-    printf("s500,0,%d\r\n", z_pos);
+    printf("500,0,%d\r\n", z_pos);
 
 	HAL_Delay(100);
 
