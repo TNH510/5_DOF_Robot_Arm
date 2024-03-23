@@ -1,0 +1,40 @@
+5-DOF-ROBOT Weekly Meeting
+-------------------------------------------------
+23/03/2024
+- Tool điều khiển C#:
+ + Menu: Đã có thể hiện giao diện Menu và demo (chưa bỏ vào tool chính)
+ + UART: Đã xử lí được data nhận từ Găng tay (nhận 3 góc x,y,z) và chạy được robot theo trục z
+ + Optimize tool: Bật UART còn 8-9 FPS, bình thường khoảng 21-22 FPS
+ + Next actions: 
+    + Bỏ mấy tính năng tool chính sang Menu
+    + Clean lại phần UART
+    + Đánh giá lại phần tốc độ thực thi
+    + Thiết kế phần tạo quỹ tạo cho việc gắp hàng trên băng tải
+    + Thiết kế hệ thống safety and sercurity cho tool
+
+- Xử lí ảnh từ Camera:
+ + Detect viền: Hiện tại đã detect được viền dùng thuật toán Keny, thời gian xử lí là 2 giây cho 1 
+                tấm ảnh
+ + Next actions: 
+    + Tìm tọa độ 4 điểm của hộp trên tấm ảnh, từ đó tính ra vị trí, và góc của hộp
+    + Tối ưu thuật toán xử lí ảnh xuống dưới 1 giây
+
+- Găng tay điều khiển:
+ + UART: Đã test giao tiếp UART lấy góc từ IMU để điểu khiển tọa độ x,y,z của robot qua C#
+         Đã set module ở Baurate cao nhất là 115200, chưa test phần tx power, khoảng cách điều khiển
+         hiện tại đã test có thể đáp ứng ở bất kì vị tri nào trong phòng    
+ + Lấy data 3 góc: Đã áp dụng thành công thuật toán lọc nhiễu MagWick cho IMU và MARG, bước đầu có thể
+         thấy góc lấy được khá ổn định, cần test kĩ hơn
+ + Thiết kế phần cơ khí: Đã lên được ý tưởng thiết kế cho phần khung cơ khí, cần vẽ mô hình 3D và fix các 
+                       thông số về kích thước tay 
+ + Thiết kế mạch điện: Đã chốt được schematic tổng quát, chọn lựa được linh kiện cần mua, cần chốt lại giá
+                        và mua về thử nghiệm
+                       Đã chốt được vấn đề nguồn cho hệ thống (Dùng sạc + nguồn 5 vôn)
+                       Đang tiến hành vẽ schematic trên KiCAD
+ + Next actions: 
+    + Lên list, chốt giá và tiến hành mua linh kiện về test chung
+    + Bắt đầu vẽ schematic chung cho hệ thống trên KiCAD
+    + Bắt đầu dùng bản vẽ 3D tham khảo và chỉnh sửa cho phù hợp với găng tay của mình
+    + Test thực nghiệm và so sánh với 1 thiết bị đo thực tế (điện thoại) để đánh giá độ chính xác
+
+
