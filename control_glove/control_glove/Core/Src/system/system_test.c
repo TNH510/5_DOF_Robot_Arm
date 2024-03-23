@@ -14,6 +14,7 @@
 #include "drv_magnetic.h"
 #include "drv_acc.h"
 #include "MadgwickAHRS.h"
+#include "bsp_mpu6050.h"
 
 /* Private includes --------------------------------------------------------- */
 /* Private defines ---------------------------------------------------------- */
@@ -30,13 +31,18 @@ system_test_error_t system_test_init(void)
 {
     drv_uart_init(); 
     drv_button_init();
-    drv_magnetic_init();
-    drv_acc_init();
+    // drv_magnetic_init();
+//    if (drv_acc_init() == BS_OK)
+//    {
+//        printf("IMU init success\r\n");
+//    }
+
+    bsp_mpu6050_init();
 }
 
 system_test_error_t system_test_general(void)
 {
-    drv_uart_printf("Hello, this is Smart Glove");
+    // drv_uart_printf("Hello, this is Smart Glove");
     return SYSTEM_TEST_OK;
 }
 
@@ -53,21 +59,26 @@ system_test_error_t system_test_polling(void)
     //     drv_uart_printf("Holding...");
     // }
 
-    drv_acc_data_t acc_data;
-    drv_magnetic_data_t mag_data;
-    drv_acc_get_data(&acc_data);
-    drv_magnetic_get_data(&mag_data);
+    // drv_acc_data_t acc_data;
+//    drv_magnetic_data_t mag_data;
+    // drv_acc_get_data(&acc_data);
+//    drv_magnetic_get_data(&mag_data);
     
-    MadgwickAHRSupdate(deg2rad((float)acc_data.gy_x), deg2rad((float)acc_data.gy_y), deg2rad((float)acc_data.gy_z),
-    	    (float)acc_data.acc_x, (float)acc_data.acc_y, (float)acc_data.acc_z, mag_data.XAxis, mag_data.YAxis, mag_data.ZAxis);
+//    MadgwickAHRSupdate(deg2rad((float)acc_data.gy_x), deg2rad((float)acc_data.gy_y), deg2rad((float)acc_data.gy_z),
+//    	    (float)acc_data.acc_x, (float)acc_data.acc_y, (float)acc_data.acc_z, mag_data.XAxis, mag_data.YAxis, mag_data.ZAxis);
+
+    // MadgwickAHRSupdate(deg2rad((float)acc_data.gy_x), deg2rad((float)acc_data.gy_y), deg2rad((float)acc_data.gy_z),
+            // (float)acc_data.acc_x, (float)acc_data.acc_y, (float)acc_data.acc_z, 0, 0, 0);
 
     // printf("%d,%d,%d\r\n",(int)acc_data.acc_x,(int)acc_data.acc_y,(int)acc_data.acc_z);
     // printf("%0.4f,%0.4f,%0.4f,%0.4f\r\n",q0,q1,q2,q3);
     // printf("%d,%d,%d\r\n",(int)acc_data.gy_x,(int)acc_data.gy_y,(int)acc_data.gy_z);
-    float psi, theta, phi;
-    quaternion_to_euler(q0, q1, q2, q3, &psi, &theta, &phi);
-    printf("%0.4f,%0.4f,%0.4f,%0.4f\r\n",psi,theta,phi,0);
-    HAL_Delay(2);
+    // float psi, theta, phi;
+    // quaternion_to_euler(q0, q1, q2, q3, &psi, &theta, &phi);
+    //  printf("%0.4f,%0.4f,%0.4f,%0.4f\r\n",psi,theta,phi,0);
+    // printf("%0.4f\r\n",psi);
+    // HAL_Delay(10);
+    bsp_mpu6050_filter_task();
 
     return SYSTEM_TEST_OK;
 }

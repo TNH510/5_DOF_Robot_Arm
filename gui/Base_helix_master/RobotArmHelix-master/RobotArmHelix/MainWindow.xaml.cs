@@ -98,10 +98,11 @@ namespace RobotArmHelix
 
         bool switchingJoint = false;
         bool isAnimating = false;
-        public bool task_run = false;
+
         string response_client;
 
         public double joint1_value, joint2_value, joint3_value, joint4_value, joint5_value;
+        public double[] axis = {0, 0, 0};
 
         public double[] angles_global = {0, 0, 0, 0, 0};
 
@@ -148,7 +149,7 @@ namespace RobotArmHelix
             //UART
             string[] ports = SerialPort.GetPortNames();
             com_port_list1.ItemsSource = ports;
-            uart.DataReceived += SerialPort_DataReceived;
+            // uart.DataReceived += SerialPort_DataReceived;
 
             // Attach the event handler to the MouseDown event
             viewPort3d.MouseDown += helixViewport3D_MouseDown;
@@ -195,8 +196,22 @@ namespace RobotArmHelix
             timer2.Tick += new System.EventHandler(timer2_Tick);
 
         }
+        
+        public void Task1()
+        {
 
-        public void Thread2Start()
+            // Sử dụng Dispatcher để thay đổi UI element từ một luồng khác
+            Dispatcher.Invoke(() =>
+            {
+                joint1.Value = angles_global[0];
+                joint2.Value = angles_global[1];
+                joint3.Value = angles_global[2];
+                joint4.Value = angles_global[3];
+                joint5.Value = angles_global[4];
+            });
+
+        }
+        private void Thread2Start()
         {
             Thread2isRunning = true;
             subThread2 = new Thread(SubThread2Work);
@@ -363,9 +378,9 @@ namespace RobotArmHelix
                     int newHeight = height - (bytesToDelete / width);  // Adjust height accordingly
 
                     // Convert byte array to BitmapImage
-                    var bitmapImage = ByteArrayToBitmapSource(byteArrayModified, newWidth, newHeight);
+                    // var bitmapImage = ByteArrayToBitmapSource(byteArrayModified, newWidth, newHeight);
 
-                    SaveImageWithAutoName(bitmapImage, filepathtosave, ".png");
+                    // SaveImageWithAutoName(bitmapImage, filepathtosave, ".png");
                 }
                 catch (Exception ex)
                 {
@@ -803,34 +818,6 @@ namespace RobotArmHelix
             //joint4.Value = angles_global[3];
             //joint5.Value = angles_global[4];
         }
-
-        // Method to convert byte array to BitmapImage
-        public static BitmapSource ByteArrayToBitmapSource(byte[] byteData, int newWidth, int newHeight)
-        {
-            if (byteData == null || byteData.Length == 0)
-                return null;
-
-            try
-            {
-                // Create BitmapSource
-                return BitmapSource.Create(
-                    newWidth,
-                    newHeight,
-                    96, // dpi x
-                    96, // dpi y
-                    PixelFormats.Gray8, // pixel format (8-bit grayscale)
-                    null, // palette
-                    byteData, // pixel data
-                    newWidth); // stride (width * bytes per pixel)
-            }
-            catch (Exception ex)
-            {
-                // Handle any exceptions
-                Console.WriteLine("Error converting byte array to BitmapSource: " + ex.Message);
-                return null;
-            }
-        }
-
         public double[] InverseKinematics(Vector3D target, double[] angles)
         {
             if (DistanceFromTarget(target, angles) < DistanceThreshold)
@@ -1962,7 +1949,6 @@ namespace RobotArmHelix
             return (value_positon2 << 16 | value_positon1) - 18000000;
         }
 
-
         private async void TCP_Connect_button_Click(object sender, RoutedEventArgs e)
         {
             // Call the StartClient method to initiate the connection and communication with the server
@@ -2096,26 +2082,29 @@ namespace RobotArmHelix
 
         }
 
-        // Helper method to wait for response or timeout
-        static bool WaitForResponse(Socket socket, TimeSpan timeout)
-        {
-            DateTime startTime = DateTime.Now;
-            while ((DateTime.Now - startTime) < timeout)
-            {
-                if (socket.Poll(1000, SelectMode.SelectRead) && socket.Available > 0)
-                {
-                    // Response received before timeout
-                    return true;
-                }
-            }
-            // Timeout occurred
-            return false;
-        }
-
         private void Camera_button_Click(object sender, RoutedEventArgs e)
         {
-            Thread thread2 = new Thread(new ThreadStart(Task2));
-            thread2.Start();
+            // Display the image
+            DisplayImage();
+        }
+
+        private void DisplayImage()
+        {
+            // Create a BitmapSource from the 2D byte array
+            BitmapSource bitmapSource = BitmapSource.Create(
+                640, 480,
+                96, 96,
+                PixelFormats.Gray8,
+                null,
+                array2D,
+                640); // Stride = width of the image in bytes
+
+            // Create an Image control
+            Image image = new Image();
+            image.Source = bitmapSource;
+
+            // Add the Image control to your WPF layout (assuming you have a Grid named "mainGrid" in your XAML)
+            mainGrid.Children.Add(image);
         }
 
         private void Forward_button_Click(object sender, RoutedEventArgs e)
@@ -2176,11 +2165,11 @@ namespace RobotArmHelix
             uart.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(Receive);
         }
 
-        private void Receive(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
+        private void Receive(object sender, SerialDataReceivedEventArgs e)
         {
             // Collecting the characters received to our 'buffer' (string).
             string data = uart.ReadExisting();
-            double[] received_angle = { 0, 0, 0 };
+            double[] received_angle = { 180, 180, 180 };
             Dispatcher.Invoke(() =>
             {
                 try
@@ -2206,34 +2195,39 @@ namespace RobotArmHelix
             progressbar1.Value = 0;
         }
 
-
-
-        // Initialize SerialPort and start reading data
-        double[] StartReadingData(string receivedData)
+    double[] StartReadingData(string receivedData)
+    {
+        int endIndex = receivedData.IndexOf("\r\n");
+        if (endIndex != -1)
         {
-            double[] axis = {0,0,0};
-            // Split received data by comma and space, and process each number
-            //string[] numbers = receivedData.Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            string[] numbers = receivedData.Split(',');
+            string dataSubstring = receivedData.Substring(0, endIndex);
+            string[] numbers = dataSubstring.Split(',');
+
             try
             {
                 axis[0] = double.Parse(numbers[0]);
                 axis[1] = double.Parse(numbers[1]);
                 axis[2] = double.Parse(numbers[2]);
-
             }
             catch (FormatException)
             {
+                // Xử lý lỗi định dạng
             }
-            return axis;
+        }
+        else
+        {
+            // Không tìm thấy \r\n trong chuỗi
         }
 
-        private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
-        {
-            // Read data from the serial port
-            string data = uart.ReadLine();
-            PrintLog("Infor", "Data received", data);
-        }
+        return axis;
+    }
+
+        // private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        // {
+        //     // Read data from the serial port
+        //     string data = uart.ReadLine();
+        //     PrintLog("Infor", "Data received", data);
+        // }
 
         private void ShowData(object sender, EventArgs e)
         {
