@@ -2275,6 +2275,12 @@ namespace RobotArmHelix
             RemoveSphereVisuals();
         }
 
+        private void Open_menu_button_click(object sender, RoutedEventArgs e)
+        {
+            Menu_control menuControl = new Menu_control(this);
+            menuControl.Show();
+        }
+
         public void turn_on_1_pulse_relay(int device)
         {
             string device_str = "M" + Convert.ToString(device);
