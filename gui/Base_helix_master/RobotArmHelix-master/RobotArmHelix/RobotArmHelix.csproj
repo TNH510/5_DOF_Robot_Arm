@@ -165,9 +165,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ImageWindow.xaml.cs">
-      <DependentUpon>ImageWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Utilities\Btn.cs" />
     <Compile Include="Utilities\RelayCommand.cs" />
     <Compile Include="Utilities\ViewModelBase.cs" />
@@ -213,10 +210,6 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="ImageWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Menu_control.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
