@@ -16,13 +16,18 @@
 /* Private macros ----------------------------------------------------------- */
 /* Public variables --------------------------------------------------------- */
 /* Private variables -------------------------------------------------------- */
+static float A[3][3] = {{ 0.093362f, 0.006494f, -0.001871f}, 
+                        {0.006494f, 0.094753f, -0.008098f}, 
+                        {-0.001871f, -0.008098f, 0.098554f}};
+
+static float b[3] = {244.368126f, 163.341400f, -10.971097f};
 /* Private prototypes ------------------------------------------------------- */
 /* Public implementations --------------------------------------------------- */
 base_status_t drv_magnetic_init(void)
 {
     HMC5883L_setRange(HMC5883L_RANGE_1_3GA);
 	HMC5883L_setMeasurementMode(HMC5883L_CONTINOUS);
-	HMC5883L_setDataRate(HMC5883L_DATARATE_15HZ);
+	HMC5883L_setDataRate(HMC5883L_DATARATE_75HZ);
 	HMC5883L_setSamples(HMC5883L_SAMPLES_1);
 	HMC5883L_setOffset(0, 0);
 
@@ -32,9 +37,33 @@ base_status_t drv_magnetic_init(void)
 base_status_t drv_magnetic_get_data(drv_magnetic_data_t *magnetic_data)
 {
     Vector mag = HMC5883L_readNormalize();
-    magnetic_data->XAxis = mag.XAxis;
-    magnetic_data->YAxis = mag.YAxis;
-    magnetic_data->ZAxis = mag.ZAxis;
+
+    float mag_temp[3] = {0.0f};
+    float mag_calib[3] = {0.0f};
+    
+    mag_temp[0] = mag.XAxis;
+    mag_temp[1] = mag.YAxis;
+    mag_temp[2] = mag.ZAxis;
+
+    for (int i = 0; i < 3; i++)
+    {
+        mag_temp[i] = mag_temp[i] - b[i];
+    }
+
+    for (int j = 0; j < 3; j++)
+    {
+        float temp = 0.0f;
+        for (int k = 0; k < 3; k++)
+        {
+            temp += A[j][k] * mag_temp[k];
+        }
+
+        mag_calib[j] = temp; 
+    }
+
+    magnetic_data->XAxis = mag_calib[0];
+    magnetic_data->YAxis = mag_calib[1];
+    magnetic_data->ZAxis = mag_calib[2];
 
     return BS_OK;
 }

@@ -31,7 +31,7 @@ system_test_error_t system_test_init(void)
 {
     drv_uart_init(); 
     drv_button_init();
-    // drv_magnetic_init();
+    drv_magnetic_init();
 //    if (drv_acc_init() == BS_OK)
 //    {
 //        printf("IMU init success\r\n");
