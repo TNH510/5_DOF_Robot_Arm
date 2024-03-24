@@ -1,8 +1,9 @@
-I=imread('XL123.jpg');
+%camera -> adruino 
+I=imread('BOX4.jpg');
 
 L=I(:,:,1);
 phuongphap = 'Canny';
-nguong = [0.2 0.4];
+nguong = [0.1 0.4];
 huong = 'horizontal';
 BW = edge(L, phuongphap, nguong, huong);
 
