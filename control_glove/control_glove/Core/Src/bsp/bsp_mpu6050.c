@@ -494,32 +494,13 @@ base_status_t bsp_mpu6050_filter_task(void)
 	lastUpdate = Now;
 
     // compute data
-    MadgwickAHRSupdate(gxrs, gyrs, gzrs, axg, ayg, azg, magnetic_data.XAxis, magnetic_data.YAxis, magnetic_data.ZAxis);
+    // MadgwickAHRSupdate(gxrs, gyrs, gzrs, axg, ayg, azg, magnetic_data.XAxis, magnetic_data.YAxis, magnetic_data.ZAxis);
     // MahonyAHRSupdateIMU(gxrs, gyrs, gzrs, axg, ayg, azg);
 
     // Value of Roll, Pitch, Yaw
-    mpu6050_getRollPitchYaw();
+    // mpu6050_getRollPitchYaw();
 
-    // Caculate z pos
-    uint16_t z_pos = 600;
-    if (pitch >= 0.0f && pitch <= 60.0f)
-    {
-        z_pos = (uint16_t)(pitch * 10.0f / 3.0f + 500.0f);
-    }
-    else
-    {   
-        if (pitch >= 60.0f)
-        {
-            z_pos = 700;
-        }
-        else if (pitch <= 0.0)
-        {
-            z_pos = 500;
-        }
-        
-    }
-
-    printf("%0.2f,%0.2f,%0.2f\r\n", pitch, roll, yaw);
+    printf("%0.2f,%0.2f,%0.2f\r\n", magnetic_data.XAxis, magnetic_data.YAxis, magnetic_data.ZAxis);
 
 	HAL_Delay(100);
 
