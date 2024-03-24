@@ -72,7 +72,7 @@ namespace WindowsFormsApp2
 
                 return Blur_Image;
             }
-            public static int[,] Computting_Gradient(int[,] Blur_Image, int high_threshold, int low_threshold)
+            public static int[,] Canny_Detect(int[,] Blur_Image, int high_threshold, int low_threshold)
             {
                 //int[,] GradientX = new int[Blur_Image.GetLength(0), Blur_Image.GetLength(1)];
                 //int[,] GradientY = new int[Blur_Image.GetLength(0), Blur_Image.GetLength(1)];
@@ -185,8 +185,6 @@ namespace WindowsFormsApp2
         
         }
 
-
-
         private void Open_Image_Click(object sender, EventArgs e)
         {
             // Tạo một OpenFileDialog
@@ -213,7 +211,7 @@ namespace WindowsFormsApp2
             int[,] gray = CannyEdgeDetection.RGB2Gray(Import_picture);
             int[,] blur = CannyEdgeDetection.Blur_Image(gray);
         
-            int[,] edges= CannyEdgeDetection.Computting_Gradient(blur,80,40);
+            int[,] edges= CannyEdgeDetection.Canny_Detect(blur,80,40);
 
             // Kích thước hình ảnh
             int width = edges.GetLength(0);
