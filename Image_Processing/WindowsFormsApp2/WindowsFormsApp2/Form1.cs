@@ -14,39 +14,37 @@ namespace WindowsFormsApp2
     public partial class Form1 : Form
     {
         static string imagePath;
-        Bitmap Import_picture;
         public Form1()
         {
             InitializeComponent();
-            
         }
         class CannyEdgeDetection
         {
-            public static int[,] RGB2Gray(Bitmap Image_Input)
+            private static int[,] RGB2Gray(Bitmap ColorImage)
             {
 
-                int width = Image_Input.Width;
-                int height = Image_Input.Height;
-                int[,] Gray_Image= new int[width,height];
+                int width = ColorImage.Width;
+                int height = ColorImage.Height;
+                int[,] GrayImage= new int[width,height];
 
                 for (int x = 0; x < width; x++)
                 {
                     for (int y = 0; y < height; y++)
                     {
-                        Color pixelColor = Image_Input.GetPixel(x, y);
-                        int Gray_Value = (int)(pixelColor.R * 0.299 + pixelColor.G * 0.587 + pixelColor.B * 0.114);
-                        Gray_Image[x, y]= Gray_Value;
+                        Color pixelColor = ColorImage.GetPixel(x, y);
+                        int GrayValue = (int)(pixelColor.R * 0.299 + pixelColor.G * 0.587 + pixelColor.B * 0.114);
+                        GrayImage[x, y]= GrayValue;
                     }  
                 }  
                        
-                return Gray_Image;
+                return GrayImage;
             }
-            public static int[,] Blur_Image(int[,] Gray_Image)
+            private static int[,] Blur_Image(int[,] GrayImage)
             {
-                int width = Gray_Image.GetLength(0);
-                int height =Gray_Image.GetLength(1);
+                int width = GrayImage.GetLength(0);
+                int height =GrayImage.GetLength(1);
 
-                int[,] Blur_Image=new int[width,height];
+                int[,] BlurImage=new int[width,height];
 
                 double[,] GaussianKernel =  {   { 2,  4,  5,  4,  2 },
                                                 { 4,  9,  12, 9,  4 },
@@ -62,32 +60,35 @@ namespace WindowsFormsApp2
                         { 
                             for(int j =-2;j<2;j++)
                             {
-                                sum += GaussianKernel[i+2,j+2]*Gray_Image[x+i,y+j];
+                                sum += GaussianKernel[i+2,j+2]*GrayImage[x+i,y+j];
 
                             }    
                         }
-                        Blur_Image[x, y] = (int)(sum / 159);
+                        BlurImage[x, y] = (int)(sum / 159);
                     }    
                 }    
 
-                return Blur_Image;
+                return BlurImage;
             }
-            public static int[,] Canny_Detect(int[,] Blur_Image, int high_threshold, int low_threshold)
+            private static int[,] Canny_Detect(int[,] BlurredImage, int high_threshold, int low_threshold)
             {
                 //int[,] GradientX = new int[Blur_Image.GetLength(0), Blur_Image.GetLength(1)];
                 //int[,] GradientY = new int[Blur_Image.GetLength(0), Blur_Image.GetLength(1)];
-                int[,] gradientMagnitude= new int [Blur_Image.GetLength(0), Blur_Image.GetLength(1)];
-                int[,] gradientAngle = new int[Blur_Image.GetLength(0), Blur_Image.GetLength(1)];
-                int[,] gradient = new int[Blur_Image.GetLength(0), Blur_Image.GetLength(1)];
+                int[,] gradientMagnitude= new int [BlurredImage.GetLength(0), BlurredImage.GetLength(1)];
+                int[,] gradientAngle = new int[BlurredImage.GetLength(0), BlurredImage.GetLength(1)];
+                int[,] Result  = new int[BlurredImage.GetLength(0), BlurredImage.GetLength(1)];
                 int[,] SobelX = {{ -1, 0, 1 },
                                     { -2, 0, 2 },
                                     { -1, 0, 1 }};
                 int[,] SobelY = {{ -1, -2, -1 },
                                     { 0, 0, 0 },
                                     { 1, 2, 1 }};
-                for (int x = 1; x < Blur_Image.GetLength(0) - 1; x++)
+                int white_point = 255;
+                int gray_point = 50;
+                //computting gradient magnitude and gradient angle
+                for (int x = 1; x < BlurredImage.GetLength(0) - 1; x++)
                 {
-                    for (int y = 1; y < Blur_Image.GetLength(1) - 1; y++)
+                    for (int y = 1; y < BlurredImage.GetLength(1) - 1; y++)
                     {
                         int sumX = 0;
                         int sumY = 0;
@@ -95,8 +96,8 @@ namespace WindowsFormsApp2
                         {
                             for (int j = -1; j <= 1; j++)
                             {
-                                sumX += (int)(SobelX[i + 1, j + 1] * Blur_Image[x + i, y + j]);
-                                sumY += (int)(SobelY[i + 1, j + 1] * Blur_Image[x + i, y + j]);
+                                sumX += (int)(SobelX[i + 1, j + 1] * BlurredImage[x + i, y + j]);
+                                sumY += (int)(SobelY[i + 1, j + 1] * BlurredImage[x + i, y + j]);
                             }
                         }
                         //GradientX[x, y] = sumX;
@@ -114,9 +115,10 @@ namespace WindowsFormsApp2
 
                     }
                 }
-                for (int x = 1; x < Blur_Image.GetLength(0) - 1; x++)
+
+                for (int x = 1; x < BlurredImage.GetLength(0) - 1; x++)
                 {
-                    for (int y = 1; y < Blur_Image.GetLength(1) - 1; y++)
+                    for (int y = 1; y < BlurredImage.GetLength(1) - 1; y++)
                     {
                         double q = 255;
                         double r = 255;
@@ -142,47 +144,80 @@ namespace WindowsFormsApp2
                         }
                         if(gradientMagnitude[x,y]>=q && gradientMagnitude[x,y]>=r)
                         {
-                            gradient[x, y] = gradientMagnitude[x,y];
+                            Result[x, y] = gradientMagnitude[x,y];
                         }    
                         else
                         {
-                            gradient[x, y] = 0;
+                            Result[x, y] = 0;
                         }
-                        if (gradient[x, y] >= high_threshold)
+
+                        if (Result[x, y] >= high_threshold)
                         {
-                            gradient[x, y] = 255;
+                            Result[x, y] = white_point;
                         }
-                        else if (gradient[x, y] >= low_threshold && gradient[x, y] < high_threshold)
+                        else if (Result[x, y] >= low_threshold && Result[x, y] < high_threshold)
                         {
-                            gradient[x, y] = 50;
+                            Result[x, y] = gray_point;
                         }
                         else
                         {
-                            gradient[x, y] = 0;
+                            Result[x, y] = 0;
                         }
                     }
                 }
                 //int[,] output=new int[gradient.GetLength(0) , gradient.GetLength(1) ];
-                for (int x = 1; x < gradient.GetLength(0) - 1; x++)
+                for (int x = 1; x < Result.GetLength(0) - 1; x++)
                 {
-                    for (int y = 1; y < gradient.GetLength(1) - 1; y++)
+                    for (int y = 1; y < Result.GetLength(1) - 1; y++)
                     {
-                        if (gradient[x, y] == 50)
+                        if (Result[x, y] == gray_point)
                         {
-                            if ((gradient[x + 1, y - 1] == 255) || (gradient[x + 1, y] == 255) || (gradient[x + 1, y + 1] == 255) || (gradient[x, y - 1] == 255) || (gradient[x, y + 1] == 255) || (gradient[x - 1, y - 1] == 255) || (gradient[x - 1, y] == 255) || (gradient[x - 1, y + 1] == 255))
+                            if ((Result[x + 1, y - 1] == white_point) || 
+                                (Result[x + 1, y] == white_point) || 
+                                (Result[x + 1, y + 1] == white_point) || 
+                                (Result[x, y - 1] == white_point) || 
+                                (Result[x, y + 1] == white_point) || 
+                                (Result[x - 1, y - 1] == white_point) || 
+                                (Result[x - 1, y] == white_point) || 
+                                (Result[x - 1, y + 1] == white_point))
                             {
-                                gradient[x, y] = 255;
+                                Result[x, y] = white_point;
                             }
                             else
-                                gradient[x, y] = 0;
+                                Result[x, y] = 0;
                         }
-
                     }
                 }
-
-                return gradient;
+                return Result;
             }
-        
+            public static Bitmap DeTectEdgeByCannyMethod(string imagePath, int high_threshold, int low_threshold)
+            {
+                Bitmap Import_picture = new Bitmap(imagePath);
+                
+                int[,] gray = CannyEdgeDetection.RGB2Gray(Import_picture);
+                int[,] blur = CannyEdgeDetection.Blur_Image(gray);
+                int[,] edges = CannyEdgeDetection.Canny_Detect(blur, high_threshold, low_threshold);
+                // Kích thước hình ảnh
+                int width = edges.GetLength(0);
+                int height = edges.GetLength(1);
+
+                // Tạo bitmap từ mảng hai chiều
+                Bitmap Result = new Bitmap(width, height);
+                for (int x = 0; x < width; x++)
+                {
+                    for (int y = 0; y < height; y++)
+                    {
+                        if (edges[x, y] >= 255)
+                            edges[x, y] = 255;
+                        else if (edges[x, y] <= 0)
+                            edges[x, y] = 0;
+                        int pixelValue = (int)edges[x, y];
+                        Color color = Color.FromArgb(pixelValue, pixelValue, pixelValue);
+                        Result.SetPixel(x, y, color);
+                    }
+                }
+                return Result;
+            }
         }
 
         private void Open_Image_Click(object sender, EventArgs e)
@@ -207,33 +242,28 @@ namespace WindowsFormsApp2
 
         private void Active_Image_Click(object sender, EventArgs e)
         {
-            Import_picture = new Bitmap(imagePath);
-            int[,] gray = CannyEdgeDetection.RGB2Gray(Import_picture);
-            int[,] blur = CannyEdgeDetection.Blur_Image(gray);
-        
-            int[,] edges= CannyEdgeDetection.Canny_Detect(blur,80,40);
-
-            // Kích thước hình ảnh
-            int width = edges.GetLength(0);
-            int height = edges.GetLength(1);
-
-            // Tạo bitmap từ mảng hai chiều
-            Bitmap bitmap = new Bitmap(width, height);
-            for (int x = 0; x < width; x++)
+            if ((!string.IsNullOrEmpty(HIGH_Threshold.Text)) || (!string.IsNullOrEmpty(LOW_Threshold.Text)))
             {
-                for (int y = 0; y < height; y++)
-                {
-                    if (edges[x, y] >= 255)
-                        edges[x, y] = 255;
-                    else if (edges[x, y] <= 0)
-                        edges[x, y] = 0;
-                    int pixelValue = (int)edges[x, y];
-                    Color color = Color.FromArgb(pixelValue, pixelValue, pixelValue);
-                    bitmap.SetPixel(x, y, color);
-                }
-            }
+                int high_threshold = Convert.ToInt16(HIGH_Threshold.Text);
+                int low_threshold = Convert.ToInt16(LOW_Threshold.Text);
+                Processed_Pic.Image = CannyEdgeDetection.DeTectEdgeByCannyMethod(imagePath,high_threshold,low_threshold);
 
-            Processed_Pic.Image = bitmap;
+            }
+            else
+            {
+                string message = "Nhập thiếu ngưỡng";
+                string caption = "Thông báo";
+                MessageBoxButtons buttons = MessageBoxButtons.OK;
+                MessageBoxIcon icon = MessageBoxIcon.Information;
+
+                MessageBox.Show(message, caption, buttons, icon);
+            }    
+            
+        }
+
+        private void LOW_Threshold_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

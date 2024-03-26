@@ -30,9 +30,12 @@
         {
             this.Original_Pic = new System.Windows.Forms.PictureBox();
             this.Processed_Pic = new System.Windows.Forms.PictureBox();
-            this.Text_Threshold = new System.Windows.Forms.TextBox();
+            this.HIGH_Threshold = new System.Windows.Forms.TextBox();
             this.Open_Image = new System.Windows.Forms.Button();
             this.Active_Image = new System.Windows.Forms.Button();
+            this.LOW_Threshold = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.Original_Pic)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Processed_Pic)).BeginInit();
             this.SuspendLayout();
@@ -59,16 +62,16 @@
             this.Processed_Pic.TabIndex = 1;
             this.Processed_Pic.TabStop = false;
             // 
-            // Text_Threshold
+            // HIGH_Threshold
             // 
-            this.Text_Threshold.Location = new System.Drawing.Point(1300, 35);
-            this.Text_Threshold.Name = "Text_Threshold";
-            this.Text_Threshold.Size = new System.Drawing.Size(150, 22);
-            this.Text_Threshold.TabIndex = 2;
+            this.HIGH_Threshold.Location = new System.Drawing.Point(1300, 51);
+            this.HIGH_Threshold.Name = "HIGH_Threshold";
+            this.HIGH_Threshold.Size = new System.Drawing.Size(150, 22);
+            this.HIGH_Threshold.TabIndex = 2;
             // 
             // Open_Image
             // 
-            this.Open_Image.Location = new System.Drawing.Point(1300, 63);
+            this.Open_Image.Location = new System.Drawing.Point(1300, 155);
             this.Open_Image.Name = "Open_Image";
             this.Open_Image.Size = new System.Drawing.Size(150, 62);
             this.Open_Image.TabIndex = 3;
@@ -78,7 +81,7 @@
             // 
             // Active_Image
             // 
-            this.Active_Image.Location = new System.Drawing.Point(1300, 131);
+            this.Active_Image.Location = new System.Drawing.Point(1300, 223);
             this.Active_Image.Name = "Active_Image";
             this.Active_Image.Size = new System.Drawing.Size(150, 62);
             this.Active_Image.TabIndex = 3;
@@ -86,14 +89,43 @@
             this.Active_Image.UseVisualStyleBackColor = true;
             this.Active_Image.Click += new System.EventHandler(this.Active_Image_Click);
             // 
+            // LOW_Threshold
+            // 
+            this.LOW_Threshold.Location = new System.Drawing.Point(1300, 112);
+            this.LOW_Threshold.Name = "LOW_Threshold";
+            this.LOW_Threshold.Size = new System.Drawing.Size(150, 22);
+            this.LOW_Threshold.TabIndex = 2;
+            this.LOW_Threshold.TextChanged += new System.EventHandler(this.LOW_Threshold_TextChanged);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(1297, 32);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(80, 16);
+            this.label1.TabIndex = 4;
+            this.label1.Text = "Ngưỡng trên";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(1297, 93);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(84, 16);
+            this.label2.TabIndex = 4;
+            this.label2.Text = "Ngưỡng dưới";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1462, 776);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.Active_Image);
             this.Controls.Add(this.Open_Image);
-            this.Controls.Add(this.Text_Threshold);
+            this.Controls.Add(this.LOW_Threshold);
+            this.Controls.Add(this.HIGH_Threshold);
             this.Controls.Add(this.Processed_Pic);
             this.Controls.Add(this.Original_Pic);
             this.Name = "Form1";
@@ -109,9 +141,12 @@
 
         private System.Windows.Forms.PictureBox Original_Pic;
         private System.Windows.Forms.PictureBox Processed_Pic;
-        private System.Windows.Forms.TextBox Text_Threshold;
+        private System.Windows.Forms.TextBox HIGH_Threshold;
         private System.Windows.Forms.Button Open_Image;
         private System.Windows.Forms.Button Active_Image;
+        private System.Windows.Forms.TextBox LOW_Threshold;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
     }
 }
 
