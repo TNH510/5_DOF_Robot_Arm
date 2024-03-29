@@ -407,9 +407,9 @@ References:
 #define twoKiDef                              (2.0f * 0.0f)    // 2 * integral gain
 
 // Transform raw data of accelerometer & gyroscope
-#define MPU6050_AXOFFSET                      -3159
-#define MPU6050_AYOFFSET                      -1843
-#define MPU6050_AZOFFSET                      -3083
+#define MPU6050_AXOFFSET -203
+#define MPU6050_AYOFFSET 19
+#define MPU6050_AZOFFSET -138
 // #define MPU6050_AXOFFSET 0
 // #define MPU6050_AYOFFSET 0
 // #define MPU6050_AZOFFSET 0
@@ -425,9 +425,9 @@ References:
 // #define MPU6050_AXGAIN 2048.0 // AFS_SEL = 3, +/-16g, MPU6050_ACCEL_FS_16
 // #define MPU6050_AYGAIN 2048.0 // AFS_SEL = 3, +/-16g, MPU6050_ACCEL_FS_16
 // #define MPU6050_AZGAIN 2048.0 // AFS_SEL = 3, +/-16g, MPU6050_ACCEL_FS_16
-#define MPU6050_GXOFFSET                      -32
-#define MPU6050_GYOFFSET                      -34
-#define MPU6050_GZOFFSET                      -28
+#define MPU6050_GXOFFSET 220
+#define MPU6050_GYOFFSET -24
+#define MPU6050_GZOFFSET -9
 // #define MPU6050_GXOFFSET 0
 // #define MPU6050_GYOFFSET 0
 // #define MPU6050_GZOFFSET 0
@@ -443,7 +443,7 @@ References:
 #define MPU6050_GXGAIN                        16.384    // FS_SEL = 3, +/-2000degree/s, MPU6050_GYRO_FS_2000
 #define MPU6050_GYGAIN                        16.384    // FS_SEL = 3, +/-2000degree/s, MPU6050_GYRO_FS_2000
 #define MPU6050_GZGAIN                        16.384    // FS_SEL = 3, +/-2000degree/s, MPU6050_GYRO_FS_2000
-#define betaDef		0.15f		// 2 * proportional gain
+#define betaDef		0.03f		// 2 * proportional gain
 
 static volatile float beta = betaDef;			   // 2 * proportional gain (Kp)
 static volatile float twoKp = twoKpDef;    // 2 * proportional gain (Kp)
@@ -494,13 +494,14 @@ base_status_t bsp_mpu6050_filter_task(void)
 	lastUpdate = Now;
 
     // compute data
-    // MadgwickAHRSupdate(gxrs, gyrs, gzrs, axg, ayg, azg, magnetic_data.XAxis, magnetic_data.YAxis, magnetic_data.ZAxis);
+    MadgwickAHRSupdate(gxrs, gyrs, gzrs, axg, ayg, azg, magnetic_data.XAxis, magnetic_data.YAxis, magnetic_data.ZAxis);
     // MahonyAHRSupdateIMU(gxrs, gyrs, gzrs, axg, ayg, azg);
 
     // Value of Roll, Pitch, Yaw
-    // mpu6050_getRollPitchYaw();
+    mpu6050_getRollPitchYaw();
 
-    printf("%0.2f,%0.2f,%0.2f\r\n", magnetic_data.XAxis, magnetic_data.YAxis, magnetic_data.ZAxis);
+    // printf("%0.2f,%0.2f,%0.2f\r\n", magnetic_data.XAxis, magnetic_data.YAxis, magnetic_data.ZAxis);
+	printf("%0.2f,%0.2f,%0.2f\r\n", pitch, roll, yaw);
 
 	HAL_Delay(100);
 
@@ -517,7 +518,7 @@ base_status_t bsp_mpu6050_init(void)
               0x01);    // Selection Clock 'PLL with X axis gyroscope reference'
 
     // MPU6050 Set sample rate = gyroscope output rate/(1 + SMPLRT_DIV) for DMP
-    // writeByte(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_SMPLRT_DIV, 0x00); // Default is 1KHz // example 0x04 is 200Hz
+    writeByte(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_SMPLRT_DIV, 0x00); // Default is 1KHz // example 0x04 is 200Hz
 
     // MPU6050 Gyroscope Configuration Setting
     /* Wire.write(0x00); // FS_SEL=0, Full Scale Range = +/- 250 [degree/sec]
@@ -531,7 +532,7 @@ base_status_t bsp_mpu6050_init(void)
        Wire.write(0x08); // AFS_SEL=1, Full Scale Range = +/- 4 [g]
        Wire.write(0x10); // AFS_SEL=2, Full Scale Range = +/- 8 [g]
        Wire.write(0x18); // AFS_SEL=3, Full Scale Range = +/- 10 [g] */
-    writeByte(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_ACCEL_CONFIG, 0x10);    // AFS_SEL=2
+    writeByte(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_ACCEL_CONFIG, 0x18);    // AFS_SEL=3
 
     // MPU6050 DLPF(Digital Low Pass Filter)
     /*Wire.write(0x00);     // Accel BW 260Hz, Delay 0ms / Gyro BW 256Hz, Delay 0.98ms, Fs 8KHz
@@ -542,7 +543,7 @@ base_status_t bsp_mpu6050_init(void)
       Wire.write(0x05);     // Accel BW 10Hz, Delay 13.8ms / Gyro BW 10Hz, Delay 13.4ms, Fs 1KHz
       Wire.write(0x06);     // Accel BW 5Hz, Delay 19ms / Gyro BW 5Hz, Delay 18.6ms, Fs 1KHz */
     writeByte(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_CONFIG,
-              0x00);    // Accel BW 260Hz, Delay 0ms / Gyro BW 256Hz, Delay 0.98ms, Fs 8KHz
+              0x06);    // Accel BW 21Hz, Delay 8.5ms / Gyro BW 20Hz, Delay 8.3ms, Fs 1KHz
 
     return BS_OK;
 }
