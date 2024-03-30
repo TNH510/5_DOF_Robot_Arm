@@ -31,13 +31,21 @@ system_test_error_t system_test_init(void)
 {
     drv_uart_init(); 
     drv_button_init();
-    drv_magnetic_init();
+    // drv_magnetic_init();
 //    if (drv_acc_init() == BS_OK)
 //    {
 //        printf("IMU init success\r\n");
 //    }
 
+    HAL_Delay(2000);
     bsp_mpu6050_init();
+    bsp_mpu6050_bypass_mode();
+    drv_magnetic_init();
+    HAL_Delay(10);
+    drv_magnetic_init();
+    HAL_Delay(10);
+    bsp_mpu6050_master_mode();
+    bsp_mpu6050_slave_read();
 }
 
 system_test_error_t system_test_general(void)

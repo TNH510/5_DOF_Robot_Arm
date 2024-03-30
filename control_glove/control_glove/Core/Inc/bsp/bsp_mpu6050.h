@@ -26,6 +26,9 @@ extern "C" {
 /* Public APIs -------------------------------------------------------------- */
 base_status_t bsp_mpu6050_filter_task(void);
 base_status_t bsp_mpu6050_init(void);
+base_status_t bsp_mpu6050_slave_read(void);
+base_status_t bsp_mpu6050_bypass_mode(void);
+base_status_t bsp_mpu6050_master_mode(void);
 
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus
