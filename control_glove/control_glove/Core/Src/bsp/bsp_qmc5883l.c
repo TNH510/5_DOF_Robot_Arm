@@ -15,22 +15,7 @@
 /* Private includes --------------------------------------------------------- */
 extern I2C_HandleTypeDef hi2c1;
 /* Private defines ---------------------------------------------------------- */
-#define QMC5883L_ADDRESS  		0x1A
 #define QMC5883L_I2C_PORT		&hi2c1
-
-#define QMC5883L_DATA_READ_X_LSB	0x00
-#define QMC5883L_DATA_READ_X_MSB	0x01
-#define QMC5883L_DATA_READ_Y_LSB	0x02
-#define QMC5883L_DATA_READ_Y_MSB	0x03
-#define QMC5883L_DATA_READ_Z_LSB	0x04
-#define QMC5883L_DATA_READ_Z_MSB	0x05
-#define QMC5883L_TEMP_READ_LSB		0x07
-#define QMC5883L_TEMP_READ_MSB		0x08 
-#define QMC5883L_STATUS		        0x06 // DOR | OVL | DRDY
-#define QMC5883L_CONFIG_1		0x09 // OSR | RNG | ODR | MODE
-#define QMC5883L_CONFIG_2		0x0A // SOFT_RST | ROL_PNT | INT_ENB
-#define QMC5883L_CONFIG_3		0x0B // SET/RESET Period FBR [7:0]
-#define QMC5883L_ID			0x0D
 
 #ifndef M_PI 
 #define M_PI 3.14159265358979323846264338327950288f 
@@ -51,21 +36,21 @@ static float Xmin,Xmax,Ymin,Ymax;
 /* Public implementations --------------------------------------------------- */
 base_status_t bsp_qmc5883l_init(void)
 {
-    QMC5883L_Initialize(MODE_CONTROL_CONTINUOUS, OUTPUT_DATA_RATE_100HZ, FULL_SCALE_8G, OVER_SAMPLE_RATIO_256);
+    QMC5883L_Initialize(MODE_CONTROL_CONTINUOUS, OUTPUT_DATA_RATE_200HZ, FULL_SCALE_8G, OVER_SAMPLE_RATIO_512);
     return BS_OK;
 }
 
 uint8_t QMC5883L_Read_Reg(uint8_t reg)
 {
 	uint8_t Buffer[1];
-	HAL_I2C_Mem_Read(QMC5883L_I2C_PORT,QMC5883L_ADDRESS,reg,1,Buffer,1,10);
+	HAL_I2C_Mem_Read(QMC5883L_I2C_PORT,QMC5883L_ADDRESS_7_BIT,reg,1,Buffer,1,10);
 	return Buffer[0];
 }
 
 void QMC5883L_Write_Reg(uint8_t reg, uint8_t data)
 {
 	uint8_t Buffer[2]={reg,data};
-	HAL_I2C_Master_Transmit(QMC5883L_I2C_PORT,QMC5883L_ADDRESS,Buffer,2,10);
+	HAL_I2C_Master_Transmit(QMC5883L_I2C_PORT,QMC5883L_ADDRESS_7_BIT,Buffer,2,10);
 }
 
 

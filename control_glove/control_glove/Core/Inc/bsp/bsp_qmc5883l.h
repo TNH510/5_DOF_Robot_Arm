@@ -22,6 +22,23 @@ extern "C"
 #include <stdint.h>
 
 /* Public defines ----------------------------------------------------------- */
+#define QMC5883L_ADDRESS  		0x0D
+#define QMC5883L_ADDRESS_7_BIT  (QMC5883L_ADDRESS << 1)
+
+#define QMC5883L_DATA_READ_X_LSB	0x00
+#define QMC5883L_DATA_READ_X_MSB	0x01
+#define QMC5883L_DATA_READ_Y_LSB	0x02
+#define QMC5883L_DATA_READ_Y_MSB	0x03
+#define QMC5883L_DATA_READ_Z_LSB	0x04
+#define QMC5883L_DATA_READ_Z_MSB	0x05
+#define QMC5883L_TEMP_READ_LSB		0x07
+#define QMC5883L_TEMP_READ_MSB		0x08
+#define QMC5883L_STATUS		        0x06 // DOR | OVL | DRDY
+#define QMC5883L_CONFIG_1		0x09 // OSR | RNG | ODR | MODE
+#define QMC5883L_CONFIG_2		0x0A // SOFT_RST | ROL_PNT | INT_ENB
+#define QMC5883L_CONFIG_3		0x0B // SET/RESET Period FBR [7:0]
+#define QMC5883L_ID			0x0D
+
 /* Public enumerate/structure ----------------------------------------------- */
 typedef enum STATUS_VARIABLES
 {

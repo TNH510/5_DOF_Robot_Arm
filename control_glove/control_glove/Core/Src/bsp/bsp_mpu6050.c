@@ -502,7 +502,7 @@ base_status_t bsp_mpu6050_filter_task(void)
 
     // printf("%0.2f,%0.2f,%0.2f\r\n", magnetic_data.XAxis, magnetic_data.YAxis, magnetic_data.ZAxis);
 
-	HAL_Delay(100);
+	HAL_Delay(200);
 
     return BS_OK;
 }
@@ -537,11 +537,11 @@ base_status_t bsp_mpu6050_master_mode(void)
 base_status_t bsp_mpu6050_slave_read(void)
 {
 	//Access Slave into read mode
-	writeByte(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_I2C_SLV0_ADDR, (0x1E | 0x80));
+	writeByte(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_I2C_SLV0_ADDR, (QMC5883L_ADDRESS | 0x80));
 	HAL_Delay(10);
 
 	//Slave REG for reading to take place
-	writeByte(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_I2C_SLV0_REG, 0x03);
+	writeByte(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_I2C_SLV0_REG, QMC5883L_DATA_READ_X_LSB);
 	HAL_Delay(10);
 
 	//Number of data bytes
@@ -601,10 +601,12 @@ static void mpu6050_GetData(void)
     GyX = data_org[8] << 8 | data_org[9];      // 0x43 (GYRO_XOUT_H) & 0x44 (GYRO_XOUT_L)
     GyY = data_org[10] << 8 | data_org[11];    // 0x45 (GYRO_YOUT_H) & 0x46 (GYRO_YOUT_L)
     GyZ = data_org[12] << 8 | data_org[13];    // 0x47 (GYRO_ZOUT_H) & 0x48 (GYRO_ZOUT_L)
-	MaX = data_org[14] << 8 | data_org[15];
-	MaZ = data_org[16] << 8 | data_org[17];
-	MaY = data_org[18] << 8 | data_org[19];
-	printf("%0.3f, %0.3f, %0.3f\r\n", (float)MaX, (float)MaY, (float)MaZ);
+
+	MaX =((int16_t)data_org[15] | (((int16_t)data_org[14]) <<8));
+	MaY =((int16_t)data_org[17] | (((int16_t)data_org[16]) <<8));
+	MaZ =((int16_t)data_org[19] | (((int16_t)data_org[18]) <<8));
+
+	printf("%d, %d, %d\r\n", MaX, MaY, MaZ);
 }
 
 static void mpu6050_updateQuaternion(void)
