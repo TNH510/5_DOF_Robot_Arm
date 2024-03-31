@@ -10,6 +10,9 @@
         "bsp_mpu6050.h": "c",
         "drv_acc.h": "c",
         "*.txt": "c",
-        "stdint.h": "c"
+        "stdint.h": "c",
+        "bsp_common.h": "c",
+        "bsp_adc.h": "c",
+        "type_traits": "c"
     }
 }
