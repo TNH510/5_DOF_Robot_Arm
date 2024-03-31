@@ -80,7 +80,7 @@ system_test_error_t system_test_polling(void)
     //  printf("%0.4f,%0.4f,%0.4f,%0.4f\r\n",psi,theta,phi,0);
     // printf("%0.4f\r\n",psi);
     // HAL_Delay(10);
-    // bsp_mpu6050_filter_task();
+    bsp_mpu6050_filter_task();
 
     // uint16_t avr_value = 0;
 
@@ -92,11 +92,11 @@ system_test_error_t system_test_polling(void)
     // }
 
     // printf("%0.2f, 0, 0\r\n", (float)(avr_value / 100.0));
-    uint16_t value;
-    bsp_adc_get_data(&value);
-    printf("%0.2f, 0, 0\r\n", (float)(value));
+    // uint16_t value;
+    // bsp_adc_get_data(&value);
+    // printf("%0.2f, 0, 0\r\n", (float)(value));
     
-    HAL_Delay(100);
+    // HAL_Delay(100);
 
     return SYSTEM_TEST_OK;
 }
