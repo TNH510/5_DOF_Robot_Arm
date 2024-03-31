@@ -30,6 +30,7 @@ using System.Data;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolTip;
 using RobotArmHelix.Properties;
 using System.Windows.Markup;
+using RobotArmHelix.View;
 /**
 * Author: Gabriele Marini (Gabryxx7)
 * This class load the 3d models of all the parts of the robotic arms and add them to the viewport
@@ -61,6 +62,7 @@ namespace RobotArmHelix
     /// </summary>
     public partial class MainWindow : Window
    {
+        public event EventHandler MyFunctionTriggered;
         private double returnX = 500;
         private double returnY = 0;
         private double returnZ = 600;
@@ -194,9 +196,13 @@ namespace RobotArmHelix
             timer2 = new System.Windows.Forms.Timer();
             timer2.Interval = 500;
             timer2.Tick += new System.EventHandler(timer2_Tick);
-
         }
-        
+
+        public void MyFunction()
+        {
+            // Thực hiện logic của bạn ở đây
+            MessageBox.Show("Hello Thach");
+        }
         public void Task1()
         {
 

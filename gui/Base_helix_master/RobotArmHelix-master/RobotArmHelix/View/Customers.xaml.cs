@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace RobotArmHelix.View
 {
@@ -20,9 +21,16 @@ namespace RobotArmHelix.View
     /// </summary>
     public partial class Customers : UserControl
     {
+        private MainWindow mainWindow; 
         public Customers()
         {
             InitializeComponent();
+            mainWindow = new MainWindow();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            mainWindow.MyFunction();
         }
     }
 }
