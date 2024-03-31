@@ -503,7 +503,7 @@ base_status_t bsp_mpu6050_filter_task(void)
     // printf("%0.2f,%0.2f,%0.2f\r\n", magnetic_data.XAxis, magnetic_data.YAxis, magnetic_data.ZAxis);
 	printf("%0.2f,%0.2f,%0.2f\r\n", pitch, roll, yaw);
 
-	HAL_Delay(100);
+	HAL_Delay(50);
 
     return BS_OK;
 }

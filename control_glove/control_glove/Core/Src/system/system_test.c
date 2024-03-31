@@ -15,6 +15,7 @@
 #include "drv_acc.h"
 #include "MadgwickAHRS.h"
 #include "bsp_mpu6050.h"
+#include "bsp_adc.h"
 
 /* Private includes --------------------------------------------------------- */
 /* Private defines ---------------------------------------------------------- */
@@ -32,6 +33,7 @@ system_test_error_t system_test_init(void)
     drv_uart_init(); 
     drv_button_init();
     drv_magnetic_init();
+    bsp_adc_start();
 //    if (drv_acc_init() == BS_OK)
 //    {
 //        printf("IMU init success\r\n");
@@ -78,7 +80,23 @@ system_test_error_t system_test_polling(void)
     //  printf("%0.4f,%0.4f,%0.4f,%0.4f\r\n",psi,theta,phi,0);
     // printf("%0.4f\r\n",psi);
     // HAL_Delay(10);
-    bsp_mpu6050_filter_task();
+    // bsp_mpu6050_filter_task();
+
+    // uint16_t avr_value = 0;
+
+    // for (int i = 0; i < 100; i++)
+    // {
+    //     uint16_t value;
+    //     bsp_adc_get_data(&value);
+    //     avr_value += value;
+    // }
+
+    // printf("%0.2f, 0, 0\r\n", (float)(avr_value / 100.0));
+    uint16_t value;
+    bsp_adc_get_data(&value);
+    printf("%0.2f, 0, 0\r\n", (float)(value));
+    
+    HAL_Delay(100);
 
     return SYSTEM_TEST_OK;
 }
