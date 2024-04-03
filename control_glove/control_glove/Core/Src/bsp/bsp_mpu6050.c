@@ -494,7 +494,8 @@ base_status_t bsp_mpu6050_filter_task(void)
 	lastUpdate = Now;
 
     // compute data
-    MadgwickAHRSupdate(gxrs, gyrs, gzrs, axg, ayg, azg, magnetic_data.XAxis, magnetic_data.YAxis, magnetic_data.ZAxis);
+    // MadgwickAHRSupdate(gxrs, gyrs, gzrs, axg, ayg, azg, magnetic_data.XAxis, magnetic_data.YAxis, magnetic_data.ZAxis);
+    MadgwickAHRSupdate(gzrs, -gyrs, gxrs, azg, -ayg, axg, -magnetic_data.YAxis, -magnetic_data.XAxis, -magnetic_data.ZAxis);
     // MahonyAHRSupdateIMU(gxrs, gyrs, gzrs, axg, ayg, azg);
 
     // Value of Roll, Pitch, Yaw
@@ -503,7 +504,7 @@ base_status_t bsp_mpu6050_filter_task(void)
     // printf("%0.2f,%0.2f,%0.2f\r\n", magnetic_data.XAxis, magnetic_data.YAxis, magnetic_data.ZAxis);
 	printf("%0.2f,%0.2f,%0.2f\r\n", pitch, roll, yaw);
 
-	HAL_Delay(50);
+	HAL_Delay(100);
 
     return BS_OK;
 }
