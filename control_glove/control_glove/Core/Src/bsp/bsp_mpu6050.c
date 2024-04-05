@@ -499,10 +499,10 @@ base_status_t bsp_mpu6050_filter_task(void)
     // MahonyAHRSupdateIMU(gxrs, gyrs, gzrs, axg, ayg, azg);
 
     // Value of Roll, Pitch, Yaw
-    mpu6050_getRollPitchYaw();
+    // mpu6050_getRollPitchYaw();
 
     // printf("%0.2f,%0.2f,%0.2f\r\n", magnetic_data.XAxis, magnetic_data.YAxis, magnetic_data.ZAxis);
-	printf("%0.2f,%0.2f,%0.2f\r\n", pitch, roll, yaw);
+	printf("%0.2f,%0.2f,%0.2f, %0.2f\r\n", q0, q1, q2, q3);
 
 	HAL_Delay(100);
 
@@ -743,11 +743,39 @@ static void MahonyAHRSupdateIMU(float gx, float gy, float gz, float ax, float ay
 	q3 *= recipNorm;
 }
 
+// static void mpu6050_getRollPitchYaw(void)
+// {
+//     // yaw   = -atan2(2.0f * (q1 * q2 + q0 * q3), q0 * q0 + q1 * q1 - q2 * q2 - q3 * q3) * 57.29577951;
+//     // pitch = asin(2.0f * (q1 * q3 - q0 * q2)) * 57.29577951;
+//     // roll  = atan2(2.0f * (q0 * q1 + q2 * q3), q0 * q0 - q1 * q1 - q2 * q2 + q3 * q3) * 57.29577951;
+
+// 	yaw = atan2(2.0f * (q1 * q2 - q0* q3), 2 * q0 * q0 + 2 * q1 * q1 - 1) * 57.29577951;
+// 	pitch = -asin(2.0f * (q1 * q3 + q0 * q2)) * 57.29577951;
+// 	roll = atan2(2.0f * (q2 * q3 - q0 * q1), 2 * q0 * q0 + 2 * q3 * q3 - 1) * 57.29577951;
+// }
+
 static void mpu6050_getRollPitchYaw(void)
-{
-    yaw   = -atan2(2.0f * (q1 * q2 + q0 * q3), q0 * q0 + q1 * q1 - q2 * q2 - q3 * q3) * 57.29577951;
-    pitch = asin(2.0f * (q1 * q3 - q0 * q2)) * 57.29577951;
-    roll  = atan2(2.0f * (q0 * q1 + q2 * q3), q0 * q0 - q1 * q1 - q2 * q2 + q3 * q3) * 57.29577951;
+{    
+    float sinr_cosp = 2 * (q0 * q1 + q2 * q3);
+    float cosr_cosp = 1 - 2 * (q1 * q1 + q2 * q2);
+    roll = atan2f(sinr_cosp, cosr_cosp) * (180.0f / M_PI);
+    
+    float sinp = 2 * (q0 * q2 - q3 * q1);
+    if (fabsf(sinp) >= 1)
+        pitch = copysignf(90.0f, sinp);
+    else
+        pitch = asinf(sinp) * (180.0f / M_PI);
+    
+    float siny_cosp = 2 * (q0 * q3 + q1 * q2);
+    float cosy_cosp = 1 - 2 * (q2 * q2 + q3 * q3);
+    yaw = atan2f(siny_cosp, cosy_cosp) * (180.0f / M_PI);
+
+    // Xử lý trường hợp góc gần không xác định
+    if (fabsf(q2 * q2 + q3 * q3 - 1) < 0.05) {
+        roll = 0.0f;
+        pitch = 0.0f;
+        yaw = 0.0f; // Hoặc có thể đặt yaw thành NaN (không phải số)
+    }
 }
 
 /*---------------------------------------------------*/
