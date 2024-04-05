@@ -22,7 +22,7 @@ namespace WindowsFormsApp2
         {
             InitializeComponent();
         }
-        class CannyEdgeDetection
+        class EdgeDetection
         {
             private static int[,] RGB2Gray(Bitmap ColorImage)
             {
@@ -237,6 +237,25 @@ namespace WindowsFormsApp2
                 }
                 return Result;
             }
+            public static int[,] BitmapToInt(Bitmap bitmap)
+            {
+                int width = bitmap.Width;
+                int height = bitmap.Height;
+
+                int[,] imageArray = new int[width, height];
+
+                for (int i = 0; i < width; i++)
+                {
+                    for (int j = 0; j < height; j++)
+                    {
+                        Color pixelColor = bitmap.GetPixel(i, j);
+                        int grayscaleValue = (pixelColor.R + pixelColor.G + pixelColor.B) / 3;
+                        imageArray[i, j] = grayscaleValue;
+                    }
+                }
+
+                return imageArray;
+            }
             public static int[,] LinkEdges(string imagePath, int high_threshold, int low_threshold)
             {
                 Bitmap Import_picture = new Bitmap(imagePath);
@@ -313,162 +332,40 @@ namespace WindowsFormsApp2
                 }
                 return edges;
             }
-        }
-        class ClosingAlgorithm
-        {
-            // Hàm đóng (closing) cho ảnh xám
-            public static Bitmap Closing(int[,]image, int iterations)
+            public static int[,] PerformHoughTransform(int[,] image)
             {
-                Bitmap image1 = CannyEdgeDetection.IntToBitmap(image); 
-                // Bước 1: Dilate (trải rộng) ảnh
-                Bitmap dilatedImage = Dilate(image1, iterations);
+                int width = image.GetLength(0);
+                int height = image.GetLength(1);
 
-                // Bước 2: Erode (co lại) ảnh kết quả từ bước 1
-                Bitmap closedImage = Erode(dilatedImage, iterations);
+                // Tính số cột của ma trận Hough dựa trên đường chéo dài nhất trong ảnh
+                int diagonalLength = (int)Math.Ceiling(Math.Sqrt(width * width + height * height));
+                int houghWidth = 180; // Số cột của ma trận Hough
+                int houghHeight = diagonalLength * 2; // Số hàng của ma trận Hough
 
-                return closedImage;
-            }
+                int[,] houghMatrix = new int[houghWidth, houghHeight];
 
-            // Hàm Dilate (trải rộng) cho ảnh xám
-            public static Bitmap Dilate(Bitmap image, int iterations)
-            {
-                Bitmap result = new Bitmap(image.Width, image.Height);
-
-                for (int i = 0; i < iterations; i++)
+                // Thực hiện Hough Transform
+                for (int x = 0; x < width; x++)
                 {
-                    for (int x = 0; x < image.Width; x++)
+                    for (int y = 0; y < height; y++)
                     {
-                        for (int y = 0; y < image.Height; y++)
+                        if (image[x, y] > 0) // Nếu điểm ảnh là điểm biên
                         {
-                            // Kiểm tra xem có pixel trắng nào xung quanh không
-                            if (CheckNeighbors(image, x, y))
+                            for (int theta = 0; theta < houghWidth; theta++)
                             {
-                                result.SetPixel(x, y, Color.White);
-                            }
-                            else
-                            {
-                                result.SetPixel(x, y, Color.Black);
+                                double radian = (theta * Math.PI) / 180.0;
+                                int rho = (int)(x * Math.Cos(radian) + y * Math.Sin(radian));
+                                rho += diagonalLength; // Dịch chuyển rho để không có giá trị âm
+                                houghMatrix[theta, rho]= houghMatrix[theta, rho]+1;
+                                
                             }
                         }
                     }
-
-                    // Copy kết quả dilate vào ảnh gốc để tiếp tục lặp
-                    CopyBitmap(result, image);
                 }
 
-                return result;
+                return houghMatrix;
             }
-
-            // Hàm Erode (co lại) cho ảnh xám
-            public static Bitmap Erode(Bitmap image, int iterations)
-            {
-                Bitmap result = new Bitmap(image.Width, image.Height);
-
-                for (int i = 0; i < iterations; i++)
-                {
-                    for (int x = 0; x < image.Width; x++)
-                    {
-                        for (int y = 0; y < image.Height; y++)
-                        {
-                            // Kiểm tra xem có pixel đen nào xung quanh không
-                            if (CheckNeighbors(image, x, y, true))
-                            {
-                                result.SetPixel(x, y, Color.Black);
-                            }
-                            else
-                            {
-                                result.SetPixel(x, y, Color.White);
-                            }
-                        }
-                    }
-
-                    // Copy kết quả erode vào ảnh gốc để tiếp tục lặp
-                    CopyBitmap(result, image);
-                }
-
-                return result;
-            }
-
-            // Hàm kiểm tra xem có pixel trắng hoặc đen xung quanh không
-            private static bool CheckNeighbors(Bitmap image, int x, int y, bool black = false)
-            {
-                int[] dx = { -1, 0, 1, -1, 1, -1, 0, 1 };
-                int[] dy = { -1, -1, -1, 0, 0, 1, 1, 1 };
-
-                for (int i = 0; i < 8; i++)
-                {
-                    int nx = x + dx[i];
-                    int ny = y + dy[i];
-
-                    if (nx >= 0 && nx < image.Width && ny >= 0 && ny < image.Height)
-                    {
-                        Color pixel = image.GetPixel(nx, ny);
-
-                        if (!black && pixel.R == 255)
-                        {
-                            return true;
-                        }
-                        else if (black && pixel.R == 0)
-                        {
-                            return true;
-                        }
-                    }
-                }
-
-                return false;
-            }
-
-            // Hàm copy dữ liệu từ một bitmap sang bitmap khác
-            private static void CopyBitmap(Bitmap source, Bitmap destination)
-            {
-                for (int x = 0; x < source.Width; x++)
-                {
-                    for (int y = 0; y < source.Height; y++)
-                    {
-                        destination.SetPixel(x, y, source.GetPixel(x, y));
-                    }
-                }
-            }
-        }
-
-            private static bool IsToBeDeleted(int[,] image, int x, int y)
-        {
-            int backgroundCount = 0;
-            int transitionCount = 0;
-
-            int[] neighborValues = new int[9]
-            {
-        image[y - 1, x - 1], image[y - 1, x], image[y - 1, x + 1],
-        image[y, x - 1], image[y, x], image[y, x + 1],
-        image[y + 1, x - 1], image[y + 1, x], image[y + 1, x + 1]
-            };
-
-            for (int i = 0; i < neighborValues.Length - 1; i++)
-            {
-                if (neighborValues[i] == 0 && neighborValues[i + 1] == 1)
-                {
-                    transitionCount++;
-                }
-
-                if (neighborValues[i] == 0)
-                {
-                    backgroundCount++;
-                }
-            }
-
-            if (neighborValues[neighborValues.Length - 1] == 0 && neighborValues[0] == 1)
-            {
-                transitionCount++;
-            }
-
-            if (neighborValues[neighborValues.Length - 1] == 0)
-            {
-                backgroundCount++;
-            }
-
-            return (backgroundCount >= 2 && backgroundCount <= 6 && transitionCount == 1 &&
-                    image[y - 1, x] * image[y, x + 1] * image[y + 1, x] == 0 &&
-                    image[y, x + 1] * image[y + 1, x] * image[y, x - 1] == 0);
+            
         }
         private void open_Click(object sender, EventArgs e)
         {
@@ -496,14 +393,12 @@ namespace WindowsFormsApp2
             {
                 int high_threshold = Convert.ToInt16(high.Text);
                 int low_threshold = Convert.ToInt16(low.Text);
-                int[,] edges = CannyEdgeDetection.DeTectEdgeByCannyMethod(imagePath, high_threshold, low_threshold);
-                //int[,] result = CannyEdgeDetection.LinkEdges(imagePath, high_threshold, low_threshold);
-
-                //Bitmap bitmap = ClosingAlgorithm.Closing(edges,1);
-                //Bitmap dilation = ClosingAlgorithm.Dilate(CannyEdgeDetection.IntToBitmap(edges), 3);
-                Bitmap bitmap = CannyEdgeDetection.IntToBitmap(edges);
-
+                int[,] edges = EdgeDetection.DeTectEdgeByCannyMethod(imagePath, high_threshold, low_threshold);
+                int[,] hough = EdgeDetection.PerformHoughTransform(edges);
+                
+                Bitmap bitmap = EdgeDetection.IntToBitmap(hough);  
                 picture2.Image = bitmap;
+                
             }
             else
             {
