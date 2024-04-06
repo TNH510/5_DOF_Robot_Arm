@@ -315,6 +315,10 @@
     <Resource Include="Images\shutdown_def.png" />
     <Resource Include="Images\shutdown_mo.png" />
     <Resource Include="Images\transaction_page.png" />
+    <Resource Include="Icons\Exit.png" />
+    <Resource Include="Icons\exit_icon.ico" />
+    <Resource Include="Icons\NewFile.png" />
+    <Resource Include="Icons\open.png" />
     <Content Include="lib\HelixToolkit.dll" />
     <Content Include="lib\HelixToolkit.pdb" />
     <Content Include="lib\HelixToolkit.Wpf.dll" />

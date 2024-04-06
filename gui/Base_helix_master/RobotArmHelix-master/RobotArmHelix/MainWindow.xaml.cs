@@ -61,6 +61,7 @@ namespace RobotArmHelix
     /// </summary>
     public partial class MainWindow : Window
    {
+        public int visible_robot = 1;
         private double returnX = 500;
         private double returnY = 0;
         private double returnZ = 600;
@@ -1073,6 +1074,10 @@ namespace RobotArmHelix
         }
         private void ConnectPLC(object sender, RoutedEventArgs e)
         {
+            /* Change state of the menu */
+            // After connecting, uncheck the "Disconnect" MenuItem
+            DisconnectMenuItem.IsChecked = false;
+            ConnectMenuItem.IsChecked = true;
             /* Disable slider */
             joint1.IsEnabled = false;
             joint2.IsEnabled = false;
@@ -1102,12 +1107,6 @@ namespace RobotArmHelix
                 //Disconnect_button.IsEnabled = true;
                 cn_bttn=false;
                 ds_bttn=true;
-                /* Change the color of the button when clicked */
-                ChangeColorObjectBackground(Connect_button, Constants.OBJECT_MODIFIED);
-                ChangeColorObjectBackground(Disconnect_button, Constants.OBJECT_MODIFIED1);
-                ChangeColorObjectForeground(Connect_button, Constants.OBJECT_MODIFIED1);
-                ChangeColorObjectForeground(Disconnect_button, Constants.OBJECT_MODIFIED);
-                ChangeColorObjectBorderBrush(Disconnect_button, Constants.OBJECT_MODIFIED);
                 /* 
                     Print the log command
                     MethosBase.GetCurrentMethod returns the action user did.
@@ -1155,6 +1154,10 @@ namespace RobotArmHelix
 
         private void DisconnectPLC(object sender, RoutedEventArgs e)
         {
+            /* Change state of the menu item */
+            // After connecting, uncheck the "Disconnect" MenuItem
+            DisconnectMenuItem.IsChecked = true;
+            ConnectMenuItem.IsChecked = false;
             /* Stop thread */
             Thread1isRunning = false;
             Thread2isRunning = false;
@@ -1189,12 +1192,6 @@ namespace RobotArmHelix
                 //Disconnect_button.IsEnabled = true;
                 cn_bttn = true;
                 ds_bttn = false;
-                /* Change the color of the button when clicked */
-                ChangeColorObjectBackground(Connect_button, Constants.OBJECT_MODIFIED1);
-                ChangeColorObjectBackground(Disconnect_button, Constants.OBJECT_MODIFIED);
-                ChangeColorObjectForeground(Connect_button, Constants.OBJECT_MODIFIED);
-                ChangeColorObjectForeground(Disconnect_button, Constants.OBJECT_MODIFIED1);
-
                 /* 
                     Print the log command
                     MethosBase.GetCurrentMethod returns the action user did.
@@ -1212,6 +1209,19 @@ namespace RobotArmHelix
 
         }
 
+        private void Visible_Robot_Click(object sender, RoutedEventArgs e)
+        {
+            visible_robot = (~visible_robot) & 0x01;
+            if(visible_robot == 0)
+            {
+                viewPort3d.Children.Remove(RoboticArm);
+            }
+            else
+            {
+                viewPort3d.Children.Add(RoboticArm);
+            }
+            
+        }
         private void Servo_button_click(object sender, RoutedEventArgs e)
         {
             int ret, servo_status;
@@ -2276,8 +2286,9 @@ namespace RobotArmHelix
 
         private void Open_menu_Click(object sender, RoutedEventArgs e)
         {
-            Menu_control menuControl = new Menu_control(this);
-            menuControl.Show();
+            //Menu_control menuControl = new Menu_control(this);
+            //menuControl.Show();
+            TCP_sendata_button.Visibility = Visibility.Hidden;
         }
 
         public void turn_on_1_pulse_relay(int device)
@@ -2378,7 +2389,10 @@ namespace RobotArmHelix
             return new Circle(new Point2(h, k), r);
         }
 
-
+        private void MenuItemExit_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
     }
 
 }
