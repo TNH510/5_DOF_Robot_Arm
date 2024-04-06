@@ -62,6 +62,11 @@ namespace RobotArmHelix
     public partial class MainWindow : Window
    {
         public int visible_robot = 1;
+        public int visible_display = 1;
+        public int visible_control = 1;
+        public int visible_jogging = 1;
+
+
         private double returnX = 500;
         private double returnY = 0;
         private double returnZ = 600;
@@ -152,8 +157,8 @@ namespace RobotArmHelix
             com_port_list1.ItemsSource = ports;
             // uart.DataReceived += SerialPort_DataReceived;
 
-            // Attach the event handler to the MouseDown event
-            viewPort3d.MouseDown += helixViewport3D_MouseDown;
+            //// Attach the event handler to the MouseDown event
+            //viewPort3d.MouseDown += helixViewport3D_MouseDown;
             basePath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\3D_Models\\";
             List<string> modelsNames = new List<string>();
             modelsNames.Add(MODEL_PATH0);
@@ -1222,6 +1227,122 @@ namespace RobotArmHelix
             }
             
         }
+        private void Visible_Display_Click(object sender, RoutedEventArgs e)
+        {
+            visible_display = (~visible_display) & 0x01;
+            if (visible_display == 0)
+            {
+                J1_lbl.Visibility = Visibility.Hidden;
+                J2_lbl.Visibility = Visibility.Hidden;
+                J3_lbl.Visibility = Visibility.Hidden;
+                J4_lbl.Visibility = Visibility.Hidden;
+                J5_lbl.Visibility = Visibility.Hidden;
+
+                joint1.Visibility = Visibility.Hidden;
+                joint2.Visibility = Visibility.Hidden;
+                joint3.Visibility = Visibility.Hidden;
+                joint4.Visibility = Visibility.Hidden;
+                joint5.Visibility = Visibility.Hidden;
+
+                J1Value.Visibility = Visibility.Hidden;
+                J2Value.Visibility = Visibility.Hidden;
+                J3Value.Visibility = Visibility.Hidden;
+                J4Value.Visibility = Visibility.Hidden;
+                J5Value.Visibility = Visibility.Hidden;
+
+                Tx.Visibility = Visibility.Hidden;
+                Ty.Visibility = Visibility.Hidden;
+                Tz.Visibility = Visibility.Hidden;
+
+                X_lbl.Visibility = Visibility.Hidden;
+                Y_lbl.Visibility = Visibility.Hidden;
+                Z_lbl.Visibility = Visibility.Hidden;
+
+                display_lbl.Visibility = Visibility.Hidden;
+            }
+            else
+            {
+                J1_lbl.Visibility = Visibility.Visible;
+                J2_lbl.Visibility = Visibility.Visible;
+                J3_lbl.Visibility = Visibility.Visible;
+                J4_lbl.Visibility = Visibility.Visible;
+                J5_lbl.Visibility = Visibility.Visible;
+
+                joint1.Visibility = Visibility.Visible;
+                joint2.Visibility = Visibility.Visible;
+                joint3.Visibility = Visibility.Visible;
+                joint4.Visibility = Visibility.Visible;
+                joint5.Visibility = Visibility.Visible;
+
+                J1Value.Visibility = Visibility.Visible;
+                J2Value.Visibility = Visibility.Visible;
+                J3Value.Visibility = Visibility.Visible;
+                J4Value.Visibility = Visibility.Visible;
+                J5Value.Visibility = Visibility.Visible;
+
+                Tx.Visibility = Visibility.Visible;
+                Ty.Visibility = Visibility.Visible;
+                Tz.Visibility = Visibility.Visible;
+
+                X_lbl.Visibility = Visibility.Visible;
+                Y_lbl.Visibility = Visibility.Visible;
+                Z_lbl.Visibility = Visibility.Visible;
+
+                display_lbl.Visibility = Visibility.Visible;
+            }
+
+        }
+
+        private void Visible_Control_Click(object sender, RoutedEventArgs e)
+        {
+            visible_control = (~visible_control) & 0x01;
+            if (visible_control == 0)
+            {
+                Servo_button.Visibility = Visibility.Hidden;
+                ResetError_button.Visibility = Visibility.Hidden;
+                SetHome_button.Visibility = Visibility.Hidden;
+                GoHome_button.Visibility = Visibility.Hidden;
+
+                control_lbl.Visibility = Visibility.Hidden;
+            }
+            else
+            {
+                Servo_button.Visibility = Visibility.Visible;
+                ResetError_button.Visibility = Visibility.Visible;
+                SetHome_button.Visibility = Visibility.Visible;
+                GoHome_button.Visibility = Visibility.Visible;
+
+                control_lbl.Visibility = Visibility.Visible;
+            }
+        }
+        private void Visible_Jogging_Click(object sender, RoutedEventArgs e)
+        {
+            visible_jogging = (~visible_jogging) & 0x01;
+            if (visible_jogging == 0)
+            {
+                Forward_button.Visibility = Visibility.Hidden;
+                Backward_button.Visibility = Visibility.Hidden;
+                Jog_set_speed.Visibility = Visibility.Hidden;
+                joint_tb.Visibility = Visibility.Hidden;
+                Joint_lbl.Visibility = Visibility.Hidden;
+                jog_speed_tb.Visibility = Visibility.Hidden;
+
+
+                jogging_lbl.Visibility = Visibility.Hidden;
+            }
+            else
+            {
+                Forward_button.Visibility = Visibility.Visible;
+                Backward_button.Visibility = Visibility.Visible;
+                Jog_set_speed.Visibility = Visibility.Visible;
+                joint_tb.Visibility = Visibility.Visible;
+                Joint_lbl.Visibility = Visibility.Visible;
+                jog_speed_tb.Visibility = Visibility.Visible;
+
+                jogging_lbl.Visibility = Visibility.Visible;
+            }
+        }
+
         private void Servo_button_click(object sender, RoutedEventArgs e)
         {
             int ret, servo_status;
@@ -1809,25 +1930,25 @@ namespace RobotArmHelix
             move = 0;
         }
 
-        private void helixViewport3D_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            Point mousePosition = e.GetPosition(viewPort3d);
+        //private void helixViewport3D_MouseDown(object sender, MouseButtonEventArgs e)
+        //{
+        //    Point mousePosition = e.GetPosition(viewPort3d);
 
-            // Find the nearest visual in the 3D scene
-            HitTestResult result = VisualTreeHelper.HitTest(viewPort3d, mousePosition);
-            RayMeshGeometry3DHitTestResult meshResult = result as RayMeshGeometry3DHitTestResult;
+        //     Find the nearest visual in the 3D scene
+        //    HitTestResult result = VisualTreeHelper.HitTest(viewPort3d, mousePosition);
+        //    RayMeshGeometry3DHitTestResult meshResult = result as RayMeshGeometry3DHitTestResult;
 
-            if (meshResult != null)
-            {
-                Point3D clickedPoint = meshResult.PointHit;
+        //    if (meshResult != null)
+        //    {
+        //        Point3D clickedPoint = meshResult.PointHit;
 
-                // Update the label content on the UI thread
-                Dispatcher.Invoke(() =>
-                {
-                    coordinatesLabel.Content = $"Coordinates: ({clickedPoint.X}, {clickedPoint.Y}, {clickedPoint.Z})";
-                });
-            }
-        }
+        //         Update the label content on the UI thread
+        //        Dispatcher.Invoke(() =>
+        //        {
+        //            coordinatesLabel.Content = $"Coordinates: ({clickedPoint.X}, {clickedPoint.Y}, {clickedPoint.Z})";
+        //        });
+        //    }
+        //}
 
         private void Press_button(string name, string adr)
         {
