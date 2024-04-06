@@ -476,6 +476,8 @@ static void    MadgwickAHRSupdate(float gx, float gy, float gz, float ax, float 
 static void    MahonyAHRSupdateIMU(float gx, float gy, float gz, float ax, float ay, float az);
 static void    mpu6050_getRollPitchYaw(void);
 static float   invSqrt(float x); 
+static float   square(float num);
+static void    kinematic_convert(float *x_pos, float *y_pos, float *z_pos);
 /*-----------------------------------------------------------------------------------------------*/
 
 base_status_t bsp_mpu6050_filter_task(void)
@@ -499,12 +501,19 @@ base_status_t bsp_mpu6050_filter_task(void)
     // MahonyAHRSupdateIMU(gxrs, gyrs, gzrs, axg, ayg, azg);
 
     // Value of Roll, Pitch, Yaw
-    // mpu6050_getRollPitchYaw();
+    mpu6050_getRollPitchYaw();
+
+	uint16_t adc_value = 0;
+	bsp_adc_get_data(&adc_value);
+
+	float x_pos, y_pos, z_pos;
+	kinematic_convert(&x_pos, &y_pos, &z_pos);
 
     // printf("%0.2f,%0.2f,%0.2f\r\n", magnetic_data.XAxis, magnetic_data.YAxis, magnetic_data.ZAxis);
-	printf("%0.2f,%0.2f,%0.2f, %0.2f\r\n", q0, q1, q2, q3);
+	// printf("%0.2f,%0.2f,%0.2f,%0.2f\r\n", q0, q1, q2, q3);
+	printf("%0.2f,%0.2f,%0.2f\r\n", x_pos, y_pos, z_pos);
 
-	HAL_Delay(100);
+	HAL_Delay(200);
 
     return BS_OK;
 }
@@ -769,13 +778,24 @@ static void mpu6050_getRollPitchYaw(void)
     float siny_cosp = 2 * (q0 * q3 + q1 * q2);
     float cosy_cosp = 1 - 2 * (q2 * q2 + q3 * q3);
     yaw = atan2f(siny_cosp, cosy_cosp) * (180.0f / M_PI);
+}
 
-    // Xử lý trường hợp góc gần không xác định
-    if (fabsf(q2 * q2 + q3 * q3 - 1) < 0.05) {
-        roll = 0.0f;
-        pitch = 0.0f;
-        yaw = 0.0f; // Hoặc có thể đặt yaw thành NaN (không phải số)
-    }
+static float square(float num)
+{
+	return (float)(num * num);
+}
+
+static void kinematic_convert(float *x_pos, float *y_pos, float *z_pos)
+{
+	float l1 = 200.0;
+	float l2 = 200.0;
+	float ce = 0.0;
+	float se = 1.0;
+	float n = square(q0) + square(q1) + square(q2) + square(q3);
+
+	*x_pos = l2*((ce*(square(q0) + square(q1) - square(q2) - square(q3)))/(n) - (se*(2*q0*q3 - 2*q1*q2))/(n)) + (l1*(square(q0) + square(q1) - square(q2) - square(q3)))/(n);
+	*y_pos = l2*((se*(square(q0) - square(q1) + square(q2) - square(q3)))/(n) + (ce*(2*q0*q3 + 2*q1*q2))/(n)) + (l1*(2*q0*q3 + 2*q1*q2))/(n);
+	*z_pos = - l2*((ce*(2*q0*q2 - 2*q1*q3))/(n) - (se*(2*q0*q1 + 2*q2*q3))/(n)) - (l1*(2*q0*q2 - 2*q1*q3))/(n);
 }
 
 /*---------------------------------------------------*/
