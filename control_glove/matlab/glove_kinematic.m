@@ -1,19 +1,15 @@
-% Define the quaternion
-quat = [0, 0, 0.7071068, 0.7071068];  % [qr, qi, qj, qk]
+syms w x y z n l1 l2 ce se
+% syms l1 l2 
 
- % Extract quaternion components
-w = quat(1);
-x = quat(2);
-y = quat(3);
-z = quat(4);
+% w = 0.5
+% x = 0.5
+% y = 0.5
+% z = 0.5
+% ce = 1
+% se = 0
 
 % Compute quaternion norm
 n = w^2 + x^2 + y^2 + z^2;
-
-% Check if the quaternion is invalid
-if n == 0
-    error('Invalid quaternion');
-end
 
 % Compute rotation matrix elements
 a11 = (w^2 + x^2 - y^2 - z^2) / n;
@@ -29,7 +25,10 @@ a32 = 2 * (y*z + w*x) / n;
 a33 = (w^2 - x^2 - y^2 + z^2) / n;
 
 % Create the rotation matrix
-rotm = [a11 a12 a13; a21 a22 a23; a31 a32 a33];
+rotm = [a11 a12 a13 0; a21 a22 a23 0; a31 a32 a33 0; 0 0 0 1];
+T1 = [1 0 0 l1; 0 1 0 0; 0 0 1 0; 0 0 0 1]
+R2 = [ce -se 0 0; se ce 0 0; 0 0 1 0; 0 0 0 1]
+T2 = [1 0 0 l2; 0 1 0 0; 0 0 1 0; 0 0 0 1]
+P  = [0; 0; 0; 1]
 
-% Display the rotation matrix
-disp(rotm);
+result = rotm * T1 * R2 * T2 * P
