@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.UI.WebControls;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
@@ -21,10 +23,11 @@ namespace WindowsFormsApp2
         public Form1()
         {
             InitializeComponent();
+            
         }
         class EdgeDetection
         {
-            private static int[,] RGB2Gray(Bitmap ColorImage)
+            public static int[,] RGB2Gray(Bitmap ColorImage)
             {
 
                 int width = ColorImage.Width;
@@ -212,9 +215,9 @@ namespace WindowsFormsApp2
             {
                 Bitmap Import_picture = new Bitmap(imagePath);
 
-                int[,] gray = CannyEdgeDetection.RGB2Gray(Import_picture);
-                int[,] blur = CannyEdgeDetection.Blur_Image(gray);
-                int[,] edges = CannyEdgeDetection.Canny_Detect(blur, high_threshold, low_threshold);
+                int[,] gray = EdgeDetection.RGB2Gray(Import_picture);
+                int[,] blur = EdgeDetection.Blur_Image(gray);
+                int[,] edges = EdgeDetection.Canny_Detect(blur, high_threshold, low_threshold);
                 
                 return edges;
             }
@@ -260,9 +263,9 @@ namespace WindowsFormsApp2
             {
                 Bitmap Import_picture = new Bitmap(imagePath);
 
-                int[,] gray = CannyEdgeDetection.RGB2Gray(Import_picture);
-                int[,] blur = CannyEdgeDetection.Blur_Image(gray);
-                int[,] edges = CannyEdgeDetection.Canny_Detect(blur, high_threshold, low_threshold);
+                int[,] gray = EdgeDetection.RGB2Gray(Import_picture);
+                int[,] blur = EdgeDetection.Blur_Image(gray);
+                int[,] edges = EdgeDetection.Canny_Detect(blur, high_threshold, low_threshold);
                 // Kích thước hình ảnh
                 int width = edges.GetLength(0);
                 int height = edges.GetLength(1);
@@ -356,7 +359,7 @@ namespace WindowsFormsApp2
                                 double radian = (theta * Math.PI) / 180.0;
                                 int rho = (int)(x * Math.Cos(radian) + y * Math.Sin(radian));
                                 rho += diagonalLength; // Dịch chuyển rho để không có giá trị âm
-                                houghMatrix[theta, rho]= houghMatrix[theta, rho]+1;
+                                houghMatrix[theta, rho]++;
                                 
                             }
                         }
@@ -365,8 +368,108 @@ namespace WindowsFormsApp2
 
                 return houghMatrix;
             }
-            
+            public static Bitmap DrawingEdges(int[,]HoughMatrix,Bitmap Gray_Image)
+            {
+                int width = HoughMatrix.GetLength(0);
+                int height = HoughMatrix.GetLength(1);
+                for (int theta=0;theta<width;theta++)
+                {
+                    for(int rho=0;rho<height;rho++)
+                    {
+                        if (HoughMatrix[theta,rho]>70)
+                        {
+                            for (int x = 0; x < Gray_Image.Width; x++)
+                            {
+                                double theta_radian = theta * Math.PI / 180;
+                                double y = rho / Math.Cos(theta_radian) - (x - Gray_Image.Width / 2) * Math.Tan(theta_radian);
+                                if (y >= 0 && y < Gray_Image.Height)
+                                {
+                                    Gray_Image.SetPixel(x, (int)y, Color.Red);
+                                }
+                            }
+
+                        }    
+
+                    }    
+                }    
+                return Gray_Image;
+            }
+            public static int[,] ComputeHoughMatrix(int[,] edgeMatrix)
+            {
+                int width = edgeMatrix.GetLength(1);
+                int height = edgeMatrix.GetLength(0);
+                int diagonal = (int)Math.Sqrt(width * width + height * height); // Đường chéo của ảnh
+
+                // Khởi tạo ma trận Hough
+                int[,] houghMatrix = new int[180, 2 * diagonal];
+
+                // Duyệt qua từng điểm cạnh trong ma trận cạnh
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        if (edgeMatrix[y, x] == 255) // Kiểm tra nếu điểm là điểm cạnh
+                        {
+                            // Duyệt qua mọi giá trị của theta (0-179)
+                            for (int theta = 0; theta < 180; theta++)
+                            {
+                                double radianTheta = theta * Math.PI / 180;
+                                int rho = (int)(x * Math.Cos(radianTheta) + y * Math.Sin(radianTheta));
+                                houghMatrix[theta, rho + diagonal]++;
+                            }
+                        }
+                    }
+                }
+
+                return houghMatrix;
+            }
+            public static Bitmap DrawLines(int[,] houghMatrix, int threshold, int width, int height)
+            {
+                int diagonal = (int)Math.Sqrt(width * width + height * height); // Đường chéo của ảnh
+
+                Bitmap resultImage = new Bitmap(width, height);
+
+                // Duyệt qua ma trận Hough
+                for (int theta = 0; theta < 180; theta++)
+                {
+                    for (int rho = 0; rho < 2 * diagonal; rho++)
+                    {
+                        if (houghMatrix[theta, rho] >= threshold)
+                        {
+                            double radianTheta = theta * Math.PI / 180;
+                            if(theta>=45&&theta<135)
+                            {
+                                for (int x = 0; x < width; x++)
+                                {
+                                    int y = (int)(((rho - diagonal) - x * Math.Cos(radianTheta)) / Math.Sin(radianTheta));
+                                    if (y >= 0 && y < height)
+                                    {
+                                        resultImage.SetPixel(x, y, Color.Red);
+                                    }
+                                  
+                                }
+                            }
+                            else
+                            {
+                                for (int y = 0; y < height; y++)
+                                {
+                                    int x = (int)(((rho - diagonal) - y * Math.Sin(radianTheta)) / Math.Cos(radianTheta));
+                                    if (x >= 0 && x < width)
+                                    {
+                                        resultImage.SetPixel(x, y, Color.Red);
+                                    }
+
+                                }
+                            }
+                            
+                        }
+                    }
+                }
+
+                return resultImage;
+            }
         }
+        
         private void open_Click(object sender, EventArgs e)
         {
             // Tạo một OpenFileDialog
@@ -386,7 +489,7 @@ namespace WindowsFormsApp2
                 picture1.Image = image;
             }
         }
-
+       
         private void process_Click(object sender, EventArgs e)
         {
             if ((!string.IsNullOrEmpty(high.Text)) || (!string.IsNullOrEmpty(low.Text)))
@@ -395,10 +498,18 @@ namespace WindowsFormsApp2
                 int low_threshold = Convert.ToInt16(low.Text);
                 int[,] edges = EdgeDetection.DeTectEdgeByCannyMethod(imagePath, high_threshold, low_threshold);
                 int[,] hough = EdgeDetection.PerformHoughTransform(edges);
+                // Lấy số hàng và số cột của mảng
+                // Khởi tạo một mảng 2 chiều
+                int threshold = Convert.ToInt16(text1.Text); ; // Ngưỡng để chọn các đỉnh trong ma trận Hough
+                int width = edges.GetLength(1);
+                int height = edges.GetLength(0);
+                Bitmap resultImage = EdgeDetection.DrawLines(hough, threshold, width, height);
                 
-                Bitmap bitmap = EdgeDetection.IntToBitmap(hough);  
-                picture2.Image = bitmap;
-                
+                picture2.Image = EdgeDetection.IntToBitmap(hough);
+
+
+                //picture3.Image = EdgeDetection.IntToBitmap(edges);
+                picture3.Image = resultImage;
             }
             else
             {
@@ -411,6 +522,9 @@ namespace WindowsFormsApp2
             }
         }
 
+        private void picture1_Click(object sender, EventArgs e)
+        {
 
+        }
     }    
 }

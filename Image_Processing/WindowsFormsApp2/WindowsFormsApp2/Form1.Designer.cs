@@ -37,6 +37,8 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.picture3 = new System.Windows.Forms.PictureBox();
+            this.text1 = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.picture1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picture2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picture3)).BeginInit();
@@ -51,6 +53,7 @@
             this.picture1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.picture1.TabIndex = 0;
             this.picture1.TabStop = false;
+            this.picture1.Click += new System.EventHandler(this.picture1_Click);
             // 
             // picture2
             // 
@@ -64,7 +67,7 @@
             // 
             // open
             // 
-            this.open.Location = new System.Drawing.Point(1225, 162);
+            this.open.Location = new System.Drawing.Point(1225, 235);
             this.open.Name = "open";
             this.open.Size = new System.Drawing.Size(163, 71);
             this.open.TabIndex = 1;
@@ -74,7 +77,7 @@
             // 
             // process
             // 
-            this.process.Location = new System.Drawing.Point(1225, 239);
+            this.process.Location = new System.Drawing.Point(1225, 326);
             this.process.Name = "process";
             this.process.Size = new System.Drawing.Size(163, 71);
             this.process.TabIndex = 1;
@@ -91,7 +94,7 @@
             // 
             // low
             // 
-            this.low.Location = new System.Drawing.Point(1225, 107);
+            this.low.Location = new System.Drawing.Point(1222, 98);
             this.low.Name = "low";
             this.low.Size = new System.Drawing.Size(163, 22);
             this.low.TabIndex = 2;
@@ -108,7 +111,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(1222, 88);
+            this.label4.Location = new System.Drawing.Point(1222, 79);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(103, 16);
             this.label4.TabIndex = 3;
@@ -124,11 +127,29 @@
             this.picture3.TabIndex = 0;
             this.picture3.TabStop = false;
             // 
+            // text1
+            // 
+            this.text1.Location = new System.Drawing.Point(1222, 170);
+            this.text1.Name = "text1";
+            this.text1.Size = new System.Drawing.Size(163, 22);
+            this.text1.TabIndex = 2;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(1222, 151);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(70, 16);
+            this.label5.TabIndex = 3;
+            this.label5.Text = "NGƯỠNG ";
+            // 
             // Form1
             // 
-            this.ClientSize = new System.Drawing.Size(1400, 630);
+            this.ClientSize = new System.Drawing.Size(1400, 436);
+            this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
+            this.Controls.Add(this.text1);
             this.Controls.Add(this.low);
             this.Controls.Add(this.high);
             this.Controls.Add(this.process);
@@ -164,6 +185,8 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.PictureBox picture3;
+        private System.Windows.Forms.TextBox text1;
+        private System.Windows.Forms.Label label5;
     }
 }
 
