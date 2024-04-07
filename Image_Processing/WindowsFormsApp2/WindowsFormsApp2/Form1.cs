@@ -654,31 +654,34 @@ namespace WindowsFormsApp2
         {
             if ((!string.IsNullOrEmpty(high.Text)) || (!string.IsNullOrEmpty(low.Text)) || (!string.IsNullOrEmpty(text1.Text)))
             {
-                int high_threshold = Convert.ToInt16(high.Text);
-                int low_threshold = Convert.ToInt16(low.Text);
+                int high_threshold = Convert.ToInt16(high.Text);//ngưỡng trên cho canny detect
+                int low_threshold = Convert.ToInt16(low.Text);//ngưỡng dưới cho canny detect 
+                int threshold = Convert.ToInt16(text1.Text);  // Ngưỡng để chọn các đỉnh trong ma trận Hough
+                
+                //ảnh binary cho canny detect
                 int[,] edges = EdgeDetection.DeTectEdgeByCannyMethod(imagePath, high_threshold, low_threshold);
                 
                 // Lấy số hàng và số cột của mảng
                 // Khởi tạo một mảng 2 chiều
-                int threshold = Convert.ToInt16(text1.Text); ; // Ngưỡng để chọn các đỉnh trong ma trận Hough
+
                 int width = edges.GetLength(0);
                 int height = edges.GetLength(1);
-                
 
-                //picture2.Image = EdgeDetection.IntToBitmap(hough);
-
-
-               
-                //picture3.Image = resultImage;
+                //mở rộng các cạnh để triệt tiêu bớt nhiễu    
                 int[,] dilation = EdgeDetection.Dilation(edges, 6);
+                //đưa độ dài cạnh về 1 để giảm dung lượng cho biểu đồ hough
                 int[,] skeleton = EdgeDetection.EdgeThinning(dilation);
+                //biểu đồ hough
                 int[,] hough = EdgeDetection.PerformHoughTransform(skeleton);
+                //vẽ đường thẳng từ biểu đồ hough
                 Bitmap resultImage = EdgeDetection.DrawLines(hough, threshold, width, height);
 
                 picture2.Image = resultImage;
-                picture4.Image = EdgeDetection.IntToBitmap(skeleton);
                 picture3.Image = EdgeDetection.IntToBitmap(dilation);
+                picture4.Image = EdgeDetection.IntToBitmap(skeleton);
             }
+            
+                
             else
             {
                 string message = "Nhập thiếu ngưỡng";
