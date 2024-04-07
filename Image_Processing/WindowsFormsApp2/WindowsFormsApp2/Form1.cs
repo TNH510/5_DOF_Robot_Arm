@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Security.Policy;
@@ -23,7 +24,7 @@ namespace WindowsFormsApp2
         public Form1()
         {
             InitializeComponent();
-            
+
         }
         class EdgeDetection
         {
@@ -218,7 +219,7 @@ namespace WindowsFormsApp2
                 int[,] gray = EdgeDetection.RGB2Gray(Import_picture);
                 int[,] blur = EdgeDetection.Blur_Image(gray);
                 int[,] edges = EdgeDetection.Canny_Detect(blur, high_threshold, low_threshold);
-                
+
                 return edges;
             }
             public static Bitmap IntToBitmap(int[,] Binary_Image)
@@ -228,13 +229,13 @@ namespace WindowsFormsApp2
                 int height = Binary_Image.GetLength(1);
 
                 // Tạo bitmap từ mảng hai chiều
-                Bitmap Result = new Bitmap(width, height);
+                Bitmap Result = new Bitmap(width, height, PixelFormat.Format16bppRgb565);
                 for (int x = 0; x < width; x++)
                 {
                     for (int y = 0; y < height; y++)
                     {
                         int pixelValue = (int)Binary_Image[x, y];
-                        Color color = Color.FromArgb(pixelValue, pixelValue, pixelValue);
+                        Color color = Color.FromArgb((byte)pixelValue, (byte)pixelValue, (byte)pixelValue);
                         Result.SetPixel(x, y, color);
                     }
                 }
@@ -323,7 +324,7 @@ namespace WindowsFormsApp2
                             {
                                 for (int j = -1; j <= 1; j++)
                                 {
-                                    if ((Math.Abs(gradientMagnitude[x+i, y+j] - gradientMagnitude[x , y ]) < 50) & (Math.Abs(gradientAngle[x+i, y+j] - gradientAngle[x, y]) < 1) & (Math.Abs(gradientAngle[x+i, y+j] - gradientAngle[x , y]) > 0.1) )
+                                    if ((Math.Abs(gradientMagnitude[x + i, y + j] - gradientMagnitude[x, y]) < 50) & (Math.Abs(gradientAngle[x + i, y + j] - gradientAngle[x, y]) < 1) & (Math.Abs(gradientAngle[x + i, y + j] - gradientAngle[x, y]) > 0.1))
                                     {
                                         edges[x + i, y + j] = 255;
                                     }
@@ -331,7 +332,7 @@ namespace WindowsFormsApp2
                             }
                         }
                     }
-                    
+
                 }
                 return edges;
             }
@@ -360,7 +361,7 @@ namespace WindowsFormsApp2
                                 int rho = (int)(x * Math.Cos(radian) + y * Math.Sin(radian));
                                 rho += diagonalLength; // Dịch chuyển rho để không có giá trị âm
                                 houghMatrix[theta, rho]++;
-                                
+
                             }
                         }
                     }
@@ -368,15 +369,15 @@ namespace WindowsFormsApp2
 
                 return houghMatrix;
             }
-            public static Bitmap DrawingEdges(int[,]HoughMatrix,Bitmap Gray_Image)
+            public static Bitmap DrawingEdges(int[,] HoughMatrix, Bitmap Gray_Image)
             {
                 int width = HoughMatrix.GetLength(0);
                 int height = HoughMatrix.GetLength(1);
-                for (int theta=0;theta<width;theta++)
+                for (int theta = 0; theta < width; theta++)
                 {
-                    for(int rho=0;rho<height;rho++)
+                    for (int rho = 0; rho < height; rho++)
                     {
-                        if (HoughMatrix[theta,rho]>70)
+                        if (HoughMatrix[theta, rho] > 70)
                         {
                             for (int x = 0; x < Gray_Image.Width; x++)
                             {
@@ -388,10 +389,10 @@ namespace WindowsFormsApp2
                                 }
                             }
 
-                        }    
+                        }
 
-                    }    
-                }    
+                    }
+                }
                 return Gray_Image;
             }
             public static int[,] ComputeHoughMatrix(int[,] edgeMatrix)
@@ -437,7 +438,8 @@ namespace WindowsFormsApp2
                         if (houghMatrix[theta, rho] >= threshold)
                         {
                             double radianTheta = theta * Math.PI / 180;
-                            if(theta>=45&&theta<135)
+
+                            if (theta >= 45 && theta < 135)
                             {
                                 for (int x = 0; x < width; x++)
                                 {
@@ -446,7 +448,7 @@ namespace WindowsFormsApp2
                                     {
                                         resultImage.SetPixel(x, y, Color.Red);
                                     }
-                                  
+
                                 }
                             }
                             else
@@ -461,16 +463,169 @@ namespace WindowsFormsApp2
 
                                 }
                             }
-                            
                         }
                     }
                 }
 
                 return resultImage;
             }
+            // Hàm dilation với số lần lặp lại xác định
+            public static int[,] Dilation(int[,] image, int iterations)
+            {
+                int width = image.GetLength(0);
+                int height = image.GetLength(1);
+                int[,] dilatedImage = new int[width, height];
+
+                for (int iter = 0; iter < iterations; iter++)
+                {
+                    for (int y = 0; y < height; y++)
+                    {
+                        for (int x = 0; x < width; x++)
+                        {
+                            int maxValue = 0;
+                            for (int ky = -1; ky <= 1; ky++)
+                            {
+                                for (int kx = -1; kx <= 1; kx++)
+                                {
+                                    int nx = x + kx;
+                                    int ny = y + ky;
+                                    if (nx >= 0 && nx < width && ny >= 0 && ny < height)
+                                    {
+                                        maxValue = Math.Max(maxValue, image[nx, ny]);
+                                    }
+                                }
+                            }
+                            dilatedImage[x, y] = maxValue;
+                        }
+                    }
+                    // Update ảnh đầu vào bằng ảnh đã dilation để tiếp tục lặp lại
+                    image = dilatedImage.Clone() as int[,];
+                }
+
+                return dilatedImage;
+            }
+            public static int[,] EdgeThinning(int[,] image)
+            {
+                int width = image.GetLength(0);
+                int height = image.GetLength(1);
+                int[,] thinnedImage = (int[,])image.Clone(); // Tạo một bản sao của ảnh để thực hiện mỏng cạnh viền
+
+                bool hasChanged = true; // Đặt biến hasChanged là true để bắt đầu vòng lặp
+
+                while (hasChanged)
+                {
+                    hasChanged = false; // Đặt lại hasChanged là false trước khi bắt đầu mỗi vòng lặp
+
+                    // Bước 1: Xác định và loại bỏ các điểm ảnh để làm mỏng cạnh viền
+                    for (int y = 1; y < height - 1; y++)
+                    {
+                        for (int x = 1; x < width - 1; x++)
+                        {
+                            if (thinnedImage[x, y] == 255) // Nếu điểm ảnh đang xét là một điểm cạnh
+                            {
+                                int count = CountNeighbors(x, y, thinnedImage);
+
+                                if (count >= 2 && count <= 6) // Nếu số lượng điểm lân cận thỏa mãn
+                                {
+                                    int transitions = Transitions(x, y, thinnedImage);
+
+                                    if (transitions == 1) // Nếu chỉ có một điểm chuyển đổi
+                                    {
+                                        int[] pixels = GetNeighborPixels(x, y, thinnedImage);
+
+                                        if (pixels[0] * pixels[2] * pixels[4] == 0 && pixels[2] * pixels[4] * pixels[6] == 0) // Kiểm tra điều kiện đặc biệt
+                                        {
+                                            thinnedImage[x, y] = 0;
+                                            hasChanged = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Bước 2: Lặp lại bước 1 với các điểm ảnh đang xét được đảo ngược
+                    for (int y = 1; y < height - 1; y++)
+                    {
+                        for (int x = 1; x < width - 1; x++)
+                        {
+                            if (thinnedImage[x, y] == 255)
+                            {
+                                int count = CountNeighbors(x, y, thinnedImage);
+
+                                if (count >= 2 && count <= 6)
+                                {
+                                    int transitions = Transitions(x, y, thinnedImage);
+
+                                    if (transitions == 1)
+                                    {
+                                        int[] pixels = GetNeighborPixels(x, y, thinnedImage);
+
+                                        if (pixels[0] * pixels[2] * pixels[6] == 0 && pixels[0] * pixels[4] * pixels[6] == 0)
+                                        {
+                                            thinnedImage[x, y] = 0;
+                                            hasChanged = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return thinnedImage;
+            }
+            // Đếm số lượng điểm lân cận
+            private static int CountNeighbors(int x, int y, int[,] image)
+            {
+                int count = 0;
+                for (int j = -1; j <= 1; j++)
+                {
+                    for (int i = -1; i <= 1; i++)
+                    {
+                        if (image[x + i, y + j] == 255)
+                        {
+                            count++;
+                        }
+                    }
+                }
+                return count - 1;
+            }
+
+            // Đếm số lượng chuyển đổi
+            private static int Transitions(int x, int y, int[,] image)
+            {
+                int count = 0;
+                int[] values = { image[x, y + 1], image[x - 1, y + 1], image[x - 1, y],
+                         image[x - 1, y - 1], image[x, y - 1], image[x + 1, y - 1],
+                         image[x + 1, y], image[x + 1, y + 1], image[x, y + 1] };
+
+                for (int i = 0; i < values.Length - 1; i++)
+                {
+                    if (values[i] == 0 && values[i + 1] == 255)
+                    {
+                        count++;
+                    }
+                }
+                return count;
+            }
+
+            // Lấy giá trị các điểm lân cận
+            private static int[] GetNeighborPixels(int x, int y, int[,] image)
+            {
+                int[] pixels = new int[9];
+                int index = 0;
+                for (int j = -1; j <= 1; j++)
+                {
+                    for (int i = -1; i <= 1; i++)
+                    {
+                        pixels[index++] = image[x + i, y + j];
+                    }
+                }
+                return pixels;
+            }
         }
-        
-        private void open_Click(object sender, EventArgs e)
+        private void open_Click_1(object sender, EventArgs e)
         {
             // Tạo một OpenFileDialog
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -489,27 +644,40 @@ namespace WindowsFormsApp2
                 picture1.Image = image;
             }
         }
-       
-        private void process_Click(object sender, EventArgs e)
+
+        private void high_TextChanged(object sender, EventArgs e)
         {
-            if ((!string.IsNullOrEmpty(high.Text)) || (!string.IsNullOrEmpty(low.Text)))
+
+        }
+
+        private void process_Click_1(object sender, EventArgs e)
+        {
+            if ((!string.IsNullOrEmpty(high.Text)) || (!string.IsNullOrEmpty(low.Text)) || (!string.IsNullOrEmpty(text1.Text)))
             {
                 int high_threshold = Convert.ToInt16(high.Text);
                 int low_threshold = Convert.ToInt16(low.Text);
                 int[,] edges = EdgeDetection.DeTectEdgeByCannyMethod(imagePath, high_threshold, low_threshold);
-                int[,] hough = EdgeDetection.PerformHoughTransform(edges);
+                
                 // Lấy số hàng và số cột của mảng
                 // Khởi tạo một mảng 2 chiều
                 int threshold = Convert.ToInt16(text1.Text); ; // Ngưỡng để chọn các đỉnh trong ma trận Hough
-                int width = edges.GetLength(1);
-                int height = edges.GetLength(0);
-                Bitmap resultImage = EdgeDetection.DrawLines(hough, threshold, width, height);
+                int width = edges.GetLength(0);
+                int height = edges.GetLength(1);
                 
-                picture2.Image = EdgeDetection.IntToBitmap(hough);
+
+                //picture2.Image = EdgeDetection.IntToBitmap(hough);
 
 
-                //picture3.Image = EdgeDetection.IntToBitmap(edges);
-                picture3.Image = resultImage;
+               
+                //picture3.Image = resultImage;
+                int[,] dilation = EdgeDetection.Dilation(edges, 6);
+                int[,] skeleton = EdgeDetection.EdgeThinning(dilation);
+                int[,] hough = EdgeDetection.PerformHoughTransform(skeleton);
+                Bitmap resultImage = EdgeDetection.DrawLines(hough, threshold, width, height);
+
+                picture2.Image = resultImage;
+                picture4.Image = EdgeDetection.IntToBitmap(skeleton);
+                picture3.Image = EdgeDetection.IntToBitmap(dilation);
             }
             else
             {
@@ -521,10 +689,5 @@ namespace WindowsFormsApp2
                 MessageBox.Show(message, caption, buttons, icon);
             }
         }
-
-        private void picture1_Click(object sender, EventArgs e)
-        {
-
-        }
-    }    
+    }
 }
