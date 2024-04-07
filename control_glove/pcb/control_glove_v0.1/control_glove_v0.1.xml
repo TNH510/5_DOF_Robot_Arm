@@ -1,0 +1,573 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export version="E">
+  <design>
+    <source>H:\OneDrive - hcmute.edu.vn\Desktop\5_DOF_Robot_Arm\control_glove\pcb\control_glove_v0.1\control_glove_v0.1.kicad_sch</source>
+    <date>4/7/2024 4:59:31 PM</date>
+    <tool>Eeschema (6.0.9)</tool>
+    <sheet number="1" name="/" tstamps="/">
+      <title_block>
+        <title/>
+        <company/>
+        <rev/>
+        <date/>
+        <source>control_glove_v0.1.kicad_sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+        <comment number="5" value=""/>
+        <comment number="6" value=""/>
+        <comment number="7" value=""/>
+        <comment number="8" value=""/>
+        <comment number="9" value=""/>
+      </title_block>
+    </sheet>
+  </design>
+  <components>
+    <comp ref="BZ1">
+      <value>Buzzer</value>
+      <footprint>Buzzer_Beeper:Buzzer_12x9.5RM7.6</footprint>
+      <libsource lib="Device" part="Buzzer" description="Buzzer, polarized"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="control_glove_v0.1.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>9b80bd40-0cfd-4672-a9aa-bcf262d19b88</tstamps>
+    </comp>
+    <comp ref="D1">
+      <value>LED</value>
+      <footprint>LED_THT:LED_D3.0mm</footprint>
+      <libsource lib="Device" part="LED" description="Light emitting diode"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="control_glove_v0.1.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>e31bdc45-d4dd-41ee-8dbb-2083e7fa4c9f</tstamps>
+    </comp>
+    <comp ref="D2">
+      <value>LED</value>
+      <footprint>LED_THT:LED_D3.0mm</footprint>
+      <libsource lib="Device" part="LED" description="Light emitting diode"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="control_glove_v0.1.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>3adb5af2-1afa-419a-9c76-0fb76ef86364</tstamps>
+    </comp>
+    <comp ref="IMU1">
+      <value>GY-521</value>
+      <footprint>Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical</footprint>
+      <libsource lib="hieu_lib" part="GY-521" description=""/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="control_glove_v0.1.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>b3cbb3cc-7bf7-4df3-8a52-03d0b3df1c3f</tstamps>
+    </comp>
+    <comp ref="IMU2">
+      <value>GY-521</value>
+      <footprint>Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical</footprint>
+      <libsource lib="hieu_lib" part="GY-521" description=""/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="control_glove_v0.1.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>9474985a-1f67-4f8a-b099-62b6e5a30379</tstamps>
+    </comp>
+    <comp ref="MARG1">
+      <value>HMC5883L</value>
+      <footprint>Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical</footprint>
+      <libsource lib="hieu_lib" part="HMC5883L" description=""/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="control_glove_v0.1.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>b07f3699-30f7-43af-85d4-425dcb1608a9</tstamps>
+    </comp>
+    <comp ref="MARG2">
+      <value>HMC5883L</value>
+      <footprint>Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical</footprint>
+      <libsource lib="hieu_lib" part="HMC5883L" description=""/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="control_glove_v0.1.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>2011b5d2-43bf-43de-a0f0-82af0765bba4</tstamps>
+    </comp>
+    <comp ref="MCU1">
+      <value>MiniSTM32F4x1</value>
+      <footprint>Connector_PinHeader_2.54mm:PinHeader_2x20_P2.54mm_Vertical</footprint>
+      <libsource lib="hieu_lib" part="MiniSTM32F4x1" description=""/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="control_glove_v0.1.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>7dd2faa2-a2bb-4518-8fa2-06ac24ac856b</tstamps>
+    </comp>
+    <comp ref="P1">
+      <value>Power_Pins</value>
+      <footprint>TerminalBlock:TerminalBlock_Altech_AK300-2_P5.00mm</footprint>
+      <libsource lib="hieu_lib" part="Power_Pins" description=""/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="control_glove_v0.1.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>2da2b242-8ba9-4955-8411-85aca43fee18</tstamps>
+    </comp>
+    <comp ref="Q1">
+      <value>Q_NPN_ECB</value>
+      <footprint>Package_TO_SOT_THT:TO-92_Inline</footprint>
+      <libsource lib="Device" part="Q_NPN_ECB" description="NPN transistor, emitter/collector/base"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="control_glove_v0.1.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>e9da7af0-ac0f-43df-8862-1009c40768d4</tstamps>
+    </comp>
+    <comp ref="R1">
+      <value>1K</value>
+      <footprint>Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal</footprint>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="control_glove_v0.1.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>8edd3bc7-6530-4c7c-8955-5a9c39a46486</tstamps>
+    </comp>
+    <comp ref="R2">
+      <value>1K</value>
+      <footprint>Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal</footprint>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="control_glove_v0.1.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>7fab233c-6dd2-4042-9726-63e2461711a1</tstamps>
+    </comp>
+    <comp ref="R3">
+      <value>300</value>
+      <footprint>Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal</footprint>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="control_glove_v0.1.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>9ee0cb6a-51a1-467b-99e2-eb4ffef6511b</tstamps>
+    </comp>
+    <comp ref="R4">
+      <value>300</value>
+      <footprint>Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal</footprint>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="control_glove_v0.1.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>c9386440-234a-40b7-8431-16b0e835d517</tstamps>
+    </comp>
+    <comp ref="R5">
+      <value>330</value>
+      <footprint>Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal</footprint>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="control_glove_v0.1.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>2503e4e7-a335-4474-b221-fed6aff3a83a</tstamps>
+    </comp>
+    <comp ref="R6">
+      <value>300</value>
+      <footprint>Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal</footprint>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="control_glove_v0.1.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>2c5c9858-aebf-4d22-b097-019c193de0d5</tstamps>
+    </comp>
+    <comp ref="RV1">
+      <value>10K</value>
+      <footprint>TerminalBlock:TerminalBlock_Altech_AK300-3_P5.00mm</footprint>
+      <libsource lib="Device" part="R_Potentiometer" description="Potentiometer"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="control_glove_v0.1.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>d7f4f082-21e6-4c43-b8e7-6c2a00ff291e</tstamps>
+    </comp>
+    <comp ref="SW1">
+      <value>SW_Push</value>
+      <footprint>TerminalBlock:TerminalBlock_Altech_AK300-3_P5.00mm</footprint>
+      <libsource lib="Switch" part="SW_Push" description="Push button switch, generic, two pins"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="control_glove_v0.1.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>6c514126-4977-41d2-9954-8c48bc22b776</tstamps>
+    </comp>
+    <comp ref="SW2">
+      <value>SW_Push</value>
+      <footprint>TerminalBlock:TerminalBlock_Altech_AK300-3_P5.00mm</footprint>
+      <libsource lib="Switch" part="SW_Push" description="Push button switch, generic, two pins"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="control_glove_v0.1.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>d85135b9-96f0-4e79-bae5-ad67c255bfc5</tstamps>
+    </comp>
+    <comp ref="U1">
+      <value>UART-RF433</value>
+      <footprint>Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical</footprint>
+      <libsource lib="hieu_lib" part="UART-RF433" description=""/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="control_glove_v0.1.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>5120248d-0281-4e6a-a20e-aed999c149a3</tstamps>
+    </comp>
+  </components>
+  <libparts>
+    <libpart lib="Device" part="Buzzer">
+      <description>Buzzer, polarized</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>*Buzzer*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">BZ</field>
+        <field name="Value">Buzzer</field>
+        <field name="Datasheet">~</field>
+      </fields>
+      <pins>
+        <pin num="1" name="-" type="passive"/>
+        <pin num="2" name="+" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="LED">
+      <description>Light emitting diode</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>LED*</fp>
+        <fp>LED_SMD:*</fp>
+        <fp>LED_THT:*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">D</field>
+        <field name="Value">LED</field>
+        <field name="Datasheet">~</field>
+      </fields>
+      <pins>
+        <pin num="1" name="K" type="passive"/>
+        <pin num="2" name="A" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="Q_NPN_ECB">
+      <description>NPN transistor, emitter/collector/base</description>
+      <docs>~</docs>
+      <fields>
+        <field name="Reference">Q</field>
+        <field name="Value">Q_NPN_ECB</field>
+        <field name="Datasheet">~</field>
+      </fields>
+      <pins>
+        <pin num="1" name="E" type="passive"/>
+        <pin num="2" name="C" type="passive"/>
+        <pin num="3" name="B" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="R">
+      <description>Resistor</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>R_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">R</field>
+        <field name="Value">R</field>
+        <field name="Datasheet">~</field>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="passive"/>
+        <pin num="2" name="" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="R_Potentiometer">
+      <description>Potentiometer</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>Potentiometer*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">RV</field>
+        <field name="Value">R_Potentiometer</field>
+        <field name="Datasheet">~</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="passive"/>
+        <pin num="2" name="2" type="passive"/>
+        <pin num="3" name="3" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Switch" part="SW_Push">
+      <description>Push button switch, generic, two pins</description>
+      <docs>~</docs>
+      <fields>
+        <field name="Reference">SW</field>
+        <field name="Value">SW_Push</field>
+        <field name="Datasheet">~</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="passive"/>
+        <pin num="2" name="2" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="hieu_lib" part="GY-521">
+      <fields>
+        <field name="Reference">IMU</field>
+        <field name="Value">GY-521</field>
+      </fields>
+      <pins>
+        <pin num="" name="AD0" type="no_connect"/>
+      </pins>
+    </libpart>
+    <libpart lib="hieu_lib" part="HMC5883L">
+      <fields>
+        <field name="Reference">MARG</field>
+        <field name="Value">HMC5883L</field>
+      </fields>
+      <pins>
+        <pin num="" name="DRDY" type="bidirectional"/>
+      </pins>
+    </libpart>
+    <libpart lib="hieu_lib" part="MiniSTM32F4x1">
+      <fields>
+        <field name="Reference">MCU</field>
+        <field name="Value">MiniSTM32F4x1</field>
+      </fields>
+      <pins>
+        <pin num="" name="3.3V" type="power_out"/>
+      </pins>
+    </libpart>
+    <libpart lib="hieu_lib" part="Power_Pins">
+      <fields>
+        <field name="Reference">Power</field>
+        <field name="Value">Power_Pins</field>
+      </fields>
+      <pins>
+        <pin num="" name="5V" type="power_out"/>
+      </pins>
+    </libpart>
+    <libpart lib="hieu_lib" part="UART-RF433">
+      <fields>
+        <field name="Reference">UART_Module</field>
+        <field name="Value">UART-RF433</field>
+      </fields>
+      <pins>
+        <pin num="" name="GND" type="bidirectional"/>
+      </pins>
+    </libpart>
+  </libparts>
+  <libraries>
+    <library logical="Device">
+      <uri>D:\program_file\kicad\6.0\share\kicad\symbols\/Device.kicad_sym</uri>
+    </library>
+    <library logical="Switch">
+      <uri>D:\program_file\kicad\6.0\share\kicad\symbols\/Switch.kicad_sym</uri>
+    </library>
+    <library logical="hieu_lib">
+      <uri>D:/kicad_lib/hieu_lib.kicad_sym</uri>
+    </library>
+  </libraries>
+  <nets>
+    <net code="1" name="3.3V">
+      <node ref="MCU1" pin="" pinfunction="3.3V" pintype="power_out"/>
+      <node ref="R1" pin="1" pintype="passive"/>
+      <node ref="R2" pin="1" pintype="passive"/>
+      <node ref="R5" pin="1" pintype="passive"/>
+    </net>
+    <net code="2" name="5V">
+      <node ref="MCU1" pin="" pinfunction="5V" pintype="power_out"/>
+      <node ref="U1" pin="" pinfunction="VCC" pintype="power_in"/>
+    </net>
+    <net code="3" name="BUZZER">
+      <node ref="BZ1" pin="1" pinfunction="-" pintype="passive"/>
+      <node ref="MCU1" pin="" pinfunction="A6" pintype="bidirectional"/>
+    </net>
+    <net code="4" name="GND">
+      <node ref="BZ1" pin="2" pinfunction="+" pintype="passive"/>
+      <node ref="D1" pin="1" pinfunction="K" pintype="passive"/>
+      <node ref="D2" pin="1" pinfunction="K" pintype="passive"/>
+      <node ref="MCU1" pin="" pinfunction="GND" pintype="bidirectional"/>
+      <node ref="P1" pin="" pinfunction="GND" pintype="bidirectional"/>
+      <node ref="Q1" pin="1" pinfunction="E" pintype="passive"/>
+      <node ref="RV1" pin="3" pinfunction="3" pintype="passive"/>
+      <node ref="SW1" pin="1" pinfunction="1" pintype="passive"/>
+      <node ref="SW2" pin="1" pinfunction="1" pintype="passive"/>
+      <node ref="U1" pin="" pinfunction="GND" pintype="bidirectional"/>
+    </net>
+    <net code="5" name="LED_GREEN">
+      <node ref="MCU1" pin="" pinfunction="B1" pintype="bidirectional"/>
+      <node ref="R4" pin="1" pintype="passive"/>
+    </net>
+    <net code="6" name="LED_RED">
+      <node ref="MCU1" pin="" pinfunction="B0" pintype="bidirectional"/>
+      <node ref="R3" pin="1" pintype="passive"/>
+    </net>
+    <net code="7" name="Net-(D1-Pad2)">
+      <node ref="D1" pin="2" pinfunction="A" pintype="passive"/>
+      <node ref="R3" pin="2" pintype="passive"/>
+    </net>
+    <net code="8" name="Net-(D2-Pad2)">
+      <node ref="D2" pin="2" pinfunction="A" pintype="passive"/>
+      <node ref="R4" pin="2" pintype="passive"/>
+    </net>
+    <net code="9" name="Net-(MCU1-Pad)">
+      <node ref="MCU1" pin="" pinfunction="5V" pintype="power_in"/>
+      <node ref="P1" pin="" pinfunction="5V" pintype="power_out"/>
+    </net>
+    <net code="10" name="Net-(R6-Pad2)">
+      <node ref="Q1" pin="3" pinfunction="B" pintype="passive"/>
+      <node ref="R6" pin="2" pintype="passive"/>
+    </net>
+    <net code="11" name="Net-(RV1-Pad1)">
+      <node ref="R5" pin="2" pintype="passive"/>
+      <node ref="RV1" pin="1" pinfunction="1" pintype="passive"/>
+    </net>
+    <net code="12" name="RV1">
+      <node ref="MCU1" pin="" pinfunction="A0" pintype="bidirectional"/>
+      <node ref="RV1" pin="2" pinfunction="2" pintype="passive"/>
+    </net>
+    <net code="13" name="RX">
+      <node ref="MCU1" pin="" pinfunction="A10" pintype="bidirectional"/>
+      <node ref="U1" pin="" pinfunction="TXD" pintype="output"/>
+    </net>
+    <net code="14" name="SCL1">
+      <node ref="IMU1" pin="" pinfunction="SCL" pintype="input"/>
+      <node ref="MARG1" pin="" pinfunction="SCL" pintype="bidirectional"/>
+      <node ref="MCU1" pin="" pinfunction="B6" pintype="bidirectional"/>
+    </net>
+    <net code="15" name="SCL2">
+      <node ref="IMU2" pin="" pinfunction="SCL" pintype="input"/>
+      <node ref="MARG2" pin="" pinfunction="SCL" pintype="bidirectional"/>
+      <node ref="MCU1" pin="" pinfunction="B10" pintype="bidirectional"/>
+    </net>
+    <net code="16" name="SDA1">
+      <node ref="IMU1" pin="" pinfunction="SDA" pintype="bidirectional"/>
+      <node ref="MARG1" pin="" pinfunction="SDA" pintype="bidirectional"/>
+      <node ref="MCU1" pin="" pinfunction="B7" pintype="bidirectional"/>
+    </net>
+    <net code="17" name="SDA2">
+      <node ref="IMU2" pin="" pinfunction="SDA" pintype="bidirectional"/>
+      <node ref="MARG2" pin="" pinfunction="SDA" pintype="bidirectional"/>
+      <node ref="MCU1" pin="" pinfunction="B3" pintype="bidirectional"/>
+    </net>
+    <net code="18" name="SENSOR-3.3V">
+      <node ref="IMU1" pin="" pinfunction="VCC" pintype="power_in"/>
+      <node ref="IMU2" pin="" pinfunction="VCC" pintype="power_in"/>
+      <node ref="MARG1" pin="" pinfunction="VCC" pintype="power_in"/>
+      <node ref="MARG2" pin="" pinfunction="VCC" pintype="power_in"/>
+      <node ref="MCU1" pin="" pinfunction="3V3" pintype="power_out"/>
+    </net>
+    <net code="19" name="SENSOR-GND">
+      <node ref="IMU1" pin="" pinfunction="GND" pintype="passive"/>
+      <node ref="IMU2" pin="" pinfunction="GND" pintype="passive"/>
+      <node ref="MARG1" pin="" pinfunction="GND" pintype="bidirectional"/>
+      <node ref="MARG2" pin="" pinfunction="GND" pintype="bidirectional"/>
+      <node ref="Q1" pin="2" pinfunction="C" pintype="passive"/>
+    </net>
+    <net code="20" name="SENSOR-PWR-EN">
+      <node ref="MCU1" pin="" pinfunction="B2" pintype="bidirectional"/>
+      <node ref="R6" pin="1" pintype="passive"/>
+    </net>
+    <net code="21" name="SET_UART">
+      <node ref="MCU1" pin="" pinfunction="A7" pintype="bidirectional"/>
+      <node ref="U1" pin="" pinfunction="SET" pintype="input"/>
+    </net>
+    <net code="22" name="SW1">
+      <node ref="MCU1" pin="" pinfunction="A1" pintype="bidirectional"/>
+      <node ref="R1" pin="2" pintype="passive"/>
+      <node ref="SW1" pin="2" pinfunction="2" pintype="passive"/>
+    </net>
+    <net code="23" name="SW2">
+      <node ref="MCU1" pin="" pinfunction="A2" pintype="bidirectional"/>
+      <node ref="R2" pin="2" pintype="passive"/>
+      <node ref="SW2" pin="2" pinfunction="2" pintype="passive"/>
+    </net>
+    <net code="24" name="TX">
+      <node ref="MCU1" pin="" pinfunction="A9" pintype="bidirectional"/>
+      <node ref="U1" pin="" pinfunction="RXD" pintype="input"/>
+    </net>
+    <net code="25" name="unconnected-(IMU1-Pad)">
+      <node ref="IMU1" pin="" pinfunction="XDA" pintype="no_connect"/>
+    </net>
+    <net code="26" name="unconnected-(IMU1-Pad)_1">
+      <node ref="IMU1" pin="" pinfunction="AD0" pintype="no_connect"/>
+    </net>
+    <net code="27" name="unconnected-(IMU1-Pad)_2">
+      <node ref="IMU1" pin="" pinfunction="INT" pintype="no_connect"/>
+    </net>
+    <net code="28" name="unconnected-(IMU1-Pad)_3">
+      <node ref="IMU1" pin="" pinfunction="XCL" pintype="no_connect"/>
+    </net>
+    <net code="29" name="unconnected-(IMU2-Pad)">
+      <node ref="IMU2" pin="" pinfunction="XDA" pintype="no_connect"/>
+    </net>
+    <net code="30" name="unconnected-(IMU2-Pad)_1">
+      <node ref="IMU2" pin="" pinfunction="AD0" pintype="no_connect"/>
+    </net>
+    <net code="31" name="unconnected-(IMU2-Pad)_2">
+      <node ref="IMU2" pin="" pinfunction="INT" pintype="no_connect"/>
+    </net>
+    <net code="32" name="unconnected-(IMU2-Pad)_3">
+      <node ref="IMU2" pin="" pinfunction="XCL" pintype="no_connect"/>
+    </net>
+    <net code="33" name="unconnected-(MARG1-Pad)">
+      <node ref="MARG1" pin="" pinfunction="DRDY" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="34" name="unconnected-(MARG2-Pad)">
+      <node ref="MARG2" pin="" pinfunction="DRDY" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="35" name="unconnected-(MCU1-Pad)">
+      <node ref="MCU1" pin="" pinfunction="R" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="36" name="unconnected-(MCU1-Pad)_1">
+      <node ref="MCU1" pin="" pinfunction="A15" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="37" name="unconnected-(MCU1-Pad)_2">
+      <node ref="MCU1" pin="" pinfunction="B5" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="38" name="unconnected-(MCU1-Pad)_3">
+      <node ref="MCU1" pin="" pinfunction="B4" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="39" name="unconnected-(MCU1-Pad)_4">
+      <node ref="MCU1" pin="" pinfunction="B8" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="40" name="unconnected-(MCU1-Pad)_5">
+      <node ref="MCU1" pin="" pinfunction="VB" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="41" name="unconnected-(MCU1-Pad)_6">
+      <node ref="MCU1" pin="" pinfunction="A11" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="42" name="unconnected-(MCU1-Pad)_7">
+      <node ref="MCU1" pin="" pinfunction="A12" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="43" name="unconnected-(MCU1-Pad)_8">
+      <node ref="MCU1" pin="" pinfunction="A3" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="44" name="unconnected-(MCU1-Pad)_9">
+      <node ref="MCU1" pin="" pinfunction="A4" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="45" name="unconnected-(MCU1-Pad)_10">
+      <node ref="MCU1" pin="" pinfunction="A5" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="46" name="unconnected-(MCU1-Pad)_11">
+      <node ref="MCU1" pin="" pinfunction="A8" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="47" name="unconnected-(MCU1-Pad)_12">
+      <node ref="MCU1" pin="" pinfunction="B12" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="48" name="unconnected-(MCU1-Pad)_13">
+      <node ref="MCU1" pin="" pinfunction="B13" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="49" name="unconnected-(MCU1-Pad)_14">
+      <node ref="MCU1" pin="" pinfunction="B14" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="50" name="unconnected-(MCU1-Pad)_15">
+      <node ref="MCU1" pin="" pinfunction="B15" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="51" name="unconnected-(MCU1-Pad)_16">
+      <node ref="MCU1" pin="" pinfunction="B9" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="52" name="unconnected-(MCU1-Pad)_17">
+      <node ref="MCU1" pin="" pinfunction="C13" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="53" name="unconnected-(MCU1-Pad)_18">
+      <node ref="MCU1" pin="" pinfunction="C14" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="54" name="unconnected-(MCU1-Pad)_19">
+      <node ref="MCU1" pin="" pinfunction="C15" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="55" name="unconnected-(MCU1-Pad)_20">
+      <node ref="MCU1" pin="" pinfunction="GND" pintype="bidirectional+no_connect"/>
+    </net>
+  </nets>
+</export>
