@@ -65,6 +65,8 @@ namespace RobotArmHelix
         public int visible_display = 1;
         public int visible_control = 1;
         public int visible_jogging = 1;
+        public int visible_path = 1;
+        public int visible_glove = 1;
 
 
         private double returnX = 500;
@@ -1214,6 +1216,57 @@ namespace RobotArmHelix
 
         }
 
+        private void Visible_Glove_Click(object sender, RoutedEventArgs e)
+        {
+            visible_glove = (~visible_glove) & 0x01;
+            if (visible_glove == 0)
+            {
+                Glove_box.Visibility = Visibility.Visible;
+                com_port_list1.Visibility = Visibility.Visible;
+                com_port_list2.Visibility = Visibility.Visible;
+                com_port_list3.Visibility = Visibility.Visible;
+                com_port_list4.Visibility = Visibility.Visible;
+                com_port_list5.Visibility = Visibility.Visible;
+
+
+                Connect_glove_btn.Visibility = Visibility.Visible;
+                Disconnect_glove_btn.Visibility = Visibility.Visible;
+
+                progressbar1.Visibility = Visibility.Visible;
+
+
+                Glove_name.Visibility = Visibility.Visible;
+                Glove_com.Visibility = Visibility.Visible;
+                Glove_baud.Visibility = Visibility.Visible;
+                Glove_data.Visibility = Visibility.Visible;
+                Glove_parity.Visibility = Visibility.Visible;
+                Glove_stop.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                Glove_box.Visibility = Visibility.Hidden;
+                com_port_list1.Visibility = Visibility.Hidden;
+                com_port_list2.Visibility = Visibility.Hidden;
+                com_port_list3.Visibility = Visibility.Hidden;
+                com_port_list4.Visibility = Visibility.Hidden;
+                com_port_list5.Visibility = Visibility.Hidden;
+
+
+                Connect_glove_btn.Visibility = Visibility.Hidden;
+                Disconnect_glove_btn.Visibility = Visibility.Hidden;
+
+                progressbar1.Visibility = Visibility.Hidden;
+
+
+                Glove_name.Visibility = Visibility.Hidden;
+                Glove_com.Visibility = Visibility.Hidden;
+                Glove_baud.Visibility = Visibility.Hidden;
+                Glove_data.Visibility = Visibility.Hidden;
+                Glove_parity.Visibility = Visibility.Hidden;
+                Glove_stop.Visibility = Visibility.Hidden;
+            }
+        }
+
         private void Visible_Robot_Click(object sender, RoutedEventArgs e)
         {
             visible_robot = (~visible_robot) & 0x01;
@@ -1340,6 +1393,75 @@ namespace RobotArmHelix
                 jog_speed_tb.Visibility = Visibility.Visible;
 
                 jogging_lbl.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void Visible_Path_Click(object sender, RoutedEventArgs e)
+        {
+            visible_path = (~visible_path) & 0x01;
+            if (visible_path == 0)
+            {
+                Tsm_moveJ_btn.Visibility = Visibility.Hidden;
+                Tsm_moveL_btn.Visibility = Visibility.Hidden;
+                Tsm_moveC_btn.Visibility = Visibility.Hidden;
+                Clear_Trajectory_btn.Visibility = Visibility.Hidden;
+                TestPos_bttn.Visibility = Visibility.Hidden;
+                set_const_speed_button.Visibility = Visibility.Hidden;
+                run_btn.Visibility = Visibility.Hidden;
+                EStop_btn.Visibility = Visibility.Hidden;
+
+
+                TbX.Visibility = Visibility.Hidden;
+                TbY.Visibility = Visibility.Hidden;
+                TbZ.Visibility = Visibility.Hidden;
+                spd_tb.Visibility = Visibility.Hidden;
+                TbX1.Visibility = Visibility.Hidden;
+                TbX2.Visibility = Visibility.Hidden;
+                TbY1.Visibility = Visibility.Hidden;
+                TbY2.Visibility = Visibility.Hidden;
+
+                tbX1_lbl.Visibility = Visibility.Hidden;
+                tbX2_lbl.Visibility = Visibility.Hidden;
+                tbY1_lbl.Visibility = Visibility.Hidden;
+                tbY2_lbl.Visibility = Visibility.Hidden;
+                tbX_lbl.Visibility = Visibility.Hidden;
+                tbY_lbl.Visibility = Visibility.Hidden;
+                tbZ_lbl.Visibility = Visibility.Hidden;
+                path_lbl.Visibility = Visibility.Hidden;
+
+
+            }
+            else
+            {
+                Tsm_moveJ_btn.Visibility = Visibility.Visible;
+                Tsm_moveL_btn.Visibility = Visibility.Visible;
+                Tsm_moveC_btn.Visibility = Visibility.Visible;
+                Clear_Trajectory_btn.Visibility = Visibility.Visible;
+                TestPos_bttn.Visibility = Visibility.Visible;
+                set_const_speed_button.Visibility = Visibility.Visible;
+                run_btn.Visibility = Visibility.Visible;
+                EStop_btn.Visibility = Visibility.Visible;
+
+
+                TbX.Visibility = Visibility.Visible;
+                TbY.Visibility = Visibility.Visible;
+                TbZ.Visibility = Visibility.Visible;
+                spd_tb.Visibility = Visibility.Visible;
+                TbX1.Visibility = Visibility.Visible;
+                TbX2.Visibility = Visibility.Visible;
+                TbY1.Visibility = Visibility.Visible;
+                TbY2.Visibility = Visibility.Visible;
+
+                tbX1_lbl.Visibility = Visibility.Visible;
+                tbX2_lbl.Visibility = Visibility.Visible;
+                tbY1_lbl.Visibility = Visibility.Visible;
+                tbY2_lbl.Visibility = Visibility.Visible;
+                tbX_lbl.Visibility = Visibility.Visible;
+                tbY_lbl.Visibility = Visibility.Visible;
+                tbZ_lbl.Visibility = Visibility.Visible;
+
+                path_lbl.Visibility = Visibility.Visible;
+
             }
         }
 
@@ -2446,6 +2568,7 @@ namespace RobotArmHelix
             PLCReadbit(device_str, out readbit);
             PrintLog("Info", device_str, Convert.ToString(readbit));
         }
+
 
         class Point2
         {

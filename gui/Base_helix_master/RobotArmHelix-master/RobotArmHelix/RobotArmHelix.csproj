@@ -216,22 +216,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\customer_page.png" />
-    <Resource Include="Images\home_page.png" />
-    <Resource Include="Images\img_customer.png" />
-    <Resource Include="Images\img_home.png" />
-    <Resource Include="Images\img_order.png" />
-    <Resource Include="Images\img_product.png" />
-    <Resource Include="Images\img_setting.png" />
-    <Resource Include="Images\img_shipment.png" />
-    <Resource Include="Images\img_transaction.png" />
-    <Resource Include="Images\order_page.png" />
-    <Resource Include="Images\product_page.png" />
-    <Resource Include="Images\setting_page.png" />
-    <Resource Include="Images\shipment_page.png" />
-    <Resource Include="Images\shutdown_def.png" />
-    <Resource Include="Images\shutdown_mo.png" />
-    <Resource Include="Images\transaction_page.png" />
     <Resource Include="Icons\Exit.png" />
     <Resource Include="Icons\exit_icon.ico" />
     <Resource Include="Icons\NewFile.png" />
