@@ -1,4 +1,4 @@
-20586761452990149
+20588520252661694
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -33842,8 +33842,8 @@ PinHeader_1x20_P2.54mm_Vertical
 Through hole straight pin header, 1x20, 2.54mm pitch, single row
 Through hole pin header THT 1x20 2.54mm single row
 0
-20
-20
+40
+40
 Connector_PinHeader_2.54mm
 PinHeader_1x20_P2.54mm_Vertical_SMD_Pin1Left
 surface-mounted straight pin header, 1x20, 2.54mm pitch, single row, style 1 (pin 1 left)
@@ -86442,3 +86442,10 @@ varistor
 0
 2
 2
+hieu
+stm32f4_board
+
+
+0
+40
+40
