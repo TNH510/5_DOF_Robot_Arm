@@ -22,6 +22,8 @@ using System.Reflection;
 using System.Threading;
 using System.Net.Sockets;
 using System.IO.Ports;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 
 
@@ -2569,6 +2571,692 @@ namespace RobotArmHelix
             PrintLog("Info", device_str, Convert.ToString(readbit));
         }
 
+        class EdgeDetection
+        {
+            public static int[,] RGB2Gray(BitmapImage colorImage)
+            {
+                int width = colorImage.PixelWidth;
+                int height = colorImage.PixelHeight;
+                int[,] grayImage = new int[width, height];
+
+                int bytesPerPixel = (colorImage.Format.BitsPerPixel + 7) / 8; // Calculate bytes per pixel
+                int stride = width * bytesPerPixel; // Calculate the stride value
+                byte[] pixelData = new byte[stride * height];
+                colorImage.CopyPixels(pixelData, stride, 0);
+
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        int offset = y * stride + x * bytesPerPixel;
+                        if (offset + 2 < pixelData.Length) // Ensure that the offset is within bounds
+                        {
+                            byte blue = pixelData[offset];
+                            byte green = pixelData[offset + 1];
+                            byte red = pixelData[offset + 2];
+                            int grayValue = (int)(red * 0.299 + green * 0.587 + blue * 0.114);
+                            grayImage[x, y] = grayValue;
+                        }
+                    }
+                }
+
+                return grayImage;
+            }
+
+            private static int[,] Blur_Image(int[,] GrayImage)
+            {
+                int width = GrayImage.GetLength(0);
+                int height = GrayImage.GetLength(1);
+
+                int[,] BlurImage = new int[width, height];
+
+                double[,] GaussianKernel =  {   { 2,  4,  5,  4,  2 },
+                                                { 4,  9,  12, 9,  4 },
+                                                { 5,  12, 15, 12, 5 },
+                                                { 4,  9,  12, 9,  4 },
+                                                { 2,  4,  5,  4,  2 }   };
+                for (int x = 2; x < width - 2; x++)
+                {
+                    for (int y = 2; y < height - 2; y++)
+                    {
+                        double sum = 0;
+                        for (int i = -2; i < 2; i++)
+                        {
+                            for (int j = -2; j < 2; j++)
+                            {
+                                sum += GaussianKernel[i + 2, j + 2] * GrayImage[x + i, y + j];
+
+                            }
+                        }
+                        BlurImage[x, y] = (int)(sum / 159);
+                    }
+                }
+
+                return BlurImage;
+            }
+            private static int[,] Canny_Detect(int[,] BlurredImage, int high_threshold, int low_threshold)
+            {
+                //int[,] GradientX = new int[Blur_Image.GetLength(0), Blur_Image.GetLength(1)];
+                //int[,] GradientY = new int[Blur_Image.GetLength(0), Blur_Image.GetLength(1)];
+                int[,] gradientMagnitude = new int[BlurredImage.GetLength(0), BlurredImage.GetLength(1)];
+                int[,] gradientAngle = new int[BlurredImage.GetLength(0), BlurredImage.GetLength(1)];
+                int[,] Result = new int[BlurredImage.GetLength(0), BlurredImage.GetLength(1)];
+                int[,] SobelX = {{ -1, 0, 1 },
+                                    { -2, 0, 2 },
+                                    { -1, 0, 1 }};
+                int[,] SobelY = {{ -1, -2, -1 },
+                                    { 0, 0, 0 },
+                                    { 1, 2, 1 }};
+                int white_point = 255;
+                int gray_point = 50;
+                //computting gradient magnitude and gradient angle
+                for (int x = 1; x < BlurredImage.GetLength(0) - 1; x++)
+                {
+                    for (int y = 1; y < BlurredImage.GetLength(1) - 1; y++)
+                    {
+                        int sumX = 0;
+                        int sumY = 0;
+                        for (int i = -1; i <= 1; i++)
+                        {
+                            for (int j = -1; j <= 1; j++)
+                            {
+                                sumX += (int)(SobelX[i + 1, j + 1] * BlurredImage[x + i, y + j]);
+                                sumY += (int)(SobelY[i + 1, j + 1] * BlurredImage[x + i, y + j]);
+                            }
+                        }
+                        //GradientX[x, y] = sumX;
+                        //GradientY[x, y] = sumY;
+                        gradientMagnitude[x, y] = (int)Math.Sqrt(sumX * sumX + sumY * sumY);
+                        if (gradientMagnitude[x, y] >= 255)
+                        {
+                            gradientMagnitude[x, y] = 255;
+                        }
+                        else if (gradientMagnitude[x, y] <= 0)
+                        {
+                            gradientMagnitude[x, y] = 0;
+                        }
+                        gradientAngle[x, y] = (int)Math.Abs((Math.Atan2(sumY, sumX) * 180 / Math.PI));
+
+                    }
+                }
+
+                for (int x = 1; x < BlurredImage.GetLength(0) - 1; x++)
+                {
+                    for (int y = 1; y < BlurredImage.GetLength(1) - 1; y++)
+                    {
+                        double q = 255;
+                        double r = 255;
+                        if ((gradientAngle[x, y] >= 0 && gradientAngle[x, y] < 22.5) || (gradientAngle[x, y] <= 180 && gradientAngle[x, y] >= 157.5))
+                        {
+                            q = gradientMagnitude[x, y - 1];
+                            r = gradientMagnitude[x, y + 1];
+                        }
+                        else if (gradientAngle[x, y] >= 22.5 && gradientAngle[x, y] < 67.5)
+                        {
+                            q = gradientMagnitude[x + 1, y - 1];
+                            r = gradientMagnitude[x - 1, y + 1];
+                        }
+                        else if (gradientAngle[x, y] >= 67.5 && gradientAngle[x, y] < 112.5)
+                        {
+                            q = gradientMagnitude[x + 1, y];
+                            r = gradientMagnitude[x - 1, y];
+                        }
+                        else if (gradientAngle[x, y] >= 112.5 && gradientAngle[x, y] < 157.5)
+                        {
+                            q = gradientMagnitude[x - 1, y - 1];
+                            r = gradientMagnitude[x + 1, y + 1];
+                        }
+                        if (gradientMagnitude[x, y] >= q && gradientMagnitude[x, y] >= r)
+                        {
+                            Result[x, y] = gradientMagnitude[x, y];
+                        }
+                        else
+                        {
+                            Result[x, y] = 0;
+                        }
+
+                        if (Result[x, y] >= high_threshold)
+                        {
+                            Result[x, y] = white_point;
+                        }
+                        else if (Result[x, y] >= low_threshold && Result[x, y] < high_threshold)
+                        {
+                            Result[x, y] = gray_point;
+                        }
+                        else
+                        {
+                            Result[x, y] = 0;
+                        }
+                    }
+                }
+                //int[,] output=new int[gradient.GetLength(0) , gradient.GetLength(1) ];
+                for (int x = 1; x < Result.GetLength(0) - 1; x++)
+                {
+                    for (int y = 1; y < Result.GetLength(1) - 1; y++)
+                    {
+                        if (Result[x, y] == gray_point)
+                        {
+                            if ((Result[x + 1, y - 1] == white_point) ||
+                                (Result[x + 1, y] == white_point) ||
+                                (Result[x + 1, y + 1] == white_point) ||
+                                (Result[x, y - 1] == white_point) ||
+                                (Result[x, y + 1] == white_point) ||
+                                (Result[x - 1, y - 1] == white_point) ||
+                                (Result[x - 1, y] == white_point) ||
+                                (Result[x - 1, y + 1] == white_point))
+                            {
+                                Result[x, y] = white_point;
+                            }
+                            else
+                                Result[x, y] = 0;
+                        }
+                    }
+                }
+                for (int x = 0; x < Result.GetLength(0); x++)
+                {
+                    for (int y = 0; y < Result.GetLength(1); y++)
+                    {
+                        if (Result[x, y] >= 255)
+                            Result[x, y] = 255;
+                        else if (Result[x, y] <= 0)
+                            Result[x, y] = 0;
+                        if ((y < 5) || (y > Result.GetLength(1) - 5))
+                            Result[x, y] = 0;
+                        if ((x < 5) || (x > Result.GetLength(0) - 5))
+                            Result[x, y] = 0;
+                    }
+                }
+                return Result;
+            }
+            public static int[,] DeTectEdgeByCannyMethod(string imagePath, int high_threshold, int low_threshold)
+            {
+                BitmapImage bitmapImage = new BitmapImage(new Uri(imagePath));
+
+                int[,] gray = RGB2Gray(bitmapImage);
+                int[,] blur = Blur_Image(gray);
+                int[,] edges = Canny_Detect(blur, high_threshold, low_threshold);
+
+                return edges;
+            }
+            public static int[,] BitmapImageToInt(BitmapImage bitmapImage)
+            {
+                int width = bitmapImage.PixelWidth;
+                int height = bitmapImage.PixelHeight;
+
+                int[,] imageArray = new int[width, height];
+
+                int bytesPerPixel = (bitmapImage.Format.BitsPerPixel + 7) / 8;
+                int stride = width * bytesPerPixel;
+                byte[] pixelData = new byte[stride * height];
+                bitmapImage.CopyPixels(pixelData, stride, 0);
+
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        int offset = y * stride + x * bytesPerPixel;
+                        int grayscaleValue = (pixelData[offset] + pixelData[offset + 1] + pixelData[offset + 2]) / 3;
+                        imageArray[x, y] = grayscaleValue;
+                    }
+                }
+
+                return imageArray;
+            }
+            public static WriteableBitmap IntToBitmap(int[,] binaryImage)
+            {
+                // Image size
+                int width = binaryImage.GetLength(0);
+                int height = binaryImage.GetLength(1);
+
+                // Create a new WriteableBitmap with the specified width, height, and DPI
+                WriteableBitmap result = new WriteableBitmap(width, height, 96, 96, PixelFormats.Gray8, null);
+
+                // Calculate stride (bytes per row)
+                int stride = width;
+
+                // Create a byte array to hold pixel data
+                byte[] pixels = new byte[height * stride];
+
+                // Populate the byte array with pixel values
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        byte pixelValue = (byte)binaryImage[x, y];
+                        pixels[y * stride + x] = pixelValue;
+                    }
+                }
+
+                // Write the pixel data to the WriteableBitmap
+                result.WritePixels(new System.Windows.Int32Rect(0, 0, width, height), pixels, stride, 0);
+
+                return result;
+            }
+            public static int[,] LinkEdges(BitmapImage bitmapImage, int high_threshold, int low_threshold)
+            {
+                int width = bitmapImage.PixelWidth;
+                int height = bitmapImage.PixelHeight;
+
+                int[,] gray = RGB2Gray(bitmapImage);
+                int[,] blur = Blur_Image(gray);
+                int[,] edges = Canny_Detect(blur, high_threshold, low_threshold);
+
+                int[,] gradientMagnitude = new int[width, height];
+                int[,] gradientAngle = new int[width, height];
+
+                int[,] SobelX = {{ -1, 0, 1 },
+                        { -2, 0, 2 },
+                        { -1, 0, 1 }};
+                int[,] SobelY = {{ -1, -2, -1 },
+                        { 0, 0, 0 },
+                        { 1, 2, 1 }};
+                int white_point = 255;
+                int gray_point = 50;
+
+                // Computing gradient magnitude and gradient angle
+                for (int x = 1; x < width - 1; x++)
+                {
+                    for (int y = 1; y < height - 1; y++)
+                    {
+                        int sumX = 0;
+                        int sumY = 0;
+                        for (int i = -1; i <= 1; i++)
+                        {
+                            for (int j = -1; j <= 1; j++)
+                            {
+                                sumX += SobelX[i + 1, j + 1] * blur[x + i, y + j];
+                                sumY += SobelY[i + 1, j + 1] * blur[x + i, y + j];
+                            }
+                        }
+                        gradientMagnitude[x, y] = (int)Math.Sqrt(sumX * sumX + sumY * sumY);
+                        if (gradientMagnitude[x, y] >= 255)
+                        {
+                            gradientMagnitude[x, y] = 255;
+                        }
+                        else if (gradientMagnitude[x, y] <= 0)
+                        {
+                            gradientMagnitude[x, y] = 0;
+                        }
+                        gradientAngle[x, y] = (int)Math.Abs((Math.Atan2(sumY, sumX) * 180 / Math.PI));
+                    }
+                }
+
+                for (int x = 1; x < width - 1; x++)
+                {
+                    for (int y = 1; y < height - 1; y++)
+                    {
+                        int edge_point = edges[x, y];
+                        if (edge_point == 255)
+                        {
+                            for (int i = -1; i <= 1; i++)
+                            {
+                                for (int j = -1; j <= 1; j++)
+                                {
+                                    if ((Math.Abs(gradientMagnitude[x + i, y + j] - gradientMagnitude[x, y]) < 50) & (Math.Abs(gradientAngle[x + i, y + j] - gradientAngle[x, y]) < 1) & (Math.Abs(gradientAngle[x + i, y + j] - gradientAngle[x, y]) > 0.1))
+                                    {
+                                        edges[x + i, y + j] = 255;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                return edges;
+            }
+            public static int[,] PerformHoughTransform(int[,] image)
+            {
+                int width = image.GetLength(0);
+                int height = image.GetLength(1);
+
+                // Tính số cột của ma trận Hough dựa trên đường chéo dài nhất trong ảnh
+                int diagonalLength = (int)Math.Ceiling(Math.Sqrt(width * width + height * height));
+                int houghWidth = 180; // Số cột của ma trận Hough
+                int houghHeight = diagonalLength * 2; // Số hàng của ma trận Hough
+
+                int[,] houghMatrix = new int[houghWidth, houghHeight];
+
+                // Thực hiện Hough Transform
+                for (int x = 0; x < width; x++)
+                {
+                    for (int y = 0; y < height; y++)
+                    {
+                        if (image[x, y] > 0) // Nếu điểm ảnh là điểm biên
+                        {
+                            for (int theta = 0; theta < houghWidth; theta++)
+                            {
+                                double radian = (theta * Math.PI) / 180.0;
+                                int rho = (int)(x * Math.Cos(radian) + y * Math.Sin(radian));
+                                rho += diagonalLength; // Dịch chuyển rho để không có giá trị âm
+                                houghMatrix[theta, rho]++;
+
+                            }
+                        }
+                    }
+                }
+
+                return houghMatrix;
+            }
+            public static WriteableBitmap DrawingEdges(int[,] houghMatrix, WriteableBitmap grayImage)
+            {
+                int width = houghMatrix.GetLength(0);
+                int height = houghMatrix.GetLength(1);
+                grayImage.Lock();
+
+                for (int theta = 0; theta < width; theta++)
+                {
+                    for (int rho = 0; rho < height; rho++)
+                    {
+                        if (houghMatrix[theta, rho] > 70)
+                        {
+                            double thetaRadian = theta * Math.PI / 180;
+
+                            // Calculate y-coordinate for each x-coordinate along the line defined by theta and rho
+                            for (int x = 0; x < grayImage.PixelWidth; x++)
+                            {
+                                double y = rho / Math.Cos(thetaRadian) - (x - grayImage.PixelWidth / 2) * Math.Tan(thetaRadian);
+                                if (y >= 0 && y < grayImage.PixelHeight)
+                                {
+                                    int yPos = (int)y;
+                                    if (yPos < grayImage.PixelHeight)
+                                    {
+                                        int pixelIndex = yPos * grayImage.BackBufferStride + x * 4; // Multiply by 4 for 32bpp format (4 bytes per pixel)
+
+                                        // Set pixel color
+                                        byte[] colorData = { 255, 0, 0, 255 }; // Red color with alpha channel
+                                        grayImage.WritePixels(new System.Windows.Int32Rect(x, yPos, 1, 1), colorData, 4, pixelIndex);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                grayImage.Unlock();
+                return grayImage;
+            }
+            public static int[,] ComputeHoughMatrix(int[,] edgeMatrix)
+            {
+                int width = edgeMatrix.GetLength(1);
+                int height = edgeMatrix.GetLength(0);
+                int diagonal = (int)Math.Sqrt(width * width + height * height); // Đường chéo của ảnh
+
+                // Khởi tạo ma trận Hough
+                int[,] houghMatrix = new int[180, 2 * diagonal];
+
+                // Duyệt qua từng điểm cạnh trong ma trận cạnh
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        if (edgeMatrix[y, x] == 255) // Kiểm tra nếu điểm là điểm cạnh
+                        {
+                            // Duyệt qua mọi giá trị của theta (0-179)
+                            for (int theta = 0; theta < 180; theta++)
+                            {
+                                double radianTheta = theta * Math.PI / 180;
+                                int rho = (int)(x * Math.Cos(radianTheta) + y * Math.Sin(radianTheta));
+                                houghMatrix[theta, rho + diagonal]++;
+                            }
+                        }
+                    }
+                }
+
+                return houghMatrix;
+            }
+            public static WriteableBitmap DrawLines(int[,] houghMatrix, int threshold, int width, int height)
+            {
+                int diagonal = (int)Math.Sqrt(width * width + height * height); // Diagonal of the image
+
+                // Create a new WriteableBitmap to store the result
+                WriteableBitmap resultImage = new WriteableBitmap(width, height, 96, 96, PixelFormats.Bgra32, null);
+                resultImage.Lock();
+
+                byte[] pixelData = new byte[width * height * 4]; // 4 bytes per pixel for BGRA format
+
+                for (int theta = 0; theta < 180; theta++)
+                {
+                    for (int rho = 0; rho < 2 * diagonal; rho++)
+                    {
+                        if (houghMatrix[theta, rho] >= threshold)
+                        {
+                            double radianTheta = theta * Math.PI / 180;
+
+                            if (theta >= 45 && theta < 135)
+                            {
+                                for (int x = 0; x < width; x++)
+                                {
+                                    int y = (int)(((rho - diagonal) - x * Math.Cos(radianTheta)) / Math.Sin(radianTheta));
+                                    if (y >= 0 && y < height)
+                                    {
+                                        int pixelIndex = (y * width + x) * 4; // Calculate the pixel index
+                                        pixelData[pixelIndex] = 0; // Blue channel
+                                        pixelData[pixelIndex + 1] = 0; // Green channel
+                                        pixelData[pixelIndex + 2] = 255; // Red channel
+                                        pixelData[pixelIndex + 3] = 255; // Alpha channel
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                for (int y = 0; y < height; y++)
+                                {
+                                    int x = (int)(((rho - diagonal) - y * Math.Sin(radianTheta)) / Math.Cos(radianTheta));
+                                    if (x >= 0 && x < width)
+                                    {
+                                        int pixelIndex = (y * width + x) * 4; // Calculate the pixel index
+                                        pixelData[pixelIndex] = 0; // Blue channel
+                                        pixelData[pixelIndex + 1] = 0; // Green channel
+                                        pixelData[pixelIndex + 2] = 255; // Red channel
+                                        pixelData[pixelIndex + 3] = 255; // Alpha channel
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Int32Rect fullRect = new Int32Rect(0, 0, width, height);
+                resultImage.WritePixels(fullRect, pixelData, width * 4, 0); // Write the pixel data to the WriteableBitmap
+
+                resultImage.Unlock();
+                return resultImage;
+            }
+            // Hàm dilation với số lần lặp lại xác định
+            public static int[,] Dilation(int[,] image, int iterations)
+            {
+                int width = image.GetLength(0);
+                int height = image.GetLength(1);
+                int[,] dilatedImage = new int[width, height];
+
+                for (int iter = 0; iter < iterations; iter++)
+                {
+                    for (int y = 0; y < height; y++)
+                    {
+                        for (int x = 0; x < width; x++)
+                        {
+                            int maxValue = 0;
+                            for (int ky = -1; ky <= 1; ky++)
+                            {
+                                for (int kx = -1; kx <= 1; kx++)
+                                {
+                                    int nx = x + kx;
+                                    int ny = y + ky;
+                                    if (nx >= 0 && nx < width && ny >= 0 && ny < height)
+                                    {
+                                        maxValue = Math.Max(maxValue, image[nx, ny]);
+                                    }
+                                }
+                            }
+                            dilatedImage[x, y] = maxValue;
+                        }
+                    }
+                    // Update ảnh đầu vào bằng ảnh đã dilation để tiếp tục lặp lại
+                    image = dilatedImage.Clone() as int[,];
+                }
+
+                return dilatedImage;
+            }
+            public static int[,] EdgeThinning(int[,] image)
+            {
+                int width = image.GetLength(0);
+                int height = image.GetLength(1);
+                int[,] thinnedImage = (int[,])image.Clone(); // Tạo một bản sao của ảnh để thực hiện mỏng cạnh viền
+
+                bool hasChanged = true; // Đặt biến hasChanged là true để bắt đầu vòng lặp
+
+                while (hasChanged)
+                {
+                    hasChanged = false; // Đặt lại hasChanged là false trước khi bắt đầu mỗi vòng lặp
+
+                    // Bước 1: Xác định và loại bỏ các điểm ảnh để làm mỏng cạnh viền
+                    for (int y = 1; y < height - 1; y++)
+                    {
+                        for (int x = 1; x < width - 1; x++)
+                        {
+                            if (thinnedImage[x, y] == 255) // Nếu điểm ảnh đang xét là một điểm cạnh
+                            {
+                                int count = CountNeighbors(x, y, thinnedImage);
+
+                                if (count >= 2 && count <= 6) // Nếu số lượng điểm lân cận thỏa mãn
+                                {
+                                    int transitions = Transitions(x, y, thinnedImage);
+
+                                    if (transitions == 1) // Nếu chỉ có một điểm chuyển đổi
+                                    {
+                                        int[] pixels = GetNeighborPixels(x, y, thinnedImage);
+
+                                        if (pixels[0] * pixels[2] * pixels[4] == 0 && pixels[2] * pixels[4] * pixels[6] == 0) // Kiểm tra điều kiện đặc biệt
+                                        {
+                                            thinnedImage[x, y] = 0;
+                                            hasChanged = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Bước 2: Lặp lại bước 1 với các điểm ảnh đang xét được đảo ngược
+                    for (int y = 1; y < height - 1; y++)
+                    {
+                        for (int x = 1; x < width - 1; x++)
+                        {
+                            if (thinnedImage[x, y] == 255)
+                            {
+                                int count = CountNeighbors(x, y, thinnedImage);
+
+                                if (count >= 2 && count <= 6)
+                                {
+                                    int transitions = Transitions(x, y, thinnedImage);
+
+                                    if (transitions == 1)
+                                    {
+                                        int[] pixels = GetNeighborPixels(x, y, thinnedImage);
+
+                                        if (pixels[0] * pixels[2] * pixels[6] == 0 && pixels[0] * pixels[4] * pixels[6] == 0)
+                                        {
+                                            thinnedImage[x, y] = 0;
+                                            hasChanged = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return thinnedImage;
+            }
+            // Đếm số lượng điểm lân cận
+            private static int CountNeighbors(int x, int y, int[,] image)
+            {
+                int count = 0;
+                for (int j = -1; j <= 1; j++)
+                {
+                    for (int i = -1; i <= 1; i++)
+                    {
+                        if (image[x + i, y + j] == 255)
+                        {
+                            count++;
+                        }
+                    }
+                }
+                return count - 1;
+            }
+            private static int Transitions(int x, int y, int[,] image)
+            {
+                int count = 0;
+                int[] values = { image[x, y + 1], image[x - 1, y + 1], image[x - 1, y],
+                         image[x - 1, y - 1], image[x, y - 1], image[x + 1, y - 1],
+                         image[x + 1, y], image[x + 1, y + 1], image[x, y + 1] };
+
+                for (int i = 0; i < values.Length - 1; i++)
+                {
+                    if (values[i] == 0 && values[i + 1] == 255)
+                    {
+                        count++;
+                    }
+                }
+                return count;
+            }
+
+            // Lấy giá trị các điểm lân cận
+            private static int[] GetNeighborPixels(int x, int y, int[,] image)
+            {
+                int[] pixels = new int[9];
+                int index = 0;
+                for (int j = -1; j <= 1; j++)
+                {
+                    for (int i = -1; i <= 1; i++)
+                    {
+                        pixels[index++] = image[x + i, y + j];
+                    }
+                }
+                return pixels;
+            }
+        }
+
+        private void Camera_Open_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Camera_Close_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Process_Image_Click(object sender, RoutedEventArgs e)
+        {
+            if ((!string.IsNullOrEmpty("80")) || (!string.IsNullOrEmpty("40")) || (!string.IsNullOrEmpty("50")))
+            {
+                int high_threshold = Convert.ToInt16("80"); // Upper threshold for Canny detect
+                int low_threshold = Convert.ToInt16("40"); // Lower threshold for Canny detect 
+                int threshold = Convert.ToInt16("50"); // Threshold for selecting peaks in Hough matrix
+
+                // Binary image for Canny detect
+                int[,] edges = EdgeDetection.DeTectEdgeByCannyMethod("C:\\Users\\daveb\\Desktop\\doiten.png", high_threshold, low_threshold);
+
+                // Get the number of rows and columns of the array
+                // Initialize a 2D array
+                int width = edges.GetLength(0);
+                int height = edges.GetLength(1);
+
+                // Dilate edges to reduce noise    
+                int[,] dilation = EdgeDetection.Dilation(edges, 6);
+                // Thin edges to a width of 1 to reduce the size of the Hough chart
+                int[,] skeleton = EdgeDetection.EdgeThinning(dilation);
+                // Hough chart
+                int[,] hough = EdgeDetection.PerformHoughTransform(skeleton);
+                // Draw lines from the Hough chart
+                WriteableBitmap resultImage = EdgeDetection.DrawLines(hough, threshold, width, height);
+
+                //CameraImage.Source = resultImage;
+                //CameraImage.Source = EdgeDetection.IntToBitmap(dilation);
+                CameraImage.Source = EdgeDetection.IntToBitmap(skeleton);
+            }
+
+        }
 
         class Point2
         {
