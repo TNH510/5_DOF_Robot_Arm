@@ -26,7 +26,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 
-
 using System.Windows.Threading;
 using System.Data;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolTip;
@@ -63,6 +62,8 @@ namespace RobotArmHelix
     /// </summary>
     public partial class MainWindow : Window
    {
+        public Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
         public int visible_robot = 1;
         public int visible_display = 1;
         public int visible_control = 1;
@@ -2212,104 +2213,82 @@ namespace RobotArmHelix
         }
         private void StartClient()
         {
-            // Create a socket object
-            using (Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+            // Connect to the server
+            string host = addr_tb.Text;
+            int port = Convert.ToInt16(port_tb.Text);
+
+            try
             {
-                // Connect to the server
-                string host = addr_tb.Text;
-                int port = Convert.ToInt16(port_tb.Text);
+                clientSocket.Connect(host, port);
+                //MessageBox.Show($"Connected to {host}:{port}");
+                PrintLog("Infor", "Connected to", $"{host}:{port}");
 
-                try
-                {
-                    clientSocket.Connect(host, port);
-                    //MessageBox.Show($"Connected to {host}:{port}");
-                    PrintLog("Infor", "Connected to", $"{host}:{port}");
+                // Send the command to the server
+                string commandToSend = data_tb.Text + "\r\n";
+                byte[] commandBytes = Encoding.ASCII.GetBytes(commandToSend);
+                Console.WriteLine(Encoding.ASCII.GetString(commandBytes));
+                clientSocket.Send(commandBytes);
 
-                    // Send the command to the server
-                    string commandToSend = data_tb.Text + "\r\n";
-                    byte[] commandBytes = Encoding.ASCII.GetBytes(commandToSend);
-                    Console.WriteLine(Encoding.ASCII.GetString(commandBytes));
-                    clientSocket.Send(commandBytes);
-
-                    // Receive the response from the server
-                    byte[] buffer = new byte[1024];
-                    int bytesRead = clientSocket.Receive(buffer);
-                    string response = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                // Receive the response from the server
+                byte[] buffer = new byte[1024];
+                int bytesRead = clientSocket.Receive(buffer);
+                string response = Encoding.ASCII.GetString(buffer, 0, bytesRead);
 
 
-                }
-                catch (Exception ex)
-                {
-                    PrintLog("Error", "Unable to connect to", $"{host}:{port}");
-                }
+            }
+            catch (Exception ex)
+            {
+                PrintLog("Error", "Unable to connect to", $"{host}:{port}");
             }
         }
 
         private void TCP_sendata_button_Click(object sender, RoutedEventArgs e)
         {
-            // Create a socket object
-            using (Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+
+            string sentencetosend = "1003I?\r\n";
+
+            // Send the command to the server
+            string commandToSend = data_tb.Text + "\r\n";
+            byte[] commandBytes = Encoding.ASCII.GetBytes(commandToSend);
+            clientSocket.Send(commandBytes);
+
+            // Receive the response from the server
+            var buffer = new byte[308295];
+            int bytesRead = clientSocket.Receive(buffer);
+            //if (commandToSend == sentencetosend)
+            //{
+            //    while (bytesRead < 308291)
+            //    {
+            //        bytesRead += clientSocket.Receive(buffer, bytesRead, 308291 - bytesRead, SocketFlags.None);
+            //    }
+            //}
+                    
+            response_client = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+            PrintLog("Data received", "", response_client);
+
+            // Specify the folder path where you want to save the file
+            string folderPath = @"C:\Users\daveb\Desktop\raw_data\";
+
+            //PrintLog("Infor", "Data received", response);
+            // Sent the whole response in the text
+
+            // Sentences to remove
+            string[] sentencesToRemove = { "1003000308278", "1003*", "1003?", "1003000307200" };
+
+            // Loop through each sentence and replace it with an empty string
+            foreach (string sentence in sentencesToRemove)
             {
-                // Connect to the server
-                string host = addr_tb.Text;
-                int port = Convert.ToInt16(port_tb.Text);
-
-                try
-                {
-                    clientSocket.Connect(host, port);
-
-                    string sentencetosend = "1003I?\r\n";
-
-                    // Send the command to the server
-                    string commandToSend = data_tb.Text + "\r\n";
-                    byte[] commandBytes = Encoding.ASCII.GetBytes(commandToSend);
-                    clientSocket.Send(commandBytes);
-
-                    // Receive the response from the server
-                    var buffer = new byte[308295];
-                    int bytesRead = clientSocket.Receive(buffer);
-                    if (commandToSend == sentencetosend)
-                    {
-                        while (bytesRead < 308291)
-                        {
-                            bytesRead += clientSocket.Receive(buffer, bytesRead, 308291 - bytesRead, SocketFlags.None);
-                        }
-                    }
-                    
-                    response_client = Encoding.ASCII.GetString(buffer, 0, bytesRead);
-                    PrintLog("Data received", "", response_client);
-
-                    // Specify the folder path where you want to save the file
-                    string folderPath = @"C:\Users\daveb\Desktop\raw_data\";
-
-                    //PrintLog("Infor", "Data received", response);
-                    // Sent the whole response in the text
-
-                    // Sentences to remove
-                    string[] sentencesToRemove = { "1003000308278", "1003*", "1003?", "1003000307200" };
-
-                    // Loop through each sentence and replace it with an empty string
-                    foreach (string sentence in sentencesToRemove)
-                    {
-                        response_client = response_client.Replace(sentence, "");
-                    }
-
-                    
-                    // Construct the full file path using Path.Combine
-                    string filePath = System.IO.Path.Combine(folderPath, "response_bytes.txt");
-
-                    // Convert the modified response string back to bytes
-                    byte[] modifiedBuffer = Encoding.ASCII.GetBytes(response_client);
-                    // Save the modified data to the byte file
-                    File.WriteAllBytes(filePath, modifiedBuffer);
-
- 
-                }
-                catch (Exception ex)
-                {
-                    PrintLog("Error", "Unable to connect to", $"{host}:{port}");
-                }
+                response_client = response_client.Replace(sentence, "");
             }
+
+                    
+            // Construct the full file path using Path.Combine
+            string filePath = System.IO.Path.Combine(folderPath, "response_bytes.txt");
+
+            // Convert the modified response string back to bytes
+            byte[] modifiedBuffer = Encoding.ASCII.GetBytes(response_client);
+            // Save the modified data to the byte file
+            File.WriteAllBytes(filePath, modifiedBuffer);
         }
 
         private async void Bitmap_cvt_button_Click(object sender, RoutedEventArgs e)
@@ -3061,6 +3040,7 @@ namespace RobotArmHelix
                 resultImage.Unlock();
                 return resultImage;
             }
+
             // Hàm dilation với số lần lặp lại xác định
             public static int[,] Dilation(int[,] image, int iterations)
             {
