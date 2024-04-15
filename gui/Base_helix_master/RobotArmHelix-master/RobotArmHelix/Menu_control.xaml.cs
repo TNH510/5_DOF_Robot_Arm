@@ -25,16 +25,7 @@ namespace RobotArmHelix
         public Menu_control(MainWindow mainWindow)
         {
             InitializeComponent();
-            this.mainWindow = mainWindow; // Store the reference to MainWindow
         }
 
-        private void CloseApp_Click(object sender, RoutedEventArgs e)
-        {
-            Close();
-        }
-
-        private void Change_color_mainwindow(object sender, RoutedEventArgs e)
-        {
-        }
     }
 }

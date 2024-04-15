@@ -1,0 +1,6 @@
+smooth image with 2D Gaussian
+compute image Gradianet using Sobel Operator
+find gradient magnitude at each pixel 
+
+
+chuyển đổi RGB2Grayscale-> gaussec blur -> sobel detect 
