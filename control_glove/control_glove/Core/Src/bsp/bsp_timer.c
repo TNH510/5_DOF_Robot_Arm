@@ -1,15 +1,15 @@
 /**
- * @file       system_manager.c
- * @copyright  Copyright (C) 2023 TNH510
+ * @file       bsp_timer.c
+ * @copyright  Copyright (C) 2024 TNH510
  * @version    1.0.0
- * @date       2023-11
+ * @date       2024-04
  * @author     Hieu Tran Ngoc
- * @brief      System manager for Control Glove project
+ * @brief      Board support package for Timer
  * @note       None
  */
 /* Public includes ---------------------------------------------------------- */
-#include "system_manager.h"
-#include "sensor_manager.h"
+#include "bsp_timer.h"
+#include "stm32f4xx_hal.h"
 
 /* Private includes --------------------------------------------------------- */
 /* Private defines ---------------------------------------------------------- */
@@ -17,15 +17,26 @@
 /* Private macros ----------------------------------------------------------- */
 /* Public variables --------------------------------------------------------- */
 /* Private variables -------------------------------------------------------- */
+static uint32_t tick_start = 0;
 /* Private prototypes ------------------------------------------------------- */
 /* Public implementations --------------------------------------------------- */
-base_status_t system_manager_init(void)
+base_status_t bsp_timer_init(void)
 {
-    return sensor_manager_init();
+    return BS_OK;
 }
-base_status_t system_manager_task(void)
+
+base_status_t bsp_timer_start(void)
 {
-    return sensor_manager_task();
+    return BS_OK;
+}
+base_status_t bsp_timer_tick_start(void)
+{
+    uwTick = 0;
+    tick_start = HAL_GetTick();
+}
+base_status_t bsp_timer_tick_stop(float *result_freq)
+{
+    *result_freq = 1000.0f / (HAL_GetTick() - tick_start);
 }
 
 /* Private implementations -------------------------------------------------- */

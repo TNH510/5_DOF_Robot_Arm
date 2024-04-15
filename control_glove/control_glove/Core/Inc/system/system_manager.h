@@ -17,20 +17,16 @@ extern "C" {
 
 /* Includes ----------------------------------------------------------------- */
 #include <stdint.h>
+#include "bsp_common.h"
 #include "drv_button.h"
-#include "system_test.h"
 
 /* Public defines ----------------------------------------------------------- */
 /* Public enumerate/structure ----------------------------------------------- */
-typedef enum
-{
-    SYSTEM_MANAGER_OK,
-    SYSTEM_MANAGER_ERROR,
-} system_manager_error_t;
 /* Public macros ------------------------------------------------------------ */
 /* Public variables --------------------------------------------------------- */
 /* Public APIs -------------------------------------------------------------- */
-system_manager_error_t system_manager_test(void);
+base_status_t system_manager_init(void);
+base_status_t system_manager_task(void);
 
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus

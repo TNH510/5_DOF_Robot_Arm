@@ -1,15 +1,15 @@
 /**
- * @file       sytem_test.h
- * @copyright  Copyright (C) 2023 TNH510
+ * @file       glove_algorithm.h
+ * @copyright  Copyright (C) 2024 TNH510
  * @version    1.0.0
- * @date       2023-11
- * @author     Hieu Tran Ngoc
- * @brief      Test project components
+ * @date       2024-04
+ * @author     Hieu Tran 
+ * @brief      Algorithm for control glove
  * @note       None
  */
 /* Define to prevent recursive inclusion ------------------------------------ */
-#ifndef __SYSTEM_TEST_H
-#define __SYSTEM_TEST_H
+#ifndef __GLOVE_ALGORITHM_H
+#define __GLOVE_ALGORITHM_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -17,25 +17,23 @@ extern "C" {
 
 /* Includes ----------------------------------------------------------------- */
 #include <stdint.h>
+#include "bsp_common.h"
 
 /* Public defines ----------------------------------------------------------- */
 /* Public enumerate/structure ----------------------------------------------- */
-typedef enum
-{
-    SYSTEM_TEST_OK,
-    SYSTEM_TEST_ERROR,
-} system_test_error_t;
 /* Public macros ------------------------------------------------------------ */
 /* Public variables --------------------------------------------------------- */
 /* Public APIs -------------------------------------------------------------- */
-system_test_error_t system_test_init(void);
-system_test_error_t system_test_general(void);
+base_status_t glv_convert_euler_angle(float q0, float q1, float q2, float q3, 
+                                      float *pitch, float *roll, float *yaw);
 
+base_status_t glv_pos_convert(float q0, float q1, float q2, float q3, 
+                              float *x_pos, float *y_pos, float *z_pos);
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus
 } /* extern "C" { */
 #endif
 
-#endif /* __SYSTEM_TEST_H */
+#endif /* __GLOVE_ALGORITHM_H */
 
 /* End of file -------------------------------------------------------------- */

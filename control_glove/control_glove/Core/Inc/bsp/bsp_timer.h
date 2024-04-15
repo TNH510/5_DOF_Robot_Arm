@@ -1,15 +1,15 @@
 /**
- * @file       bsp_mpu6050.h
+ * @file       bsp_timer.h
  * @copyright  Copyright (C) 2024 TNH510
  * @version    1.0.0
- * @date       2024-03
- * @author     Hieu Tran
- * @brief      BSP for MPU6050
+ * @date       2024-04
+ * @author     Hieu Tran Ngoc
+ * @brief      Board supoprt package for Timer
  * @note       None
  */
 /* Define to prevent recursive inclusion ------------------------------------ */
-#ifndef __BSP_MPU6050_H
-#define __BSP_MPU6050_H
+#ifndef __BSP_TIMER_H
+#define __BSP_TIMER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,14 +24,16 @@ extern "C" {
 /* Public macros ------------------------------------------------------------ */
 /* Public variables --------------------------------------------------------- */
 /* Public APIs -------------------------------------------------------------- */
-base_status_t bsp_mpu6050_get_data(float *gxrs, float *gyrs, float *gzrs, float *axg, float *ayg, float *azg);
-base_status_t bsp_mpu6050_init(void);
+base_status_t bsp_timer_init(void);
+base_status_t bsp_timer_start(void);
+base_status_t bsp_timer_tick_start(void);
+base_status_t bsp_timer_tick_stop(float *result_freq);
 
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus
 } /* extern "C" { */
 #endif
 
-#endif /* __BSP_MPU6050_H */
+#endif /* __BSP_TIMER_H */
 
 /* End of file -------------------------------------------------------------- */

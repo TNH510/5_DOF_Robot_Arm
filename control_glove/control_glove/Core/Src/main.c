@@ -118,7 +118,7 @@ int main(void)
   MX_TIM11_Init();
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
-  system_test_init();
+  system_manager_init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -126,7 +126,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-    system_test_polling();
+    system_manager_task();
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

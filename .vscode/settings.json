@@ -13,6 +13,12 @@
         "stdint.h": "c",
         "bsp_common.h": "c",
         "bsp_adc.h": "c",
-        "type_traits": "c"
+        "type_traits": "c",
+        "bsp_hmc5883l.h": "c",
+        "madgwickahrs.h": "c",
+        "glove_algorithm.h": "c",
+        "drv_imu.h": "c",
+        "sensor_manager.h": "c",
+        "cstdio": "c"
     }
 }
