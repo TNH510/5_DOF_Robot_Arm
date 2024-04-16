@@ -66,7 +66,7 @@ base_status_t sensor_manager_task(void)
     glv_convert_euler_angle(q0, q1, q2, q3, &pitch, &roll, &yaw);
 
     // Printf
-    printf("%0.2f,%0.2f,%0.2f\r\n", pitch, roll, yaw);
+    printf("%0.2f,%0.2f,%0.2f\r\n", g_magnetic_data.XAxis, g_magnetic_data.YAxis, g_magnetic_data.ZAxis);
 
     HAL_Delay(200);
 }

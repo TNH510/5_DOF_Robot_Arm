@@ -19,6 +19,7 @@ extern "C" {
 #include <stdint.h>
 #include "bsp_common.h"
 #include "drv_button.h"
+#include "bsp_gpio.h"
 
 /* Public defines ----------------------------------------------------------- */
 /* Public enumerate/structure ----------------------------------------------- */

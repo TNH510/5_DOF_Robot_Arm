@@ -19,6 +19,10 @@
         "glove_algorithm.h": "c",
         "drv_imu.h": "c",
         "sensor_manager.h": "c",
-        "cstdio": "c"
+        "cstdio": "c",
+        "cmath": "cpp",
+        "drv_button.h": "c",
+        "main.h": "c",
+        "stm32f4xx_hal_def.h": "c"
     }
 }

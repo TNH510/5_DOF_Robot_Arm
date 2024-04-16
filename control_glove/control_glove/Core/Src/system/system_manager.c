@@ -21,6 +21,8 @@
 /* Public implementations --------------------------------------------------- */
 base_status_t system_manager_init(void)
 {
+    // bsp_gpio_set_pin(LED_RED_GPIO_Port, LED_RED_Pin);
+    bsp_gpio_set_pin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
     return sensor_manager_init();
 }
 base_status_t system_manager_task(void)
