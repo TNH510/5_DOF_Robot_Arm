@@ -43,7 +43,7 @@ class SerialPort:
     Attributes:
         read(**kwargs): Read and decode data string from serial port.
     """
-    def __init__(self, port, baud=9600):
+    def __init__(self, port, baud=115200):
         """Create and read serial data.
 
         Args:

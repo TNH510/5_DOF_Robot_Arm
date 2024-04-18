@@ -16,11 +16,11 @@
 /* Private macros ----------------------------------------------------------- */
 /* Public variables --------------------------------------------------------- */
 /* Private variables -------------------------------------------------------- */
-static float A[3][3] = {{ 0.093362f, 0.006494f, -0.001871f}, 
-                        {0.006494f, 0.094753f, -0.008098f}, 
-                        {-0.001871f, -0.008098f, 0.098554f}};
+static float A[3][3] = {{ 87.423326f, -2.273900f, -0.483181f}, 
+                        {-2.273900f, 91.119974f, -1.580122f}, 
+                        {-0.483181f, -1.580122f, 105.946092f}};
 
-static float b[3] = {244.368126f, 163.341400f, -10.971097f};
+static float b[3] = {38.294125f, -167.486285f, -9.709824f};
 /* Private prototypes ------------------------------------------------------- */
 /* Public implementations --------------------------------------------------- */
 base_status_t drv_magnetic_init(void)
@@ -64,6 +64,10 @@ base_status_t drv_magnetic_get_data(drv_magnetic_data_t *magnetic_data)
     magnetic_data->XAxis = mag_calib[0];
     magnetic_data->YAxis = mag_calib[1];
     magnetic_data->ZAxis = mag_calib[2];
+
+    // magnetic_data->XAxis = mag.XAxis;
+    // magnetic_data->YAxis = mag.YAxis;
+    // magnetic_data->ZAxis = mag.ZAxis;
 
     return BS_OK;
 }
