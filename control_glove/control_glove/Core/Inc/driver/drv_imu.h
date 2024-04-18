@@ -1,41 +1,47 @@
 /**
- * @file       sytem_test.h
- * @copyright  Copyright (C) 2023 TNH510
+ * @file       drv_imu.h
+ * @copyright  Copyright (C) 2024 TNH510
  * @version    1.0.0
- * @date       2023-11
+ * @date       2024-04
  * @author     Hieu Tran Ngoc
- * @brief      Test project components
+ * @brief      Driver for IMU
  * @note       None
  */
 /* Define to prevent recursive inclusion ------------------------------------ */
-#ifndef __SYSTEM_TEST_H
-#define __SYSTEM_TEST_H
+#ifndef __DRV_IMU_H
+#define __DRV_IMU_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Includes ----------------------------------------------------------------- */
+#include "bsp_common.h"
 #include <stdint.h>
 
 /* Public defines ----------------------------------------------------------- */
 /* Public enumerate/structure ----------------------------------------------- */
-typedef enum
+typedef struct
 {
-    SYSTEM_TEST_OK,
-    SYSTEM_TEST_ERROR,
-} system_test_error_t;
+    float axg;
+    float ayg;
+    float azg;
+    float gxrs;
+    float gyrs;
+    float gzrs;  
+} drv_imu_t;
+
 /* Public macros ------------------------------------------------------------ */
 /* Public variables --------------------------------------------------------- */
 /* Public APIs -------------------------------------------------------------- */
-system_test_error_t system_test_init(void);
-system_test_error_t system_test_general(void);
+base_status_t drv_imu_init(void);
+base_status_t drv_imu_get_data(drv_imu_t *imu_data);
 
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus
 } /* extern "C" { */
 #endif
 
-#endif /* __SYSTEM_TEST_H */
+#endif /* __DRV_IMU_H */
 
 /* End of file -------------------------------------------------------------- */

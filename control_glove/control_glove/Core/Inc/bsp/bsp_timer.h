@@ -1,15 +1,15 @@
 /**
- * @file       system_manager.h
- * @copyright  Copyright (C) 2023 TNH510
+ * @file       bsp_timer.h
+ * @copyright  Copyright (C) 2024 TNH510
  * @version    1.0.0
- * @date       2023-11
+ * @date       2024-04
  * @author     Hieu Tran Ngoc
- * @brief      System manager for Control Glove project
+ * @brief      Board supoprt package for Timer
  * @note       None
  */
 /* Define to prevent recursive inclusion ------------------------------------ */
-#ifndef __SYSTEM_MANAGER_H
-#define __SYSTEM_MANAGER_H
+#ifndef __BSP_TIMER_H
+#define __BSP_TIMER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,22 +18,22 @@ extern "C" {
 /* Includes ----------------------------------------------------------------- */
 #include <stdint.h>
 #include "bsp_common.h"
-#include "drv_button.h"
-#include "bsp_gpio.h"
 
 /* Public defines ----------------------------------------------------------- */
 /* Public enumerate/structure ----------------------------------------------- */
 /* Public macros ------------------------------------------------------------ */
 /* Public variables --------------------------------------------------------- */
 /* Public APIs -------------------------------------------------------------- */
-base_status_t system_manager_init(void);
-base_status_t system_manager_task(void);
+base_status_t bsp_timer_init(void);
+base_status_t bsp_timer_start(void);
+base_status_t bsp_timer_tick_start(void);
+base_status_t bsp_timer_tick_stop(float *result_freq);
 
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus
 } /* extern "C" { */
 #endif
 
-#endif /* __SYSTEM_MANAGER_H */
+#endif /* __BSP_TIMER_H */
 
 /* End of file -------------------------------------------------------------- */
