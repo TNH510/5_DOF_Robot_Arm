@@ -57,7 +57,7 @@ base_status_t sensor_manager_task(void)
     if (g_button_state == CLICK_SELECT_BUTTON)
     {
         count++;
-        if (count == 4)
+        if (count == 5)
         {
             count = 0;
         }
@@ -83,6 +83,10 @@ base_status_t sensor_manager_task(void)
     float pitch, roll, yaw;
     glv_convert_euler_angle(q0, q1, q2, q3, &pitch, &roll, &yaw);
 
+    // Caculate kinematic
+    float x_pos, y_pos, z_pos;
+    glv_pos_convert(q0, q1, q2, q3, &x_pos, &y_pos, &z_pos);
+
     // Printf
     // printf("%0.2f,%0.2f,%0.2f\r\n", roll, pitch, yaw);
 
@@ -103,6 +107,9 @@ base_status_t sensor_manager_task(void)
             break;
         case 3:
             printf("%0.2f,%0.2f,%0.2f\r\n", roll, pitch, yaw);
+            break;
+        case 4:
+            printf("%0.2f,%0.2f,%0.2f\r\n", x_pos, y_pos, z_pos);
             break;
         default:
             break;
