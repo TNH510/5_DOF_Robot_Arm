@@ -23,7 +23,7 @@
 static float square(float num);
 
 /* Public implementations --------------------------------------------------- */
-base_status_t glv_convert_euler_angle(float q0, float q1, float q2, float q3, 
+void glv_convert_euler_angle(float q0, float q1, float q2, float q3, 
                                       float *pitch, float *roll, float *yaw)
 {
   *yaw   = -atan2(2.0f * (q1 * q2 + q0 * q3), q0 * q0 + q1 * q1 - q2 * q2 - q3 * q3) * 57.29577951;   
@@ -33,7 +33,7 @@ base_status_t glv_convert_euler_angle(float q0, float q1, float q2, float q3,
     return BS_OK;
 }
 
-base_status_t glv_pos_convert(float q0, float q1, float q2, float q3, 
+void glv_pos_convert(float q0, float q1, float q2, float q3, 
                               float *x_pos, float *y_pos, float *z_pos)
 {
 	const float l1 = 200.0;
@@ -47,11 +47,14 @@ base_status_t glv_pos_convert(float q0, float q1, float q2, float q3,
 	*z_pos = - l2*((ce*(2*q0*q2 - 2*q1*q3))/(n) - (se*(2*q0*q1 + 2*q2*q3))/(n)) - (l1*(2*q0*q2 - 2*q1*q3))/(n);
 }
 
+float low_pass_filter(float input, float pre_output, float alpha) 
+{
+    return alpha * input + (1 - alpha) * pre_output;
+}
 
 /* Private implementations -------------------------------------------------- */
 static float square(float num)
 {
 	return (float)(num * num);
 }
-
 /* End of file -------------------------------------------------------------- */

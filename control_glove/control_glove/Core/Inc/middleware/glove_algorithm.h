@@ -24,11 +24,13 @@ extern "C" {
 /* Public macros ------------------------------------------------------------ */
 /* Public variables --------------------------------------------------------- */
 /* Public APIs -------------------------------------------------------------- */
-base_status_t glv_convert_euler_angle(float q0, float q1, float q2, float q3, 
+void glv_convert_euler_angle(float q0, float q1, float q2, float q3, 
                                       float *pitch, float *roll, float *yaw);
 
-base_status_t glv_pos_convert(float q0, float q1, float q2, float q3, 
+void glv_pos_convert(float q0, float q1, float q2, float q3, 
                               float *x_pos, float *y_pos, float *z_pos);
+
+float low_pass_filter(float input, float pre_output, float alpha);
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus
 } /* extern "C" { */

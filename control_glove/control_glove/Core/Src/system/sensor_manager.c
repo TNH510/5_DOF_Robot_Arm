@@ -15,6 +15,7 @@
 #include "drv_button.h"
 
 #include "bsp_timer.h"
+#include "bsp_adc.h"
 
 #include "glove_algorithm.h"
 // #include "MadgwickAHRS.h"
@@ -46,18 +47,21 @@ base_status_t sensor_manager_init(void)
     // Start get tick
     bsp_timer_tick_start();
 
+    // Start ADC
+    bsp_adc_start();
+
     return BS_OK;
 }
 
 base_status_t sensor_manager_task(void)
 {
     // Check event button
-    static count = 0;
+    static count = 5;
     drv_button_check_event(&g_button_state);
     if (g_button_state == CLICK_SELECT_BUTTON)
     {
         count++;
-        if (count == 5)
+        if (count == 6)
         {
             count = 0;
         }
@@ -68,6 +72,33 @@ base_status_t sensor_manager_task(void)
 
     // Get marg data
     drv_magnetic_get_data(&g_magnetic_data);
+
+    // Get RV1 data
+    static uint16_t adc_value[10] = {0}; 
+    float adc_avr_value;
+    static float adc_low_pass = 0.0f;
+    static uint8_t adc_sample_count = 0;
+
+    bsp_adc_get_data(&adc_value[adc_sample_count]);
+    adc_sample_count++;
+
+    if (adc_sample_count == 10)
+    {
+        uint16_t sum = 0;
+        adc_sample_count = 0;
+        // Caculate average 20 sample for RV1
+        for (int i = 0; i < 10; i++)
+        {
+            sum += adc_value[i];
+        }
+
+        adc_avr_value = sum / 10.0f;
+
+        // Low pass filter for RV1
+        static float pre_output = 0;
+        adc_low_pass = low_pass_filter(adc_avr_value, pre_output, 0.03f);
+        pre_output = adc_avr_value;
+    }
 
     // Get sample freq 
     bsp_timer_tick_stop(&g_freq);
@@ -110,6 +141,9 @@ base_status_t sensor_manager_task(void)
             break;
         case 4:
             printf("%0.2f,%0.2f,%0.2f\r\n", x_pos, y_pos, z_pos);
+            break;
+        case 5:
+            printf("%0.2f,%0.2f,%0.2f\r\n", adc_low_pass, (float)adc_value[adc_sample_count], 0);
             break;
         default:
             break;

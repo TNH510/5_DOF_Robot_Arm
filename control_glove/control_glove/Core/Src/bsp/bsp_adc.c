@@ -28,7 +28,7 @@ base_status_t bsp_adc_start(void)
 base_status_t bsp_adc_get_data(uint16_t* adc_value)
 {
     HAL_ADC_Start(&hadc1);
-    HAL_ADC_PollForConversion(&hadc1, 50);
+    HAL_ADC_PollForConversion(&hadc1, 10);
     *adc_value = HAL_ADC_GetValue(&hadc1);
     return BS_OK;
 }
