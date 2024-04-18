@@ -100,6 +100,9 @@ base_status_t sensor_manager_task(void)
         pre_output = adc_avr_value;
     }
 
+    // Caculate elbow angle
+    float elbow_angle = adc_avr_value * 0.0013189f; 
+
     // Get sample freq 
     bsp_timer_tick_stop(&g_freq);
     bsp_timer_tick_start(); // Reset tick
@@ -116,7 +119,7 @@ base_status_t sensor_manager_task(void)
 
     // Caculate kinematic
     float x_pos, y_pos, z_pos;
-    glv_pos_convert(q0, q1, q2, q3, &x_pos, &y_pos, &z_pos);
+    glv_pos_convert(q0, q1, q2, q3, elbow_angle, &x_pos, &y_pos, &z_pos);
 
     // Printf
     // printf("%0.2f,%0.2f,%0.2f\r\n", roll, pitch, yaw);
@@ -143,7 +146,7 @@ base_status_t sensor_manager_task(void)
             printf("%0.2f,%0.2f,%0.2f\r\n", x_pos, y_pos, z_pos);
             break;
         case 5:
-            printf("%0.2f,%0.2f,%0.2f\r\n", adc_low_pass, (float)adc_value[adc_sample_count], 0);
+            printf("%0.2f,%0.2f,%0.2f\r\n", adc_low_pass, (float)adc_value[adc_sample_count], elbow_angle*57.296f);
             break;
         default:
             break;

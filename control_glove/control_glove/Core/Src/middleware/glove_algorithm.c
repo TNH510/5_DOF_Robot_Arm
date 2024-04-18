@@ -33,13 +33,13 @@ void glv_convert_euler_angle(float q0, float q1, float q2, float q3,
     return BS_OK;
 }
 
-void glv_pos_convert(float q0, float q1, float q2, float q3, 
+void glv_pos_convert(float q0, float q1, float q2, float q3, float elbow_angle, 
                               float *x_pos, float *y_pos, float *z_pos)
 {
 	const float l1 = 200.0;
 	const float l2 = 200.0;
-	const float ce = 0.0;
-	const float se = 1.0;
+	float ce = cos(elbow_angle);
+	float se = sin(elbow_angle);
 	float n = square(q0) + square(q1) + square(q2) + square(q3);
 
 	*x_pos = l2*((ce*(square(q0) + square(q1) - square(q2) - square(q3)))/(n) - (se*(2*q0*q3 - 2*q1*q2))/(n)) + (l1*(square(q0) + square(q1) - square(q2) - square(q3)))/(n);
