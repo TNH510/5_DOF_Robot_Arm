@@ -23,6 +23,9 @@
 #define USER_BUTTON_Pin GPIO_PIN_14
 #define USER_BUTTON_GPIO_Port GPIOC
 #define USER_BUTTON_EXTI_IRQn EXTI15_10_IRQn
+#define SW3_Pin GPIO_PIN_3
+#define SW3_GPIO_Port GPIOA
+#define SW3_EXTI_IRQn EXTI3_IRQn
 
 /* Number of button */
 #define BUTTON_MAX         (1)

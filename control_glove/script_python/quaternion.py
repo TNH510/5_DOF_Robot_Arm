@@ -1,91 +1,71 @@
+from vpython import *
+from time import *
+# from visual import *
 import numpy as np
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib.animation import FuncAnimation
+import math
+import serial
 
-# Khởi tạo các biến
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-ax.set_xlim([-1, 1])
-ax.set_ylim([-1, 1])
-ax.set_zlim([-1, 1])
 
-# Tạo ma trận chứa các điểm của khối lập phương không đổi
-cubePoints = np.array([[0.5, -0.5, -0.5, 0.5, 0.5],
-                       [0.5, 0.5, -0.5, -0.5, 0.5],
-                       [0.5, 0.5, 0.5, 0.5, 0.5]])
+ad=serial.Serial('COM20', 115200)
+sleep(1)
 
-# Hàm xử lý sự kiện nhấn phím
-def on_key_press(event):
-    global quaternion
-    if event.key == 'up':
-        # Quay quaternion theo trục x
-        angle = np.pi / 12
-        quaternion = quaternion_rotation(quaternion, angle, [1, 0, 0])
-    elif event.key == 'down':
-        # Quay quaternion theo trục x ngược chiều kim đồng hồ
-        angle = -np.pi / 12
-        quaternion = quaternion_rotation(quaternion, angle, [1, 0, 0])
-    elif event.key == 'left':
-        # Quay quaternion theo trục y
-        angle = np.pi / 12
-        quaternion = quaternion_rotation(quaternion, angle, [0, 1, 0])
-    elif event.key == 'right':
-        # Quay quaternion theo trục y ngược chiều kim đồng hồ
-        angle = -np.pi / 12
-        quaternion = quaternion_rotation(quaternion, angle, [0, 1, 0])
-    elif event.key == 'pageup':
-        # Quay quaternion theo trục z
-        angle = np.pi / 12
-        quaternion = quaternion_rotation(quaternion, angle, [0, 0, 1])
-    elif event.key == 'pagedown':
-        # Quay quaternion theo trục z ngược chiều kim đồng hồ
-        angle = -np.pi / 12
-        quaternion = quaternion_rotation(quaternion, angle, [0, 0, 1])
+canvas(title='IMU Data 3D Visualization', caption='A caption')
 
-# Hàm tính toán ma trận quay từ quaternion
-def quaternion_to_rotation_matrix(q):
-    q0, q1, q2, q3 = q
-    rotationMatrix = np.array([[1-2*q2**2-2*q3**2, 2*q1*q2-2*q0*q3, 2*q1*q3+2*q0*q2],
-                               [2*q1*q2+2*q0*q3, 1-2*q1**2-2*q2**2, 2*q2*q3-2*q0*q1],
-                               [2*q1*q3-2*q0*q2, 2*q2*q3+2*q0*q1, 1-2*q1**2-2*q3**2]])
-    return rotationMatrix
+scene.range=5
+toRad=2*np.pi/360
+toDeg=1/toRad
+scene.forward=vector(-1,-1,-1)
 
-# Hàm tính toán quaternion quay theo trục và góc
-def quaternion_rotation(q, angle, axis):
-    q = np.array(q)
-    axis = np.array(axis) / np.linalg.norm(axis)
-    q_axis = np.concatenate(([0], axis))
-    q_new = np.cos(angle / 2) * q - np.sin(angle / 2) * q_axis
-    return q_new / np.linalg.norm(q_new)
+scene.width=800
+scene.height=800
 
-# Khởi tạo quaternion ban đầu
-quaternion = np.array([0.707, 0.0, 0.707, 0.0])
+xarrow=arrow(lenght=2, shaftwidth=.1, color=color.red,axis=vector(1,0,0))
+yarrow=arrow(lenght=2, shaftwidth=.1, color=color.green,axis=vector(0,1,0))
+zarrow=arrow(lenght=4, shaftwidth=.1, color=color.blue,axis=vector(0,0,1))
 
-# Gắn kết sự kiện nhấn phím
-fig.canvas.mpl_connect('key_press_event', on_key_press)
+frontArrow=arrow(length=4,shaftwidth=.1,color=color.purple,axis=vector(1,0,0))
+upArrow=arrow(length=1,shaftwidth=.1,color=color.magenta,axis=vector(0,1,0))
+sideArrow=arrow(length=2,shaftwidth=.1,color=color.orange,axis=vector(0,0,1))
 
-# Hàm cập nhật frame
-def update_frame(frame):
-    ax.clear()
-    ax.set_xlim([-1, 1])
-    ax.set_ylim([-1, 1])
-    ax.set_zlim([-1, 1])
+bBoard=box(texture={'file':'board.jpg','place':['right'] },length=.2,width=2,height=6,opacity=.8)
+bBoard.rotate(angle=np.pi/2,axis=vector(0,0,1))
 
-    # Tính ma trận quay từ quaternion
-    rotationMatrix = quaternion_to_rotation_matrix(quaternion)
+while (True):
+    while (ad.inWaiting()==0):
+        pass
+    roll,pitch,yaw= .0,.0,.0     
+    try:
+            dataPacket=ad.readline()
+            dataPacket=str(dataPacket,'utf-8')
+            splitPacket=dataPacket.split(",")
+            roll=float(splitPacket[1])*toRad
+            pitch=float(splitPacket[0])*toRad
+            yaw=float(splitPacket[2])*toRad+np.pi
+            yaw = -yaw
+    except:
+        pass
+    log = 'Roll={},Pitch={},Yaw={}'.format(roll, pitch,yaw)
+    print(log)
+    scene.caption = log
+     
+    rate(50)
 
-    # Tính toán các điểm mới của khối lập phương theo ma trận quay
-    rotatedPoints = np.dot(rotationMatrix, cubePoints)
+    body_x,body_y,body_z = cos(yaw)*cos(pitch),sin(pitch),sin(yaw)*cos(pitch)
+    k=vector(body_x,body_y,body_z)
 
-    # Vẽ khối lập phương
-    ax.plot(rotatedPoints[0], rotatedPoints[1], rotatedPoints[2], 'b')
-    ax.set_xlabel('X')
-    ax.set_ylabel('Y')
-    ax.set_zlabel('Z')
+    y=vector(0,1,0)
+    s=cross(k,y)
+    v=cross(s,k)
+    vrot=v*cos(roll)+cross(k,v)*sin(roll)
 
-# Tạo animation
-ani = FuncAnimation(fig, update_frame, frames=np.arange(0, 100), interval=50, repeat=True)
-
-# Hiển thị đồ thị
-plt.show()
+    frontArrow.axis=k
+    sideArrow.axis=cross(k,vrot)
+    upArrow.axis=v
+    bBoard.axis=vrot
+    bBoard.up=k
+    sideArrow.length=2
+    frontArrow.length=4
+    upArrow.length=1
+    bBoard.width = 2
+    bBoard.height = 6
+    bBoard.length = .2

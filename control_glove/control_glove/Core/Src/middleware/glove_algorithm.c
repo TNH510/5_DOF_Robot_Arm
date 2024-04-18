@@ -26,19 +26,9 @@ static float square(float num);
 base_status_t glv_convert_euler_angle(float q0, float q1, float q2, float q3, 
                                       float *pitch, float *roll, float *yaw)
 {
-    float sinr_cosp = 2 * (q0 * q1 + q2 * q3);
-    float cosr_cosp = 1 - 2 * (q1 * q1 + q2 * q2);
-    *roll = atan2f(sinr_cosp, cosr_cosp) * (180.0f / M_PI);
-    
-    float sinp = 2 * (q0 * q2 - q3 * q1);
-    if (fabsf(sinp) >= 1)
-        *pitch = copysignf(90.0f, sinp);
-    else
-        *pitch = asinf(sinp) * (180.0f / M_PI);
-    
-    float siny_cosp = 2 * (q0 * q3 + q1 * q2);
-    float cosy_cosp = 1 - 2 * (q2 * q2 + q3 * q3);
-    *yaw = atan2f(siny_cosp, cosy_cosp) * (180.0f / M_PI);
+  *yaw   = -atan2(2.0f * (q1 * q2 + q0 * q3), q0 * q0 + q1 * q1 - q2 * q2 - q3 * q3) * 57.29577951;   
+  *pitch = asin(2.0f * (q1 * q3 - q0 * q2)) * 57.29577951;
+  *roll  = atan2(2.0f * (q0 * q1 + q2 * q3), q0 * q0 - q1 * q1 - q2 * q2 + q3 * q3) * 57.29577951;
 
     return BS_OK;
 }

@@ -31,7 +31,6 @@ base_status_t bsp_timer_start(void)
 }
 base_status_t bsp_timer_tick_start(void)
 {
-    uwTick = 0;
     tick_start = HAL_GetTick();
 }
 base_status_t bsp_timer_tick_stop(float *result_freq)
