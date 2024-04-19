@@ -119,6 +119,7 @@ int main(void)
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
   system_manager_init();
+  bsp_i2c1_deinit();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -127,6 +128,7 @@ int main(void)
   {
     /* USER CODE END WHILE */
     system_manager_task();
+    
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

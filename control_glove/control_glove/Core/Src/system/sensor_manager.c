@@ -60,11 +60,24 @@ base_status_t sensor_manager_task(void)
     drv_button_check_event(&g_button_state);
     if (g_button_state == CLICK_SELECT_BUTTON)
     {
-        count++;
-        if (count == 6)
-        {
-            count = 0;
-        }
+        // count++;
+        // if (count == 6)
+        // {
+        //     count = 0;
+        // }
+
+        // Test reset I2C
+        bsp_i2c1_deinit();
+
+        // Wait 1000ms
+        HAL_Delay(1000);
+
+        // Reinit I2C 
+        bsp_i2c1_init();
+
+        // Init sensor
+        drv_imu_init();
+        drv_magnetic_init();
     }
 
     // Get imu data
@@ -128,29 +141,29 @@ base_status_t sensor_manager_task(void)
     if (HAL_GetTick() - tick > 100)
     {
         tick = HAL_GetTick();
-        switch (count)
-        {
-        case 0:
-            printf("%0.2f,%0.2f,%0.2f\r\n", -g_imu_data.gxrs, -g_imu_data.gyrs, -g_imu_data.gzrs);
-            break;
-        case 1:
-            printf("%0.2f,%0.2f,%0.2f\r\n", -g_imu_data.axg, -g_imu_data.ayg, -g_imu_data.azg);
-            break;
-        case 2:
-            printf("%0.2f,%0.2f,%0.2f\r\n", g_magnetic_data.XAxis, g_magnetic_data.YAxis, g_magnetic_data.ZAxis);
-            break;
-        case 3:
-            printf("%0.2f,%0.2f,%0.2f\r\n", roll, pitch, yaw);
-            break;
-        case 4:
+        // switch (count)
+        // {
+        // case 0:
+        //     printf("%0.2f,%0.2f,%0.2f\r\n", -g_imu_data.gxrs, -g_imu_data.gyrs, -g_imu_data.gzrs);
+        //     break;
+        // case 1:
+        //     printf("%0.2f,%0.2f,%0.2f\r\n", -g_imu_data.axg, -g_imu_data.ayg, -g_imu_data.azg);
+        //     break;
+        // case 2:
+        //     printf("%0.2f,%0.2f,%0.2f\r\n", g_magnetic_data.XAxis, g_magnetic_data.YAxis, g_magnetic_data.ZAxis);
+        //     break;
+        // case 3:
+        //     printf("%0.2f,%0.2f,%0.2f\r\n", roll, pitch, yaw);
+        //     break;
+        // case 4:
             printf("%0.2f,%0.2f,%0.2f\r\n", x_pos, y_pos, z_pos);
-            break;
-        case 5:
-            printf("%0.2f,%0.2f,%0.2f\r\n", adc_low_pass, (float)adc_value[adc_sample_count], elbow_angle*57.296f);
-            break;
-        default:
-            break;
-        }
+            // break;
+        // case 5:
+        //     printf("%0.2f,%0.2f,%0.2f\r\n", adc_low_pass, (float)adc_value[adc_sample_count], elbow_angle*57.296f);
+        //     break;
+        // default:
+        //     break;
+        // }
     }
 }
 
