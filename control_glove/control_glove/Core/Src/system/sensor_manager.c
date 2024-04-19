@@ -13,6 +13,7 @@
 #include "drv_imu.h"
 #include "drv_magnetic.h"
 #include "drv_button.h"
+#include "drv_uart.h"
 
 #include "bsp_timer.h"
 #include "bsp_adc.h"
@@ -60,11 +61,11 @@ base_status_t sensor_manager_task(void)
     drv_button_check_event(&g_button_state);
     if (g_button_state == CLICK_SELECT_BUTTON)
     {
-        count++;
-        if (count == 6)
-        {
-            count = 0;
-        }
+        // count++;
+        // if (count == 6)
+        // {
+        //     count = 0;
+        // }
     }
 
     // Get imu data
@@ -113,48 +114,52 @@ base_status_t sensor_manager_task(void)
                         g_imu_data.axg, g_imu_data.ayg, g_imu_data.azg, 
                         -g_magnetic_data.XAxis, -g_magnetic_data.YAxis, -g_magnetic_data.ZAxis);
 
-    // Caculate Euler to test
-    float pitch, roll, yaw;
-    glv_convert_euler_angle(q0, q1, q2, q3, &pitch, &roll, &yaw);
+    // // Caculate Euler to test
+    // float pitch, roll, yaw;
+    // glv_convert_euler_angle(q0, q1, q2, q3, &pitch, &roll, &yaw);
 
-    // Caculate kinematic
-    float x_pos, y_pos, z_pos;
-    glv_pos_convert(q0, q1, q2, q3, elbow_angle, &x_pos, &y_pos, &z_pos);
+    // // Caculate kinematic
+    // float x_pos, y_pos, z_pos;
+    // glv_pos_convert(q0, q1, q2, q3, elbow_angle, &x_pos, &y_pos, &z_pos);
 
     // Printf
     // printf("%0.2f,%0.2f,%0.2f\r\n", roll, pitch, yaw);
 
     static uint32_t tick = 0;
-    if (HAL_GetTick() - tick > 100)
+    if (HAL_GetTick() - tick > 1000)
     {
         tick = HAL_GetTick();
-        switch (count)
-        {
-        case 0:
-            printf("%0.2f,%0.2f,%0.2f\r\n", -g_imu_data.gxrs, -g_imu_data.gyrs, -g_imu_data.gzrs);
-            break;
-        case 1:
-            printf("%0.2f,%0.2f,%0.2f\r\n", -g_imu_data.axg, -g_imu_data.ayg, -g_imu_data.azg);
-            break;
-        case 2:
-            printf("%0.2f,%0.2f,%0.2f\r\n", g_magnetic_data.XAxis, g_magnetic_data.YAxis, g_magnetic_data.ZAxis);
-            break;
-        case 3:
-            printf("%0.2f,%0.2f,%0.2f\r\n", roll, pitch, yaw);
-            break;
-        case 4:
-            printf("%0.2f,%0.2f,%0.2f\r\n", x_pos, y_pos, z_pos);
-            break;
-        case 5:
-            printf("%0.2f,%0.2f,%0.2f\r\n", adc_low_pass, (float)adc_value[adc_sample_count], elbow_angle*57.296f);
-            break;
-        default:
-            break;
-        }
+
+        uint8_t send_data[10] = {0};
+        glv_encrypt_sensor_data(q0, q1, q2, q3, elbow_angle, send_data);
+
+        drv_uart_send_data(send_data, 10);
+
+        // switch (count)
+        // {
+        // case 0:
+        //     printf("%0.2f,%0.2f,%0.2f\r\n", -g_imu_data.gxrs, -g_imu_data.gyrs, -g_imu_data.gzrs);
+        //     break;
+        // case 1:
+        //     printf("%0.2f,%0.2f,%0.2f\r\n", -g_imu_data.axg, -g_imu_data.ayg, -g_imu_data.azg);
+        //     break;
+        // case 2:
+        //     printf("%0.2f,%0.2f,%0.2f\r\n", g_magnetic_data.XAxis, g_magnetic_data.YAxis, g_magnetic_data.ZAxis);
+        //     break;
+        // case 3:
+        //     printf("%0.2f,%0.2f,%0.2f\r\n", roll, pitch, yaw);
+        //     break;
+        // case 4:
+        //     printf("%0.2f,%0.2f,%0.2f\r\n", x_pos, y_pos, z_pos);
+        //     break;
+        // case 5:
+        //     printf("%0.2f,%0.2f,%0.2f\r\n", adc_low_pass, (float)adc_value[adc_sample_count], elbow_angle*57.296f);
+        //     break;
+        // default:
+        //     break;
+        // }
     }
 }
 
 /* Private implementations -------------------------------------------------- */
-
-
 /* End of file -------------------------------------------------------------- */

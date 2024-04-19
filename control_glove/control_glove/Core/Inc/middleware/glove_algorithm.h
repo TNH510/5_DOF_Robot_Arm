@@ -30,6 +30,9 @@ void glv_convert_euler_angle(float q0, float q1, float q2, float q3,
 void glv_pos_convert(float q0, float q1, float q2, float q3, float elbow_angle, 
                               float *x_pos, float *y_pos, float *z_pos);
 
+void glv_encrypt_sensor_data(float q0, float q1, float q2, float q3, 
+                             float elbow_angle, uint8_t *data);
+                             
 float low_pass_filter(float input, float pre_output, float alpha);
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus

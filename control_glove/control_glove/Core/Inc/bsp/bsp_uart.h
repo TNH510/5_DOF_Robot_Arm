@@ -87,6 +87,8 @@ void bsp_uart_deinit_peripheral(void);
  */
 void bsp_uart_printf_len(UART_HandleTypeDef *huart, uint8_t *string, uint16_t len);
 
+void bsp_uart_send_data(UART_HandleTypeDef *huart, uint8_t *data, uint16_t len);
+
 #endif
 
 /* End of file -------------------------------------------------------- */
