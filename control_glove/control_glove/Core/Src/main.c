@@ -119,7 +119,7 @@ int main(void)
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
   system_manager_init();
-  bsp_mpu6050_calib();
+  // bsp_mpu6050_calib();
   /* USER CODE END 2 */
 
   /* Infinite loop */

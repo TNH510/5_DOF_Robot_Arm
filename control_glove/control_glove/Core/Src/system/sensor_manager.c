@@ -57,7 +57,7 @@ base_status_t sensor_manager_init(void)
 base_status_t sensor_manager_task(void)
 {
     // Check event button
-    static count = 0;
+    static count = 4;
     drv_button_check_event(&g_button_state);
     if (g_button_state == CLICK_SELECT_BUTTON)
     {
@@ -117,7 +117,7 @@ base_status_t sensor_manager_task(void)
     }
 
     // Caculate elbow angle
-    float elbow_angle = adc_avr_value * 0.0013189f; 
+    float elbow_angle = adc_avr_value * 0.0013189f - 1.1519173f; 
 
     // Get sample freq 
     bsp_timer_tick_stop(&g_freq);
@@ -133,12 +133,10 @@ base_status_t sensor_manager_task(void)
     float pitch, roll, yaw;
     glv_convert_euler_angle(q0, q1, q2, q3, &pitch, &roll, &yaw);
 
-    // // Caculate kinematic
-    // float x_pos, y_pos, z_pos;
-    // glv_pos_convert(q0, q1, q2, q3, elbow_angle, &x_pos, &y_pos, &z_pos);
-
-    // Printf
-    // printf("%0.2f,%0.2f,%0.2f\r\n", roll, pitch, yaw);
+    // Caculate kinematic
+    float x_pos, y_pos, z_pos;
+    glv_pos_convert(q0, q1, q2, q3, elbow_angle, &x_pos, &y_pos, &z_pos);
+    // glv_pos_shoulder_convert(q0, q1, q2, q3, &x_pos, &y_pos, &z_pos);
 
     static uint32_t tick = 0;
     if (HAL_GetTick() - tick > 100)
@@ -164,9 +162,9 @@ base_status_t sensor_manager_task(void)
         case 3:
             printf("%0.2f,%0.2f,%0.2f\r\n", pitch, roll, yaw);
             break;
-        // case 4:
-            // printf("%0.2f,%0.2f,%0.2f\r\n", x_pos, y_pos, z_pos);
-            // break;
+        case 4:
+            printf("%0.2f,%0.2f,%0.2f\r\n", x_pos, y_pos, z_pos);
+            break;
         case 5:
             printf("%0.2f,%0.2f,%0.2f\r\n", adc_low_pass, (float)adc_value[adc_sample_count], elbow_angle*57.296f);
             break;
