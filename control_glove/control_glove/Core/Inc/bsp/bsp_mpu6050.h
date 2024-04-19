@@ -26,6 +26,7 @@ extern "C" {
 /* Public APIs -------------------------------------------------------------- */
 base_status_t bsp_mpu6050_get_data(float *gxrs, float *gyrs, float *gzrs, float *axg, float *ayg, float *azg);
 base_status_t bsp_mpu6050_init(void);
+base_status_t bsp_mpu6050_calib(void);
 
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus

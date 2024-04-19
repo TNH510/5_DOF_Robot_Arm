@@ -402,9 +402,9 @@ References:
 #define MPU6050_DMP_MEMORY_CHUNK_SIZE         16
 
 // Transform raw data of accelerometer & gyroscope
-#define MPU6050_AXOFFSET 250
-#define MPU6050_AYOFFSET 23
-#define MPU6050_AZOFFSET -204
+#define MPU6050_AXOFFSET                      145
+#define MPU6050_AYOFFSET                      111
+#define MPU6050_AZOFFSET                      -217
 // #define MPU6050_AXOFFSET 0
 // #define MPU6050_AYOFFSET 0
 // #define MPU6050_AZOFFSET 0
@@ -420,9 +420,9 @@ References:
 // #define MPU6050_AXGAIN 2048.0 // AFS_SEL = 3, +/-16g, MPU6050_ACCEL_FS_16
 // #define MPU6050_AYGAIN 2048.0 // AFS_SEL = 3, +/-16g, MPU6050_ACCEL_FS_16
 // #define MPU6050_AZGAIN 2048.0 // AFS_SEL = 3, +/-16g, MPU6050_ACCEL_FS_16
-#define MPU6050_GXOFFSET -27
-#define MPU6050_GYOFFSET -3
-#define MPU6050_GZOFFSET -32
+#define MPU6050_GXOFFSET                      -25
+#define MPU6050_GYOFFSET                      -3
+#define MPU6050_GZOFFSET                      -30
 // #define MPU6050_GXOFFSET 0
 // #define MPU6050_GYOFFSET 0
 // #define MPU6050_GZOFFSET 0
@@ -456,7 +456,7 @@ base_status_t bsp_mpu6050_init(void)
               0x01);    // Selection Clock 'PLL with X axis gyroscope reference'
 
     // MPU6050 Set sample rate = gyroscope output rate/(1 + SMPLRT_DIV) for DMP
-    writeByte(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_SMPLRT_DIV, 0x00); // Default is 1KHz // example 0x04 is 200Hz
+    writeByte(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_SMPLRT_DIV, 0x00);    // Default is 1KHz // example 0x04 is 200Hz
 
     // MPU6050 Gyroscope Configuration Setting
     /* Wire.write(0x00); // FS_SEL=0, Full Scale Range = +/- 250 [degree/sec]
@@ -470,7 +470,7 @@ base_status_t bsp_mpu6050_init(void)
        Wire.write(0x08); // AFS_SEL=1, Full Scale Range = +/- 4 [g]
        Wire.write(0x10); // AFS_SEL=2, Full Scale Range = +/- 8 [g]
        Wire.write(0x18); // AFS_SEL=3, Full Scale Range = +/- 10 [g] */
-    writeByte(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_ACCEL_CONFIG, 0x18);    // AFS_SEL=3
+    writeByte(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_ACCEL_CONFIG, 0x10);    // AFS_SEL=2
 
     // MPU6050 DLPF(Digital Low Pass Filter)
     /*Wire.write(0x00);     // Accel BW 260Hz, Delay 0ms / Gyro BW 256Hz, Delay 0.98ms, Fs 8KHz
@@ -481,7 +481,7 @@ base_status_t bsp_mpu6050_init(void)
       Wire.write(0x05);     // Accel BW 10Hz, Delay 13.8ms / Gyro BW 10Hz, Delay 13.4ms, Fs 1KHz
       Wire.write(0x06);     // Accel BW 5Hz, Delay 19ms / Gyro BW 5Hz, Delay 18.6ms, Fs 1KHz */
     writeByte(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_CONFIG,
-              0x06);    // Accel BW 21Hz, Delay 8.5ms / Gyro BW 20Hz, Delay 8.3ms, Fs 1KHz
+              0x00);    //  Accel BW 260Hz, Delay 0ms / Gyro BW 256Hz, Delay 0.98ms, Fs 8KHz
 
     return BS_OK;
 }
@@ -499,13 +499,78 @@ base_status_t bsp_mpu6050_get_data(float *gxrs, float *gyrs, float *gzrs, float 
     GyY = data_org[10] << 8 | data_org[11];    // 0x45 (GYRO_YOUT_H) & 0x46 (GYRO_YOUT_L)
     GyZ = data_org[12] << 8 | data_org[13];    // 0x47 (GYRO_ZOUT_H) & 0x48 (GYRO_ZOUT_L)
 
-	*axg  = (float) (AcX - MPU6050_AXOFFSET) / MPU6050_AXGAIN;
+    *axg  = (float) (AcX - MPU6050_AXOFFSET) / MPU6050_AXGAIN;
     *ayg  = (float) (AcY - MPU6050_AYOFFSET) / MPU6050_AYGAIN;
     *azg  = (float) (AcZ - MPU6050_AZOFFSET) / MPU6050_AZGAIN;
     *gxrs = (float) (GyX - MPU6050_GXOFFSET) / MPU6050_GXGAIN * 0.01745329;    // degree to radians
     *gyrs = (float) (GyY - MPU6050_GYOFFSET) / MPU6050_GYGAIN * 0.01745329;    // degree to radians
     *gzrs = (float) (GyZ - MPU6050_GZOFFSET) / MPU6050_GZGAIN * 0.01745329;    // degree to radians
     // Degree to Radians Pi / 180 = 0.01745329 0.01745329251994329576923690768489
+}
+
+base_status_t bsp_mpu6050_calib(void)
+{
+    int16_t   AcX, AcY, AcZ, Tmp, GyX, GyY, GyZ;
+    int32_t   Cal_AcX = 0, Cal_AcY = 0, Cal_AcZ = 0,
+    		  Cal_Tmp = 0, Cal_GyX = 0, Cal_GyY = 0,
+			  Cal_GyZ = 0;
+
+    for (int i = 0; i < 3000; i++)
+    {
+        if (i % 200 == 0)
+        {
+            printf("Calculating .....\r\n");
+            printf("AcX = %d\r\n", AcX);
+            printf("AcY = %d\r\n", AcY);
+            printf("AcZ = %d\r\n", AcZ);
+
+            printf("GyX = %d\r\n", GyX);
+            printf("GyY = %d\r\n", GyY);
+            printf("GyZ = %d\r\n", GyZ);
+        }        
+
+        if (i >= 1000)    
+        {
+            uint8_t data_org[14];    // original data of accelerometer and gyro
+            readBytes(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_ACCEL_XOUT_H, 14, &data_org[0]);
+
+            AcX = data_org[0] << 8 | data_org[1];      // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)
+            AcY = data_org[2] << 8 | data_org[3];      // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
+            AcZ = (data_org[4] << 8 | data_org[5]) - 4096;      // 0x3F (ACCEL_ZOUT_H) & 0x40 (ACCEL_ZOUT_L)
+            Tmp = data_org[6] << 8 | data_org[7];      // 0x41 (TEMP_OUT_H) & 0x42 (TEMP_OUT_L)
+            GyX = data_org[8] << 8 | data_org[9];      // 0x43 (GYRO_XOUT_H) & 0x44 (GYRO_XOUT_L)
+            GyY = data_org[10] << 8 | data_org[11];    // 0x45 (GYRO_YOUT_H) & 0x46 (GYRO_YOUT_L)
+            GyZ = data_org[12] << 8 | data_org[13];    // 0x47 (GYRO_ZOUT_H) & 0x48 (GYRO_ZOUT_L)
+
+            HAL_Delay(10);
+
+            // Sum data
+            Cal_AcX += AcX;
+            Cal_AcY += AcY;
+            Cal_AcZ += AcZ;
+            Cal_GyX += GyX;
+            Cal_GyY += GyY;
+            Cal_GyZ += GyZ;
+        }
+    }
+
+    // Average Data
+    Cal_AcX = Cal_AcX / 2000;
+    Cal_AcY = Cal_AcY / 2000;
+    Cal_AcZ = Cal_AcZ / 2000;
+    Cal_GyX = Cal_GyX / 2000;
+    Cal_GyY = Cal_GyY / 2000;
+    Cal_GyZ = Cal_GyZ / 2000;
+
+    // Print Data
+    printf("End of Calculation\r\n");
+    printf("AcX = %d\r\n", Cal_AcX);
+    printf("AcY = %d\r\n", Cal_AcY);
+    printf("AcZ = %d\r\n", Cal_AcZ);
+
+    printf("GyX = %d\r\n", Cal_GyX);
+    printf("GyX = %d\r\n", Cal_GyY);
+    printf("GyX = %d\r\n", Cal_GyZ);
 }
 
 /*---------------------------------------------------*/
