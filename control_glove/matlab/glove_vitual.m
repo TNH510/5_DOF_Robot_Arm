@@ -3,8 +3,14 @@ s = serial('COM20');
 set(s, 'BaudRate', 115200); 
 fopen(s); 
 
+t = 0.0;
+tic;
+
 while true
-    pause(0.1);
+    pause(0.00001);
+    dt = toc;
+    t = t + dt;
+    tic;
 
     % Check data in UART
     if s.BytesAvailable >= 10
@@ -61,11 +67,40 @@ while true
 
         elbow = bitor(bitshift(byte_9, 8), byte_10) / 10; % rad
 
-        q0
-        q1
-        q2
-        q3
-        elbow
+        % q0
+        % q1
+        % q2
+        % q3
+        % elbow
+
+        % Plot data
+        % subplot(2,2,1);
+        plot(t,q0,'.r'); xlabel('Time (s)'); ylabel('q0'); title('Graph of q0');
+        plot(t,q1,'.b'); xlabel('Time (s)'); ylabel('q1'); title('Graph of q1');
+        plot(t,q2,'.g'); xlabel('Time (s)'); ylabel('q2'); title('Graph of q2');
+        plot(t,q3,'.r'); xlabel('Time (s)'); ylabel('q3'); title('Graph of q3');
+        xlim([t-10, t]); 
+        hold on
+        grid on
+
+        % subplot(2,2,2);
+        % plot(t,q1,'.b'); xlabel('Time (s)'); ylabel('q1'); title('Graph of q1');
+        % xlim([t-10, t]); 
+        % hold on
+        % grid on
+
+        % subplot(2,2,3);
+        % plot(t,q2,'.g'); xlabel('Time (s)'); ylabel('q2'); title('Graph of q2');
+        % xlim([t-10, t]); 
+        % hold on
+        % grid on
+
+        % subplot(2,2,4);
+        % plot(t,q3,'.r'); xlabel('Time (s)'); ylabel('q3'); title('Graph of q3');
+        % xlim([t-10, t]); 
+        % hold on
+        % grid on
+
     end
 end
 fclose(s);

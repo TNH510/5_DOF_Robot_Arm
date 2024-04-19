@@ -126,7 +126,7 @@ base_status_t sensor_manager_task(void)
     // printf("%0.2f,%0.2f,%0.2f\r\n", roll, pitch, yaw);
 
     static uint32_t tick = 0;
-    if (HAL_GetTick() - tick > 1000)
+    if (HAL_GetTick() - tick > 50)
     {
         tick = HAL_GetTick();
 
