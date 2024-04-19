@@ -66,7 +66,20 @@ base_status_t sensor_manager_task(void)
         // {
         //     count = 0;
         // }
+
+        // Test reset I2C
+        bsp_i2c1_deinit();
+
+        // Wait 1000ms
+        HAL_Delay(1000);
+
+        // Reinit I2C 
+        bsp_i2c1_init();
     }
+
+    // Init sensor
+    drv_imu_init();
+    drv_magnetic_init();
 
     // Get imu data
     drv_imu_get_data(&g_imu_data);  
