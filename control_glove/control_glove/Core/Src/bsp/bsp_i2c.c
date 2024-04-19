@@ -61,6 +61,29 @@ i2c_mem_dma_rx_cplt_callback_t i2c3_mem_dma_rx_cplt_callback = NULL;
 /* Function definitions ----------------------------------------------- */
 
 #if BSP_I2C1 == 1
+void bsp_i2c1_deinit(void)
+{
+  HAL_I2C_DeInit(&hi2c1);
+}
+
+void bsp_i2c1_init(void)
+{
+  hi2c1.Instance = I2C1;
+  hi2c1.Init.ClockSpeed = 100000;
+  hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
+  hi2c1.Init.OwnAddress1 = 0;
+  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c1.Init.OwnAddress2 = 0;
+  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
+
 bool bsp_i2c1_is_device_ready(uint8_t address_device)
 {
   return (HAL_I2C_IsDeviceReady(&hi2c1, address_device, 5, BSP_I2C_TIMEOUT) == HAL_ERROR) ? false : true;

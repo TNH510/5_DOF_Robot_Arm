@@ -38,6 +38,8 @@ typedef enum
  */
 drv_uart_error_t drv_uart_init(void);
 
+drv_uart_error_t drv_uart_send_data(uint8_t *data, uint16_t len);
+
 /**
  * @brief Print string via COM
  * 

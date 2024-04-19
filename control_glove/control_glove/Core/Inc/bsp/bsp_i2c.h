@@ -35,6 +35,9 @@
 /* Public function prototypes ----------------------------------------- */
 
 #ifdef BSP_I2C1
+void bsp_i2c1_deinit(void);
+void bsp_i2c1_init(void);
+
 /**
  * @brief Check I2C busy or not
  *

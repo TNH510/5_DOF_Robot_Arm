@@ -119,6 +119,7 @@ int main(void)
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
   system_manager_init();
+  // bsp_mpu6050_calib();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -127,6 +128,7 @@ int main(void)
   {
     /* USER CODE END WHILE */
     system_manager_task();
+    
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -409,7 +411,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(USER_LED_GPIO_Port, USER_LED_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(SET_UART_GPIO_Port, SET_UART_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(SET_UART_GPIO_Port, SET_UART_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, LED_RED_Pin|LED_GREEN_Pin, GPIO_PIN_RESET);
@@ -436,7 +438,7 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin : SET_UART_Pin */
   GPIO_InitStruct.Pin = SET_UART_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(SET_UART_GPIO_Port, &GPIO_InitStruct);
 

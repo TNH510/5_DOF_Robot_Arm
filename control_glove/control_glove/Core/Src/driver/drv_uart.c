@@ -36,6 +36,11 @@ drv_uart_error_t drv_uart_init(void)
     return DRV_UART_OK;
 }
 
+drv_uart_error_t drv_uart_send_data(uint8_t *data, uint16_t len)
+{
+    bsp_uart_send_data(&huart1, data, len);
+}
+
 drv_uart_error_t drv_uart_printf(uint8_t *string)
 {
     bsp_uart_printf(&huart1, string);
