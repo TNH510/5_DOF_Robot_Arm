@@ -59,7 +59,7 @@
             // picture2
             // 
             this.picture2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.picture2.Location = new System.Drawing.Point(326, 22);
+            this.picture2.Location = new System.Drawing.Point(316, 327);
             this.picture2.Name = "picture2";
             this.picture2.Size = new System.Drawing.Size(265, 299);
             this.picture2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -68,7 +68,7 @@
             // 
             // open
             // 
-            this.open.Location = new System.Drawing.Point(651, 263);
+            this.open.Location = new System.Drawing.Point(622, 162);
             this.open.Name = "open";
             this.open.Size = new System.Drawing.Size(163, 71);
             this.open.TabIndex = 1;
@@ -78,7 +78,7 @@
             // 
             // process
             // 
-            this.process.Location = new System.Drawing.Point(651, 354);
+            this.process.Location = new System.Drawing.Point(622, 253);
             this.process.Name = "process";
             this.process.Size = new System.Drawing.Size(163, 71);
             this.process.TabIndex = 1;
@@ -88,7 +88,7 @@
             // 
             // high
             // 
-            this.high.Location = new System.Drawing.Point(648, 69);
+            this.high.Location = new System.Drawing.Point(619, 42);
             this.high.Name = "high";
             this.high.Size = new System.Drawing.Size(163, 22);
             this.high.TabIndex = 2;
@@ -96,7 +96,7 @@
             // 
             // low
             // 
-            this.low.Location = new System.Drawing.Point(648, 126);
+            this.low.Location = new System.Drawing.Point(619, 88);
             this.low.Name = "low";
             this.low.Size = new System.Drawing.Size(163, 22);
             this.low.TabIndex = 2;
@@ -104,7 +104,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(648, 50);
+            this.label3.Location = new System.Drawing.Point(619, 23);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(108, 16);
             this.label3.TabIndex = 3;
@@ -113,7 +113,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(648, 107);
+            this.label4.Location = new System.Drawing.Point(619, 69);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(103, 16);
             this.label4.TabIndex = 3;
@@ -122,16 +122,16 @@
             // picture3
             // 
             this.picture3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.picture3.Location = new System.Drawing.Point(326, 327);
+            this.picture3.Location = new System.Drawing.Point(316, 23);
             this.picture3.Name = "picture3";
-            this.picture3.Size = new System.Drawing.Size(265, 270);
+            this.picture3.Size = new System.Drawing.Size(265, 298);
             this.picture3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.picture3.TabIndex = 0;
             this.picture3.TabStop = false;
             // 
             // text1
             // 
-            this.text1.Location = new System.Drawing.Point(648, 198);
+            this.text1.Location = new System.Drawing.Point(619, 134);
             this.text1.Name = "text1";
             this.text1.Size = new System.Drawing.Size(163, 22);
             this.text1.TabIndex = 2;
@@ -139,7 +139,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(648, 179);
+            this.label5.Location = new System.Drawing.Point(619, 115);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(70, 16);
             this.label5.TabIndex = 3;
@@ -150,14 +150,14 @@
             this.picture4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.picture4.Location = new System.Drawing.Point(22, 327);
             this.picture4.Name = "picture4";
-            this.picture4.Size = new System.Drawing.Size(288, 270);
+            this.picture4.Size = new System.Drawing.Size(288, 299);
             this.picture4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.picture4.TabIndex = 0;
             this.picture4.TabStop = false;
             // 
             // Form1
             // 
-            this.ClientSize = new System.Drawing.Size(862, 621);
+            this.ClientSize = new System.Drawing.Size(818, 633);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);

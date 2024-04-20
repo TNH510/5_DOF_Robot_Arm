@@ -1,19 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
-using System.Linq;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
-using System.Web.UI.WebControls;
 using System.Windows.Forms;
-using System.Windows.Forms.VisualStyles;
-using static System.Net.Mime.MediaTypeNames;
 
 
 namespace WindowsFormsApp2
@@ -26,6 +14,7 @@ namespace WindowsFormsApp2
             InitializeComponent();
 
         }
+        
         class EdgeDetection
         {
             public static int[,] RGB2Gray(Bitmap ColorImage)
@@ -360,7 +349,11 @@ namespace WindowsFormsApp2
                                 double radian = (theta * Math.PI) / 180.0;
                                 int rho = (int)(x * Math.Cos(radian) + y * Math.Sin(radian));
                                 rho += diagonalLength; // Dịch chuyển rho để không có giá trị âm
-                                houghMatrix[theta, rho]++;
+                                houghMatrix[theta, rho]= houghMatrix[theta,rho] + 1;
+                                if(houghMatrix[theta, rho]>255)
+                                {
+                                    houghMatrix[theta, rho] = 255;
+                                }    
 
                             }
                         }
@@ -369,67 +362,187 @@ namespace WindowsFormsApp2
 
                 return houghMatrix;
             }
-            public static Bitmap DrawingEdges(int[,] HoughMatrix, Bitmap Gray_Image)
+            public static int[,] DrawLines(int[,] houghMatrix, int threshold, int width, int height)
             {
-                int width = HoughMatrix.GetLength(0);
-                int height = HoughMatrix.GetLength(1);
-                for (int theta = 0; theta < width; theta++)
+                int diagonal = (int)Math.Sqrt(width * width + height * height); // Đường chéo của ảnh
+
+                int[,] resultImage = new int[width, height];
+                int count = 0;
+                int[,] theta_rho = new int[100, 3];
+                int[,] result = new int [10, 3];
+                // Duyệt qua ma trận Hough
+                for (int theta = 0; theta < 180; theta++)
                 {
-                    for (int rho = 0; rho < height; rho++)
+                    for (int rho = 0; rho < 2 * diagonal; rho++)
                     {
-                        if (HoughMatrix[theta, rho] > 70)
+                        if (houghMatrix[theta, rho] >= threshold)//giảm dần
                         {
-                            for (int x = 0; x < Gray_Image.Width; x++)
+                            //// lấy toàn bộ số điểm vượt ngưỡng 
+                            theta_rho[count, 0] = theta;
+                            theta_rho[count, 1] = rho;
+                            theta_rho[count, 2] = 0;
+                            count++;
+                            ////vẽ đường thẳng
+                            //double radianTheta = theta * Math.PI / 180;
+                            //if (theta >= 45 && theta < 135)
+                            //{
+                            //    for (int x = 0; x < width; x++)
+                            //    {
+                            //        int y = (int)(((rho - diagonal) - x * Math.Cos(radianTheta)) / Math.Sin(radianTheta));
+                            //        if (y >= 0 && y < height)
+                            //        {
+                            //            resultImage[x, y] = 255;
+                            //            //if (resultImage[x, y] == 0)
+                            //            //{
+                            //            //    resultImage[x, y] = 255;
+                            //            //}
+                            //            //else if (resultImage[x, y] == 255)
+                            //            //{
+                            //            //    resultImage[x, y] = 10;
+                            //            //}
+                            //            //else if (resultImage[x, y] == 10)
+                            //            //{
+                            //            //    //DO NOTHING
+                            //            //}
+                            //        }
+                            //    }
+                            //}
+                            //else
+                            //{
+                            //    for (int y = 0; y < height; y++)
+                            //    {
+                            //        int x = (int)(((rho - diagonal) - y * Math.Sin(radianTheta)) / Math.Cos(radianTheta));
+                            //        if (x >= 0 && x < width)
+                            //        {
+                            //            resultImage[x, y] = 255;
+                            //            //if (resultImage[x, y] == 0)
+                            //            //{
+                            //            //    resultImage[x, y] = 255;
+                            //            //}
+                            //            //else if (resultImage[x, y] == 255)
+                            //            //{
+                            //            //    resultImage[x, y] = 10;
+                            //            //}
+                            //            //else if (resultImage[x, y] == 10)
+                            //            //{
+                            //            //    //DO NOTHING
+                            //            //}
+                            //        }
+                            //    }
+                            //}
+                            ////
+                        }
+                    }
+                }
+                //phân loại đường thẳng 
+                int delta_a = 0;
+                int delta_p = 0;
+                int delta_a_threshold = 5;
+                int delta_p_threshold = 20;
+                int nhom = 10;
+                //int[,] phanloai = new int[count, 2];
+                
+                int[,,] ketqua = new int [count,2,nhom];
+
+                for (int i = 0; i < nhom; i++)
+                {
+                    int index = 0;
+                    
+                    //lấy số chuẩn
+                    for (int j = 0; j < count; j++)
+                    {
+                        if (theta_rho[j, 2] == 0)
+                        {
+                            ketqua[index, 0, i] = theta_rho[j, 0];
+                            ketqua[index, 1, i] = theta_rho[j, 1];
+                            theta_rho[j, 2] = 1;
+                            index++;
+                            j = count;//thoát vòng lặp
+                        }
+                    }
+                    //phân nhóm
+                    for (int j = 0; j < count; j++)
+                    {
+                        if (theta_rho[j, 2] == 0)
+                        {
+                            delta_a = Math.Abs(ketqua[0, 0, i] - theta_rho[j, 0]);
+                            delta_p = Math.Abs(ketqua[0, 1, i] - theta_rho[j, 1]);
+                            if (((delta_a < delta_a_threshold) || (delta_a > 180 - delta_a_threshold)) && (delta_p < delta_p_threshold))
                             {
-                                double theta_radian = theta * Math.PI / 180;
-                                double y = rho / Math.Cos(theta_radian) - (x - Gray_Image.Width / 2) * Math.Tan(theta_radian);
-                                if (y >= 0 && y < Gray_Image.Height)
+                                ketqua[index, 0, i] = theta_rho[j, 0];
+                                ketqua[index, 1, i] = theta_rho[j, 1];
+                                theta_rho[j, 2] = 1;
+                                index++;
+                            }
+                        }
+                    }
+                    //tìm đường trung bình trong các nhóm
+                    int avr_theta1 = 0;
+                    int avr_rho1 = 0;
+                    if( index!= 0)
+                    {
+                        for (int j = 0; j < index; j++)
+                        {
+                            avr_theta1 = (avr_theta1 + ketqua[j, 0, i]);
+                            avr_rho1 = (avr_rho1 + ketqua[j, 1, i]);
+                        }
+                        int avr_theta = avr_theta1 / (index);
+                        int avr_rho = avr_rho1 / (index);
+                        //vẽ đường thẳng
+                        double radianTheta = avr_theta * Math.PI / 180;
+                        if (avr_theta >= 45 && avr_theta < 135)
+                        {
+                            for (int x = 0; x < width; x++)
+                            {
+                                int y = (int)(((avr_rho - diagonal) - x * Math.Cos(radianTheta)) / Math.Sin(radianTheta));
+                                if (y >= 0 && y < height)
                                 {
-                                    Gray_Image.SetPixel(x, (int)y, Color.Red);
+                                    resultImage[x, y] = 255;
                                 }
                             }
-
                         }
-
-                    }
-                }
-                return Gray_Image;
-            }
-            public static int[,] ComputeHoughMatrix(int[,] edgeMatrix)
-            {
-                int width = edgeMatrix.GetLength(1);
-                int height = edgeMatrix.GetLength(0);
-                int diagonal = (int)Math.Sqrt(width * width + height * height); // Đường chéo của ảnh
-
-                // Khởi tạo ma trận Hough
-                int[,] houghMatrix = new int[180, 2 * diagonal];
-
-                // Duyệt qua từng điểm cạnh trong ma trận cạnh
-                for (int y = 0; y < height; y++)
-                {
-                    for (int x = 0; x < width; x++)
-                    {
-                        if (edgeMatrix[y, x] == 255) // Kiểm tra nếu điểm là điểm cạnh
+                        else
                         {
-                            // Duyệt qua mọi giá trị của theta (0-179)
-                            for (int theta = 0; theta < 180; theta++)
+                            for (int y = 0; y < height; y++)
                             {
-                                double radianTheta = theta * Math.PI / 180;
-                                int rho = (int)(x * Math.Cos(radianTheta) + y * Math.Sin(radianTheta));
-                                houghMatrix[theta, rho + diagonal]++;
+                                int x = (int)(((avr_rho - diagonal) - y * Math.Sin(radianTheta)) / Math.Cos(radianTheta));
+                                if (x >= 0 && x < width)
+                                {
+                                    resultImage[x, y] = 255;
+                                }
                             }
                         }
+                        //
                     }
+
                 }
 
-                return houghMatrix;
+                return resultImage;
             }
-            public static Bitmap DrawLines(int[,] houghMatrix, int threshold, int width, int height)
+            public static int[,] CheckPoint(int[,]line )
+            {
+                int[,] PointMap = new int[line.GetLength(0), line.GetLength(1)];
+                
+                for (int i =0; i<line.GetLength(0);i++)
+                {
+                    for (int j =0;j<line.GetLength(1);j++)
+                    {
+                        if (line[i,j]==10)
+                        {
+                            PointMap[i,j] = 255;
+                        }    
+                    }    
+                }    
+
+                return PointMap;
+            }
+            public static int[,] DrawLines2(int[,] houghMatrix, int threshold, int width, int height)
             {
                 int diagonal = (int)Math.Sqrt(width * width + height * height); // Đường chéo của ảnh
 
-                Bitmap resultImage = new Bitmap(width, height);
+                int[,] resultImage = new int[width, height];
 
+                
                 // Duyệt qua ma trận Hough
                 for (int theta = 0; theta < 180; theta++)
                 {
@@ -437,31 +550,82 @@ namespace WindowsFormsApp2
                     {
                         if (houghMatrix[theta, rho] >= threshold)
                         {
-                            double radianTheta = theta * Math.PI / 180;
-
-                            if (theta >= 45 && theta < 135)
+                            double sumI = 0;
+                            double sumJ = 0;
+                            int count = 0;
+                            int max_value = 0;
+                            //check các điểm xung quanh
+                            for (int i = theta - 15;i <= theta + 15; i++)
                             {
-                                for (int x = 0; x < width; x++)
+                                for (int j = rho - 15; j <= rho + 15; j++)
                                 {
-                                    int y = (int)(((rho - diagonal) - x * Math.Cos(radianTheta)) / Math.Sin(radianTheta));
-                                    if (y >= 0 && y < height)
+                                    if ((i<180)&&(i>0)&&(j>0)&&(j<2*diagonal))
                                     {
-                                        resultImage.SetPixel(x, y, Color.Red);
-                                    }
-
-                                }
+                                        if(houghMatrix[i, j] >= threshold)
+                                        {
+                                            sumI = sumI + i;
+                                            sumJ = sumJ + j;
+                                            count++;
+                                            if (houghMatrix[i,j]>max_value)
+                                            {
+                                                max_value = houghMatrix[i, j];
+                                            }
+                                            houghMatrix[i, j] = 0;
+                                        }    
+                                    }    
+                                }    
                             }
-                            else
+                            if (count > 0)
                             {
-                                for (int y = 0; y < height; y++)
+                                houghMatrix[(int)sumI / count, (int)sumJ / count] = max_value;
+                                //vẽ đường thẳng
+                                double radianTheta = ((int)sumI / count) * Math.PI / 180;
+                                rho = (int)sumJ / count;
+                                if (((int)sumI / count) >= 45 && ((int)sumI / count) < 135)
                                 {
-                                    int x = (int)(((rho - diagonal) - y * Math.Sin(radianTheta)) / Math.Cos(radianTheta));
-                                    if (x >= 0 && x < width)
+                                    for (int x = 0; x < width; x++)
                                     {
-                                        resultImage.SetPixel(x, y, Color.Red);
+                                        int y = (int)(((rho - diagonal) - x * Math.Cos(radianTheta)) / Math.Sin(radianTheta));
+                                        if (y >= 0 && y < height)
+                                        {
+                                            if (resultImage[x, y] == 0)
+                                            {
+                                                resultImage[x, y] = 255;
+                                            }
+                                            else if (resultImage[x, y] == 255)
+                                            {
+                                                resultImage[x, y] = 10;
+                                            }
+                                            else if (resultImage[x, y] == 10)
+                                            {
+                                                //DO NOTHING
+                                            }
+                                        }
                                     }
-
                                 }
+                                else
+                                {
+                                    for (int y = 0; y < height; y++)
+                                    {
+                                        int x = (int)(((rho - diagonal) - y * Math.Sin(radianTheta)) / Math.Cos(radianTheta));
+                                        if (x >= 0 && x < width)
+                                        {
+                                            if (resultImage[x, y] == 0)
+                                            {
+                                                resultImage[x, y] = 255;
+                                            }
+                                            else if (resultImage[x, y] == 255)
+                                            {
+                                                resultImage[x, y] = 10;
+                                            }
+                                            else if (resultImage[x, y] == 10)
+                                            {
+                                                //DO NOTHING
+                                            }
+                                        }
+                                    }
+                                }
+                                //
                             }
                         }
                     }
@@ -469,6 +633,7 @@ namespace WindowsFormsApp2
 
                 return resultImage;
             }
+
             // Hàm dilation với số lần lặp lại xác định
             public static int[,] Dilation(int[,] image, int iterations)
             {
@@ -625,6 +790,7 @@ namespace WindowsFormsApp2
                 return pixels;
             }
         }
+        
         private void open_Click_1(object sender, EventArgs e)
         {
             // Tạo một OpenFileDialog
@@ -644,7 +810,7 @@ namespace WindowsFormsApp2
                 picture1.Image = image;
             }
         }
-
+        
         private void high_TextChanged(object sender, EventArgs e)
         {
 
@@ -657,27 +823,33 @@ namespace WindowsFormsApp2
                 int high_threshold = Convert.ToInt16(high.Text);//ngưỡng trên cho canny detect
                 int low_threshold = Convert.ToInt16(low.Text);//ngưỡng dưới cho canny detect 
                 int threshold = Convert.ToInt16(text1.Text);  // Ngưỡng để chọn các đỉnh trong ma trận Hough
-                
                 //ảnh binary cho canny detect
                 int[,] edges = EdgeDetection.DeTectEdgeByCannyMethod(imagePath, high_threshold, low_threshold);
                 
                 // Lấy số hàng và số cột của mảng
                 // Khởi tạo một mảng 2 chiều
-
                 int width = edges.GetLength(0);
                 int height = edges.GetLength(1);
-
+                
                 //mở rộng các cạnh để triệt tiêu bớt nhiễu    
                 int[,] dilation = EdgeDetection.Dilation(edges, 6);
+                
                 //đưa độ dài cạnh về 1 để giảm dung lượng cho biểu đồ hough
                 int[,] skeleton = EdgeDetection.EdgeThinning(dilation);
+                
                 //biểu đồ hough
                 int[,] hough = EdgeDetection.PerformHoughTransform(skeleton);
+                
                 //vẽ đường thẳng từ biểu đồ hough
-                Bitmap resultImage = EdgeDetection.DrawLines(hough, threshold, width, height);
+                int[,] resultImage = EdgeDetection.DrawLines(hough, threshold, width, height);
 
-                picture2.Image = resultImage;
-                picture3.Image = EdgeDetection.IntToBitmap(dilation);
+                //int[,] PointMap = EdgeDetection.CheckPoint(resultImage);
+                //resultImage = EdgeDetection.Dilation(resultImage, 3);
+                //resultImage = EdgeDetection.EdgeThinning(resultImage);
+                
+                // thể hiện lên GUI
+                picture2.Image = EdgeDetection.IntToBitmap(resultImage);
+                picture3.Image = EdgeDetection.IntToBitmap(hough);
                 picture4.Image = EdgeDetection.IntToBitmap(skeleton);
             }
             
