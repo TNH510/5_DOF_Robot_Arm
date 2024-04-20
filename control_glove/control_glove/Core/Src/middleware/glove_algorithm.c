@@ -52,6 +52,31 @@ void glv_pos_shoulder_convert(float q0, float q1, float q2, float q3,
     *q3_pos = -(l1*(2*q0*q2 - 2*q1*q3));
 }
 
+void glv_robot_pos_convert(float x_pos, float y_pos, float z_pos, 
+                           float *robot_x_pos, float *robot_y_pos, float *robot_z_pos)
+{
+	// Offset FIRST POINT to zero (31.8, 0, 0)
+	x_pos = x_pos - 31.8f;
+
+	// Set axis direction
+	x_pos = x_pos * (-1);
+	y_pos = y_pos * (-1);
+	z_pos = z_pos * (-1);
+
+	// Scale to robot axis (x5)
+	x_pos = x_pos * 5;
+	y_pos = y_pos * 5;
+	z_pos = z_pos * 5;
+
+	// Set final point to ROBOT FIRST POINT
+	x_pos = x_pos + 500;
+
+	// Return value
+	*robot_x_pos = x_pos;
+	*robot_y_pos = y_pos;
+	*robot_z_pos = z_pos;
+}
+
 float low_pass_filter(float input, float pre_output, float alpha) 
 {
     return alpha * input + (1 - alpha) * pre_output;
