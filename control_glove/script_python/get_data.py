@@ -13,9 +13,9 @@ timestamps = []
 plt.ion()  # Bật chế độ interactive cho đồ thị
 
 fig, ax = plt.subplots()
-line1, = ax.plot(timestamps, data1, label='Data 1')
-line2, = ax.plot(timestamps, data2, label='Data 2')
-line3, = ax.plot(timestamps, data3, label='Data 3')
+line1, = ax.plot(timestamps, data1, label='X')
+line2, = ax.plot(timestamps, data2, label='Y')
+line3, = ax.plot(timestamps, data3, label='Z')
 
 ax.set_xlabel('Time')
 ax.set_ylabel('Data')
@@ -62,7 +62,7 @@ with open('data.csv', 'w', newline='') as csvfile:
                     plt.pause(0.1)  # Tạm dừng một chút để đồ thị được cập nhật
 
                     # Kiểm tra nếu đạt 200 mẫu dữ liệu, thoát khỏi vòng lặp
-                    if len(data1) == 200:
+                    if len(data1) == 400:
                         break
                 except ValueError:
                     pass
