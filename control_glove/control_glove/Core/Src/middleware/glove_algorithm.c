@@ -77,6 +77,46 @@ void glv_robot_pos_convert(float x_pos, float y_pos, float z_pos,
 	*robot_z_pos = z_pos;
 }
 
+void glv_robot_invert_kinematic(float x_pos, float y_pos, float z_pos,
+                                float *theta1, float *theta2, float *theta3, 
+                                float *theta4, float *theta5)
+{
+	float t1, t2, t3, t4, t5, s2, c2, s3, c3, m, n;
+	const float l1 = 690.0f, l2 = 440.0f, l3 = 500.0f, l4 = 0.0f, l5 = 230.0f; 
+	float roll, pitch;
+	roll = 0.0;
+	pitch = - M_PI / 2;
+	t1 = atan2(y_pos, x_pos);
+	t5 = roll - t1;
+	m = sqrt(x_pos * x_pos + y_pos * y_pos);
+	n = z_pos - l1 + l5;
+	c3 = (m * m + n * n - l2 * l2 - l3 * l3) / (2 * l2 * l3);
+	/* s3 has 2 value --> take the value of -sin */
+	s3 = sqrt(1 - c3 * c3);
+	t3 = atan2(s3, c3);
+	if (t3 >= -M_PI / 6 && t3 <= (4 * M_PI) / 9)
+	{
+		/* Do nothing*/
+	}
+	else
+	{
+		s3 = -1 * sqrt(1 - c3 * c3);
+		t3 = atan2(s3, c3);
+	}
+	/* Angle 3 */
+	c2 = m * (l3 * c3 + l2) + n * (l3 * s3);
+	s2 = n * (l3 * c3 + l2) - m * (l3 * s3);
+	/* Angle 2 */
+	t2 = atan2(s2, c2);
+	/* Angle 4 */
+	t4 = pitch - t2 - t3;
+	*theta1 = t1 / M_PI * 180.0;
+	*theta2 = t2 / M_PI * 180.0;
+	*theta3 = t3 / M_PI * 180.0;
+	*theta4 = t4 / M_PI * 180.0;
+	*theta5 = t5 / M_PI * 180.0;
+}								
+
 float low_pass_filter(float input, float pre_output, float alpha) 
 {
     return alpha * input + (1 - alpha) * pre_output;

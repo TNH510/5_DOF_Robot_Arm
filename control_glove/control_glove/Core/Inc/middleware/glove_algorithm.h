@@ -36,6 +36,10 @@ void glv_pos_shoulder_convert(float q0, float q1, float q2, float q3,
 void glv_robot_pos_convert(float x_pos, float y_pos, float z_pos, 
                            float *robot_x_pos, float *robot_y_pos, float *robot_z_pos);
 
+void glv_robot_invert_kinematic(float x_pos, float y_pos, float z_pos,
+                                float *theta1, float *theta2, float *theta3, 
+                                float *theta4, float *theta5);
+
 void glv_encrypt_sensor_data(float q0, float q1, float q2, float q3, 
                              float elbow_angle, uint8_t *data);
                              
