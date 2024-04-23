@@ -300,6 +300,24 @@ namespace RobotArmHelix
                 timer.Stop();
             }
         }
+
+        public void readfunction()
+        {
+            int ret;
+            int stt;
+            
+            ret = plc.ReadDeviceBlock("D542", 1, out stt);
+            if (ret != 0)
+            {
+                
+                PrintLog("Error", "", "Read PLC Fail");
+                return;
+            }
+            else
+            {
+                PrintLog("Infor", "", Convert.ToString(stt));
+            }
+        }
         private async void Camera_run()
         {
             // Perform your desired action here
@@ -1529,6 +1547,12 @@ namespace RobotArmHelix
         private void GoHome_button_Click(object sender, RoutedEventArgs e)
         {
             Press_button(MethodBase.GetCurrentMethod().Name, Constants.R_GOHOME);
+            readfunction();
+        }
+
+        private void Test_Click(object sender, RoutedEventArgs e)
+        {
+            readfunction();
         }
 
         private void Jog_set_speed_Click(object sender, RoutedEventArgs e)
