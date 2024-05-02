@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.picture1 = new System.Windows.Forms.PictureBox();
             this.picture2 = new System.Windows.Forms.PictureBox();
             this.open = new System.Windows.Forms.Button();
@@ -40,6 +41,7 @@
             this.text1 = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.picture4 = new System.Windows.Forms.PictureBox();
+            this.zGHistogram = new ZedGraph.ZedGraphControl();
             ((System.ComponentModel.ISupportInitialize)(this.picture1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picture2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picture3)).BeginInit();
@@ -68,7 +70,7 @@
             // 
             // open
             // 
-            this.open.Location = new System.Drawing.Point(622, 162);
+            this.open.Location = new System.Drawing.Point(1151, 162);
             this.open.Name = "open";
             this.open.Size = new System.Drawing.Size(163, 71);
             this.open.TabIndex = 1;
@@ -78,7 +80,7 @@
             // 
             // process
             // 
-            this.process.Location = new System.Drawing.Point(622, 253);
+            this.process.Location = new System.Drawing.Point(1151, 253);
             this.process.Name = "process";
             this.process.Size = new System.Drawing.Size(163, 71);
             this.process.TabIndex = 1;
@@ -88,34 +90,34 @@
             // 
             // high
             // 
-            this.high.Location = new System.Drawing.Point(619, 42);
+            this.high.Location = new System.Drawing.Point(1148, 42);
             this.high.Name = "high";
-            this.high.Size = new System.Drawing.Size(163, 22);
+            this.high.Size = new System.Drawing.Size(163, 20);
             this.high.TabIndex = 2;
             this.high.TextChanged += new System.EventHandler(this.high_TextChanged);
             // 
             // low
             // 
-            this.low.Location = new System.Drawing.Point(619, 88);
+            this.low.Location = new System.Drawing.Point(1148, 88);
             this.low.Name = "low";
-            this.low.Size = new System.Drawing.Size(163, 22);
+            this.low.Size = new System.Drawing.Size(163, 20);
             this.low.TabIndex = 2;
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(619, 23);
+            this.label3.Location = new System.Drawing.Point(1148, 23);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(108, 16);
+            this.label3.Size = new System.Drawing.Size(88, 13);
             this.label3.TabIndex = 3;
             this.label3.Text = "NGƯỠNG TRÊN";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(619, 69);
+            this.label4.Location = new System.Drawing.Point(1148, 69);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(103, 16);
+            this.label4.Size = new System.Drawing.Size(85, 13);
             this.label4.TabIndex = 3;
             this.label4.Text = "NGƯỠNG DƯỚI";
             // 
@@ -131,17 +133,17 @@
             // 
             // text1
             // 
-            this.text1.Location = new System.Drawing.Point(619, 134);
+            this.text1.Location = new System.Drawing.Point(1148, 134);
             this.text1.Name = "text1";
-            this.text1.Size = new System.Drawing.Size(163, 22);
+            this.text1.Size = new System.Drawing.Size(163, 20);
             this.text1.TabIndex = 2;
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(619, 115);
+            this.label5.Location = new System.Drawing.Point(1148, 115);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(70, 16);
+            this.label5.Size = new System.Drawing.Size(58, 13);
             this.label5.TabIndex = 3;
             this.label5.Text = "NGƯỠNG ";
             // 
@@ -155,9 +157,25 @@
             this.picture4.TabIndex = 0;
             this.picture4.TabStop = false;
             // 
+            // zGHistogram
+            // 
+            this.zGHistogram.Location = new System.Drawing.Point(587, 134);
+            this.zGHistogram.Name = "zGHistogram";
+            this.zGHistogram.ScrollGrace = 0D;
+            this.zGHistogram.ScrollMaxX = 0D;
+            this.zGHistogram.ScrollMaxY = 0D;
+            this.zGHistogram.ScrollMaxY2 = 0D;
+            this.zGHistogram.ScrollMinX = 0D;
+            this.zGHistogram.ScrollMinY = 0D;
+            this.zGHistogram.ScrollMinY2 = 0D;
+            this.zGHistogram.Size = new System.Drawing.Size(558, 384);
+            this.zGHistogram.TabIndex = 5;
+            this.zGHistogram.UseExtendedPrintDialog = true;
+            // 
             // Form1
             // 
-            this.ClientSize = new System.Drawing.Size(818, 633);
+            this.ClientSize = new System.Drawing.Size(1330, 646);
+            this.Controls.Add(this.zGHistogram);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
@@ -202,6 +220,7 @@
         private System.Windows.Forms.TextBox text1;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.PictureBox picture4;
+        private ZedGraph.ZedGraphControl zGHistogram;
     }
 }
 
