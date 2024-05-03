@@ -17,7 +17,7 @@ namespace Mini_prj05
         public Form1()
         {
             InitializeComponent();
-      
+
 
         }
         public Bitmap ChuyenhinhRBGsanghinhxamLuminance(Bitmap hinhgoc)
@@ -45,8 +45,8 @@ namespace Mini_prj05
 
             // khai báo mảng có 256 phần tử
             double[] histogram = new double[256];
-            for (int x = 0; x < HinhMucXam.Width; x++) 
-                for (int y = 0; y<HinhMucXam.Height;y++)
+            for (int x = 0; x < HinhMucXam.Width; x++)
+                for (int y = 0; y < HinhMucXam.Height; y++)
                 {
 
                     Color color = HinhMucXam.GetPixel(x, y);
@@ -72,8 +72,8 @@ namespace Mini_prj05
             }
             return points;
 
-                
-                
+
+
         }
         //đưa các thông số hiển thị lên biểu đồ 
         public GraphPane BieuDoHistogram(PointPairList histogram)
@@ -137,6 +137,42 @@ namespace Mini_prj05
             zGHistogram.GraphPane = BieuDoHistogram(points);
             zGHistogram.Refresh();
         }
-    }
+        private void threshold_Click(object sender, EventArgs e)
+        {
+           
+        }
 
+        private void button3_Click(object sender, EventArgs e)
+        {
+            hinhgoc = new Bitmap(imagePath);
+            Bitmap HinhMucXam = new Bitmap(hinhgoc.Width, hinhgoc.Height);
+            for (int x = 0; x < hinhgoc.Width; x++)
+            {
+                for (int y = 0; y < hinhgoc.Height; y++)
+                {
+                    //lấy điểm ảnh
+                    Color pixel = hinhgoc.GetPixel(x, y);
+                    byte R = pixel.R;
+                    byte G = pixel.G;
+                    byte B = pixel.B;
+
+                    // Tính giá trị mức xám cho điểm (x,y)
+                    byte gray = (byte)(0.2126 * R + 0.7152 * G + 0.0722 * B);
+                    if (gray < Convert.ToInt16(textBox1.Text))
+                    {
+                        HinhMucXam.SetPixel(x, y, Color.FromArgb(0, 0, 0));
+                    }
+                    else
+                    {
+                        HinhMucXam.SetPixel(x, y, Color.FromArgb(255, 255, 255));
+                    }
+                    // gán giá trị mức xám vừa tính
+
+
+                }
+            }
+
+            pictureBox1.Image = HinhMucXam;
+        }
+    }
 }
