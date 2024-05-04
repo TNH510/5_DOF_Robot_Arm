@@ -3,7 +3,7 @@ import os
 import csv
 import matplotlib.pyplot as plt
 
-uart = serial.Serial('COM20', 115200)  # Thay đổi cổng UART và baudrate tương ứng
+uart = serial.Serial('COM8', 115200)  # Thay đổi cổng UART và baudrate tương ứng
 
 data1 = []
 data2 = []

@@ -31,6 +31,8 @@ using System.Data;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolTip;
 using RobotArmHelix.Properties;
 using System.Windows.Markup;
+using OxyPlot.Series;
+using OxyPlot;
 /**
 * Author: Gabriele Marini (Gabryxx7)
 * This class load the 3d models of all the parts of the robotic arms and add them to the viewport
@@ -152,7 +154,9 @@ namespace RobotArmHelix
         private const string MODEL_PATH4 = "K4.stl";
         private const string MODEL_PATH5 = "K5.stl";
 #endif
-
+        //private readonly PlotModel _plotModel;
+        //private readonly DispatcherTimer _timer;
+        //private double _xValue = 0;
 
         public MainWindow()
         {
@@ -205,6 +209,27 @@ namespace RobotArmHelix
             timer2 = new System.Windows.Forms.Timer();
             timer2.Interval = 500;
             timer2.Tick += new System.EventHandler(timer2_Tick);
+
+            //// Create plot model
+            //_plotModel = new PlotModel { Title = "Real-Time Graph" };
+
+            //// Create line series for each value
+            //var series1 = new LineSeries { Title = "Value 1" };
+            //var series2 = new LineSeries { Title = "Value 2" };
+            //var series3 = new LineSeries { Title = "Value 3" };
+
+            //// Add series to plot model
+            //_plotModel.Series.Add(series1);
+            //_plotModel.Series.Add(series2);
+            //_plotModel.Series.Add(series3);
+
+            // Set up timer to update graph
+            //_timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
+            //_timer.Tick += Timer_Tick;
+            //_timer.Start();
+
+            // Set plot model to PlotView
+            //plotView.Model = _plotModel;
 
         }
         
@@ -2401,26 +2426,61 @@ namespace RobotArmHelix
 
         private void Receive(object sender, SerialDataReceivedEventArgs e)
         {
-            // Collecting the characters received to our 'buffer' (string).
-            string data = uart.ReadExisting();
-            double[] received_angle = { 180, 180, 180 };
-            Dispatcher.Invoke(() =>
+            string receivedData = uart.ReadLine().Trim();
+
+            if (!string.IsNullOrEmpty(receivedData))
             {
-                try
+                string[] numbers = receivedData.Split(',');
+
+                if (numbers.Length == 3)
                 {
-                    received_angle = StartReadingData(data);
-                    returnX = received_angle[0];
-                    returnY = received_angle[1];
-                    returnZ = received_angle[2];
-                    ErrorLog.Text = returnX.ToString() + "\n" + returnY.ToString() + "\n" + returnZ.ToString();
+                    double num1, num2, num3;
+                    bool success = double.TryParse(numbers[0], out num1);
+                    success &= double.TryParse(numbers[1], out num2);
+                    success &= double.TryParse(numbers[2], out num3);
+                    double theta_test;
+                    double t1_test, t2_test, t3_test, t4_test, t5_test;
+                    int ret;
+                    if (success)
+                    {
+                        Dispatcher.Invoke(() =>
+                        {
+                            // Cập nhật các giá trị trên giao diện
+                            returnX = num1;
+                            returnY = num2;
+                            returnZ = num3;
+                            ErrorLog.Text = returnX.ToString() + "\n" + returnY.ToString() + "\n" + returnZ.ToString();
 
+                            (t1_test, t2_test, t3_test, t4_test, t5_test) = convert_position_angle(returnX, returnY, returnZ);
+                            //ret = Check_angle(t1_test, t2_test, t3_test, t4_test, t5_test);
+                            //if (ret == 0)
+                            //{
+                            //    double theta = 0.0;
+                            //    if (ret == 1) theta = t1_test;
+                            //    else if (ret == 2) theta = t2_test;
+                            //    else if (ret == 3) theta = t3_test;
+                            //    else if (ret == 4) theta = t4_test;
+                            //    else if (ret == 5) theta = t5_test;
+                            //    PrintLog("\nError", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
+                            //    return;
+                            //}
+                            //else
+                            //{
+                                double[] angles = { t1_test, t1_test, t1_test, t1_test, t1_test };
+                                /* Update position for robot on GUI */
+                                ForwardKinematics(angles);
+                                /* Update data for slider on GUI */
+                                joint1.Value = angles[0];
+                                joint2.Value = angles[1];
+                                joint3.Value = angles[2];
+                                joint4.Value = angles[3];
+                                joint5.Value = angles[4];
+                            //}
+
+                        });
+                    }
                 }
-                catch
-                {
-
-                }
-
-            });
+            }
         }
 
         private void Glove_disconnect_button_Click(object sender, RoutedEventArgs e)
@@ -2494,13 +2554,13 @@ namespace RobotArmHelix
             /* Turn on relay */
             turn_on_1_pulse_relay(600);
             /* Timer 1 start */
-            timer1.Start();
+            // timer1.Start();
         }
 
         private void Glove_disable_button_Click(object sender, RoutedEventArgs e)
         {
             /* Timer 1 start */
-            timer1.Stop();
+            // timer1.Stop();
         }
 
         private void Clr_Traj_btn_Click(object sender, RoutedEventArgs e)
