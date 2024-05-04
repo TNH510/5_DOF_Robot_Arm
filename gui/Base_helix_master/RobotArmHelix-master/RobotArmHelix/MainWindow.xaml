@@ -187,6 +187,6 @@
         <Canvas Margin="613,527,967,285">
             <Image x:Name="CameraImage" Canvas.Left="-604" Canvas.Top="-103" Source="C:\Users\daveb\Desktop\doiten.png" Height="215" Width="292" HorizontalAlignment="Left" VerticalAlignment="Top"/>
         </Canvas>
-        <oxy:PlotView x:Name="plotView" Margin="580,377,655,264" />
+        <oxy:PlotView x:Name="plotView" Margin="-2,82,1237,519" />
     </Grid>
 </Window>

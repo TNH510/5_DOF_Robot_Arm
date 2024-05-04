@@ -245,9 +245,9 @@ namespace RobotArmHelix
         {
             // Update data points
             var timestamp = DateTime.Now;
-            var dataPoint1 = new DataPoint(DateTimeAxis.ToDouble(timestamp), returnX);
-            var dataPoint2 = new DataPoint(DateTimeAxis.ToDouble(timestamp), returnY);
-            var dataPoint3 = new DataPoint(DateTimeAxis.ToDouble(timestamp), returnZ);
+            var dataPoint1 = new DataPoint(DateTimeAxis.ToDouble(timestamp), (returnX / 20) );
+            var dataPoint2 = new DataPoint(DateTimeAxis.ToDouble(timestamp), (returnY / 30) );
+            var dataPoint3 = new DataPoint(DateTimeAxis.ToDouble(timestamp), ((returnZ - 700) / 20));
 
             // Update series
             var series1 = (LineSeries)_plotModel.Series[0];
@@ -2434,27 +2434,27 @@ namespace RobotArmHelix
                             Dispatcher.Invoke(() =>
                             {
                                 // Cập nhật các giá trị trên giao diện
-                                returnX = num1;
-                                returnY = num2;
-                                returnZ = num3;
+                                returnX = num1 * 20;
+                                returnY = num2 * 30;
+                                returnZ = num3 * 20 + 700;
                                 ErrorLog.Text = returnX.ToString() + "\n" + returnY.ToString() + "\n" + returnZ.ToString();
 
-                                (t1_test, t2_test, t3_test, t4_test, t5_test) = convert_position_angle(returnX, returnY, returnZ);
-                                //ret = Check_angle(t1_test, t2_test, t3_test, t4_test, t5_test);
-                                //if (ret == 0)
-                                //{
-                                //    double theta = 0.0;
-                                //    if (ret == 1) theta = t1_test;
-                                //    else if (ret == 2) theta = t2_test;
-                                //    else if (ret == 3) theta = t3_test;
-                                //    else if (ret == 4) theta = t4_test;
-                                //    else if (ret == 5) theta = t5_test;
-                                //    PrintLog("\nError", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
-                                //    return;
-                                //}
-                                //else
-                                //{
-                                double[] angles = { t1_test, t1_test, t1_test, t1_test, t1_test };
+                            (t1_test, t2_test, t3_test, t4_test, t5_test) = convert_position_angle(returnX, returnY, returnZ);
+                            ret = Check_angle(t1_test, t2_test, t3_test, t4_test, t5_test);
+                            if (ret != 0)
+                            {
+                                double theta = 0.0;
+                                if (ret == 1) theta = t1_test;
+                                else if (ret == 2) theta = t2_test;
+                                else if (ret == 3) theta = t3_test;
+                                else if (ret == 4) theta = t4_test;
+                                else if (ret == 5) theta = t5_test;
+                                PrintLog("\nError", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
+                                return;
+                            }
+                            else
+                            {
+                                double[] angles = { t1_test, t2_test - 90.0, t3_test + 90.0, t4_test + 90.0, t5_test};
                                 /* Update position for robot on GUI */
                                 ForwardKinematics(angles);
                                 /* Update data for slider on GUI */
@@ -2463,7 +2463,7 @@ namespace RobotArmHelix
                                 joint3.Value = angles[2];
                                 joint4.Value = angles[3];
                                 joint5.Value = angles[4];
-                                //}
+                            }
 
                             });
                         }
