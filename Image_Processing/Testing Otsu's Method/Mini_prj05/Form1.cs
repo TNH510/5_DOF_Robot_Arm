@@ -40,11 +40,11 @@ namespace Mini_prj05
                 }
             return HinhMucXam;
         }
-        public double[] TinhHistogram(Bitmap HinhMucXam)
+        public int[] TinhHistogram(Bitmap HinhMucXam)
         {
 
             // khai báo mảng có 256 phần tử
-            double[] histogram = new double[256];
+            int[] histogram = new int[256];
             for (int x = 0; x < HinhMucXam.Width; x++)
                 for (int y = 0; y < HinhMucXam.Height; y++)
                 {
@@ -59,8 +59,106 @@ namespace Mini_prj05
             return histogram;
 
         }
+        public int ComputeThresholdByOtsuMethod(Bitmap HinhMucXam)
+        {
+            int[] histogram = TinhHistogram(HinhMucXam);
+            int threshold = 1;
+            int varience_max = 0;
+            int m_1 = 0;
+            int P1 = 0;
+            int m_G = 0;
+            //compute the global intensity mean
+            for (int j = 0; j < 256; j++)
+            {
+                m_G = m_G + j * (histogram[j] / (HinhMucXam.Width * HinhMucXam.Height));
+            }
+            for (int i = 1; i < 256; i++)
+            {
+                //compute the cumulative sum and mean
+                for (int j = 0; j < i; j++)
+                {
+                    P1 = P1 + histogram[j] / (HinhMucXam.Width * HinhMucXam.Height);
+                    m_1 = m_1 + j * (histogram[j] / (HinhMucXam.Width * HinhMucXam.Height));
+                }
+                //compute the between class varience and finf varience max
+                int varience=0;
+                if (P1!=0)
+                {
+                    varience = (m_G * P1 - m_1) ^ 2 / (P1 * (1 - P1));
+                }
+                //int varience = (m_G * P1 - m_1) ^ 2 / (P1 * (1 - P1));
+                if (varience > varience_max)
+                {
+                    varience_max = varience;
+                    threshold = i;
+                }
 
-        PointPairList ChuyenDoiHistogram(double[] histogram)
+            }
+            return threshold;
+        }
+        public static int CalculateThreshold(Bitmap image)
+        {
+            // Tính histogram
+            int[] histogram = new int[256];
+            int totalPixels = 0;
+
+            for (int y = 0; y < image.Height; y++)
+            {
+                for (int x = 0; x < image.Width; x++)
+                {
+                    Color pixel = image.GetPixel(x, y);
+                    int grayLevel = (int)(pixel.R * 0.299 + pixel.G * 0.587 + pixel.B * 0.114);
+                    histogram[grayLevel]++;
+                    totalPixels++;
+                }
+            }
+
+            // Tính tổng trọng số
+            double[] weights = new double[256];
+            for (int i = 0; i < 256; i++)
+            {
+                weights[i] = (double)histogram[i] / totalPixels;
+            }
+
+            // Tìm ngưỡng tối ưu
+            double maxVariance = 0;
+            int threshold = 0;
+
+            for (int t = 0; t < 256; t++)
+            {
+                double w1 = 0, w2 = 0;
+                double mean1 = 0, mean2 = 0;
+                double variance = 0;
+
+                for (int i = 0; i <= t; i++)
+                {
+                    w1 += weights[i];
+                    mean1 += i * weights[i];
+                }
+
+                for (int i = t + 1; i < 256; i++)
+                {
+                    w2 += weights[i];
+                    mean2 += i * weights[i];
+                }
+
+                if (w1 != 0 && w2 != 0)
+                {
+                    mean1 /= w1;
+                    mean2 /= w2;
+                    variance = w1 * w2 * Math.Pow(mean1 - mean2, 2);
+                }
+
+                if (variance > maxVariance)
+                {
+                    maxVariance = variance;
+                    threshold = t;
+                }
+            }
+
+            return threshold;
+        }
+        PointPairList ChuyenDoiHistogram(int[] histogram)
         {
 
             PointPairList points = new PointPairList();
@@ -131,18 +229,15 @@ namespace Mini_prj05
             pic_xam.Image = HinhMucXam;
 
             // gọi hàm đã viết để chạy biểu đồ
-            double[] histogram = TinhHistogram(HinhMucXam);
+            int[] histogram = TinhHistogram(HinhMucXam);
             PointPairList points = ChuyenDoiHistogram(histogram);
             // vẽ và hiển thị biểu đồ
             zGHistogram.GraphPane = BieuDoHistogram(points);
             zGHistogram.Refresh();
         }
-        private void threshold_Click(object sender, EventArgs e)
-        {
-           
-        }
 
-        private void button3_Click(object sender, EventArgs e)
+
+            private void button3_Click(object sender, EventArgs e)
         {
             hinhgoc = new Bitmap(imagePath);
             Bitmap HinhMucXam = new Bitmap(hinhgoc.Width, hinhgoc.Height);
@@ -167,12 +262,20 @@ namespace Mini_prj05
                         HinhMucXam.SetPixel(x, y, Color.FromArgb(255, 255, 255));
                     }
                     // gán giá trị mức xám vừa tính
-
-
                 }
             }
 
             pictureBox1.Image = HinhMucXam;
+        }
+
+        private void button4_Click_1(object sender, EventArgs e)
+        {
+            Bitmap hinhgoc1 = new Bitmap(imagePath);
+            //chuyen doi sang hinh muc xam
+            Bitmap Hinhmucxam = ChuyenhinhRBGsanghinhxamLuminance(hinhgoc1);
+            //tinh threshold
+            int threshold = CalculateThreshold(Hinhmucxam);
+            textBox1.Text = threshold.ToString();
         }
     }
 }

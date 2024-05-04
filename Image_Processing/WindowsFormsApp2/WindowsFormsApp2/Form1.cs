@@ -215,6 +215,22 @@ namespace WindowsFormsApp2
 
                 int[,] gray = EdgeDetection.RGB2Gray(Import_picture);
                 int[,] blur = EdgeDetection.Blur_Image(gray);
+                Bitmap img_blur = IntToBitmap(blur);
+                int threhold = CalculateThreshold(img_blur);
+                for(int i =0; i<blur.GetLength(0);i++)
+                {
+                    for(int j=0; j<blur.GetLength(1);j++)
+                    {
+                        if (blur[i,j]<threhold)
+                        {
+                            blur[i,j] = 0;
+                        }
+                        else
+                        {
+                            blur[i,j] = 255;
+                        }
+                    }    
+                }    
                 int[,] edges = EdgeDetection.Canny_Detect(blur, high_threshold, low_threshold);
 
                 return edges;
@@ -230,9 +246,18 @@ namespace WindowsFormsApp2
                 for (int x = 0; x < width; x++)
                 {
                     for (int y = 0; y < height; y++)
-                    {                   
+                    {
+                        Color color;
                         int pixelValue = (int)Binary_Image[x, y];
-                        Color color = Color.FromArgb((byte)pixelValue, (byte)pixelValue, (byte)pixelValue);
+                        if (pixelValue == 10)
+                        {
+                            color = Color.FromArgb(255, 0, 0);
+                        }  
+                        else
+                        {
+                            color = Color.FromArgb((byte)pixelValue, (byte)pixelValue, (byte)pixelValue);
+                        }    
+                        //color = Color.FromArgb((byte)pixelValue, (byte)pixelValue, (byte)pixelValue);
                         Result.SetPixel(x, y, color);                                             
                     }
                 }
@@ -257,82 +282,82 @@ namespace WindowsFormsApp2
 
                 return imageArray;
             }
-            public static int[,] LinkEdges(string imagePath, int high_threshold, int low_threshold)
-            {
-                Bitmap Import_picture = new Bitmap(imagePath);
+            //public static int[,] LinkEdges(string imagePath, int high_threshold, int low_threshold)
+            //{
+            //    Bitmap Import_picture = new Bitmap(imagePath);
 
-                int[,] gray = EdgeDetection.RGB2Gray(Import_picture);
-                int[,] blur = EdgeDetection.Blur_Image(gray);
-                int[,] edges = EdgeDetection.Canny_Detect(blur, high_threshold, low_threshold);
-                // Kích thước hình ảnh
-                int width = edges.GetLength(0);
-                int height = edges.GetLength(1);
+            //    int[,] gray = EdgeDetection.RGB2Gray(Import_picture);
+            //    int[,] blur = EdgeDetection.Blur_Image(gray);
+            //    int[,] edges = EdgeDetection.Canny_Detect(blur, high_threshold, low_threshold);
+            //    // Kích thước hình ảnh
+            //    int width = edges.GetLength(0);
+            //    int height = edges.GetLength(1);
 
-                int[,] gradientMagnitude = new int[width, height];
-                int[,] gradientAngle = new int[width, height];
+            //    int[,] gradientMagnitude = new int[width, height];
+            //    int[,] gradientAngle = new int[width, height];
 
-                int[,] SobelX = {{ -1, 0, 1 },
-                                    { -2, 0, 2 },
-                                    { -1, 0, 1 }};
-                int[,] SobelY = {{ -1, -2, -1 },
-                                    { 0, 0, 0 },
-                                    { 1, 2, 1 }};
-                int white_point = 255;
-                int gray_point = 50;
-                //computting gradient magnitude and gradient angle
-                for (int x = 1; x < width - 1; x++)
-                {
-                    for (int y = 1; y < height - 1; y++)
-                    {
-                        int sumX = 0;
-                        int sumY = 0;
-                        for (int i = -1; i <= 1; i++)
-                        {
-                            for (int j = -1; j <= 1; j++)
-                            {
-                                sumX += (int)(SobelX[i + 1, j + 1] * blur[x + i, y + j]);
-                                sumY += (int)(SobelY[i + 1, j + 1] * blur[x + i, y + j]);
-                            }
-                        }
-                        //GradientX[x, y] = sumX;
-                        //GradientY[x, y] = sumY;
-                        gradientMagnitude[x, y] = (int)Math.Sqrt(sumX * sumX + sumY * sumY);
-                        if (gradientMagnitude[x, y] >= 255)
-                        {
-                            gradientMagnitude[x, y] = 255;
-                        }
-                        else if (gradientMagnitude[x, y] <= 0)
-                        {
-                            gradientMagnitude[x, y] = 0;
-                        }
-                        gradientAngle[x, y] = (int)Math.Abs((Math.Atan2(sumY, sumX) * 180 / Math.PI));
+            //    int[,] SobelX = {{ -1, 0, 1 },
+            //                        { -2, 0, 2 },
+            //                        { -1, 0, 1 }};
+            //    int[,] SobelY = {{ -1, -2, -1 },
+            //                        { 0, 0, 0 },
+            //                        { 1, 2, 1 }};
+            //    int white_point = 255;
+            //    int gray_point = 50;
+            //    //computting gradient magnitude and gradient angle
+            //    for (int x = 1; x < width - 1; x++)
+            //    {
+            //        for (int y = 1; y < height - 1; y++)
+            //        {
+            //            int sumX = 0;
+            //            int sumY = 0;
+            //            for (int i = -1; i <= 1; i++)
+            //            {
+            //                for (int j = -1; j <= 1; j++)
+            //                {
+            //                    sumX += (int)(SobelX[i + 1, j + 1] * blur[x + i, y + j]);
+            //                    sumY += (int)(SobelY[i + 1, j + 1] * blur[x + i, y + j]);
+            //                }
+            //            }
+            //            //GradientX[x, y] = sumX;
+            //            //GradientY[x, y] = sumY;
+            //            gradientMagnitude[x, y] = (int)Math.Sqrt(sumX * sumX + sumY * sumY);
+            //            if (gradientMagnitude[x, y] >= 255)
+            //            {
+            //                gradientMagnitude[x, y] = 255;
+            //            }
+            //            else if (gradientMagnitude[x, y] <= 0)
+            //            {
+            //                gradientMagnitude[x, y] = 0;
+            //            }
+            //            gradientAngle[x, y] = (int)Math.Abs((Math.Atan2(sumY, sumX) * 180 / Math.PI));
 
-                    }
-                }
-                //
-                for (int x = 1; x < width - 1; x++)
-                {
-                    for (int y = 1; y < height - 1; y++)
-                    {
-                        int edge_point = edges[x, y];
-                        if (edge_point == 255)
-                        {
-                            for (int i = -1; i <= 1; i++)
-                            {
-                                for (int j = -1; j <= 1; j++)
-                                {
-                                    if ((Math.Abs(gradientMagnitude[x + i, y + j] - gradientMagnitude[x, y]) < 50) & (Math.Abs(gradientAngle[x + i, y + j] - gradientAngle[x, y]) < 1) & (Math.Abs(gradientAngle[x + i, y + j] - gradientAngle[x, y]) > 0.1))
-                                    {
-                                        edges[x + i, y + j] = 255;
-                                    }
-                                }
-                            }
-                        }
-                    }
+            //        }
+            //    }
+            //    //
+            //    for (int x = 1; x < width - 1; x++)
+            //    {
+            //        for (int y = 1; y < height - 1; y++)
+            //        {
+            //            int edge_point = edges[x, y];
+            //            if (edge_point == 255)
+            //            {
+            //                for (int i = -1; i <= 1; i++)
+            //                {
+            //                    for (int j = -1; j <= 1; j++)
+            //                    {
+            //                        if ((Math.Abs(gradientMagnitude[x + i, y + j] - gradientMagnitude[x, y]) < 50) & (Math.Abs(gradientAngle[x + i, y + j] - gradientAngle[x, y]) < 1) & (Math.Abs(gradientAngle[x + i, y + j] - gradientAngle[x, y]) > 0.1))
+            //                        {
+            //                            edges[x + i, y + j] = 255;
+            //                        }
+            //                    }
+            //                }
+            //            }
+            //        }
 
-                }
-                return edges;
-            }
+            //    }
+            //    return edges;
+            //}
             public static int[,] PerformHoughTransform(int[,] image)
             {
                 int width = image.GetLength(0);
@@ -375,40 +400,37 @@ namespace WindowsFormsApp2
                 int diagonal = (int)Math.Sqrt(width * width + height * height); // Đường chéo của ảnh
 
                 int[,] resultImage = new int[width, height];
-                int[,] Point = new int[100, 2];
+                //int[,] Point = new int[100, 2];
                 int count = 0;
-                int[,] theta_rho = new int[200, 3];
-                int[,] result = new int [10, 3];
+                int[,] theta_rho = new int[1000, 3];
+                //int[,] result = new int [10, 3];
                 // Duyệt qua ma trận Hough
+
                 for (int theta = 0; theta < 180; theta++)
                 {
                     for (int rho = 0; rho < 2 * diagonal; rho++)
                     {
-                        if (houghMatrix[theta, rho] >= threshold)//giảm dần
+                        if (houghMatrix[theta, rho] >= threshold)
                         {
-                            //// lấy toàn bộ số điểm vượt ngưỡng 
+                            // lấy toàn bộ số điểm vượt ngưỡng 
                             theta_rho[count, 0] = theta;
                             theta_rho[count, 1] = rho;
                             theta_rho[count, 2] = 0;
                             count++;
-                            
+
                         }
                     }
                 }
-                //phân loại đường thẳng 
-                int delta_a = 0;
-                int delta_p = 0;
-                int delta_a_threshold = 10;
-                int delta_p_threshold = 50;
+                //phân loại đường thẳng                
+                int delta_a_threshold = 40;
+                int delta_p_threshold = 70;
                 int nhom = 10;
-                //int[,] phanloai = new int[count, 2];
-                
-                int[,,] ketqua = new int [count,2,nhom];
+                int[,,] ketqua = new int[count, 2, nhom];
 
                 for (int i = 0; i < nhom; i++)
                 {
                     int index = 0;
-                    
+
                     //lấy số chuẩn
                     for (int j = 0; j < count; j++)
                     {
@@ -422,6 +444,8 @@ namespace WindowsFormsApp2
                         }
                     }
                     //phân nhóm
+                    int delta_a = 0;
+                    int delta_p = 0;
                     for (int j = 0; j < count; j++)
                     {
                         if (theta_rho[j, 2] == 0)
@@ -437,10 +461,11 @@ namespace WindowsFormsApp2
                             }
                         }
                     }
+
                     //tìm đường trung bình trong các nhóm
                     int avr_theta1 = 0;
                     int avr_rho1 = 0;
-                    if( index!= 0)
+                    if (index != 0)
                     {
                         for (int j = 0; j < index; j++)
                         {
@@ -458,14 +483,16 @@ namespace WindowsFormsApp2
                                 int y = (int)(((avr_rho - diagonal) - x * Math.Cos(radianTheta)) / Math.Sin(radianTheta));
                                 if (y >= 0 && y < height)
                                 {
-                                   //resultImage[x, y] = 255;
+                                    //resultImage[x, y] = 255;
                                     if (resultImage[x, y] == 0)
                                     {
                                         resultImage[x, y] = 255;
+                                        resultImage[x, y+1] = 255;
                                     }
                                     else if (resultImage[x, y] == 255)
                                     {
                                         resultImage[x, y] = 10;
+                                        resultImage[x, y+1] = 10;
                                     }
                                     else if (resultImage[x, y] == 10)
                                     {
@@ -485,10 +512,12 @@ namespace WindowsFormsApp2
                                     if (resultImage[x, y] == 0)
                                     {
                                         resultImage[x, y] = 255;//vẽ line 
+                                        resultImage[x+1, y] = 255;//vẽ line
                                     }
                                     else if (resultImage[x, y] == 255)
                                     {
                                         resultImage[x, y] = 10;//giao điểm
+                                        resultImage[x+1, y] = 10;//giao điểm
                                     }
                                     else if (resultImage[x, y] == 10)
                                     {
@@ -500,7 +529,118 @@ namespace WindowsFormsApp2
                         }
                         //
                     }
+
                 }
+                return resultImage;
+            }
+            public static int[,] DrawLines2(int[,] houghMatrix, int threshold, int width, int height)
+            {
+                int diagonal = (int)Math.Sqrt(width * width + height * height); // Đường chéo của ảnh
+                int[,] resultImage = new int[width, height];
+                int[,] theta_rho_result  = new int[8, 2];
+                //bool check = true;
+                //int result = 0;
+                //int[,] new_houghMatrix = houghMatrix;
+                for (int theta = 0; theta < 180; theta++)
+                {
+                    for (int rho = 0; rho < 2 * diagonal; rho++)
+                    {
+                        int avr_theta = 0;
+                        int avr_rho = 0;
+                        if (houghMatrix[theta, rho] >= threshold)
+                        {
+                           int count_point = 0;
+                           // lấy toàn bộ số điểm vượt ngưỡng có trong mặt nạ 
+                            for (int i = theta - 20; i < theta + 20; i++)
+                            {
+                                for (int j = rho - 100; j < rho + 100; j++)
+                                {
+                                    if (i >= 0 && i < 180 && j >= 0 && j < 2 * diagonal)
+                                    {
+                                        if (houghMatrix[i, j] >= threshold)
+                                        {
+                                            houghMatrix[i, j] = 0;
+                                            avr_rho += j;
+                                            avr_theta += i;
+                                            count_point++;
+                                        }
+                                    }
+                                }
+                            }
+                             avr_theta /= count_point;
+                             avr_rho /= count_point;
+                            //vẽ đường thẳng.
+                            double radianTheta = avr_theta * Math.PI / 180;
+                            if (avr_theta >= 45 && avr_theta < 135)
+                            {
+                                for (int x = 0; x < width; x++)
+                                {
+                                    int y = (int)(((avr_rho - diagonal) - x * Math.Cos(radianTheta)) / Math.Sin(radianTheta));
+                                    if (y >= 0 && y < height)
+                                    {
+                                        //resultImage[x, y] = 255;
+                                        if (resultImage[x, y] == 0)
+                                        {
+                                            resultImage[x, y ] = 255;
+                                            if(y+1 < height)
+                                            {
+                                                resultImage[x, y +1] = 255;
+                                            }    
+                                            
+                                        }
+                                        else if (resultImage[x, y] == 255)
+                                        {
+                                            resultImage[x, y] = 10;
+                                            if (y + 1 < height)
+                                            {
+                                                resultImage[x, y + 1] = 10;
+                                            }
+                                        }
+                                        else if (resultImage[x, y] == 10)
+                                        {
+                                            //DO NOTHING
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                for (int y = 0; y < height; y++)
+                                {
+                                    int x = (int)(((avr_rho - diagonal) - y * Math.Sin(radianTheta)) / Math.Cos(radianTheta));
+                                    if (x >= 0 && x < width)
+                                    {
+                                        //resultImage[x, y] = 255;
+                                        if (resultImage[x, y] == 0)
+                                        {
+                                            resultImage[x, y] = 255;//vẽ line
+                                            if (x + 1 < width)
+                                            {
+                                                resultImage[x + 1, y] = 255;
+                                            }
+                                            
+                                        }
+                                        else if (resultImage[x, y] == 255)
+                                        {
+                                            resultImage[x, y] = 10;//giao điểm
+                                            if (x + 1 < width)
+                                            {
+                                                resultImage[x + 1, y] = 10;
+                                            }
+                                        }
+                                        else if (resultImage[x, y] == 10)
+                                        {
+                                            //DO NOTHING
+                                            //nền
+                                        }
+                                    }
+                                }
+                            }
+                            //
+                        }
+                    }
+                }
+
                 return resultImage;
             }
             public static int[,] FindCorner(int[,]line )
@@ -546,10 +686,9 @@ namespace WindowsFormsApp2
                 //Ax + By + C =0
                 int A = Ymax - Ymin;
                 int B = Xmax - Xmin;
-                int C;
+                
                 return PointMap;
-            }
-            
+            }           
             // Hàm dilation với số lần lặp lại xác định
             public static int[,] Dilation(int[,] image, int iterations)
             {
@@ -672,7 +811,6 @@ namespace WindowsFormsApp2
                 }
                 return count - 1;
             }
-
             // Đếm số lượng chuyển đổi
             private static int Transitions(int x, int y, int[,] image)
             {
@@ -690,7 +828,6 @@ namespace WindowsFormsApp2
                 }
                 return count;
             }
-
             // Lấy giá trị các điểm lân cận
             private static int[] GetNeighborPixels(int x, int y, int[,] image)
             {
@@ -705,195 +842,71 @@ namespace WindowsFormsApp2
                 }
                 return pixels;
             }
-        }
-        public class CannyThresholdSelector
-        {
-            public static (int, int) AutoSelectThreshold(Bitmap image)
+            public static int CalculateThreshold(Bitmap image)
             {
-                // Chuyển đổi ảnh sang ảnh grayscale
-                Bitmap grayscaleImage = ConvertToGrayscale(image);
-
-                // Tính toán gradient theo hướng x và y
-                int[,] gradientX = CalculateGradient(grayscaleImage, true);
-                int[,] gradientY = CalculateGradient(grayscaleImage, false);
-
-                // Tính toán magnitute gradient
-                double[,] gradientMagnitude = CalculateGradientMagnitude(gradientX, gradientY);
-
-                // Tính toán histogram gradient
-                int[] histogram = CalculateGradientHistogram(gradientMagnitude);
-
-                // Tính toán phân vị dựa trên histogram
-                double percentile1 = Percentile(histogram, 0.1);
-                double percentile2 = Percentile(histogram, 0.9);
-
-                // Chọn ngưỡng dựa trên phân vị
-                int threshold1 = (int)(percentile1 * 255);
-                int threshold2 = (int)(percentile2 * 255);
-
-                return (threshold1, threshold2);
-            }
-
-            private static Bitmap ConvertToGrayscale(Bitmap image)
-            {
-                Bitmap grayscaleImage = new Bitmap(image.Width, image.Height);
+                // Tính histogram
+                int[] histogram = new int[256];
+                int totalPixels = 0;
 
                 for (int y = 0; y < image.Height; y++)
                 {
                     for (int x = 0; x < image.Width; x++)
                     {
-                        Color pixelColor = image.GetPixel(x, y);
-                        int average = (pixelColor.R + pixelColor.G + pixelColor.B) / 3;
-                        grayscaleImage.SetPixel(x, y, Color.FromArgb(average, average, average));
+                        Color pixel = image.GetPixel(x, y);
+                        int grayLevel = (int)(pixel.R * 0.299 + pixel.G * 0.587 + pixel.B * 0.114);
+                        histogram[grayLevel]++;
+                        totalPixels++;
                     }
                 }
 
-                return grayscaleImage;
-            }
-
-            private static int[,] CalculateGradient(Bitmap image, bool useXGradient)
-            {
-                int[,] gradient = new int[image.Width, image.Height];
-
-                for (int y = 0; y < image.Height; y++)
+                // Tính tổng trọng số
+                double[] weights = new double[256];
+                for (int i = 0; i < 256; i++)
                 {
-                    for (int x = 0; x < image.Width; x++)
+                    weights[i] = (double)histogram[i] / totalPixels;
+                }
+
+                // Tìm ngưỡng tối ưu
+                double maxVariance = 0;
+                int threshold = 0;
+
+                for (int t = 0; t < 256; t++)
+                {
+                    double w1 = 0, w2 = 0;
+                    double mean1 = 0, mean2 = 0;
+                    double variance = 0;
+
+                    for (int i = 0; i <= t; i++)
                     {
-                        int pixel1 = image.GetPixel(x, y).R;
-                        int pixel2;
-
-                        if (useXGradient)
-                        {
-                            if (x < image.Width - 1)
-                                pixel2 = image.GetPixel(x + 1, y).R;
-                            else
-                                pixel2 = image.GetPixel(x - 1, y).R;
-                        }
-                        else
-                        {
-                            if (y < image.Height - 1)
-                                pixel2 = image.GetPixel(x, y + 1).R;
-                            else
-                                pixel2 = image.GetPixel(x, y - 1).R;
-                        }
-
-                        gradient[x, y] = Math.Abs(pixel1 - pixel2);
+                        w1 += weights[i];
+                        mean1 += i * weights[i];
                     }
-                }
 
-                return gradient;
-            }
-
-            private static double[,] CalculateGradientMagnitude(int[,] gradientX, int[,] gradientY)
-            {
-                int width = gradientX.GetLength(0);
-                int height = gradientX.GetLength(1);
-                double[,] magnitude = new double[width, height];
-
-                for (int y = 0; y < height; y++)
-                {
-                    for (int x = 0; x < width; x++)
+                    for (int i = t + 1; i < 256; i++)
                     {
-                        magnitude[x, y] = Math.Sqrt(Math.Pow(gradientX[x, y], 2) + Math.Pow(gradientY[x, y], 2));
+                        w2 += weights[i];
+                        mean2 += i * weights[i];
                     }
-                }
 
-                return magnitude;
-            }
-
-            private static int[] CalculateGradientHistogram(double[,] gradientMagnitude)
-            {
-                int[] histogram = new int[1000];
-
-                foreach (double value in gradientMagnitude)
-                {
-                    int intensity = (int)(value * 255);
-                    // Kiểm tra xem intensity có nằm trong phạm vi của mảng histogram không
-                    if (intensity >= 0 && intensity < histogram.Length)
+                    if (w1 != 0 && w2 != 0)
                     {
-                        histogram[intensity]++;
+                        mean1 /= w1;
+                        mean2 /= w2;
+                        variance = w1 * w2 * Math.Pow(mean1 - mean2, 2);
                     }
-                    //histogram[intensity]++;
+
+                    if (variance > maxVariance)
+                    {
+                        maxVariance = variance;
+                        threshold = t;
+                    }
                 }
 
-                return histogram;
-            }
-
-            private static double Percentile(int[] histogram, double percentile)
-            {
-                int sum = histogram.Sum();
-                int threshold = (int)(sum * percentile);
-
-                int cumulativeSum = 0;
-                for (int i = 0; i < histogram.Length; i++)
-                {
-                    cumulativeSum += histogram[i];
-                    if (cumulativeSum >= threshold)
-                        return i / 255.0;
-                }
-
-                return 1.0;
+                return threshold;
             }
         }
-        public int[] TinhHistogram(int[,] gradient)
-        {
-
-            // khai báo mảng có 256 phần tử
-            int[] histogram = new int[256];
-            for (int x = 0; x < gradient.GetLength(0); x++)
-                for (int y = 0; y < gradient.GetLength(1); y++)
-                {
-
-                    int color = gradient[x, y];
-                    //byte gray = color.R;//trong hình  mức xám giá trị kênh R cũng giống  G hoặc B
-                    // giá trị gray cũng chính là  phần tử thứ gray  trong mảng histogram dã khai báo 
-                    //  Sẽ Tăng số đểm của phần tử thứ gray lên 1
-                    histogram[color]++;
-
-                }
-            return histogram;
-
-        }
-
-        PointPairList ChuyenDoiHistogram(int[] histogram)
-        {
-
-            PointPairList points = new PointPairList();
-            for (int i = 0; i < histogram.Length; i++)
-            {
-                //i chạy từ 0-->255 vì nó là giá trị gray
-                //histogram[i] tương ứng  trục đứng, là số pixels cùng mức xám
-                points.Add(i, histogram[i]);
-            }
-            return points;
-
-
-
-        }
-        //đưa các thông số hiển thị lên biểu đồ 
-        public GraphPane BieuDoHistogram(PointPairList histogram)
-        {
-            //GraphPane lad đối tượng  biểu đồ trong  Zedgraph
-            GraphPane gp = new GraphPane();
-
-            gp.Title.Text = @"";//tên biểu đồ
-            //gp.Rect = new Rectangle(0, 0, 1000, 900);// khung chứa biểu đồ
-            // thiết lập trục ngang
-            gp.XAxis.Title.Text = @"Giá trị đạo hàm";
-            gp.XAxis.Scale.Min = 0;
-            gp.XAxis.Scale.Max = 255;
-            gp.XAxis.Scale.MajorStep = 5;
-            gp.XAxis.Scale.MinorStep = 1;
-            //Thiết lập trục đứng
-            gp.YAxis.Title.Text = @"Số điểm ảnh có cùng Giá trị đạo hàm";
-            gp.YAxis.Scale.Min = 0;
-            gp.YAxis.Scale.Max = 25000;// cho giá trị lớn hơn giá trị điểm ảnh có nhiều nhất
-            gp.YAxis.Scale.MajorStep = 5;
-            gp.YAxis.Scale.MinorStep = 1;
-            // dùng biểu đồ dạng Bar để  biểu diễn Histogram
-            gp.AddBar("Histogram", histogram, Color.OrangeRed);
-            return gp;
-        }
+        
+        
 
         private void open_Click_1(object sender, EventArgs e)
         {
@@ -922,16 +935,12 @@ namespace WindowsFormsApp2
 
         private void process_Click_1(object sender, EventArgs e)
         {
-            if ((!string.IsNullOrEmpty(high.Text)) || (!string.IsNullOrEmpty(low.Text)) || (!string.IsNullOrEmpty(text1.Text)))
+            if (!string.IsNullOrEmpty(text1.Text))
             {
-                int high_threshold = Convert.ToInt16(high.Text);//ngưỡng trên cho canny detect
-                int low_threshold = Convert.ToInt16(low.Text);//ngưỡng dưới cho canny detect 
+                int high_threshold = 200;//ngưỡng trên cho canny detect
+                int low_threshold = 40;//ngưỡng dưới cho canny detect 
                 int threshold = Convert.ToInt16(text1.Text);  // Ngưỡng để chọn các đỉnh trong ma trận Hough
-                
-                //// 
-                Bitmap image = new Bitmap(imagePath);
-                (int threshold1, int threshold2) = CannyThresholdSelector.AutoSelectThreshold(image);
-                ////
+               // int thre = Convert.ToInt16(text_thres.Text);
                 //ảnh binary cho canny detect
                 int[,] edges = EdgeDetection.DeTectEdgeByCannyMethod(imagePath, high_threshold, low_threshold);
 
@@ -950,28 +959,15 @@ namespace WindowsFormsApp2
                 int[,] hough = EdgeDetection.PerformHoughTransform(edges);
 
                 //vẽ đường thẳng từ biểu đồ hough
-                int[,] resultImage = EdgeDetection.DrawLines(hough, threshold, width, height);
-
-                //int[,] PointMap = EdgeDetection.CheckPoint(resultImage);
-                //resultImage = EdgeDetection.Dilation(resultImage, 3);
-                //resultImage = EdgeDetection.EdgeThinning(resultImage);
+                int[,] result = EdgeDetection.DrawLines2(hough, threshold, width, height);
 
                 // thể hiện lên GUI
-                picture2.Image = EdgeDetection.IntToBitmap(resultImage);
+                picture2.Image = EdgeDetection.IntToBitmap(result);
                 picture3.Image = EdgeDetection.IntToBitmap(hough);
                 picture4.Image = EdgeDetection.IntToBitmap(edges);
 
-                // gọi hàm đã viết để chạy biểu đồ
-                int[] histogram = TinhHistogram(gradient);
-                PointPairList points = ChuyenDoiHistogram(histogram);
-                // vẽ và hiển thị biểu đồ
-                zGHistogram.GraphPane = BieuDoHistogram(points);
-                zGHistogram.Refresh();
-
-
             }
-            
-                
+
             else
             {
                 string message = "Nhập thiếu ngưỡng";
@@ -983,9 +979,8 @@ namespace WindowsFormsApp2
             }
         }
 
-        private void pictureBox1_Click(object sender, EventArgs e)
-        {
 
-        }
+
+       
     }
 }
