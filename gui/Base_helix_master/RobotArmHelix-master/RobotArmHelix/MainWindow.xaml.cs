@@ -1809,36 +1809,42 @@ namespace RobotArmHelix
                 y = double.Parse(TbY.Text);
                 z = double.Parse(TbZ.Text);
 
-                (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
-                ret = Check_angle(t1, t2, t3, t4, t5);
-                if (ret != 0)
+                if (z >= 500 && z <= 1000)
                 {
-                    double theta = 0.0;
-                    if (ret == 1) theta = t1;
-                    else if (ret == 2) theta = t2;
-                    else if (ret == 3) theta = t3;
-                    else if (ret == 4) theta = t4;
-                    else if (ret == 5) theta = t5;
-                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
-                    return;
-                }
-                t2 -= 90.0;
-                t3 += 90.0;
-                t4 += 90.0;
+                    (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
+                    ret = Check_angle(t1, t2, t3, t4, t5);
+                    if (ret != 0)
+                    {
+                        double theta = 0.0;
+                        if (ret == 1) theta = t1;
+                        else if (ret == 2) theta = t2;
+                        else if (ret == 3) theta = t3;
+                        else if (ret == 4) theta = t4;
+                        else if (ret == 5) theta = t5;
+                        PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
+                        return;
+                    }
+                    t2 -= 90.0;
+                    t3 += 90.0;
+                    t4 += 90.0;
 
-                int[] value_angle = new int[10];
-                /* Run */
-                temp_value[0] = (int)(Convert.ToDouble(t1) * 100000 + 18000000);
-                temp_value[1] = (int)(Convert.ToDouble(t2) * 100000 + 18000000);
-                temp_value[2] = (int)(Convert.ToDouble(t3) * 100000 + 18000000);
-                temp_value[3] = (int)(Convert.ToDouble(t4) * 100000 + 18000000);
-                temp_value[4] = (int)(Convert.ToDouble(t5) * 100000 + 18000000);
-                /* Write the angle */
-                for (int ind = 0; ind < 5; ind++)
+                    int[] value_angle = new int[10];
+                    /* Run */
+                    temp_value[0] = (int)(Convert.ToDouble(t1) * 100000 + 18000000);
+                    temp_value[1] = (int)(Convert.ToDouble(t2) * 100000 + 18000000);
+                    temp_value[2] = (int)(Convert.ToDouble(t3) * 100000 + 18000000);
+                    temp_value[3] = (int)(Convert.ToDouble(t4) * 100000 + 18000000);
+                    temp_value[4] = (int)(Convert.ToDouble(t5) * 100000 + 18000000);
+                    /* Write the angle */
+                    for (int ind = 0; ind < 5; ind++)
+                    {
+                        write_d_mem_32_bit(1010 + 2 * ind, temp_value[ind]);
+                    }
+                }
+                else
                 {
-                    write_d_mem_32_bit(1010 + 2 * ind, temp_value[ind]);
+                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", "Out of range of Z axis"));
                 }
-
             }
             catch (Exception er)
             {
@@ -1925,28 +1931,35 @@ namespace RobotArmHelix
                 x = curr_pos[0] + (vect_u[0] / 10) * (t + 1); /* 500 is the actual position of robot following the x axis */
                 y = curr_pos[1] + (vect_u[1] / 10) * (t + 1); /* 0 is the actual position of robot following the y axis */
                 z = curr_pos[2] + (vect_u[2] / 10) * (t + 1); /* 900 is the actual position of robot following the y axis */
-                (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
-                ret = Check_angle(t1, t2, t3, t4, t5);
-                if (ret != 0)
+                if(z >= 500 && z >= 1000)
                 {
-                    double theta = 0.0;
-                    if (ret == 1) theta = t1;
-                    else if (ret == 2) theta = t2;
-                    else if (ret == 3) theta = t3;
-                    else if (ret == 4) theta = t4;
-                    else if (ret == 5) theta = t5;
-                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
-                    return;
+                    (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
+                    ret = Check_angle(t1, t2, t3, t4, t5);
+                    if (ret != 0)
+                    {
+                        double theta = 0.0;
+                        if (ret == 1) theta = t1;
+                        else if (ret == 2) theta = t2;
+                        else if (ret == 3) theta = t3;
+                        else if (ret == 4) theta = t4;
+                        else if (ret == 5) theta = t5;
+                        PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
+                        return;
+                    }
+                    t2 -= 90.0;
+                    t3 += 90.0;
+                    t4 += 90.0;
+                    /* Assign value */
+                    angle_array[t, 0] = (int)(t1 * 100000 + 18000000);
+                    angle_array[t, 1] = (int)(t2 * 100000 + 18000000);
+                    angle_array[t, 2] = (int)(t3 * 100000 + 18000000);
+                    angle_array[t, 3] = (int)(t4 * 100000 + 18000000);
+                    angle_array[t, 4] = (int)(t5 * 100000 + 18000000);
                 }
-                t2 -= 90.0;
-                t3 += 90.0;
-                t4 += 90.0;
-                /* Assign value */
-                angle_array[t, 0] = (int)(t1 * 100000 + 18000000);
-                angle_array[t, 1] = (int)(t2 * 100000 + 18000000);
-                angle_array[t, 2] = (int)(t3 * 100000 + 18000000);
-                angle_array[t, 3] = (int)(t4 * 100000 + 18000000);
-                angle_array[t, 4] = (int)(t5 * 100000 + 18000000);
+                else
+                {
+                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", "Out of range of Z axis"));
+                }
 
             }
             for (int j = 0; j < 10; j++)
@@ -2257,6 +2270,22 @@ namespace RobotArmHelix
             if ((t5 > Constants.T5_LU) || (t5 < Constants.T5_LD) || double.IsNaN(t5))
             {
                 return 5;
+            }
+            return 0;
+        }
+        public int Check_position(double position_x, double position_y, double position_z)
+        {
+            if ((position_x > Constants.T1_LU) || (position_x < Constants.T1_LD) || double.IsNaN(position_x))
+            {
+                return 1;
+            }
+            if ((position_y > Constants.T2_LU) || (position_y < Constants.T2_LD) || double.IsNaN(position_y))
+            {
+                return 2;
+            }
+            if ((position_z > Constants.T3_LU) || (position_z < Constants.T3_LD) || double.IsNaN(position_z))
+            {
+                return 3;
             }
             return 0;
         }
