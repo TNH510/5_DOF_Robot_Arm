@@ -55,16 +55,16 @@
             // picture2
             // 
             this.picture2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.picture2.Location = new System.Drawing.Point(587, 23);
+            this.picture2.Location = new System.Drawing.Point(316, 23);
             this.picture2.Name = "picture2";
-            this.picture2.Size = new System.Drawing.Size(510, 603);
+            this.picture2.Size = new System.Drawing.Size(265, 298);
             this.picture2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.picture2.TabIndex = 0;
             this.picture2.TabStop = false;
             // 
             // open
             // 
-            this.open.Location = new System.Drawing.Point(1103, 81);
+            this.open.Location = new System.Drawing.Point(597, 81);
             this.open.Name = "open";
             this.open.Size = new System.Drawing.Size(96, 71);
             this.open.TabIndex = 1;
@@ -74,7 +74,7 @@
             // 
             // process
             // 
-            this.process.Location = new System.Drawing.Point(1103, 173);
+            this.process.Location = new System.Drawing.Point(597, 173);
             this.process.Name = "process";
             this.process.Size = new System.Drawing.Size(96, 71);
             this.process.TabIndex = 1;
@@ -85,7 +85,7 @@
             // picture3
             // 
             this.picture3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.picture3.Location = new System.Drawing.Point(316, 23);
+            this.picture3.Location = new System.Drawing.Point(316, 327);
             this.picture3.Name = "picture3";
             this.picture3.Size = new System.Drawing.Size(265, 298);
             this.picture3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -94,7 +94,7 @@
             // 
             // text1
             // 
-            this.text1.Location = new System.Drawing.Point(1103, 42);
+            this.text1.Location = new System.Drawing.Point(597, 42);
             this.text1.Name = "text1";
             this.text1.Size = new System.Drawing.Size(96, 22);
             this.text1.TabIndex = 2;
@@ -102,7 +102,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(1103, 23);
+            this.label5.Location = new System.Drawing.Point(597, 23);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(128, 16);
             this.label5.TabIndex = 3;
@@ -120,7 +120,7 @@
             // 
             // Form1
             // 
-            this.ClientSize = new System.Drawing.Size(1247, 646);
+            this.ClientSize = new System.Drawing.Size(735, 646);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.text1);
             this.Controls.Add(this.process);

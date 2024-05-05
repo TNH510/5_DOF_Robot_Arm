@@ -553,18 +553,18 @@ namespace WindowsFormsApp2
 
                 int[,] resultImage = new int[width, height];
                 int count = 0;
-                int[,] theta_rho = new int[1000, 3];
+                int[,] theta_rho = new int[1000, 4];
                 // lấy toàn bộ số điểm vượt ngưỡng 
                 for (int theta = 0; theta < 180; theta++)
                 {
                     for (int rho = 0; rho < 2 * diagonal; rho++)
                     {
                         if (houghMatrix[theta, rho] >= threshold)
-                        {
-                            
+                        {                            
                             theta_rho[count, 0] = theta;
                             theta_rho[count, 1] = rho;
                             theta_rho[count, 2] = 0;
+                            theta_rho[count,3] = houghMatrix[theta, rho];
                             count++;
                         }
                     }
@@ -579,19 +579,26 @@ namespace WindowsFormsApp2
                 {
                     int index = 0;
 
-                    //lấy số chuẩn cho mỗi nhóm
+
+                    //lấy số chuẩn cho mỗi nhóm điều kiện phải là số có hough lớn nhất còn lại
+                    int max_value_hough = 0;
+                    int max_index = 0;
                     for (int j = 0; j < count; j++)
                     {
-                        if (theta_rho[j, 2] == 0)
+                        if(theta_rho[j, 2] == 0)
                         {
-                            ketqua[index, 0, i] = theta_rho[j, 0];
-                            ketqua[index, 1, i] = theta_rho[j, 1];
-                            theta_rho[j, 2] = 1;
-                            index++;
-                            j = count;//thoát vòng lặp
-                            soluong_nhom++;
-                        }
+                            if (theta_rho[j,3] > max_value_hough)
+                            {
+                                max_value_hough = theta_rho[j,3];
+                                max_index = j;
+                            }  
+                        }    
                     }
+                    ketqua[index, 0, i] = theta_rho[max_index, 0];
+                    ketqua[index, 1, i] = theta_rho[max_index, 1];
+                    theta_rho[max_index, 2] = 1;
+                    index++;
+                    soluong_nhom++;
                     //phân nhóm
                     int delta_a = 0;
                     int delta_p = 0;
@@ -1006,7 +1013,7 @@ namespace WindowsFormsApp2
             {
                 int high_threshold = 200;//ngưỡng trên cho canny detect
                 int low_threshold = 40;//ngưỡng dưới cho canny detect 
-                int threshold = 100;  // Ngưỡng để chọn các đỉnh trong ma trận Hough
+                int threshold = 50;  // Ngưỡng để chọn các đỉnh trong ma trận Hough
                // int thre = Convert.ToInt16(text_thres.Text);
                 //ảnh binary cho canny detect
                 int[,] edges = EdgeDetection.DeTectEdgeByCannyMethod(imagePath, high_threshold, low_threshold);
