@@ -59,43 +59,7 @@ namespace Mini_prj05
             return histogram;
 
         }
-        public int ComputeThresholdByOtsuMethod(Bitmap HinhMucXam)
-        {
-            int[] histogram = TinhHistogram(HinhMucXam);
-            int threshold = 1;
-            int varience_max = 0;
-            int m_1 = 0;
-            int P1 = 0;
-            int m_G = 0;
-            //compute the global intensity mean
-            for (int j = 0; j < 256; j++)
-            {
-                m_G = m_G + j * (histogram[j] / (HinhMucXam.Width * HinhMucXam.Height));
-            }
-            for (int i = 1; i < 256; i++)
-            {
-                //compute the cumulative sum and mean
-                for (int j = 0; j < i; j++)
-                {
-                    P1 = P1 + histogram[j] / (HinhMucXam.Width * HinhMucXam.Height);
-                    m_1 = m_1 + j * (histogram[j] / (HinhMucXam.Width * HinhMucXam.Height));
-                }
-                //compute the between class varience and finf varience max
-                int varience=0;
-                if (P1!=0)
-                {
-                    varience = (m_G * P1 - m_1) ^ 2 / (P1 * (1 - P1));
-                }
-                //int varience = (m_G * P1 - m_1) ^ 2 / (P1 * (1 - P1));
-                if (varience > varience_max)
-                {
-                    varience_max = varience;
-                    threshold = i;
-                }
-
-            }
-            return threshold;
-        }
+     
         public static int CalculateThreshold(Bitmap image)
         {
             // Tính histogram
