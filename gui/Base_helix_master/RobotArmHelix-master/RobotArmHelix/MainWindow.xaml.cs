@@ -79,6 +79,12 @@ namespace RobotArmHelix
         private double returnY = 0;
         private double returnZ = 600;
 
+        private double returnX_update = 500;
+        private double returnY_update = 0;
+        private double returnZ_update = 600;
+
+        private int glove_enable = 0;
+
         private int servo_status_timer = 0;
         private System.Timers.Timer timer;
         private int count;
@@ -842,9 +848,12 @@ namespace RobotArmHelix
                 //y = double.Parse(TbY.Text);
                 //z = double.Parse(TbZ.Text);
 
-                x = returnX;
-                y = returnY;
-                z = returnZ;
+                //x = returnX_update;
+                //y = returnY_update;
+
+                x = 500.0;
+                y = 0.0;
+                z = returnZ_update;
 
                 (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
                 ret = Check_angle(t1, t2, t3, t4, t5);
@@ -2458,42 +2467,72 @@ namespace RobotArmHelix
                         double theta_test;
                         double t1_test, t2_test, t3_test, t4_test, t5_test;
                         int ret;
+                        int[] temp_value = new int[5];
                         if (success)
                         {
                             Dispatcher.Invoke(() =>
                             {
                                 // Cập nhật các giá trị trên giao diện
-                                returnX = num1 * 20;
-                                returnY = num2 * 30;
+                                //returnX = num1 * 20;
+                                //returnY = num2 * 30;
+
+                                returnX = 500.0;
+                                returnY = 0.0;
                                 returnZ = num3 * 20 + 700;
                                 ErrorLog.Text = returnX.ToString() + "\n" + returnY.ToString() + "\n" + returnZ.ToString();
 
-                            (t1_test, t2_test, t3_test, t4_test, t5_test) = convert_position_angle(returnX, returnY, returnZ);
-                            ret = Check_angle(t1_test, t2_test, t3_test, t4_test, t5_test);
-                            if (ret != 0)
-                            {
-                                double theta = 0.0;
-                                if (ret == 1) theta = t1_test;
-                                else if (ret == 2) theta = t2_test;
-                                else if (ret == 3) theta = t3_test;
-                                else if (ret == 4) theta = t4_test;
-                                else if (ret == 5) theta = t5_test;
-                                PrintLog("\nError", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
-                                return;
-                            }
-                            else
-                            {
-                                double[] angles = { t1_test, t2_test - 90.0, t3_test + 90.0, t4_test + 90.0, t5_test};
-                                /* Update position for robot on GUI */
-                                ForwardKinematics(angles);
-                                /* Update data for slider on GUI */
-                                joint1.Value = angles[0];
-                                joint2.Value = angles[1];
-                                joint3.Value = angles[2];
-                                joint4.Value = angles[3];
-                                joint5.Value = angles[4];
-                            }
+                                if (returnZ >= 500 && returnZ <= 1000)
+                                {
+                                    (t1_test, t2_test, t3_test, t4_test, t5_test) = convert_position_angle(returnX, returnY, returnZ);
+                                    ret = Check_angle(t1_test, t2_test, t3_test, t4_test, t5_test);
+                                    if (ret != 0)
+                                    {
+                                        double theta = 0.0;
+                                        if (ret == 1) theta = t1_test;
+                                        else if (ret == 2) theta = t2_test;
+                                        else if (ret == 3) theta = t3_test;
+                                        else if (ret == 4) theta = t4_test;
+                                        else if (ret == 5) theta = t5_test;
+                                        PrintLog("\nError", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
+                                        return;
+                                    }
+                                    else
+                                    {
+                                        double[] angles = { t1_test, t2_test - 90.0, t3_test + 90.0, t4_test + 90.0, t5_test };
+                                        /* Update position for robot on GUI */
+                                        ForwardKinematics(angles);
+                                        /* Update data for slider on GUI */
+                                        joint1.Value = angles[0];
+                                        joint2.Value = angles[1];
+                                        joint3.Value = angles[2];
+                                        joint4.Value = angles[3];
+                                        joint5.Value = angles[4];
 
+                                        returnX_update = returnX;
+                                        returnY_update = returnY;
+                                        returnZ_update = returnZ;
+
+                                        if (glove_enable == 1)
+                                        {
+                                            int[] value_angle = new int[10];
+                                            /* Run */
+                                            temp_value[0] = (int)(Convert.ToDouble(t1_test) * 100000 + 18000000);
+                                            temp_value[1] = (int)(Convert.ToDouble(t2_test) * 100000 + 18000000);
+                                            temp_value[2] = (int)(Convert.ToDouble(t3_test) * 100000 + 18000000);
+                                            temp_value[3] = (int)(Convert.ToDouble(t4_test) * 100000 + 18000000);
+                                            temp_value[4] = (int)(Convert.ToDouble(t5_test) * 100000 + 18000000);
+                                            /* Write the angle */
+                                            for (int ind = 0; ind < 5; ind++)
+                                            {
+                                                write_d_mem_32_bit(1400 + 2 * ind, temp_value[ind]);
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", "Out of range of Z axis"));
+                                }
                             });
                         }
                     }
@@ -2695,15 +2734,13 @@ namespace RobotArmHelix
             /* Turn on relay */
             turn_on_1_pulse_relay(600);
             /* Timer 1 start */
-            // timer1.Start();
-
+            glove_enable = 1;
         }
 
         private void Glove_disable_button_Click(object sender, RoutedEventArgs e)
         {
             /* Timer 1 start */
-            // timer1.Stop();
-
+            glove_enable = 0;
         }
 
         private void Clr_Traj_btn_Click(object sender, RoutedEventArgs e)
