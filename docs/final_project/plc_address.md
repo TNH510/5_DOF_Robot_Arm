@@ -11,6 +11,7 @@ Control Memory
 | M1999  | Set Home (K0)      |
 | M515   | Reset Error        |
 | M530   | Move Path (K3)     |
+| M532   | Move Path 2 (K5)   |
 | M550   | JOG1_F             |
 | M551   | JOG1_R             |
 | M552   | JOG2_F             |
@@ -32,8 +33,8 @@ Data memory
 | **D1010 --> D1019** | **Data for 5 axis go_pos**        |
 | **D1010 --> D1089** | **Data for 4 axis move_path**     |
 | D2000 --> D2019     | Data for axis 5 move_path         |
-| D1100 --> D1259     | Data for 4 axis move_path_2       |
-| D1300 --> D1339     | Data for axis 5 move_path_2       |
+| D1100 --> D1179     | Data for 4 axis move_path_2       |
+| D1300 --> D1319     | Data for axis 5 move_path_2       |
 | **D1400 --> D1401** | **Data for axis 1 adapt_control** |
 | D1402 --> D1403     | Data for axis 2 adapt_control     |
 | D1404 --> D1405     | Data for axis 3 adapt_control     |
