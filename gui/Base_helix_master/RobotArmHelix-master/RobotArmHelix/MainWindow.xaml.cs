@@ -83,6 +83,8 @@ namespace RobotArmHelix
         private double returnY_update = 0;
         private double returnZ_update = 900;
 
+        double t1_test, t2_test, t3_test, t4_test, t5_test;
+
         private int glove_enable = 0;
 
         private int servo_status_timer = 0;
@@ -249,30 +251,76 @@ namespace RobotArmHelix
 
         private void Timer_Tick_Graph(object sender, EventArgs e)
         {
-            // Update data points
-            var timestamp = DateTime.Now;
-            var dataPoint1 = new DataPoint(DateTimeAxis.ToDouble(timestamp), (returnX / 20) );
-            var dataPoint2 = new DataPoint(DateTimeAxis.ToDouble(timestamp), (returnY / 30) );
-            var dataPoint3 = new DataPoint(DateTimeAxis.ToDouble(timestamp), ((returnZ - 700) / 20));
+            //// Update data points
+            //var timestamp = DateTime.Now;
+            //var dataPoint1 = new DataPoint(DateTimeAxis.ToDouble(timestamp), (returnX / 20) );
+            //var dataPoint2 = new DataPoint(DateTimeAxis.ToDouble(timestamp), (returnY / 30) );
+            //var dataPoint3 = new DataPoint(DateTimeAxis.ToDouble(timestamp), ((returnZ - 700) / 20));
 
-            // Update series
-            var series1 = (LineSeries)_plotModel.Series[0];
-            var series2 = (LineSeries)_plotModel.Series[1];
-            var series3 = (LineSeries)_plotModel.Series[2];
-            series1.Points.Add(dataPoint1);
-            series2.Points.Add(dataPoint2);
-            series3.Points.Add(dataPoint3);
+            //// Update series
+            //var series1 = (LineSeries)_plotModel.Series[0];
+            //var series2 = (LineSeries)_plotModel.Series[1];
+            //var series3 = (LineSeries)_plotModel.Series[2];
+            //series1.Points.Add(dataPoint1);
+            //series2.Points.Add(dataPoint2);
+            //series3.Points.Add(dataPoint3);
 
-            // Limit number of data points to keep graph responsive
-            if (series1.Points.Count > 100)
+            //// Limit number of data points to keep graph responsive
+            //if (series1.Points.Count > 100)
+            //{
+            //    series1.Points.RemoveAt(0);
+            //    series2.Points.RemoveAt(0);
+            //    series3.Points.RemoveAt(0);
+            //}
+
+            //// Refresh plot view
+            //plotView.InvalidatePlot();
+
+            int ret = 0;
+            if (returnZ >= 500 && returnZ <= 1000)
             {
-                series1.Points.RemoveAt(0);
-                series2.Points.RemoveAt(0);
-                series3.Points.RemoveAt(0);
-            }
+                (t1_test, t2_test, t3_test, t4_test, t5_test) = convert_position_angle(returnX, returnY, returnZ);
+                ret = Check_angle(t1_test, t2_test, t3_test, t4_test, t5_test);
+                if (ret != 0)
+                {
+                    double theta = 0.0;
+                    if (ret == 1) theta = t1_test;
+                    else if (ret == 2) theta = t2_test;
+                    else if (ret == 3) theta = t3_test;
+                    else if (ret == 4) theta = t4_test;
+                    else if (ret == 5) theta = t5_test;
+                    PrintLog("\nError", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
+                    return;
+                }
+                else
+                {
+                    double[] angles = { t1_test, t2_test - 90.0, t3_test + 90.0, t4_test + 90.0, t5_test };
+                    int[] temp_value = new int[5];
 
-            // Refresh plot view
-            plotView.InvalidatePlot();
+                    returnX_update = returnX;
+                    returnY_update = returnY;
+                    returnZ_update = returnZ;
+                    if (glove_enable == 1)
+                    {
+                        int[] value_angle = new int[10];
+                        /* Run */
+                        temp_value[0] = (int)(Convert.ToDouble(t1_test) * 100000 + 18000000);
+                        temp_value[1] = (int)(Convert.ToDouble(t2_test - 90) * 100000 + 18000000);
+                        temp_value[2] = (int)(Convert.ToDouble(t3_test + 90) * 100000 + 18000000);
+                        temp_value[3] = (int)(Convert.ToDouble(t4_test + 90) * 100000 + 18000000);
+                        temp_value[4] = (int)(Convert.ToDouble(t5_test) * 100000 + 18000000);
+                        /* Write the angle */
+                        for (int ind = 0; ind < 5; ind++)
+                        {
+                            write_d_mem_32_bit(1400 + 2 * ind, temp_value[ind]);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", "Out of range of Z axis"));
+            }
         }
 
         public void Task1()
@@ -1227,8 +1275,8 @@ namespace RobotArmHelix
             }
             /* Start timer1 and timer2 */
             // timer1.Start();
-            Thread1Start();
-            Thread2Start();
+            //Thread1Start();
+            //Thread2Start();
             //timer1.Start();
         }
 
@@ -2465,7 +2513,6 @@ namespace RobotArmHelix
                         success &= double.TryParse(numbers[1], out num2);
                         success &= double.TryParse(numbers[2], out num3);
                         double theta_test;
-                        double t1_test, t2_test, t3_test, t4_test, t5_test;
                         int ret;
                         int[] temp_value = new int[5];
                         if (success)
@@ -2476,9 +2523,9 @@ namespace RobotArmHelix
                                 //returnX = num1 * 20;
                                 //returnY = num2 * 30;
 
-                                returnX = 500.0;
-                                returnY = 0.0;
-                                returnZ = num3 * 20 + 700;
+                                returnX = num1 * 20;
+                                returnY = num2 * 20;
+                                returnZ = num3 * 15 + 700;
                                 ErrorLog.Text = returnX.ToString() + "\n" + returnY.ToString() + "\n" + returnZ.ToString();
 
                                 if (returnZ >= 500 && returnZ <= 1000)
@@ -2495,38 +2542,6 @@ namespace RobotArmHelix
                                         else if (ret == 5) theta = t5_test;
                                         PrintLog("\nError", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
                                         return;
-                                    }
-                                    else
-                                    {
-                                        double[] angles = { t1_test, t2_test - 90.0, t3_test + 90.0, t4_test + 90.0, t5_test };
-                                        ///* Update position for robot on GUI */
-                                        //ForwardKinematics(angles);
-                                        ///* Update data for slider on GUI */
-                                        //joint1.Value = angles[0];
-                                        //joint2.Value = angles[1];
-                                        //joint3.Value = angles[2];
-                                        //joint4.Value = angles[3];
-                                        //joint5.Value = angles[4];
-
-                                        returnX_update = returnX;
-                                        returnY_update = returnY;
-                                        returnZ_update = returnZ;
-
-                                        if (glove_enable == 1)
-                                        {
-                                            int[] value_angle = new int[10];
-                                            /* Run */
-                                            temp_value[0] = (int)(Convert.ToDouble(t1_test) * 100000 + 18000000);
-                                            temp_value[1] = (int)(Convert.ToDouble(t2_test) * 100000 + 18000000);
-                                            temp_value[2] = (int)(Convert.ToDouble(t3_test) * 100000 + 18000000);
-                                            temp_value[3] = (int)(Convert.ToDouble(t4_test) * 100000 + 18000000);
-                                            temp_value[4] = (int)(Convert.ToDouble(t5_test) * 100000 + 18000000);
-                                            /* Write the angle */
-                                            for (int ind = 0; ind < 5; ind++)
-                                            {
-                                                write_d_mem_32_bit(1400 + 2 * ind, temp_value[ind]);
-                                            }
-                                        }
                                     }
                                 }
                                 else
