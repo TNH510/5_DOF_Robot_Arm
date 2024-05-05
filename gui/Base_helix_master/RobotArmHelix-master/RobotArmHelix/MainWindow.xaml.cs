@@ -1953,28 +1953,15 @@ namespace RobotArmHelix
             }
         }
 
-        private void Tsm_moveL_btn_Click(object sender, RoutedEventArgs e)
+        private void MoveL_Function(double[] curr_pos, double[] targ_pos, string device)
         {
-            move = 2;
             double[] vect_u = new double[3];
-            double[] curr_pos = new double[3];
-            double[] targ_pos = new double[3];
             double t1, t2, t3, t4, t5;
             int[,] angle_array = new int[10, 5];
             double x, y, z;
             int ret;
             int[] value_angle = new int[80];
             int[] value_angle_t5 = new int[20];
-
-            /* Assign corrdination for each array */
-            curr_pos[0] = Convert.ToDouble(Tx.Content);
-            curr_pos[1] = Convert.ToDouble(Ty.Content);
-            curr_pos[2] = Convert.ToDouble(Tz.Content);
-
-            targ_pos[0] = Convert.ToDouble(TbX.Text);
-            targ_pos[1] = Convert.ToDouble(TbY.Text);
-            targ_pos[2] = Convert.ToDouble(TbZ.Text);
-
             /* Referred vector */
             for (int i = 0; i < 3; i++)
             {
@@ -1988,7 +1975,7 @@ namespace RobotArmHelix
                 x = curr_pos[0] + (vect_u[0] / 10) * (t + 1); /* 500 is the actual position of robot following the x axis */
                 y = curr_pos[1] + (vect_u[1] / 10) * (t + 1); /* 0 is the actual position of robot following the y axis */
                 z = curr_pos[2] + (vect_u[2] / 10) * (t + 1); /* 900 is the actual position of robot following the y axis */
-                if(z >= 500 && z <= 1000)
+                if (z >= 500 && z <= 1000)
                 {
                     (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
                     ret = Check_angle(t1, t2, t3, t4, t5);
@@ -2043,12 +2030,37 @@ namespace RobotArmHelix
                 PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 7]));
 
             }
-            plc.WriteDeviceBlock("D1010", 80, ref value_angle[0]);
+            plc.WriteDeviceBlock(device, 80, ref value_angle[0]);
             for (int j = 0; j < 10; j++)
             {
                 value_angle_t5[2 * j] = Write_Theta(angle_array[j, 4])[0];
                 value_angle_t5[2 * j + 1] = Write_Theta(angle_array[j, 4])[1];
             }
+        }
+
+        private void Tsm_moveL_btn_Click(object sender, RoutedEventArgs e)
+        {
+            move = 2;
+            double[] vect_u = new double[3];
+            double[] curr_pos = new double[3];
+            double[] targ_pos = new double[3];
+            double t1, t2, t3, t4, t5;
+            int[,] angle_array = new int[10, 5];
+            double x, y, z;
+            int ret;
+            int[] value_angle = new int[80];
+            int[] value_angle_t5 = new int[20];
+
+            /* Assign corrdination for each array */
+            curr_pos[0] = Convert.ToDouble(Tx.Content);
+            curr_pos[1] = Convert.ToDouble(Ty.Content);
+            curr_pos[2] = Convert.ToDouble(Tz.Content);
+
+            targ_pos[0] = Convert.ToDouble(TbX.Text);
+            targ_pos[1] = Convert.ToDouble(TbY.Text);
+            targ_pos[2] = Convert.ToDouble(TbZ.Text);
+
+            MoveL_Function(curr_pos, targ_pos, "D1010");
         }
 
         private void Tsm_moveC_btn_Click(object sender, RoutedEventArgs e)
@@ -3495,16 +3507,25 @@ namespace RobotArmHelix
 
         private void Glove_test_button_Click(object sender, RoutedEventArgs e)
         {
-            /* Reset error */
-            turn_on_1_pulse_relay(3200);
-            /* Turn on relay */
-            turn_on_1_pulse_relay(600);
+            ///* Reset error */
+            //turn_on_1_pulse_relay(3200);
+            ///* Turn on relay */
+            //turn_on_1_pulse_relay(600);
             int[] temp_value = new int[5];
             double t1_glove, t2_glove, t3_glove, t4_glove, t5_glove;
-            double X_test = 550;
-            double Y_test = 0.0;
-            double Z_test = 750.0;
-            (t1_glove, t2_glove, t3_glove, t4_glove, t5_glove) = convert_position_angle(X_test, Y_test, Z_test);
+
+            double X1_test = 550;
+            double Y1_test = 0.0;
+            double Z1_test = 900;
+
+            double X2_test = 0.0;
+            double Y2_test = 700.0;
+            double Z2_test = 600.0;
+
+            double X3_test = 600.0;
+            double Y3_test = 0.0;
+            double Z3_test = 800.0;
+            (t1_glove, t2_glove, t3_glove, t4_glove, t5_glove) = convert_position_angle(X1_test, Y1_test, Z1_test);
             /* Run */
             temp_value[0] = (int)(Convert.ToDouble(t1_glove * 100000 + 18000000));
             temp_value[1] = (int)(Convert.ToDouble((t2_glove - 90) * 100000 + 18000000));
