@@ -81,7 +81,7 @@ namespace RobotArmHelix
 
         private double returnX_update = 500;
         private double returnY_update = 0;
-        private double returnZ_update = 600;
+        private double returnZ_update = 900;
 
         private int glove_enable = 0;
 
@@ -2499,14 +2499,14 @@ namespace RobotArmHelix
                                     else
                                     {
                                         double[] angles = { t1_test, t2_test - 90.0, t3_test + 90.0, t4_test + 90.0, t5_test };
-                                        /* Update position for robot on GUI */
-                                        ForwardKinematics(angles);
-                                        /* Update data for slider on GUI */
-                                        joint1.Value = angles[0];
-                                        joint2.Value = angles[1];
-                                        joint3.Value = angles[2];
-                                        joint4.Value = angles[3];
-                                        joint5.Value = angles[4];
+                                        ///* Update position for robot on GUI */
+                                        //ForwardKinematics(angles);
+                                        ///* Update data for slider on GUI */
+                                        //joint1.Value = angles[0];
+                                        //joint2.Value = angles[1];
+                                        //joint3.Value = angles[2];
+                                        //joint4.Value = angles[3];
+                                        //joint5.Value = angles[4];
 
                                         returnX_update = returnX;
                                         returnY_update = returnY;
@@ -3476,6 +3476,31 @@ namespace RobotArmHelix
                 CameraImage.Source = EdgeDetection.IntToBitmap(skeleton);
             }
 
+        }
+
+        private void Glove_test_button_Click(object sender, RoutedEventArgs e)
+        {
+            /* Reset error */
+            turn_on_1_pulse_relay(3200);
+            /* Turn on relay */
+            turn_on_1_pulse_relay(600);
+            int[] temp_value = new int[5];
+            double t1_glove, t2_glove, t3_glove, t4_glove, t5_glove;
+            double X_test = 550;
+            double Y_test = 0.0;
+            double Z_test = 750.0;
+            (t1_glove, t2_glove, t3_glove, t4_glove, t5_glove) = convert_position_angle(X_test, Y_test, Z_test);
+            /* Run */
+            temp_value[0] = (int)(Convert.ToDouble(t1_glove * 100000 + 18000000));
+            temp_value[1] = (int)(Convert.ToDouble((t2_glove - 90) * 100000 + 18000000));
+            temp_value[2] = (int)(Convert.ToDouble((t3_glove + 90) * 100000 + 18000000));
+            temp_value[3] = (int)(Convert.ToDouble((t4_glove + 90) * 100000 + 18000000));
+            temp_value[4] = (int)(Convert.ToDouble(t5_glove * 100000 + 18000000));
+            /* Write the angle */
+            for (int ind = 0; ind < 5; ind++)
+            {
+                write_d_mem_32_bit(1400 + 2 * ind, temp_value[ind]);
+            }
         }
 
         class Point2
