@@ -58,6 +58,11 @@ void bsp_uart_printf_len(UART_HandleTypeDef *huart, uint8_t *string, uint16_t le
     HAL_UART_Transmit(huart, string, len, TIME_OUT_TRANSMIT_UART);
 }
 
+void bsp_uart_send_data(UART_HandleTypeDef *huart, uint8_t *data, uint16_t len)
+{
+    HAL_UART_Transmit(huart, data, len, 10);
+}
+
 void bsp_uart_receive_to_idle_dma(UART_HandleTypeDef *huart, uint8_t *data, uint16_t size)
 {
     p_buffer_for_reception = rx_buffer_one;

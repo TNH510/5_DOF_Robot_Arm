@@ -70,7 +70,7 @@ void drv_button_check_event(button_name_t *button_state)
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-    if (GPIO_Pin == USER_BUTTON_Pin)
+    if (GPIO_Pin == SW3_Pin)
         drv_button.button_1_interrupt = true;
 }
 

@@ -1,0 +1,9 @@
+- ENTER AT MODE:
+    + Connect all pins and VCC (NOT CONNECT SET PIN)
+    + Connect SET PIN to GND
+- Test on terminal:
+    + MUST CHOOSE: Baurate 9600, Mode auto send CR+LF
+    + Test: Send "AT" and wait for respone
+- Exit AT MODE:
+    + MUST DISCONNECT SET PIN FIRST
+    + Disconnect VCC and checks

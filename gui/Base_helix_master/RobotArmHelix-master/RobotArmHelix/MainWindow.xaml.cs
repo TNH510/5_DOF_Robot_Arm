@@ -22,14 +22,18 @@ using System.Reflection;
 using System.Threading;
 using System.Net.Sockets;
 using System.IO.Ports;
-
-
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using OxyPlot;
+using OxyPlot.Series;
 
 using System.Windows.Threading;
 using System.Data;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolTip;
 using RobotArmHelix.Properties;
 using System.Windows.Markup;
+using OxyPlot.Axes;
+using System.ComponentModel;
 /**
 * Author: Gabriele Marini (Gabryxx7)
 * This class load the 3d models of all the parts of the robotic arms and add them to the viewport
@@ -61,15 +65,36 @@ namespace RobotArmHelix
     /// </summary>
     public partial class MainWindow : Window
    {
+        public Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
-        private double returnZaxis = 0;
+        public int visible_robot = 1;
+        public int visible_display = 1;
+        public int visible_control = 1;
+        public int visible_jogging = 1;
+        public int visible_path = 1;
+        public int visible_glove = 1;
+
+
+        private double returnX = 500;
+        private double returnY = 0;
+        private double returnZ = 600;
+
+        private double returnX_update = 500;
+        private double returnY_update = 0;
+        private double returnZ_update = 900;
+
+        double t1_test, t2_test, t3_test, t4_test, t5_test;
+
+        private int glove_enable = 0;
+
         private int servo_status_timer = 0;
         private System.Timers.Timer timer;
         private int count;
 
         private SerialPort uart = new SerialPort();
         string receivedData;
-
+        /* Create the list for later removal */
+        private List<ModelVisual3D> sphereVisuals = new List<ModelVisual3D>();
 
         private Thread subThread1;
         private Thread subThread2;
@@ -86,6 +111,7 @@ namespace RobotArmHelix
         //provides functionality to 3d models
         Model3DGroup RA = new Model3DGroup(); //RoboticArm 3d group
         Model3D geom = null; //Debug sphere to check in which point the joint is rotatin
+        Model3D geomtest = null; //Debug sphere to check in which point the joint is rotatin
         public ActUtlType plc = new();
         List<Joint> joints = null;
         int move = 0; /* move = 1 -> MoveJ, move = 2 -> MoveL */
@@ -94,10 +120,11 @@ namespace RobotArmHelix
 
         bool switchingJoint = false;
         bool isAnimating = false;
-        public bool task_run = false;
+
         string response_client;
 
         public double joint1_value, joint2_value, joint3_value, joint4_value, joint5_value;
+        public double[] axis = {0, 0, 0};
 
         public double[] angles_global = {0, 0, 0, 0, 0};
 
@@ -136,7 +163,10 @@ namespace RobotArmHelix
         private const string MODEL_PATH4 = "K4.stl";
         private const string MODEL_PATH5 = "K5.stl";
 #endif
-
+        private readonly PlotModel _plotModel;
+        private readonly DispatcherTimer _timer;
+        private double _xValue = 0;
+        private readonly BackgroundWorker _uartWorker;
 
         public MainWindow()
         {
@@ -144,14 +174,10 @@ namespace RobotArmHelix
             //UART
             string[] ports = SerialPort.GetPortNames();
             com_port_list1.ItemsSource = ports;
-            uart.DataReceived += SerialPort_DataReceived;
+            // uart.DataReceived += SerialPort_DataReceived;
 
-            /* Temporary for test automation */
-            move = 1; /* moveJ */
-
-
-            // Attach the event handler to the MouseDown event
-            viewPort3d.MouseDown += helixViewport3D_MouseDown;
+            //// Attach the event handler to the MouseDown event
+            //viewPort3d.MouseDown += helixViewport3D_MouseDown;
             basePath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\3D_Models\\";
             List<string> modelsNames = new List<string>();
             modelsNames.Add(MODEL_PATH0);
@@ -160,6 +186,7 @@ namespace RobotArmHelix
             modelsNames.Add(MODEL_PATH3);
             modelsNames.Add(MODEL_PATH4);
             modelsNames.Add(MODEL_PATH5);
+
 
 #if IRB6700
 #endif
@@ -186,11 +213,130 @@ namespace RobotArmHelix
             ForwardKinematics(angles);
 
             timer1 = new System.Windows.Forms.Timer();
-            timer1.Interval = 500;
+            timer1.Interval = 100;
             timer1.Tick += new System.EventHandler(timer1_Tick);
 
+            timer2 = new System.Windows.Forms.Timer();
+            timer2.Interval = 500;
+            timer2.Tick += new System.EventHandler(timer2_Tick);
+
+            // Create plot model
+            _plotModel = new PlotModel { Title = "Real-Time Graph" };
+
+            // Create line series for each value
+            var series1 = new LineSeries { Title = "Value 1" };
+            var series2 = new LineSeries { Title = "Value 2" };
+            var series3 = new LineSeries { Title = "Value 3" };
+
+            // Add series to plot model
+            _plotModel.Series.Add(series1);
+            _plotModel.Series.Add(series2);
+            _plotModel.Series.Add(series3);
+
+            // Set up timer to update graph
+            _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
+            _timer.Tick += Timer_Tick_Graph;
+
+            // Set plot model to PlotView
+            plotView.Model = _plotModel;
+
+            // Initialize BackgroundWorker
+            _uartWorker = new BackgroundWorker
+            {
+                WorkerReportsProgress = true,
+                WorkerSupportsCancellation = true
+            };
+            _uartWorker.DoWork += UartWorker_DoWork;
         }
 
+        private void Timer_Tick_Graph(object sender, EventArgs e)
+        {
+            //// Update data points
+            //var timestamp = DateTime.Now;
+            //var dataPoint1 = new DataPoint(DateTimeAxis.ToDouble(timestamp), (returnX / 20) );
+            //var dataPoint2 = new DataPoint(DateTimeAxis.ToDouble(timestamp), (returnY / 30) );
+            //var dataPoint3 = new DataPoint(DateTimeAxis.ToDouble(timestamp), ((returnZ - 700) / 20));
+
+            //// Update series
+            //var series1 = (LineSeries)_plotModel.Series[0];
+            //var series2 = (LineSeries)_plotModel.Series[1];
+            //var series3 = (LineSeries)_plotModel.Series[2];
+            //series1.Points.Add(dataPoint1);
+            //series2.Points.Add(dataPoint2);
+            //series3.Points.Add(dataPoint3);
+
+            //// Limit number of data points to keep graph responsive
+            //if (series1.Points.Count > 100)
+            //{
+            //    series1.Points.RemoveAt(0);
+            //    series2.Points.RemoveAt(0);
+            //    series3.Points.RemoveAt(0);
+            //}
+
+            //// Refresh plot view
+            //plotView.InvalidatePlot();
+
+            int ret = 0;
+            if (returnZ >= 500 && returnZ <= 1000)
+            {
+                (t1_test, t2_test, t3_test, t4_test, t5_test) = convert_position_angle(returnX, returnY, returnZ);
+                ret = Check_angle(t1_test, t2_test, t3_test, t4_test, t5_test);
+                if (ret != 0)
+                {
+                    double theta = 0.0;
+                    if (ret == 1) theta = t1_test;
+                    else if (ret == 2) theta = t2_test;
+                    else if (ret == 3) theta = t3_test;
+                    else if (ret == 4) theta = t4_test;
+                    else if (ret == 5) theta = t5_test;
+                    PrintLog("\nError", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
+                    return;
+                }
+                else
+                {
+                    double[] angles = { t1_test, t2_test - 90.0, t3_test + 90.0, t4_test + 90.0, t5_test };
+                    int[] temp_value = new int[5];
+
+                    returnX_update = returnX;
+                    returnY_update = returnY;
+                    returnZ_update = returnZ;
+                    if (glove_enable == 1)
+                    {
+                        int[] value_angle = new int[10];
+                        /* Run */
+                        temp_value[0] = (int)(Convert.ToDouble(t1_test) * 100000 + 18000000);
+                        temp_value[1] = (int)(Convert.ToDouble(t2_test - 90) * 100000 + 18000000);
+                        temp_value[2] = (int)(Convert.ToDouble(t3_test + 90) * 100000 + 18000000);
+                        temp_value[3] = (int)(Convert.ToDouble(t4_test + 90) * 100000 + 18000000);
+                        temp_value[4] = (int)(Convert.ToDouble(t5_test) * 100000 + 18000000);
+                        /* Write the angle */
+                        for (int ind = 0; ind < 5; ind++)
+                        {
+                            write_d_mem_32_bit(1400 + 2 * ind, temp_value[ind]);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", "Out of range of Z axis"));
+            }
+        }
+
+        public void Task1()
+        {
+
+            // Sử dụng Dispatcher để thay đổi UI element từ một luồng khác
+            Dispatcher.Invoke(() =>
+            {
+                joint1.Value = angles_global[0];
+                joint2.Value = angles_global[1];
+                joint3.Value = angles_global[2];
+                joint4.Value = angles_global[3];
+                joint5.Value = angles_global[4];
+            });
+
+        }
         private void Thread2Start()
         {
             Thread2isRunning = true;
@@ -224,7 +370,7 @@ namespace RobotArmHelix
             }
         }
 
-        private void Thread1Start()
+        public void Thread1Start()
         {
             Thread1isRunning = true;
             subThread1 = new Thread(SubThread1Work);
@@ -358,9 +504,9 @@ namespace RobotArmHelix
                     int newHeight = height - (bytesToDelete / width);  // Adjust height accordingly
 
                     // Convert byte array to BitmapImage
-                    var bitmapImage = ByteArrayToBitmapSource(byteArrayModified, newWidth, newHeight);
+                    // var bitmapImage = ByteArrayToBitmapSource(byteArrayModified, newWidth, newHeight);
 
-                    SaveImageWithAutoName(bitmapImage, filepathtosave, ".png");
+                    // SaveImageWithAutoName(bitmapImage, filepathtosave, ".png");
                 }
                 catch (Exception ex)
                 {
@@ -706,7 +852,7 @@ namespace RobotArmHelix
         private void ViewPort3D_OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             // Perform the hit test on the mouse's position relative to the viewport.
-            HitTestResult result = VisualTreeHelper.HitTest(viewPort3d, e.GetPosition(viewPort3d));
+            System.Windows.Media.HitTestResult result = VisualTreeHelper.HitTest(viewPort3d, e.GetPosition(viewPort3d));
             RayMeshGeometry3DHitTestResult mesh_result = result as RayMeshGeometry3DHitTestResult;
 
             if (oldSelectedModel != null)
@@ -718,7 +864,7 @@ namespace RobotArmHelix
             }
         }
 
-        public HitTestResultBehavior ResultCallback(HitTestResult result)
+        public HitTestResultBehavior ResultCallback(System.Windows.Media.HitTestResult result)
         {
             // Did we hit 3D?
             RayHitTestResult rayResult = result as RayHitTestResult;
@@ -740,15 +886,22 @@ namespace RobotArmHelix
         public void timer1_Tick(object sender, EventArgs e)
         {
             double x, y, z;
+            double theta_test;
             double t1, t2, t3, t4, t5;
             int ret;
             int[] temp_value = new int[5];
             try
             {
-                x = double.Parse(TbX.Text);
-                y = double.Parse(TbY.Text);
+                //x = double.Parse(TbX.Text);
+                //y = double.Parse(TbY.Text);
                 //z = double.Parse(TbZ.Text);
-                z = returnZaxis;
+
+                //x = returnX_update;
+                //y = returnY_update;
+
+                x = 500.0;
+                y = 0.0;
+                z = returnZ_update;
 
                 (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
                 ret = Check_angle(t1, t2, t3, t4, t5);
@@ -777,54 +930,23 @@ namespace RobotArmHelix
                 /* Write the angle */
                 for (int ind = 0; ind < 5; ind++)
                 {
-                    write_d_mem_32_bit(1010 + 2 * ind, temp_value[ind]);
+                    write_d_mem_32_bit(1400 + 2 * ind, temp_value[ind]);
                 }
-
             }
             catch (Exception er)
             {
                 PrintLog("Bug", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", er));
             }
-            turn_on_1_pulse_relay(528);
         }
 
         public void timer2_Tick(object sender, EventArgs e)
         {
-            joint1.Value = angles_global[0];
-            joint2.Value = angles_global[1];
-            joint3.Value = angles_global[2];
-            joint4.Value = angles_global[3];
-            joint5.Value = angles_global[4];
-
+            //joint1.Value = angles_global[0];
+            //joint2.Value = angles_global[1];
+            //joint3.Value = angles_global[2];
+            //joint4.Value = angles_global[3];
+            //joint5.Value = angles_global[4];
         }
-
-        // Method to convert byte array to BitmapImage
-        public static BitmapSource ByteArrayToBitmapSource(byte[] byteData, int newWidth, int newHeight)
-        {
-            if (byteData == null || byteData.Length == 0)
-                return null;
-
-            try
-            {
-                // Create BitmapSource
-                return BitmapSource.Create(
-                    newWidth,
-                    newHeight,
-                    96, // dpi x
-                    96, // dpi y
-                    PixelFormats.Gray8, // pixel format (8-bit grayscale)
-                    null, // palette
-                    byteData, // pixel data
-                    newWidth); // stride (width * bytes per pixel)
-            }
-            catch (Exception ex)
-            {
-                // Handle any exceptions
-                Console.WriteLine("Error converting byte array to BitmapSource: " + ex.Message);
-                return null;
-            }
-        }
-
         public double[] InverseKinematics(Vector3D target, double[] angles)
         {
             if (DistanceFromTarget(target, angles) < DistanceThreshold)
@@ -894,7 +1016,23 @@ namespace RobotArmHelix
             return Math.Sqrt(Math.Pow((point.X - target.X), 2.0) + Math.Pow((point.Y - target.Y), 2.0) + Math.Pow((point.Z - target.Z), 2.0));
         }
         
+        // Function to calculate the trajectory points (example)
+        private List<Point3D> CalculateTrajectoryLine()
+        {
+            List<Point3D> trajectoryPoints = new List<Point3D>();
 
+            // Example trajectory calculation (replace with your own logic)
+            for (double t = 0; t <= 500; t += 50)
+            {
+                double x = Math.Cos(t); // Replace with your x-coordinate calculation
+                double y = Math.Sin(t); // Replace with your y-coordinate calculation
+                double z = t;            // Replace with your z-coordinate calculation
+
+                trajectoryPoints.Add(new Point3D(x, y, z));
+            }
+
+            return trajectoryPoints;
+        }
         public Vector3D ForwardKinematics(double [] angles)
         {
 
@@ -983,6 +1121,24 @@ namespace RobotArmHelix
             Ty.Content = y;
             Tz.Content = z;
 
+            /* Draw trajectory */
+            List<Point3D> trajectoryPoints = new List<Point3D>();
+            // Create a debug sphere at the trajectory point
+            MeshBuilder buildertest = new MeshBuilder();
+            buildertest.AddSphere(new Point3D(x + 250, y + 250, z + 250), 5, 15, 15); // Adjust the radius as needed
+
+            // Create a GeometryModel3D using the mesh and a blue material
+            GeometryModel3D sphereModel = new GeometryModel3D(buildertest.ToMesh(), Materials.Red);
+
+            // Create a ModelVisual3D to hold the GeometryModel3D
+            ModelVisual3D visualtest = new ModelVisual3D();
+            visualtest.Content = sphereModel;
+
+            // Add the ModelVisual3D to the Viewport3D
+            viewPort3d.Children.Add(visualtest);
+            // Add the ModelVisual3D to the list for later removal
+            sphereVisuals.Add(visualtest);
+
 #if IRB6700
 
 #else
@@ -995,6 +1151,16 @@ namespace RobotArmHelix
 #endif
 
             return new Vector3D(joints[5].model.Bounds.Location.X, joints[5].model.Bounds.Location.Y, joints[5].model.Bounds.Location.Z);
+        }
+
+        // Function to remove all sphere visuals from the viewport
+        private void RemoveSphereVisuals()
+        {
+            foreach (ModelVisual3D visual in sphereVisuals)
+            {
+                viewPort3d.Children.Remove(visual);
+            }
+            sphereVisuals.Clear();
         }
 
         public static (double, double, double, double, double) convert_position_angle(double x, double y, double z)
@@ -1036,6 +1202,10 @@ namespace RobotArmHelix
         }
         private void ConnectPLC(object sender, RoutedEventArgs e)
         {
+            /* Change state of the menu */
+            // After connecting, uncheck the "Disconnect" MenuItem
+            DisconnectMenuItem.IsChecked = false;
+            ConnectMenuItem.IsChecked = true;
             /* Disable slider */
             joint1.IsEnabled = false;
             joint2.IsEnabled = false;
@@ -1065,12 +1235,6 @@ namespace RobotArmHelix
                 //Disconnect_button.IsEnabled = true;
                 cn_bttn=false;
                 ds_bttn=true;
-                /* Change the color of the button when clicked */
-                ChangeColorObjectBackground(Connect_button, Constants.OBJECT_MODIFIED);
-                ChangeColorObjectBackground(Disconnect_button, Constants.OBJECT_MODIFIED1);
-                ChangeColorObjectForeground(Connect_button, Constants.OBJECT_MODIFIED1);
-                ChangeColorObjectForeground(Disconnect_button, Constants.OBJECT_MODIFIED);
-                ChangeColorObjectBorderBrush(Disconnect_button, Constants.OBJECT_MODIFIED);
                 /* 
                     Print the log command
                     MethosBase.GetCurrentMethod returns the action user did.
@@ -1111,13 +1275,17 @@ namespace RobotArmHelix
             }
             /* Start timer1 and timer2 */
             // timer1.Start();
-            Thread1Start();
-            Thread2Start();
+            //Thread1Start();
+            //Thread2Start();
             //timer1.Start();
         }
 
         private void DisconnectPLC(object sender, RoutedEventArgs e)
         {
+            /* Change state of the menu item */
+            // After connecting, uncheck the "Disconnect" MenuItem
+            DisconnectMenuItem.IsChecked = true;
+            ConnectMenuItem.IsChecked = false;
             /* Stop thread */
             Thread1isRunning = false;
             Thread2isRunning = false;
@@ -1152,12 +1320,6 @@ namespace RobotArmHelix
                 //Disconnect_button.IsEnabled = true;
                 cn_bttn = true;
                 ds_bttn = false;
-                /* Change the color of the button when clicked */
-                ChangeColorObjectBackground(Connect_button, Constants.OBJECT_MODIFIED1);
-                ChangeColorObjectBackground(Disconnect_button, Constants.OBJECT_MODIFIED);
-                ChangeColorObjectForeground(Connect_button, Constants.OBJECT_MODIFIED);
-                ChangeColorObjectForeground(Disconnect_button, Constants.OBJECT_MODIFIED1);
-
                 /* 
                     Print the log command
                     MethosBase.GetCurrentMethod returns the action user did.
@@ -1173,6 +1335,255 @@ namespace RobotArmHelix
                 PrintLog("Error", MethodBase.GetCurrentMethod().Name, "Disconnect PLC unsuccessfully");
             }
 
+        }
+
+        private void Visible_Glove_Click(object sender, RoutedEventArgs e)
+        {
+            visible_glove = (~visible_glove) & 0x01;
+            if (visible_glove == 0)
+            {
+                Glove_box.Visibility = Visibility.Visible;
+                com_port_list1.Visibility = Visibility.Visible;
+                com_port_list2.Visibility = Visibility.Visible;
+                com_port_list3.Visibility = Visibility.Visible;
+                com_port_list4.Visibility = Visibility.Visible;
+                com_port_list5.Visibility = Visibility.Visible;
+
+
+                Connect_glove_btn.Visibility = Visibility.Visible;
+                Disconnect_glove_btn.Visibility = Visibility.Visible;
+
+                progressbar1.Visibility = Visibility.Visible;
+
+
+                Glove_name.Visibility = Visibility.Visible;
+                Glove_com.Visibility = Visibility.Visible;
+                Glove_baud.Visibility = Visibility.Visible;
+                Glove_data.Visibility = Visibility.Visible;
+                Glove_parity.Visibility = Visibility.Visible;
+                Glove_stop.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                Glove_box.Visibility = Visibility.Hidden;
+                com_port_list1.Visibility = Visibility.Hidden;
+                com_port_list2.Visibility = Visibility.Hidden;
+                com_port_list3.Visibility = Visibility.Hidden;
+                com_port_list4.Visibility = Visibility.Hidden;
+                com_port_list5.Visibility = Visibility.Hidden;
+
+
+                Connect_glove_btn.Visibility = Visibility.Hidden;
+                Disconnect_glove_btn.Visibility = Visibility.Hidden;
+
+                progressbar1.Visibility = Visibility.Hidden;
+
+
+                Glove_name.Visibility = Visibility.Hidden;
+                Glove_com.Visibility = Visibility.Hidden;
+                Glove_baud.Visibility = Visibility.Hidden;
+                Glove_data.Visibility = Visibility.Hidden;
+                Glove_parity.Visibility = Visibility.Hidden;
+                Glove_stop.Visibility = Visibility.Hidden;
+            }
+        }
+
+        private void Visible_Robot_Click(object sender, RoutedEventArgs e)
+        {
+            visible_robot = (~visible_robot) & 0x01;
+            if(visible_robot == 0)
+            {
+                viewPort3d.Children.Remove(RoboticArm);
+            }
+            else
+            {
+                viewPort3d.Children.Add(RoboticArm);
+            }
+            
+        }
+        private void Visible_Display_Click(object sender, RoutedEventArgs e)
+        {
+            visible_display = (~visible_display) & 0x01;
+            if (visible_display == 0)
+            {
+                J1_lbl.Visibility = Visibility.Hidden;
+                J2_lbl.Visibility = Visibility.Hidden;
+                J3_lbl.Visibility = Visibility.Hidden;
+                J4_lbl.Visibility = Visibility.Hidden;
+                J5_lbl.Visibility = Visibility.Hidden;
+
+                joint1.Visibility = Visibility.Hidden;
+                joint2.Visibility = Visibility.Hidden;
+                joint3.Visibility = Visibility.Hidden;
+                joint4.Visibility = Visibility.Hidden;
+                joint5.Visibility = Visibility.Hidden;
+
+                J1Value.Visibility = Visibility.Hidden;
+                J2Value.Visibility = Visibility.Hidden;
+                J3Value.Visibility = Visibility.Hidden;
+                J4Value.Visibility = Visibility.Hidden;
+                J5Value.Visibility = Visibility.Hidden;
+
+                Tx.Visibility = Visibility.Hidden;
+                Ty.Visibility = Visibility.Hidden;
+                Tz.Visibility = Visibility.Hidden;
+
+                X_lbl.Visibility = Visibility.Hidden;
+                Y_lbl.Visibility = Visibility.Hidden;
+                Z_lbl.Visibility = Visibility.Hidden;
+
+                display_lbl.Visibility = Visibility.Hidden;
+            }
+            else
+            {
+                J1_lbl.Visibility = Visibility.Visible;
+                J2_lbl.Visibility = Visibility.Visible;
+                J3_lbl.Visibility = Visibility.Visible;
+                J4_lbl.Visibility = Visibility.Visible;
+                J5_lbl.Visibility = Visibility.Visible;
+
+                joint1.Visibility = Visibility.Visible;
+                joint2.Visibility = Visibility.Visible;
+                joint3.Visibility = Visibility.Visible;
+                joint4.Visibility = Visibility.Visible;
+                joint5.Visibility = Visibility.Visible;
+
+                J1Value.Visibility = Visibility.Visible;
+                J2Value.Visibility = Visibility.Visible;
+                J3Value.Visibility = Visibility.Visible;
+                J4Value.Visibility = Visibility.Visible;
+                J5Value.Visibility = Visibility.Visible;
+
+                Tx.Visibility = Visibility.Visible;
+                Ty.Visibility = Visibility.Visible;
+                Tz.Visibility = Visibility.Visible;
+
+                X_lbl.Visibility = Visibility.Visible;
+                Y_lbl.Visibility = Visibility.Visible;
+                Z_lbl.Visibility = Visibility.Visible;
+
+                display_lbl.Visibility = Visibility.Visible;
+            }
+
+        }
+
+        private void Visible_Control_Click(object sender, RoutedEventArgs e)
+        {
+            visible_control = (~visible_control) & 0x01;
+            if (visible_control == 0)
+            {
+                Servo_button.Visibility = Visibility.Hidden;
+                ResetError_button.Visibility = Visibility.Hidden;
+                SetHome_button.Visibility = Visibility.Hidden;
+                GoHome_button.Visibility = Visibility.Hidden;
+
+                control_lbl.Visibility = Visibility.Hidden;
+            }
+            else
+            {
+                Servo_button.Visibility = Visibility.Visible;
+                ResetError_button.Visibility = Visibility.Visible;
+                SetHome_button.Visibility = Visibility.Visible;
+                GoHome_button.Visibility = Visibility.Visible;
+
+                control_lbl.Visibility = Visibility.Visible;
+            }
+        }
+        private void Visible_Jogging_Click(object sender, RoutedEventArgs e)
+        {
+            visible_jogging = (~visible_jogging) & 0x01;
+            if (visible_jogging == 0)
+            {
+                Forward_button.Visibility = Visibility.Hidden;
+                Backward_button.Visibility = Visibility.Hidden;
+                Jog_set_speed.Visibility = Visibility.Hidden;
+                joint_tb.Visibility = Visibility.Hidden;
+                Joint_lbl.Visibility = Visibility.Hidden;
+                jog_speed_tb.Visibility = Visibility.Hidden;
+
+
+                jogging_lbl.Visibility = Visibility.Hidden;
+            }
+            else
+            {
+                Forward_button.Visibility = Visibility.Visible;
+                Backward_button.Visibility = Visibility.Visible;
+                Jog_set_speed.Visibility = Visibility.Visible;
+                joint_tb.Visibility = Visibility.Visible;
+                Joint_lbl.Visibility = Visibility.Visible;
+                jog_speed_tb.Visibility = Visibility.Visible;
+
+                jogging_lbl.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void Visible_Path_Click(object sender, RoutedEventArgs e)
+        {
+            visible_path = (~visible_path) & 0x01;
+            if (visible_path == 0)
+            {
+                Tsm_moveJ_btn.Visibility = Visibility.Hidden;
+                Tsm_moveL_btn.Visibility = Visibility.Hidden;
+                Tsm_moveC_btn.Visibility = Visibility.Hidden;
+                Clear_Trajectory_btn.Visibility = Visibility.Hidden;
+                TestPos_bttn.Visibility = Visibility.Hidden;
+                set_const_speed_button.Visibility = Visibility.Hidden;
+                run_btn.Visibility = Visibility.Hidden;
+                EStop_btn.Visibility = Visibility.Hidden;
+
+
+                TbX.Visibility = Visibility.Hidden;
+                TbY.Visibility = Visibility.Hidden;
+                TbZ.Visibility = Visibility.Hidden;
+                spd_tb.Visibility = Visibility.Hidden;
+                TbX1.Visibility = Visibility.Hidden;
+                TbX2.Visibility = Visibility.Hidden;
+                TbY1.Visibility = Visibility.Hidden;
+                TbY2.Visibility = Visibility.Hidden;
+
+                tbX1_lbl.Visibility = Visibility.Hidden;
+                tbX2_lbl.Visibility = Visibility.Hidden;
+                tbY1_lbl.Visibility = Visibility.Hidden;
+                tbY2_lbl.Visibility = Visibility.Hidden;
+                tbX_lbl.Visibility = Visibility.Hidden;
+                tbY_lbl.Visibility = Visibility.Hidden;
+                tbZ_lbl.Visibility = Visibility.Hidden;
+                path_lbl.Visibility = Visibility.Hidden;
+
+
+            }
+            else
+            {
+                Tsm_moveJ_btn.Visibility = Visibility.Visible;
+                Tsm_moveL_btn.Visibility = Visibility.Visible;
+                Tsm_moveC_btn.Visibility = Visibility.Visible;
+                Clear_Trajectory_btn.Visibility = Visibility.Visible;
+                TestPos_bttn.Visibility = Visibility.Visible;
+                set_const_speed_button.Visibility = Visibility.Visible;
+                run_btn.Visibility = Visibility.Visible;
+                EStop_btn.Visibility = Visibility.Visible;
+
+
+                TbX.Visibility = Visibility.Visible;
+                TbY.Visibility = Visibility.Visible;
+                TbZ.Visibility = Visibility.Visible;
+                spd_tb.Visibility = Visibility.Visible;
+                TbX1.Visibility = Visibility.Visible;
+                TbX2.Visibility = Visibility.Visible;
+                TbY1.Visibility = Visibility.Visible;
+                TbY2.Visibility = Visibility.Visible;
+
+                tbX1_lbl.Visibility = Visibility.Visible;
+                tbX2_lbl.Visibility = Visibility.Visible;
+                tbY1_lbl.Visibility = Visibility.Visible;
+                tbY2_lbl.Visibility = Visibility.Visible;
+                tbX_lbl.Visibility = Visibility.Visible;
+                tbY_lbl.Visibility = Visibility.Visible;
+                tbZ_lbl.Visibility = Visibility.Visible;
+
+                path_lbl.Visibility = Visibility.Visible;
+
+            }
         }
 
         private void Servo_button_click(object sender, RoutedEventArgs e)
@@ -1236,18 +1647,6 @@ namespace RobotArmHelix
         private void GoHome_button_Click(object sender, RoutedEventArgs e)
         {
             Press_button(MethodBase.GetCurrentMethod().Name, Constants.R_GOHOME);
-
-            //try
-            //{
-            //    uart.Open();
-            //    uart.WriteLine("hello");
-            //    uart.Close();
-            //    MessageBox.Show("Data sent successfully!");
-            //}
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show("Error sending data: " + ex.Message);
-            //}
         }
 
         private void Jog_set_speed_Click(object sender, RoutedEventArgs e)
@@ -1467,36 +1866,42 @@ namespace RobotArmHelix
                 y = double.Parse(TbY.Text);
                 z = double.Parse(TbZ.Text);
 
-                (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
-                ret = Check_angle(t1, t2, t3, t4, t5);
-                if (ret != 0)
+                if (z >= 500 && z <= 1000)
                 {
-                    double theta = 0.0;
-                    if (ret == 1) theta = t1;
-                    else if (ret == 2) theta = t2;
-                    else if (ret == 3) theta = t3;
-                    else if (ret == 4) theta = t4;
-                    else if (ret == 5) theta = t5;
-                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
-                    return;
-                }
-                t2 -= 90.0;
-                t3 += 90.0;
-                t4 += 90.0;
+                    (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
+                    ret = Check_angle(t1, t2, t3, t4, t5);
+                    if (ret != 0)
+                    {
+                        double theta = 0.0;
+                        if (ret == 1) theta = t1;
+                        else if (ret == 2) theta = t2;
+                        else if (ret == 3) theta = t3;
+                        else if (ret == 4) theta = t4;
+                        else if (ret == 5) theta = t5;
+                        PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
+                        return;
+                    }
+                    t2 -= 90.0;
+                    t3 += 90.0;
+                    t4 += 90.0;
 
-                int[] value_angle = new int[10];
-                /* Run */
-                temp_value[0] = (int)(Convert.ToDouble(t1) * 100000 + 18000000);
-                temp_value[1] = (int)(Convert.ToDouble(t2) * 100000 + 18000000);
-                temp_value[2] = (int)(Convert.ToDouble(t3) * 100000 + 18000000);
-                temp_value[3] = (int)(Convert.ToDouble(t4) * 100000 + 18000000);
-                temp_value[4] = (int)(Convert.ToDouble(t5) * 100000 + 18000000);
-                /* Write the angle */
-                for (int ind = 0; ind < 5; ind++)
+                    int[] value_angle = new int[10];
+                    /* Run */
+                    temp_value[0] = (int)(Convert.ToDouble(t1) * 100000 + 18000000);
+                    temp_value[1] = (int)(Convert.ToDouble(t2) * 100000 + 18000000);
+                    temp_value[2] = (int)(Convert.ToDouble(t3) * 100000 + 18000000);
+                    temp_value[3] = (int)(Convert.ToDouble(t4) * 100000 + 18000000);
+                    temp_value[4] = (int)(Convert.ToDouble(t5) * 100000 + 18000000);
+                    /* Write the angle */
+                    for (int ind = 0; ind < 5; ind++)
+                    {
+                        write_d_mem_32_bit(1010 + 2 * ind, temp_value[ind]);
+                    }
+                }
+                else
                 {
-                    write_d_mem_32_bit(1010 + 2 * ind, temp_value[ind]);
+                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", "Out of range of Z axis"));
                 }
-
             }
             catch (Exception er)
             {
@@ -1505,7 +1910,8 @@ namespace RobotArmHelix
         }
         private void TestPos_Click(object sender, RoutedEventArgs e)
         {
-            if(testpos_bttn == true)
+            //timer2.Start();
+            if (testpos_bttn == true)
             {
                 double x, y, z;
                 double t1, t2, t3, t4, t5;
@@ -1582,28 +1988,36 @@ namespace RobotArmHelix
                 x = curr_pos[0] + (vect_u[0] / 10) * (t + 1); /* 500 is the actual position of robot following the x axis */
                 y = curr_pos[1] + (vect_u[1] / 10) * (t + 1); /* 0 is the actual position of robot following the y axis */
                 z = curr_pos[2] + (vect_u[2] / 10) * (t + 1); /* 900 is the actual position of robot following the y axis */
-                (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
-                ret = Check_angle(t1, t2, t3, t4, t5);
-                if (ret != 0)
+                if(z >= 500 && z <= 1000)
                 {
-                    double theta = 0.0;
-                    if (ret == 1) theta = t1;
-                    else if (ret == 2) theta = t2;
-                    else if (ret == 3) theta = t3;
-                    else if (ret == 4) theta = t4;
-                    else if (ret == 5) theta = t5;
-                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
-                    return;
+                    (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
+                    ret = Check_angle(t1, t2, t3, t4, t5);
+                    if (ret != 0)
+                    {
+                        double theta = 0.0;
+                        if (ret == 1) theta = t1;
+                        else if (ret == 2) theta = t2;
+                        else if (ret == 3) theta = t3;
+                        else if (ret == 4) theta = t4;
+                        else if (ret == 5) theta = t5;
+                        PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
+                        return;
+                    }
+                    t2 -= 90.0;
+                    t3 += 90.0;
+                    t4 += 90.0;
+                    /* Assign value */
+                    angle_array[t, 0] = (int)(t1 * 100000 + 18000000);
+                    angle_array[t, 1] = (int)(t2 * 100000 + 18000000);
+                    angle_array[t, 2] = (int)(t3 * 100000 + 18000000);
+                    angle_array[t, 3] = (int)(t4 * 100000 + 18000000);
+                    angle_array[t, 4] = (int)(t5 * 100000 + 18000000);
                 }
-                t2 -= 90.0;
-                t3 += 90.0;
-                t4 += 90.0;
-                /* Assign value */
-                angle_array[t, 0] = (int)(t1 * 100000 + 18000000);
-                angle_array[t, 1] = (int)(t2 * 100000 + 18000000);
-                angle_array[t, 2] = (int)(t3 * 100000 + 18000000);
-                angle_array[t, 3] = (int)(t4 * 100000 + 18000000);
-                angle_array[t, 4] = (int)(t5 * 100000 + 18000000);
+                else
+                {
+                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", "Out of range of Z axis"));
+                }
+
             }
             for (int j = 0; j < 10; j++)
             {
@@ -1749,9 +2163,7 @@ namespace RobotArmHelix
         {
             if (move == 1)
             {
-                /* Turn on relay */
-                timer1.Start();
-                //turn_on_1_pulse_relay(528);
+                turn_on_1_pulse_relay(528);
             }
             else if (move == 2)
             {
@@ -1774,25 +2186,25 @@ namespace RobotArmHelix
             move = 0;
         }
 
-        private void helixViewport3D_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            Point mousePosition = e.GetPosition(viewPort3d);
+        //private void helixViewport3D_MouseDown(object sender, MouseButtonEventArgs e)
+        //{
+        //    Point mousePosition = e.GetPosition(viewPort3d);
 
-            // Find the nearest visual in the 3D scene
-            HitTestResult result = VisualTreeHelper.HitTest(viewPort3d, mousePosition);
-            RayMeshGeometry3DHitTestResult meshResult = result as RayMeshGeometry3DHitTestResult;
+        //     Find the nearest visual in the 3D scene
+        //    HitTestResult result = VisualTreeHelper.HitTest(viewPort3d, mousePosition);
+        //    RayMeshGeometry3DHitTestResult meshResult = result as RayMeshGeometry3DHitTestResult;
 
-            if (meshResult != null)
-            {
-                Point3D clickedPoint = meshResult.PointHit;
+        //    if (meshResult != null)
+        //    {
+        //        Point3D clickedPoint = meshResult.PointHit;
 
-                // Update the label content on the UI thread
-                Dispatcher.Invoke(() =>
-                {
-                    coordinatesLabel.Content = $"Coordinates: ({clickedPoint.X}, {clickedPoint.Y}, {clickedPoint.Z})";
-                });
-            }
-        }
+        //         Update the label content on the UI thread
+        //        Dispatcher.Invoke(() =>
+        //        {
+        //            coordinatesLabel.Content = $"Coordinates: ({clickedPoint.X}, {clickedPoint.Y}, {clickedPoint.Z})";
+        //        });
+        //    }
+        //}
 
         private void Press_button(string name, string adr)
         {
@@ -1918,12 +2330,27 @@ namespace RobotArmHelix
             }
             return 0;
         }
+        public int Check_position(double position_x, double position_y, double position_z)
+        {
+            if ((position_x > Constants.T1_LU) || (position_x < Constants.T1_LD) || double.IsNaN(position_x))
+            {
+                return 1;
+            }
+            if ((position_y > Constants.T2_LU) || (position_y < Constants.T2_LD) || double.IsNaN(position_y))
+            {
+                return 2;
+            }
+            if ((position_z > Constants.T3_LU) || (position_z < Constants.T3_LD) || double.IsNaN(position_z))
+            {
+                return 3;
+            }
+            return 0;
+        }
         // Convert value read from PLC to int value
         public uint Read_Position(uint value_positon1, uint value_positon2)
         {
             return (value_positon2 << 16 | value_positon1) - 18000000;
         }
-
 
         private async void TCP_Connect_button_Click(object sender, RoutedEventArgs e)
         {
@@ -1933,104 +2360,82 @@ namespace RobotArmHelix
         }
         private void StartClient()
         {
-            // Create a socket object
-            using (Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+            // Connect to the server
+            string host = addr_tb.Text;
+            int port = Convert.ToInt16(port_tb.Text);
+
+            try
             {
-                // Connect to the server
-                string host = addr_tb.Text;
-                int port = Convert.ToInt16(port_tb.Text);
+                clientSocket.Connect(host, port);
+                //MessageBox.Show($"Connected to {host}:{port}");
+                PrintLog("Infor", "Connected to", $"{host}:{port}");
 
-                try
-                {
-                    clientSocket.Connect(host, port);
-                    //MessageBox.Show($"Connected to {host}:{port}");
-                    PrintLog("Infor", "Connected to", $"{host}:{port}");
+                // Send the command to the server
+                string commandToSend = data_tb.Text + "\r\n";
+                byte[] commandBytes = Encoding.ASCII.GetBytes(commandToSend);
+                Console.WriteLine(Encoding.ASCII.GetString(commandBytes));
+                clientSocket.Send(commandBytes);
 
-                    // Send the command to the server
-                    string commandToSend = data_tb.Text + "\r\n";
-                    byte[] commandBytes = Encoding.ASCII.GetBytes(commandToSend);
-                    Console.WriteLine(Encoding.ASCII.GetString(commandBytes));
-                    clientSocket.Send(commandBytes);
-
-                    // Receive the response from the server
-                    byte[] buffer = new byte[1024];
-                    int bytesRead = clientSocket.Receive(buffer);
-                    string response = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                // Receive the response from the server
+                byte[] buffer = new byte[1024];
+                int bytesRead = clientSocket.Receive(buffer);
+                string response = Encoding.ASCII.GetString(buffer, 0, bytesRead);
 
 
-                }
-                catch (Exception ex)
-                {
-                    PrintLog("Error", "Unable to connect to", $"{host}:{port}");
-                }
+            }
+            catch (Exception ex)
+            {
+                PrintLog("Error", "Unable to connect to", $"{host}:{port}");
             }
         }
 
         private void TCP_sendata_button_Click(object sender, RoutedEventArgs e)
         {
-            // Create a socket object
-            using (Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+
+            string sentencetosend = "1003I?\r\n";
+
+            // Send the command to the server
+            string commandToSend = data_tb.Text + "\r\n";
+            byte[] commandBytes = Encoding.ASCII.GetBytes(commandToSend);
+            clientSocket.Send(commandBytes);
+
+            // Receive the response from the server
+            var buffer = new byte[308295];
+            int bytesRead = clientSocket.Receive(buffer);
+            //if (commandToSend == sentencetosend)
+            //{
+            //    while (bytesRead < 308291)
+            //    {
+            //        bytesRead += clientSocket.Receive(buffer, bytesRead, 308291 - bytesRead, SocketFlags.None);
+            //    }
+            //}
+                    
+            response_client = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+            PrintLog("Data received", "", response_client);
+
+            // Specify the folder path where you want to save the file
+            string folderPath = @"C:\Users\daveb\Desktop\raw_data\";
+
+            //PrintLog("Infor", "Data received", response);
+            // Sent the whole response in the text
+
+            // Sentences to remove
+            string[] sentencesToRemove = { "1003000308278", "1003*", "1003?", "1003000307200" };
+
+            // Loop through each sentence and replace it with an empty string
+            foreach (string sentence in sentencesToRemove)
             {
-                // Connect to the server
-                string host = addr_tb.Text;
-                int port = Convert.ToInt16(port_tb.Text);
-
-                try
-                {
-                    clientSocket.Connect(host, port);
-
-                    string sentencetosend = "1003I?\r\n";
-
-                    // Send the command to the server
-                    string commandToSend = data_tb.Text + "\r\n";
-                    byte[] commandBytes = Encoding.ASCII.GetBytes(commandToSend);
-                    clientSocket.Send(commandBytes);
-
-                    // Receive the response from the server
-                    var buffer = new byte[308295];
-                    int bytesRead = clientSocket.Receive(buffer);
-                    if (commandToSend == sentencetosend)
-                    {
-                        while (bytesRead < 308291)
-                        {
-                            bytesRead += clientSocket.Receive(buffer, bytesRead, 308291 - bytesRead, SocketFlags.None);
-                        }
-                    }
-                    
-                    response_client = Encoding.ASCII.GetString(buffer, 0, bytesRead);
-                    PrintLog("Data received", "", response_client);
-
-                    // Specify the folder path where you want to save the file
-                    string folderPath = @"C:\Users\daveb\Desktop\raw_data\";
-
-                    //PrintLog("Infor", "Data received", response);
-                    // Sent the whole response in the text
-
-                    // Sentences to remove
-                    string[] sentencesToRemove = { "1003000308278", "1003*", "1003?", "1003000307200" };
-
-                    // Loop through each sentence and replace it with an empty string
-                    foreach (string sentence in sentencesToRemove)
-                    {
-                        response_client = response_client.Replace(sentence, "");
-                    }
-
-                    
-                    // Construct the full file path using Path.Combine
-                    string filePath = System.IO.Path.Combine(folderPath, "response_bytes.txt");
-
-                    // Convert the modified response string back to bytes
-                    byte[] modifiedBuffer = Encoding.ASCII.GetBytes(response_client);
-                    // Save the modified data to the byte file
-                    File.WriteAllBytes(filePath, modifiedBuffer);
-
- 
-                }
-                catch (Exception ex)
-                {
-                    PrintLog("Error", "Unable to connect to", $"{host}:{port}");
-                }
+                response_client = response_client.Replace(sentence, "");
             }
+
+                    
+            // Construct the full file path using Path.Combine
+            string filePath = System.IO.Path.Combine(folderPath, "response_bytes.txt");
+
+            // Convert the modified response string back to bytes
+            byte[] modifiedBuffer = Encoding.ASCII.GetBytes(response_client);
+            // Save the modified data to the byte file
+            File.WriteAllBytes(filePath, modifiedBuffer);
         }
 
         private async void Bitmap_cvt_button_Click(object sender, RoutedEventArgs e)
@@ -2058,26 +2463,29 @@ namespace RobotArmHelix
 
         }
 
-        // Helper method to wait for response or timeout
-        static bool WaitForResponse(Socket socket, TimeSpan timeout)
-        {
-            DateTime startTime = DateTime.Now;
-            while ((DateTime.Now - startTime) < timeout)
-            {
-                if (socket.Poll(1000, SelectMode.SelectRead) && socket.Available > 0)
-                {
-                    // Response received before timeout
-                    return true;
-                }
-            }
-            // Timeout occurred
-            return false;
-        }
-
         private void Camera_button_Click(object sender, RoutedEventArgs e)
         {
-            Thread thread2 = new Thread(new ThreadStart(Task2));
-            thread2.Start();
+            // Display the image
+            DisplayImage();
+        }
+
+        private void DisplayImage()
+        {
+            // Create a BitmapSource from the 2D byte array
+            BitmapSource bitmapSource = BitmapSource.Create(
+                640, 480,
+                96, 96,
+                PixelFormats.Gray8,
+                null,
+                array2D,
+                640); // Stride = width of the image in bytes
+
+            // Create an Image control
+            Image image = new Image();
+            image.Source = bitmapSource;
+
+            // Add the Image control to your WPF layout (assuming you have a Grid named "mainGrid" in your XAML)
+            mainGrid.Children.Add(image);
         }
 
         private void Forward_button_Click(object sender, RoutedEventArgs e)
@@ -2085,8 +2493,72 @@ namespace RobotArmHelix
 
         }
 
+        private void UartWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            BackgroundWorker worker = sender as BackgroundWorker;
+
+            // UART transmission logic
+            while (!worker.CancellationPending)
+            {
+                string receivedData = uart.ReadLine().Trim();
+
+                if (!string.IsNullOrEmpty(receivedData))
+                {
+                    string[] numbers = receivedData.Split(',');
+
+                    if (numbers.Length == 3)
+                    {
+                        double num1, num2, num3;
+                        bool success = double.TryParse(numbers[0], out num1);
+                        success &= double.TryParse(numbers[1], out num2);
+                        success &= double.TryParse(numbers[2], out num3);
+                        double theta_test;
+                        int ret;
+                        int[] temp_value = new int[5];
+                        if (success)
+                        {
+                            Dispatcher.Invoke(() =>
+                            {
+                                // Cập nhật các giá trị trên giao diện
+                                //returnX = num1 * 20;
+                                //returnY = num2 * 30;
+
+                                returnX = num1 * 20;
+                                returnY = num2 * 20;
+                                returnZ = num3 * 15 + 700;
+                                ErrorLog.Text = returnX.ToString() + "\n" + returnY.ToString() + "\n" + returnZ.ToString();
+
+                                if (returnZ >= 500 && returnZ <= 1000)
+                                {
+                                    (t1_test, t2_test, t3_test, t4_test, t5_test) = convert_position_angle(returnX, returnY, returnZ);
+                                    ret = Check_angle(t1_test, t2_test, t3_test, t4_test, t5_test);
+                                    if (ret != 0)
+                                    {
+                                        double theta = 0.0;
+                                        if (ret == 1) theta = t1_test;
+                                        else if (ret == 2) theta = t2_test;
+                                        else if (ret == 3) theta = t3_test;
+                                        else if (ret == 4) theta = t4_test;
+                                        else if (ret == 5) theta = t5_test;
+                                        PrintLog("\nError", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
+                                        return;
+                                    }
+                                }
+                                else
+                                {
+                                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", "Out of range of Z axis"));
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+        }
+
         private async void Glove_connect_button_Click(object sender, RoutedEventArgs e)
         {
+
+            _timer.Start();
             uart = new SerialPort();
             uart.PortName = com_port_list1.Text;
             // Set baud rate
@@ -2135,68 +2607,116 @@ namespace RobotArmHelix
             }
             progressbar1.Value = 100;
             uart.Open();
-            uart.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(Receive);
+            //uart.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(Receive);
+            if (!_uartWorker.IsBusy)
+            {
+                _uartWorker.RunWorkerAsync();
+            }
         }
 
-        private void Receive(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
+        private void Receive(object sender, SerialDataReceivedEventArgs e)
         {
-            // Collecting the characters received to our 'buffer' (string).
-            string data = uart.ReadExisting();
-            Dispatcher.Invoke(() =>
+            string receivedData = uart.ReadLine().Trim();
+
+            if (!string.IsNullOrEmpty(receivedData))
             {
-                try
-                {
-                    ErrorLog.Text = data;
-                    StartReadingData(data);
-                    returnZaxis = Convert.ToDouble(data);
-                }
-                catch
-                {
+                string[] numbers = receivedData.Split(',');
 
-                }
+                if (numbers.Length == 3)
+                {
+                    double num1, num2, num3;
+                    bool success = double.TryParse(numbers[0], out num1);
+                    success &= double.TryParse(numbers[1], out num2);
+                    success &= double.TryParse(numbers[2], out num3);
+                    double theta_test;
+                    double t1_test, t2_test, t3_test, t4_test, t5_test;
+                    int ret;
+                    if (success)
+                    {
+                        Dispatcher.Invoke(() =>
+                        {
+                            // Cập nhật các giá trị trên giao diện
+                            returnX = num1;
+                            returnY = num2;
+                            returnZ = num3;
+                            ErrorLog.Text = returnX.ToString() + "\n" + returnY.ToString() + "\n" + returnZ.ToString();
 
-            });
+                            (t1_test, t2_test, t3_test, t4_test, t5_test) = convert_position_angle(returnX, returnY, returnZ);
+                            //ret = Check_angle(t1_test, t2_test, t3_test, t4_test, t5_test);
+                            //if (ret == 0)
+                            //{
+                            //    double theta = 0.0;
+                            //    if (ret == 1) theta = t1_test;
+                            //    else if (ret == 2) theta = t2_test;
+                            //    else if (ret == 3) theta = t3_test;
+                            //    else if (ret == 4) theta = t4_test;
+                            //    else if (ret == 5) theta = t5_test;
+                            //    PrintLog("\nError", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
+                            //    return;
+                            //}
+                            //else
+                            //{
+                                double[] angles = { t1_test, t1_test, t1_test, t1_test, t1_test };
+                                /* Update position for robot on GUI */
+                                ForwardKinematics(angles);
+                                /* Update data for slider on GUI */
+                                joint1.Value = angles[0];
+                                joint2.Value = angles[1];
+                                joint3.Value = angles[2];
+                                joint4.Value = angles[3];
+                                joint5.Value = angles[4];
+                            //}
+
+                        });
+                    }
+                }
+            }
         }
 
         private void Glove_disconnect_button_Click(object sender, RoutedEventArgs e)
         {
             uart.Close();
             progressbar1.Value = 0;
+            _timer.Stop();
+            if (_uartWorker.IsBusy)
+            {
+                _uartWorker.CancelAsync();
+            }
         }
 
-
-
-        // Initialize SerialPort and start reading data
-        double StartReadingData(string receivedData)
+    double[] StartReadingData(string receivedData)
+    {
+        int endIndex = receivedData.IndexOf("\r\n");
+        if (endIndex != -1)
         {
-            double returnZ = 0;
-            // Split received data by comma and space, and process each number
-            //string[] numbers = receivedData.Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            string numbers = receivedData.TrimEnd('\r', '\n');
+            string dataSubstring = receivedData.Substring(0, endIndex);
+            string[] numbers = dataSubstring.Split(',');
+
             try
             {
-                //double num1 = double.Parse(numbers[0]);
-                //double num2 = double.Parse(numbers[1]);
-                //double num3 = double.Parse(numbers[2]);
-                //double num4 = double.Parse(numbers[3]);
-                returnZ = double.Parse(numbers);
-
+                axis[0] = double.Parse(numbers[0]);
+                axis[1] = double.Parse(numbers[1]);
+                axis[2] = double.Parse(numbers[2]);
             }
             catch (FormatException)
             {
-                // Handle invalid data format
-                // For example: Show a message box
-                MessageBox.Show("Invalid data format received.");
+                // Xử lý lỗi định dạng
             }
-            return returnZ;
+        }
+        else
+        {
+            // Không tìm thấy \r\n trong chuỗi
         }
 
-        private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
-        {
-            // Read data from the serial port
-            string data = uart.ReadLine();
-            PrintLog("Infor", "Data received", data);
-        }
+        return axis;
+    }
+
+        // private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        // {
+        //     // Read data from the serial port
+        //     string data = uart.ReadLine();
+        //     PrintLog("Infor", "Data received", data);
+        // }
 
         private void ShowData(object sender, EventArgs e)
         {
@@ -2206,6 +2726,48 @@ namespace RobotArmHelix
         private void spd_tb_TextChanged(object sender, TextChangedEventArgs e)
         {
 
+        }
+
+        private void EStop_bttn_Click(object sender, RoutedEventArgs e)
+        {
+            /* Stop command axis 1 */
+            turn_on_1_pulse_relay(3200);
+            /* Stop command axis 2 */
+            turn_on_1_pulse_relay(3220);
+            /* Stop command axis 3 */
+            turn_on_1_pulse_relay(3240);
+            /* Stop command axis 4 */
+            turn_on_1_pulse_relay(3260);
+            /* Stop command axis 5 */
+            turn_on_1_pulse_relay(3280);
+        }
+
+        private void Glove_enable_button_Click(object sender, RoutedEventArgs e)
+        {
+            /* Reset error */
+            turn_on_1_pulse_relay(3200);
+            /* Turn on relay */
+            turn_on_1_pulse_relay(600);
+            /* Timer 1 start */
+            glove_enable = 1;
+        }
+
+        private void Glove_disable_button_Click(object sender, RoutedEventArgs e)
+        {
+            /* Timer 1 start */
+            glove_enable = 0;
+        }
+
+        private void Clr_Traj_btn_Click(object sender, RoutedEventArgs e)
+        {
+            RemoveSphereVisuals();
+        }
+
+        private void Open_menu_Click(object sender, RoutedEventArgs e)
+        {
+            //Menu_control menuControl = new Menu_control(this);
+            //menuControl.Show();
+            TCP_sendata_button.Visibility = Visibility.Hidden;
         }
 
         public void turn_on_1_pulse_relay(int device)
@@ -2241,6 +2803,719 @@ namespace RobotArmHelix
             }
             PLCReadbit(device_str, out readbit);
             PrintLog("Info", device_str, Convert.ToString(readbit));
+        }
+
+        class EdgeDetection
+        {
+            public static int[,] RGB2Gray(BitmapImage colorImage)
+            {
+                int width = colorImage.PixelWidth;
+                int height = colorImage.PixelHeight;
+                int[,] grayImage = new int[width, height];
+
+                int bytesPerPixel = (colorImage.Format.BitsPerPixel + 7) / 8; // Calculate bytes per pixel
+                int stride = width * bytesPerPixel; // Calculate the stride value
+                byte[] pixelData = new byte[stride * height];
+                colorImage.CopyPixels(pixelData, stride, 0);
+
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        int offset = y * stride + x * bytesPerPixel;
+                        if (offset + 2 < pixelData.Length) // Ensure that the offset is within bounds
+                        {
+                            byte blue = pixelData[offset];
+                            byte green = pixelData[offset + 1];
+                            byte red = pixelData[offset + 2];
+                            int grayValue = (int)(red * 0.299 + green * 0.587 + blue * 0.114);
+                            grayImage[x, y] = grayValue;
+                        }
+                    }
+                }
+
+                return grayImage;
+            }
+
+            private static int[,] Blur_Image(int[,] GrayImage)
+            {
+                int width = GrayImage.GetLength(0);
+                int height = GrayImage.GetLength(1);
+
+                int[,] BlurImage = new int[width, height];
+
+                double[,] GaussianKernel =  {   { 2,  4,  5,  4,  2 },
+                                                { 4,  9,  12, 9,  4 },
+                                                { 5,  12, 15, 12, 5 },
+                                                { 4,  9,  12, 9,  4 },
+                                                { 2,  4,  5,  4,  2 }   };
+                for (int x = 2; x < width - 2; x++)
+                {
+                    for (int y = 2; y < height - 2; y++)
+                    {
+                        double sum = 0;
+                        for (int i = -2; i < 2; i++)
+                        {
+                            for (int j = -2; j < 2; j++)
+                            {
+                                sum += GaussianKernel[i + 2, j + 2] * GrayImage[x + i, y + j];
+
+                            }
+                        }
+                        BlurImage[x, y] = (int)(sum / 159);
+                    }
+                }
+
+                return BlurImage;
+            }
+            private static int[,] Canny_Detect(int[,] BlurredImage, int high_threshold, int low_threshold)
+            {
+                //int[,] GradientX = new int[Blur_Image.GetLength(0), Blur_Image.GetLength(1)];
+                //int[,] GradientY = new int[Blur_Image.GetLength(0), Blur_Image.GetLength(1)];
+                int[,] gradientMagnitude = new int[BlurredImage.GetLength(0), BlurredImage.GetLength(1)];
+                int[,] gradientAngle = new int[BlurredImage.GetLength(0), BlurredImage.GetLength(1)];
+                int[,] Result = new int[BlurredImage.GetLength(0), BlurredImage.GetLength(1)];
+                int[,] SobelX = {{ -1, 0, 1 },
+                                    { -2, 0, 2 },
+                                    { -1, 0, 1 }};
+                int[,] SobelY = {{ -1, -2, -1 },
+                                    { 0, 0, 0 },
+                                    { 1, 2, 1 }};
+                int white_point = 255;
+                int gray_point = 50;
+                //computting gradient magnitude and gradient angle
+                for (int x = 1; x < BlurredImage.GetLength(0) - 1; x++)
+                {
+                    for (int y = 1; y < BlurredImage.GetLength(1) - 1; y++)
+                    {
+                        int sumX = 0;
+                        int sumY = 0;
+                        for (int i = -1; i <= 1; i++)
+                        {
+                            for (int j = -1; j <= 1; j++)
+                            {
+                                sumX += (int)(SobelX[i + 1, j + 1] * BlurredImage[x + i, y + j]);
+                                sumY += (int)(SobelY[i + 1, j + 1] * BlurredImage[x + i, y + j]);
+                            }
+                        }
+                        //GradientX[x, y] = sumX;
+                        //GradientY[x, y] = sumY;
+                        gradientMagnitude[x, y] = (int)Math.Sqrt(sumX * sumX + sumY * sumY);
+                        if (gradientMagnitude[x, y] >= 255)
+                        {
+                            gradientMagnitude[x, y] = 255;
+                        }
+                        else if (gradientMagnitude[x, y] <= 0)
+                        {
+                            gradientMagnitude[x, y] = 0;
+                        }
+                        gradientAngle[x, y] = (int)Math.Abs((Math.Atan2(sumY, sumX) * 180 / Math.PI));
+
+                    }
+                }
+
+                for (int x = 1; x < BlurredImage.GetLength(0) - 1; x++)
+                {
+                    for (int y = 1; y < BlurredImage.GetLength(1) - 1; y++)
+                    {
+                        double q = 255;
+                        double r = 255;
+                        if ((gradientAngle[x, y] >= 0 && gradientAngle[x, y] < 22.5) || (gradientAngle[x, y] <= 180 && gradientAngle[x, y] >= 157.5))
+                        {
+                            q = gradientMagnitude[x, y - 1];
+                            r = gradientMagnitude[x, y + 1];
+                        }
+                        else if (gradientAngle[x, y] >= 22.5 && gradientAngle[x, y] < 67.5)
+                        {
+                            q = gradientMagnitude[x + 1, y - 1];
+                            r = gradientMagnitude[x - 1, y + 1];
+                        }
+                        else if (gradientAngle[x, y] >= 67.5 && gradientAngle[x, y] < 112.5)
+                        {
+                            q = gradientMagnitude[x + 1, y];
+                            r = gradientMagnitude[x - 1, y];
+                        }
+                        else if (gradientAngle[x, y] >= 112.5 && gradientAngle[x, y] < 157.5)
+                        {
+                            q = gradientMagnitude[x - 1, y - 1];
+                            r = gradientMagnitude[x + 1, y + 1];
+                        }
+                        if (gradientMagnitude[x, y] >= q && gradientMagnitude[x, y] >= r)
+                        {
+                            Result[x, y] = gradientMagnitude[x, y];
+                        }
+                        else
+                        {
+                            Result[x, y] = 0;
+                        }
+
+                        if (Result[x, y] >= high_threshold)
+                        {
+                            Result[x, y] = white_point;
+                        }
+                        else if (Result[x, y] >= low_threshold && Result[x, y] < high_threshold)
+                        {
+                            Result[x, y] = gray_point;
+                        }
+                        else
+                        {
+                            Result[x, y] = 0;
+                        }
+                    }
+                }
+                //int[,] output=new int[gradient.GetLength(0) , gradient.GetLength(1) ];
+                for (int x = 1; x < Result.GetLength(0) - 1; x++)
+                {
+                    for (int y = 1; y < Result.GetLength(1) - 1; y++)
+                    {
+                        if (Result[x, y] == gray_point)
+                        {
+                            if ((Result[x + 1, y - 1] == white_point) ||
+                                (Result[x + 1, y] == white_point) ||
+                                (Result[x + 1, y + 1] == white_point) ||
+                                (Result[x, y - 1] == white_point) ||
+                                (Result[x, y + 1] == white_point) ||
+                                (Result[x - 1, y - 1] == white_point) ||
+                                (Result[x - 1, y] == white_point) ||
+                                (Result[x - 1, y + 1] == white_point))
+                            {
+                                Result[x, y] = white_point;
+                            }
+                            else
+                                Result[x, y] = 0;
+                        }
+                    }
+                }
+                for (int x = 0; x < Result.GetLength(0); x++)
+                {
+                    for (int y = 0; y < Result.GetLength(1); y++)
+                    {
+                        if (Result[x, y] >= 255)
+                            Result[x, y] = 255;
+                        else if (Result[x, y] <= 0)
+                            Result[x, y] = 0;
+                        if ((y < 5) || (y > Result.GetLength(1) - 5))
+                            Result[x, y] = 0;
+                        if ((x < 5) || (x > Result.GetLength(0) - 5))
+                            Result[x, y] = 0;
+                    }
+                }
+                return Result;
+            }
+            public static int[,] DeTectEdgeByCannyMethod(string imagePath, int high_threshold, int low_threshold)
+            {
+                BitmapImage bitmapImage = new BitmapImage(new Uri(imagePath));
+
+                int[,] gray = RGB2Gray(bitmapImage);
+                int[,] blur = Blur_Image(gray);
+                int[,] edges = Canny_Detect(blur, high_threshold, low_threshold);
+
+                return edges;
+            }
+            public static int[,] BitmapImageToInt(BitmapImage bitmapImage)
+            {
+                int width = bitmapImage.PixelWidth;
+                int height = bitmapImage.PixelHeight;
+
+                int[,] imageArray = new int[width, height];
+
+                int bytesPerPixel = (bitmapImage.Format.BitsPerPixel + 7) / 8;
+                int stride = width * bytesPerPixel;
+                byte[] pixelData = new byte[stride * height];
+                bitmapImage.CopyPixels(pixelData, stride, 0);
+
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        int offset = y * stride + x * bytesPerPixel;
+                        int grayscaleValue = (pixelData[offset] + pixelData[offset + 1] + pixelData[offset + 2]) / 3;
+                        imageArray[x, y] = grayscaleValue;
+                    }
+                }
+
+                return imageArray;
+            }
+            public static WriteableBitmap IntToBitmap(int[,] binaryImage)
+            {
+                // Image size
+                int width = binaryImage.GetLength(0);
+                int height = binaryImage.GetLength(1);
+
+                // Create a new WriteableBitmap with the specified width, height, and DPI
+                WriteableBitmap result = new WriteableBitmap(width, height, 96, 96, PixelFormats.Gray8, null);
+
+                // Calculate stride (bytes per row)
+                int stride = width;
+
+                // Create a byte array to hold pixel data
+                byte[] pixels = new byte[height * stride];
+
+                // Populate the byte array with pixel values
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        byte pixelValue = (byte)binaryImage[x, y];
+                        pixels[y * stride + x] = pixelValue;
+                    }
+                }
+
+                // Write the pixel data to the WriteableBitmap
+                result.WritePixels(new System.Windows.Int32Rect(0, 0, width, height), pixels, stride, 0);
+
+                return result;
+            }
+            public static int[,] LinkEdges(BitmapImage bitmapImage, int high_threshold, int low_threshold)
+            {
+                int width = bitmapImage.PixelWidth;
+                int height = bitmapImage.PixelHeight;
+
+                int[,] gray = RGB2Gray(bitmapImage);
+                int[,] blur = Blur_Image(gray);
+                int[,] edges = Canny_Detect(blur, high_threshold, low_threshold);
+
+                int[,] gradientMagnitude = new int[width, height];
+                int[,] gradientAngle = new int[width, height];
+
+                int[,] SobelX = {{ -1, 0, 1 },
+                        { -2, 0, 2 },
+                        { -1, 0, 1 }};
+                int[,] SobelY = {{ -1, -2, -1 },
+                        { 0, 0, 0 },
+                        { 1, 2, 1 }};
+                int white_point = 255;
+                int gray_point = 50;
+
+                // Computing gradient magnitude and gradient angle
+                for (int x = 1; x < width - 1; x++)
+                {
+                    for (int y = 1; y < height - 1; y++)
+                    {
+                        int sumX = 0;
+                        int sumY = 0;
+                        for (int i = -1; i <= 1; i++)
+                        {
+                            for (int j = -1; j <= 1; j++)
+                            {
+                                sumX += SobelX[i + 1, j + 1] * blur[x + i, y + j];
+                                sumY += SobelY[i + 1, j + 1] * blur[x + i, y + j];
+                            }
+                        }
+                        gradientMagnitude[x, y] = (int)Math.Sqrt(sumX * sumX + sumY * sumY);
+                        if (gradientMagnitude[x, y] >= 255)
+                        {
+                            gradientMagnitude[x, y] = 255;
+                        }
+                        else if (gradientMagnitude[x, y] <= 0)
+                        {
+                            gradientMagnitude[x, y] = 0;
+                        }
+                        gradientAngle[x, y] = (int)Math.Abs((Math.Atan2(sumY, sumX) * 180 / Math.PI));
+                    }
+                }
+
+                for (int x = 1; x < width - 1; x++)
+                {
+                    for (int y = 1; y < height - 1; y++)
+                    {
+                        int edge_point = edges[x, y];
+                        if (edge_point == 255)
+                        {
+                            for (int i = -1; i <= 1; i++)
+                            {
+                                for (int j = -1; j <= 1; j++)
+                                {
+                                    if ((Math.Abs(gradientMagnitude[x + i, y + j] - gradientMagnitude[x, y]) < 50) & (Math.Abs(gradientAngle[x + i, y + j] - gradientAngle[x, y]) < 1) & (Math.Abs(gradientAngle[x + i, y + j] - gradientAngle[x, y]) > 0.1))
+                                    {
+                                        edges[x + i, y + j] = 255;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                return edges;
+            }
+            public static int[,] PerformHoughTransform(int[,] image)
+            {
+                int width = image.GetLength(0);
+                int height = image.GetLength(1);
+
+                // Tính số cột của ma trận Hough dựa trên đường chéo dài nhất trong ảnh
+                int diagonalLength = (int)Math.Ceiling(Math.Sqrt(width * width + height * height));
+                int houghWidth = 180; // Số cột của ma trận Hough
+                int houghHeight = diagonalLength * 2; // Số hàng của ma trận Hough
+
+                int[,] houghMatrix = new int[houghWidth, houghHeight];
+
+                // Thực hiện Hough Transform
+                for (int x = 0; x < width; x++)
+                {
+                    for (int y = 0; y < height; y++)
+                    {
+                        if (image[x, y] > 0) // Nếu điểm ảnh là điểm biên
+                        {
+                            for (int theta = 0; theta < houghWidth; theta++)
+                            {
+                                double radian = (theta * Math.PI) / 180.0;
+                                int rho = (int)(x * Math.Cos(radian) + y * Math.Sin(radian));
+                                rho += diagonalLength; // Dịch chuyển rho để không có giá trị âm
+                                houghMatrix[theta, rho]++;
+
+                            }
+                        }
+                    }
+                }
+
+                return houghMatrix;
+            }
+            public static WriteableBitmap DrawingEdges(int[,] houghMatrix, WriteableBitmap grayImage)
+            {
+                int width = houghMatrix.GetLength(0);
+                int height = houghMatrix.GetLength(1);
+                grayImage.Lock();
+
+                for (int theta = 0; theta < width; theta++)
+                {
+                    for (int rho = 0; rho < height; rho++)
+                    {
+                        if (houghMatrix[theta, rho] > 70)
+                        {
+                            double thetaRadian = theta * Math.PI / 180;
+
+                            // Calculate y-coordinate for each x-coordinate along the line defined by theta and rho
+                            for (int x = 0; x < grayImage.PixelWidth; x++)
+                            {
+                                double y = rho / Math.Cos(thetaRadian) - (x - grayImage.PixelWidth / 2) * Math.Tan(thetaRadian);
+                                if (y >= 0 && y < grayImage.PixelHeight)
+                                {
+                                    int yPos = (int)y;
+                                    if (yPos < grayImage.PixelHeight)
+                                    {
+                                        int pixelIndex = yPos * grayImage.BackBufferStride + x * 4; // Multiply by 4 for 32bpp format (4 bytes per pixel)
+
+                                        // Set pixel color
+                                        byte[] colorData = { 255, 0, 0, 255 }; // Red color with alpha channel
+                                        grayImage.WritePixels(new System.Windows.Int32Rect(x, yPos, 1, 1), colorData, 4, pixelIndex);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                grayImage.Unlock();
+                return grayImage;
+            }
+            public static int[,] ComputeHoughMatrix(int[,] edgeMatrix)
+            {
+                int width = edgeMatrix.GetLength(1);
+                int height = edgeMatrix.GetLength(0);
+                int diagonal = (int)Math.Sqrt(width * width + height * height); // Đường chéo của ảnh
+
+                // Khởi tạo ma trận Hough
+                int[,] houghMatrix = new int[180, 2 * diagonal];
+
+                // Duyệt qua từng điểm cạnh trong ma trận cạnh
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        if (edgeMatrix[y, x] == 255) // Kiểm tra nếu điểm là điểm cạnh
+                        {
+                            // Duyệt qua mọi giá trị của theta (0-179)
+                            for (int theta = 0; theta < 180; theta++)
+                            {
+                                double radianTheta = theta * Math.PI / 180;
+                                int rho = (int)(x * Math.Cos(radianTheta) + y * Math.Sin(radianTheta));
+                                houghMatrix[theta, rho + diagonal]++;
+                            }
+                        }
+                    }
+                }
+
+                return houghMatrix;
+            }
+            public static WriteableBitmap DrawLines(int[,] houghMatrix, int threshold, int width, int height)
+            {
+                int diagonal = (int)Math.Sqrt(width * width + height * height); // Diagonal of the image
+
+                // Create a new WriteableBitmap to store the result
+                WriteableBitmap resultImage = new WriteableBitmap(width, height, 96, 96, PixelFormats.Bgra32, null);
+                resultImage.Lock();
+
+                byte[] pixelData = new byte[width * height * 4]; // 4 bytes per pixel for BGRA format
+
+                for (int theta = 0; theta < 180; theta++)
+                {
+                    for (int rho = 0; rho < 2 * diagonal; rho++)
+                    {
+                        if (houghMatrix[theta, rho] >= threshold)
+                        {
+                            double radianTheta = theta * Math.PI / 180;
+
+                            if (theta >= 45 && theta < 135)
+                            {
+                                for (int x = 0; x < width; x++)
+                                {
+                                    int y = (int)(((rho - diagonal) - x * Math.Cos(radianTheta)) / Math.Sin(radianTheta));
+                                    if (y >= 0 && y < height)
+                                    {
+                                        int pixelIndex = (y * width + x) * 4; // Calculate the pixel index
+                                        pixelData[pixelIndex] = 0; // Blue channel
+                                        pixelData[pixelIndex + 1] = 0; // Green channel
+                                        pixelData[pixelIndex + 2] = 255; // Red channel
+                                        pixelData[pixelIndex + 3] = 255; // Alpha channel
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                for (int y = 0; y < height; y++)
+                                {
+                                    int x = (int)(((rho - diagonal) - y * Math.Sin(radianTheta)) / Math.Cos(radianTheta));
+                                    if (x >= 0 && x < width)
+                                    {
+                                        int pixelIndex = (y * width + x) * 4; // Calculate the pixel index
+                                        pixelData[pixelIndex] = 0; // Blue channel
+                                        pixelData[pixelIndex + 1] = 0; // Green channel
+                                        pixelData[pixelIndex + 2] = 255; // Red channel
+                                        pixelData[pixelIndex + 3] = 255; // Alpha channel
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Int32Rect fullRect = new Int32Rect(0, 0, width, height);
+                resultImage.WritePixels(fullRect, pixelData, width * 4, 0); // Write the pixel data to the WriteableBitmap
+
+                resultImage.Unlock();
+                return resultImage;
+            }
+
+            // Hàm dilation với số lần lặp lại xác định
+            public static int[,] Dilation(int[,] image, int iterations)
+            {
+                int width = image.GetLength(0);
+                int height = image.GetLength(1);
+                int[,] dilatedImage = new int[width, height];
+
+                for (int iter = 0; iter < iterations; iter++)
+                {
+                    for (int y = 0; y < height; y++)
+                    {
+                        for (int x = 0; x < width; x++)
+                        {
+                            int maxValue = 0;
+                            for (int ky = -1; ky <= 1; ky++)
+                            {
+                                for (int kx = -1; kx <= 1; kx++)
+                                {
+                                    int nx = x + kx;
+                                    int ny = y + ky;
+                                    if (nx >= 0 && nx < width && ny >= 0 && ny < height)
+                                    {
+                                        maxValue = Math.Max(maxValue, image[nx, ny]);
+                                    }
+                                }
+                            }
+                            dilatedImage[x, y] = maxValue;
+                        }
+                    }
+                    // Update ảnh đầu vào bằng ảnh đã dilation để tiếp tục lặp lại
+                    image = dilatedImage.Clone() as int[,];
+                }
+
+                return dilatedImage;
+            }
+            public static int[,] EdgeThinning(int[,] image)
+            {
+                int width = image.GetLength(0);
+                int height = image.GetLength(1);
+                int[,] thinnedImage = (int[,])image.Clone(); // Tạo một bản sao của ảnh để thực hiện mỏng cạnh viền
+
+                bool hasChanged = true; // Đặt biến hasChanged là true để bắt đầu vòng lặp
+
+                while (hasChanged)
+                {
+                    hasChanged = false; // Đặt lại hasChanged là false trước khi bắt đầu mỗi vòng lặp
+
+                    // Bước 1: Xác định và loại bỏ các điểm ảnh để làm mỏng cạnh viền
+                    for (int y = 1; y < height - 1; y++)
+                    {
+                        for (int x = 1; x < width - 1; x++)
+                        {
+                            if (thinnedImage[x, y] == 255) // Nếu điểm ảnh đang xét là một điểm cạnh
+                            {
+                                int count = CountNeighbors(x, y, thinnedImage);
+
+                                if (count >= 2 && count <= 6) // Nếu số lượng điểm lân cận thỏa mãn
+                                {
+                                    int transitions = Transitions(x, y, thinnedImage);
+
+                                    if (transitions == 1) // Nếu chỉ có một điểm chuyển đổi
+                                    {
+                                        int[] pixels = GetNeighborPixels(x, y, thinnedImage);
+
+                                        if (pixels[0] * pixels[2] * pixels[4] == 0 && pixels[2] * pixels[4] * pixels[6] == 0) // Kiểm tra điều kiện đặc biệt
+                                        {
+                                            thinnedImage[x, y] = 0;
+                                            hasChanged = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Bước 2: Lặp lại bước 1 với các điểm ảnh đang xét được đảo ngược
+                    for (int y = 1; y < height - 1; y++)
+                    {
+                        for (int x = 1; x < width - 1; x++)
+                        {
+                            if (thinnedImage[x, y] == 255)
+                            {
+                                int count = CountNeighbors(x, y, thinnedImage);
+
+                                if (count >= 2 && count <= 6)
+                                {
+                                    int transitions = Transitions(x, y, thinnedImage);
+
+                                    if (transitions == 1)
+                                    {
+                                        int[] pixels = GetNeighborPixels(x, y, thinnedImage);
+
+                                        if (pixels[0] * pixels[2] * pixels[6] == 0 && pixels[0] * pixels[4] * pixels[6] == 0)
+                                        {
+                                            thinnedImage[x, y] = 0;
+                                            hasChanged = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return thinnedImage;
+            }
+            // Đếm số lượng điểm lân cận
+            private static int CountNeighbors(int x, int y, int[,] image)
+            {
+                int count = 0;
+                for (int j = -1; j <= 1; j++)
+                {
+                    for (int i = -1; i <= 1; i++)
+                    {
+                        if (image[x + i, y + j] == 255)
+                        {
+                            count++;
+                        }
+                    }
+                }
+                return count - 1;
+            }
+            private static int Transitions(int x, int y, int[,] image)
+            {
+                int count = 0;
+                int[] values = { image[x, y + 1], image[x - 1, y + 1], image[x - 1, y],
+                         image[x - 1, y - 1], image[x, y - 1], image[x + 1, y - 1],
+                         image[x + 1, y], image[x + 1, y + 1], image[x, y + 1] };
+
+                for (int i = 0; i < values.Length - 1; i++)
+                {
+                    if (values[i] == 0 && values[i + 1] == 255)
+                    {
+                        count++;
+                    }
+                }
+                return count;
+            }
+
+            // Lấy giá trị các điểm lân cận
+            private static int[] GetNeighborPixels(int x, int y, int[,] image)
+            {
+                int[] pixels = new int[9];
+                int index = 0;
+                for (int j = -1; j <= 1; j++)
+                {
+                    for (int i = -1; i <= 1; i++)
+                    {
+                        pixels[index++] = image[x + i, y + j];
+                    }
+                }
+                return pixels;
+            }
+        }
+
+        private void Camera_Open_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Camera_Close_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Process_Image_Click(object sender, RoutedEventArgs e)
+        {
+            if ((!string.IsNullOrEmpty("80")) || (!string.IsNullOrEmpty("40")) || (!string.IsNullOrEmpty("50")))
+            {
+                int high_threshold = Convert.ToInt16("80"); // Upper threshold for Canny detect
+                int low_threshold = Convert.ToInt16("40"); // Lower threshold for Canny detect 
+                int threshold = Convert.ToInt16("50"); // Threshold for selecting peaks in Hough matrix
+
+                // Binary image for Canny detect
+                int[,] edges = EdgeDetection.DeTectEdgeByCannyMethod("C:\\Users\\daveb\\Desktop\\doiten.png", high_threshold, low_threshold);
+
+                // Get the number of rows and columns of the array
+                // Initialize a 2D array
+                int width = edges.GetLength(0);
+                int height = edges.GetLength(1);
+
+                // Dilate edges to reduce noise    
+                int[,] dilation = EdgeDetection.Dilation(edges, 6);
+                // Thin edges to a width of 1 to reduce the size of the Hough chart
+                int[,] skeleton = EdgeDetection.EdgeThinning(dilation);
+                // Hough chart
+                int[,] hough = EdgeDetection.PerformHoughTransform(skeleton);
+                // Draw lines from the Hough chart
+                WriteableBitmap resultImage = EdgeDetection.DrawLines(hough, threshold, width, height);
+
+                //CameraImage.Source = resultImage;
+                //CameraImage.Source = EdgeDetection.IntToBitmap(dilation);
+                CameraImage.Source = EdgeDetection.IntToBitmap(skeleton);
+            }
+
+        }
+
+        private void Glove_test_button_Click(object sender, RoutedEventArgs e)
+        {
+            /* Reset error */
+            turn_on_1_pulse_relay(3200);
+            /* Turn on relay */
+            turn_on_1_pulse_relay(600);
+            int[] temp_value = new int[5];
+            double t1_glove, t2_glove, t3_glove, t4_glove, t5_glove;
+            double X_test = 550;
+            double Y_test = 0.0;
+            double Z_test = 750.0;
+            (t1_glove, t2_glove, t3_glove, t4_glove, t5_glove) = convert_position_angle(X_test, Y_test, Z_test);
+            /* Run */
+            temp_value[0] = (int)(Convert.ToDouble(t1_glove * 100000 + 18000000));
+            temp_value[1] = (int)(Convert.ToDouble((t2_glove - 90) * 100000 + 18000000));
+            temp_value[2] = (int)(Convert.ToDouble((t3_glove + 90) * 100000 + 18000000));
+            temp_value[3] = (int)(Convert.ToDouble((t4_glove + 90) * 100000 + 18000000));
+            temp_value[4] = (int)(Convert.ToDouble(t5_glove * 100000 + 18000000));
+            /* Write the angle */
+            for (int ind = 0; ind < 5; ind++)
+            {
+                write_d_mem_32_bit(1400 + 2 * ind, temp_value[ind]);
+            }
         }
 
         class Point2
@@ -2306,7 +3581,10 @@ namespace RobotArmHelix
             return new Circle(new Point2(h, k), r);
         }
 
-
+        private void MenuItemExit_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
     }
 
 }
