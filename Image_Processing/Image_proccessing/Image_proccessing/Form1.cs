@@ -3,10 +3,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
 
-
-
-
-namespace WindowsFormsApp2
+namespace Image_proccessing
 {
     public partial class Form1 : Form
     {
@@ -18,7 +15,7 @@ namespace WindowsFormsApp2
         }
         static int[,] gradient;
         class EdgeDetection
-        { 
+        {
             public static int[,] RGB2Gray(Bitmap ColorImage)
             {
 
@@ -103,10 +100,10 @@ namespace WindowsFormsApp2
                         //GradientX[x, y] = sumX;
                         //GradientY[x, y] = sumY;
                         gradientMagnitude[x, y] = (int)Math.Sqrt(sumX * sumX + sumY * sumY);
-                        if (gradientMagnitude[x, y]>max_gradient)
+                        if (gradientMagnitude[x, y] > max_gradient)
                         {
                             max_gradient = gradientMagnitude[x, y];
-                        }    
+                        }
                         if (gradientMagnitude[x, y] >= 255)
                         {
                             gradientMagnitude[x, y] = 255;
@@ -217,20 +214,20 @@ namespace WindowsFormsApp2
                 int[,] blur = EdgeDetection.Blur_Image(gray);
                 Bitmap img_blur = IntToBitmap(blur);
                 int threhold = CalculateThreshold(img_blur);
-                for(int i =0; i<blur.GetLength(0);i++)
+                for (int i = 0; i < blur.GetLength(0); i++)
                 {
-                    for(int j=0; j<blur.GetLength(1);j++)
+                    for (int j = 0; j < blur.GetLength(1); j++)
                     {
-                        if (blur[i,j]<threhold)
+                        if (blur[i, j] < threhold)
                         {
-                            blur[i,j] = 0;
+                            blur[i, j] = 0;
                         }
                         else
                         {
-                            blur[i,j] = 255;
+                            blur[i, j] = 255;
                         }
-                    }    
-                }    
+                    }
+                }
                 int[,] edges = EdgeDetection.Canny_Detect(blur, high_threshold, low_threshold);
 
                 return edges;
@@ -258,7 +255,7 @@ namespace WindowsFormsApp2
                         //    color = Color.FromArgb((byte)pixelValue, (byte)pixelValue, (byte)pixelValue);
                         //}    
                         color = Color.FromArgb((byte)pixelValue, (byte)pixelValue, (byte)pixelValue);
-                        Result.SetPixel(x, y, color);                                             
+                        Result.SetPixel(x, y, color);
                     }
                 }
                 return Result;
@@ -282,82 +279,6 @@ namespace WindowsFormsApp2
 
                 return imageArray;
             }
-            //public static int[,] LinkEdges(string imagePath, int high_threshold, int low_threshold)
-            //{
-            //    Bitmap Import_picture = new Bitmap(imagePath);
-
-            //    int[,] gray = EdgeDetection.RGB2Gray(Import_picture);
-            //    int[,] blur = EdgeDetection.Blur_Image(gray);
-            //    int[,] edges = EdgeDetection.Canny_Detect(blur, high_threshold, low_threshold);
-            //    // Kích thước hình ảnh
-            //    int width = edges.GetLength(0);
-            //    int height = edges.GetLength(1);
-
-            //    int[,] gradientMagnitude = new int[width, height];
-            //    int[,] gradientAngle = new int[width, height];
-
-            //    int[,] SobelX = {{ -1, 0, 1 },
-            //                        { -2, 0, 2 },
-            //                        { -1, 0, 1 }};
-            //    int[,] SobelY = {{ -1, -2, -1 },
-            //                        { 0, 0, 0 },
-            //                        { 1, 2, 1 }};
-            //    int white_point = 255;
-            //    int gray_point = 50;
-            //    //computting gradient magnitude and gradient angle
-            //    for (int x = 1; x < width - 1; x++)
-            //    {
-            //        for (int y = 1; y < height - 1; y++)
-            //        {
-            //            int sumX = 0;
-            //            int sumY = 0;
-            //            for (int i = -1; i <= 1; i++)
-            //            {
-            //                for (int j = -1; j <= 1; j++)
-            //                {
-            //                    sumX += (int)(SobelX[i + 1, j + 1] * blur[x + i, y + j]);
-            //                    sumY += (int)(SobelY[i + 1, j + 1] * blur[x + i, y + j]);
-            //                }
-            //            }
-            //            //GradientX[x, y] = sumX;
-            //            //GradientY[x, y] = sumY;
-            //            gradientMagnitude[x, y] = (int)Math.Sqrt(sumX * sumX + sumY * sumY);
-            //            if (gradientMagnitude[x, y] >= 255)
-            //            {
-            //                gradientMagnitude[x, y] = 255;
-            //            }
-            //            else if (gradientMagnitude[x, y] <= 0)
-            //            {
-            //                gradientMagnitude[x, y] = 0;
-            //            }
-            //            gradientAngle[x, y] = (int)Math.Abs((Math.Atan2(sumY, sumX) * 180 / Math.PI));
-
-            //        }
-            //    }
-            //    //
-            //    for (int x = 1; x < width - 1; x++)
-            //    {
-            //        for (int y = 1; y < height - 1; y++)
-            //        {
-            //            int edge_point = edges[x, y];
-            //            if (edge_point == 255)
-            //            {
-            //                for (int i = -1; i <= 1; i++)
-            //                {
-            //                    for (int j = -1; j <= 1; j++)
-            //                    {
-            //                        if ((Math.Abs(gradientMagnitude[x + i, y + j] - gradientMagnitude[x, y]) < 50) & (Math.Abs(gradientAngle[x + i, y + j] - gradientAngle[x, y]) < 1) & (Math.Abs(gradientAngle[x + i, y + j] - gradientAngle[x, y]) > 0.1))
-            //                        {
-            //                            edges[x + i, y + j] = 255;
-            //                        }
-            //                    }
-            //                }
-            //            }
-            //        }
-
-            //    }
-            //    return edges;
-            //}
             public static int[,] PerformHoughTransform(int[,] image)
             {
                 int width = image.GetLength(0);
@@ -382,11 +303,11 @@ namespace WindowsFormsApp2
                                 double radian = (theta * Math.PI) / 180.0;
                                 int rho = (int)(x * Math.Cos(radian) + y * Math.Sin(radian));
                                 rho += diagonalLength; // Dịch chuyển rho để không có giá trị âm
-                                houghMatrix[theta, rho]= houghMatrix[theta,rho] + 1;
-                                if(houghMatrix[theta, rho]>255)
+                                houghMatrix[theta, rho] = houghMatrix[theta, rho] + 1;
+                                if (houghMatrix[theta, rho] > 255)
                                 {
                                     houghMatrix[theta, rho] = 255;
-                                }    
+                                }
 
                             }
                         }
@@ -485,16 +406,16 @@ namespace WindowsFormsApp2
                                     if (resultImage[x, y] == 0)
                                     {
                                         resultImage[x, y] = 255;
-                                        if(y+1< resultImage.GetLength(1))
+                                        if (y + 1 < resultImage.GetLength(1))
                                         {
-                                            resultImage[x, y+1] = 255;
-                                        }    
-                                        
+                                            resultImage[x, y + 1] = 255;
+                                        }
+
                                     }
                                     else if (resultImage[x, y] == 255)
                                     {
                                         resultImage[x, y] = 10;
-                                        
+
                                         if (y + 1 < resultImage.GetLength(1))
                                         {
                                             resultImage[x, y + 1] = 10;
@@ -518,19 +439,19 @@ namespace WindowsFormsApp2
                                     if (resultImage[x, y] == 0)
                                     {
                                         resultImage[x, y] = 255;//vẽ line 
-                                        
+
                                         if (x + 1 < resultImage.GetLength(0))
                                         {
-                                            resultImage[x+1, y ] = 255;
+                                            resultImage[x + 1, y] = 255;
                                         }
                                     }
                                     else if (resultImage[x, y] == 255)
                                     {
                                         resultImage[x, y] = 10;//giao điểm
-                                        
-                                        if (x+ 1 < resultImage.GetLength(0))
+
+                                        if (x + 1 < resultImage.GetLength(0))
                                         {
-                                            resultImage[x+1, y ] =10;
+                                            resultImage[x + 1, y] = 10;
                                         }
                                     }
                                     else if (resultImage[x, y] == 10)
@@ -560,11 +481,11 @@ namespace WindowsFormsApp2
                     for (int rho = 0; rho < 2 * diagonal; rho++)
                     {
                         if (houghMatrix[theta, rho] >= threshold)
-                        {                            
+                        {
                             theta_rho[count, 0] = theta;
                             theta_rho[count, 1] = rho;
                             theta_rho[count, 2] = 0;
-                            theta_rho[count,3] = houghMatrix[theta, rho];
+                            theta_rho[count, 3] = houghMatrix[theta, rho];
                             count++;
                         }
                     }
@@ -585,14 +506,14 @@ namespace WindowsFormsApp2
                     int max_index = 0;
                     for (int j = 0; j < count; j++)
                     {
-                        if(theta_rho[j, 2] == 0)
+                        if (theta_rho[j, 2] == 0)
                         {
-                            if (theta_rho[j,3] > max_value_hough)
+                            if (theta_rho[j, 3] > max_value_hough)
                             {
-                                max_value_hough = theta_rho[j,3];
+                                max_value_hough = theta_rho[j, 3];
                                 max_index = j;
-                            }  
-                        }    
+                            }
+                        }
                     }
                     ketqua[index, 0, i] = theta_rho[max_index, 0];
                     ketqua[index, 1, i] = theta_rho[max_index, 1];
@@ -630,10 +551,10 @@ namespace WindowsFormsApp2
                             avr_theta1 = (avr_theta1 + ketqua[j, 0, i]);
                             avr_rho1 = (avr_rho1 + ketqua[j, 1, i]);
                         }
-                        line[i,0] = avr_theta1 / (index);
-                        line[i,1] = avr_rho1 / (index);
+                        line[i, 0] = avr_theta1 / (index);
+                        line[i, 1] = avr_rho1 / (index);
                     }
-                    if(soluong_nhom>=4)
+                    if (soluong_nhom >= 4)
                     {
                         i = nhom;
                     }
@@ -641,8 +562,8 @@ namespace WindowsFormsApp2
                 }
                 for (int i = 0; i < 4; i++)
                 {
-                    int avr_theta= line[i,0];
-                    int avr_rho= line[i,1];
+                    int avr_theta = line[i, 0];
+                    int avr_rho = line[i, 1];
                     //vẽ đường thẳng
                     double radianTheta = avr_theta * Math.PI / 180;
                     if (avr_theta >= 45 && avr_theta < 135)
@@ -717,52 +638,52 @@ namespace WindowsFormsApp2
 
                 return resultImage;
             }
-            public static int[,] FindCorner(int[,]line )
+            public static int[,] FindCorner(int[,] line)
             {
                 int[,] PointMap = new int[line.GetLength(0), line.GetLength(1)];
                 int distance = 0;
                 int max_distance = 0;
-                int Xmax=0;
-                int Ymax=0;
-                int Xmin = 0; 
-                int Ymin=0;
+                int Xmax = 0;
+                int Ymax = 0;
+                int Xmin = 0;
+                int Ymin = 0;
                 //tìm ra 2 điểm của 1 đường chéo 
-                for (int i =0; i<line.GetLength(0);i++)
+                for (int i = 0; i < line.GetLength(0); i++)
                 {
-                    for (int j =0;j<line.GetLength(1);j++)
+                    for (int j = 0; j < line.GetLength(1); j++)
                     {
-                        if (line[i,j]==10)
+                        if (line[i, j] == 10)
                         {
                             Xmin = i;
                             Ymin = j;
                             PointMap[Xmin, Ymin] = 150;
 
-                            for (int a =i; a< line.GetLength(0); a++)
+                            for (int a = i; a < line.GetLength(0); a++)
                             {
-                                for (int b =j; b< line.GetLength(1);b++)
+                                for (int b = j; b < line.GetLength(1); b++)
                                 {
-                                    if (line[a,b]==10)
+                                    if (line[a, b] == 10)
                                     {
-                                        distance =(int)Math.Sqrt((i - a) * (i - a) + (j - b) * (j - b));
-                                        if(distance> max_distance)
+                                        distance = (int)Math.Sqrt((i - a) * (i - a) + (j - b) * (j - b));
+                                        if (distance > max_distance)
                                         {
                                             max_distance = distance;
-                                            Xmax= a;
-                                            Ymax= b;    
-                                        }    
-                                    }    
-                                }    
+                                            Xmax = a;
+                                            Ymax = b;
+                                        }
+                                    }
+                                }
                             }
-                            PointMap[Xmax, Ymax]=150;
-                        }    
-                    }    
+                            PointMap[Xmax, Ymax] = 150;
+                        }
+                    }
                 }
                 //Ax + By + C =0
                 int A = Ymax - Ymin;
                 int B = Xmax - Xmin;
-                
+
                 return PointMap;
-            }           
+            }
             // Hàm dilation với số lần lặp lại xác định
             public static int[,] Dilation(int[,] image, int iterations)
             {
@@ -979,10 +900,9 @@ namespace WindowsFormsApp2
                 return threshold;
             }
         }
-        
-        
 
-        private void open_Click_1(object sender, EventArgs e)
+
+        private void button1_Click(object sender, EventArgs e)
         {
             // Tạo một OpenFileDialog
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -997,46 +917,41 @@ namespace WindowsFormsApp2
                 imagePath = openFileDialog.FileName;
 
                 // Hiển thị ảnh trong PictureBox
-                System.Drawing.Image image = System.Drawing.Image.FromFile(imagePath);
+                Image image = Image.FromFile(imagePath);
                 picture1.Image = image;
             }
         }
-        
-        private void high_TextChanged(object sender, EventArgs e)
+
+        private void button2_Click(object sender, EventArgs e)
         {
+            int high_threshold = 200;//ngưỡng trên cho canny detect
+            int low_threshold = 40;//ngưỡng dưới cho canny detect 
+            int threshold = 50;  // Ngưỡng để chọn các đỉnh trong ma trận Hough
+                                 // int thre = Convert.ToInt16(text_thres.Text);
+                                 //ảnh binary cho canny detect
+            int[,] edges = EdgeDetection.DeTectEdgeByCannyMethod(imagePath, high_threshold, low_threshold);
 
-        }
+            // Lấy số hàng và số cột của mảng
+            // Khởi tạo một mảng 2 chiều
+            int width = edges.GetLength(0);
+            int height = edges.GetLength(1);
 
-        private void process_Click_1(object sender, EventArgs e)
-        {
-                int high_threshold = 200;//ngưỡng trên cho canny detect
-                int low_threshold = 40;//ngưỡng dưới cho canny detect 
-                int threshold = 50;  // Ngưỡng để chọn các đỉnh trong ma trận Hough
-               // int thre = Convert.ToInt16(text_thres.Text);
-                //ảnh binary cho canny detect
-                int[,] edges = EdgeDetection.DeTectEdgeByCannyMethod(imagePath, high_threshold, low_threshold);
+            //mở rộng các cạnh để triệt tiêu bớt nhiễu    
+            //int[,] dilation = EdgeDetection.Dilation(edges, 6);
 
-                // Lấy số hàng và số cột của mảng
-                // Khởi tạo một mảng 2 chiều
-                int width = edges.GetLength(0);
-                int height = edges.GetLength(1);
+            //đưa độ dài cạnh về 1 để giảm dung lượng cho biểu đồ hough
+            //int[,] skeleton = EdgeDetection.EdgeThinning(dilation);
 
-                //mở rộng các cạnh để triệt tiêu bớt nhiễu    
-                //int[,] dilation = EdgeDetection.Dilation(edges, 6);
+            //biểu đồ hough
+            int[,] hough = EdgeDetection.PerformHoughTransform(edges);
 
-                //đưa độ dài cạnh về 1 để giảm dung lượng cho biểu đồ hough
-                //int[,] skeleton = EdgeDetection.EdgeThinning(dilation);
+            //vẽ đường thẳng từ biểu đồ hough
+            int[,] result = EdgeDetection.DrawLines2(hough, threshold, width, height);
 
-                //biểu đồ hough
-                int[,] hough = EdgeDetection.PerformHoughTransform(edges);
-
-                //vẽ đường thẳng từ biểu đồ hough
-                int[,] result = EdgeDetection.DrawLines2(hough, threshold, width, height);
-
-                // thể hiện lên GUI
-                picture2.Image = EdgeDetection.IntToBitmap(result);
-                picture3.Image = EdgeDetection.IntToBitmap(hough);
-                picture4.Image = EdgeDetection.IntToBitmap(edges);
+            // thể hiện lên GUI
+            picture2.Image = EdgeDetection.IntToBitmap(result);
+            picture3.Image = EdgeDetection.IntToBitmap(hough);
+            picture4.Image = EdgeDetection.IntToBitmap(edges);
 
         }
     }
