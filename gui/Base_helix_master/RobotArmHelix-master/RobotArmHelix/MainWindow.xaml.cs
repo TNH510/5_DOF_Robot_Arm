@@ -2374,7 +2374,7 @@ namespace RobotArmHelix
         {
             // Connect to the server
             string host = addr_tb.Text;
-            int port = Convert.ToInt16(port_tb.Text);
+            int port = Convert.ToInt32(port_tb.Text);
 
             try
             {
