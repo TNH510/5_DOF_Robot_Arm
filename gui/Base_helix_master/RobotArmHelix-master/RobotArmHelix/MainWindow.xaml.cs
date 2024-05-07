@@ -3513,30 +3513,48 @@ namespace RobotArmHelix
             //turn_on_1_pulse_relay(600);
             int[] temp_value = new int[5];
             double t1_glove, t2_glove, t3_glove, t4_glove, t5_glove;
+            int ret = 0;
 
-            double X1_test = 550;
-            double Y1_test = 0.0;
-            double Z1_test = 900;
+            double[] point1 = new double[3];
+            double[] point2 = new double[3];
+            double[] point3 = new double[3];
 
-            double X2_test = 0.0;
-            double Y2_test = 700.0;
-            double Z2_test = 600.0;
+            point1[0] = 550;
+            point1[1] = 0.0;
+            point1[2] = 900;
 
-            double X3_test = 600.0;
-            double Y3_test = 0.0;
-            double Z3_test = 800.0;
-            (t1_glove, t2_glove, t3_glove, t4_glove, t5_glove) = convert_position_angle(X1_test, Y1_test, Z1_test);
-            /* Run */
-            temp_value[0] = (int)(Convert.ToDouble(t1_glove * 100000 + 18000000));
-            temp_value[1] = (int)(Convert.ToDouble((t2_glove - 90) * 100000 + 18000000));
-            temp_value[2] = (int)(Convert.ToDouble((t3_glove + 90) * 100000 + 18000000));
-            temp_value[3] = (int)(Convert.ToDouble((t4_glove + 90) * 100000 + 18000000));
-            temp_value[4] = (int)(Convert.ToDouble(t5_glove * 100000 + 18000000));
-            /* Write the angle */
-            for (int ind = 0; ind < 5; ind++)
+            point2[0] = 0.0;
+            point2[1] = 700.0;
+            point2[2] = 600.0;
+
+            point3[0] = 600.0;
+            point3[1] = 0.0;
+            point3[2] = 800.0;
+            int movepath1_status;
+            //(t1_glove, t2_glove, t3_glove, t4_glove, t5_glove) = convert_position_angle(X1_test, Y1_test, Z1_test);
+            ///* Run */
+            //temp_value[0] = (int)(Convert.ToDouble(t1_glove * 100000 + 18000000));
+            //temp_value[1] = (int)(Convert.ToDouble((t2_glove - 90) * 100000 + 18000000));
+            //temp_value[2] = (int)(Convert.ToDouble((t3_glove + 90) * 100000 + 18000000));
+            //temp_value[3] = (int)(Convert.ToDouble((t4_glove + 90) * 100000 + 18000000));
+            //temp_value[4] = (int)(Convert.ToDouble(t5_glove * 100000 + 18000000));
+            ///* Write the angle */
+            //for (int ind = 0; ind < 5; ind++)
+            //{
+            //    write_d_mem_32_bit(1400 + 2 * ind, temp_value[ind]);
+            //}
+
+            /* Turn on relay */
+            turn_on_1_pulse_relay(530);
+            /* Read status of Brake and AC Servo */
+            ret = PLCReadbit(Constants.MOVEL_PATH1, out movepath1_status);
+            if (movepath1_status == 1)
             {
-                write_d_mem_32_bit(1400 + 2 * ind, temp_value[ind]);
+                MoveL_Function(point1, point2, "D1010");
+
             }
+
+
         }
 
         class Point2
