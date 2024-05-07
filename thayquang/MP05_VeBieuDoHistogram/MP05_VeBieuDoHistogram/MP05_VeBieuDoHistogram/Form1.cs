@@ -157,7 +157,7 @@ namespace MP03_ChuyenAnhMauRGBsangGrayscale
             Connect_btn.Enabled = false;
             // Connect to the server
             string host = "192.168.0.49";
-            int port = Convert.ToInt16("2011");
+            int port = Convert.ToInt32("50010");
 
             try
             {
