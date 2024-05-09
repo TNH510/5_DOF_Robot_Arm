@@ -900,8 +900,6 @@ namespace Image_proccessing
                 return threshold;
             }
         }
-
-
         private void button1_Click(object sender, EventArgs e)
         {
             // Tạo một OpenFileDialog

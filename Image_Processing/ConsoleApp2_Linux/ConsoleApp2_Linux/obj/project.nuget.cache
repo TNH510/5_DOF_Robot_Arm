@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "dgSpecHash": "Ru6MGoSyPI8VWIY8Q1beH/lxVMv5RyUfee0s3O92RTySrxeq4Z2JuX4vAk4uQSFxk+/WqazFN12aqyfkIHxrrw==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Loc\\Desktop\\5_DOF_Robot_Arm\\Image_Processing\\ConsoleApp2_Linux\\ConsoleApp2_Linux\\ConsoleApp2_Linux.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Loc\\.nuget\\packages\\microsoft.win32.systemevents\\8.0.0\\microsoft.win32.systemevents.8.0.0.nupkg.sha512",
+    "C:\\Users\\Loc\\.nuget\\packages\\skiasharp\\2.88.8\\skiasharp.2.88.8.nupkg.sha512",
+    "C:\\Users\\Loc\\.nuget\\packages\\skiasharp.nativeassets.macos\\2.88.8\\skiasharp.nativeassets.macos.2.88.8.nupkg.sha512",
+    "C:\\Users\\Loc\\.nuget\\packages\\skiasharp.nativeassets.win32\\2.88.8\\skiasharp.nativeassets.win32.2.88.8.nupkg.sha512",
+    "C:\\Users\\Loc\\.nuget\\packages\\system.drawing.common\\8.0.4\\system.drawing.common.8.0.4.nupkg.sha512"
+  ],
+  "logs": []
+}
