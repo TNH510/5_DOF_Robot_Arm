@@ -791,18 +791,18 @@ namespace RobotArmHelix
             }
         }
 
-        private Color changeModelColor(Joint pJoint, Color newColor)
+        private System.Windows.Media.Color changeModelColor(Joint pJoint, System.Windows.Media.Color newColor)
         {
             Model3DGroup models = ((Model3DGroup)pJoint.model);
             return changeModelColor(models.Children[0] as GeometryModel3D, newColor);
         }
 
-        private Color changeModelColor(GeometryModel3D pModel, Color newColor)
+        private System.Windows.Media.Color changeModelColor(GeometryModel3D pModel, System.Windows.Media.Color newColor)
         {
             if (pModel == null)
                 return oldColor;
 
-            Color previousColor = Colors.Black;
+            System.Windows.Media.Color previousColor = Colors.Black;
 
             MaterialGroup mg = (MaterialGroup)pModel.Material;
             if (mg.Children.Count > 0)
@@ -2267,7 +2267,7 @@ namespace RobotArmHelix
                 return;
             }
         }
-        public void ChangeColorObjectForeground(object objectin, Color color_object)
+        public void ChangeColorObjectForeground(object objectin, System.Windows.Media.Color color_object)
         {
             var button = objectin as Button;
             if (button != null)
@@ -2284,7 +2284,7 @@ namespace RobotArmHelix
             }
         }
 
-        public void ChangeColorObjectBorderBrush(object objectin, Color color_object)
+        public void ChangeColorObjectBorderBrush(object objectin, System.Windows.Media.Color color_object)
         {
             var button = objectin as Button;
             if (button != null)
