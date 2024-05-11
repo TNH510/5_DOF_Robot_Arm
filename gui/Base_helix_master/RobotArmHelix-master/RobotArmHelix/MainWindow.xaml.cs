@@ -1972,7 +1972,7 @@ namespace RobotArmHelix
 
                 PrintLog("Infor", "Transmission", "Done");
             }
-            plc.WriteDeviceBlock(device, 8*point, ref value_angle[0]);
+            plc.WriteDeviceBlock(device, 8 * point, ref value_angle[0]);
         }
 
         private void MoveL_Function(double[] curr_pos, double[] targ_pos, string device)
@@ -2028,30 +2028,6 @@ namespace RobotArmHelix
                 }
 
             }
-            for (int j = 0; j < 10; j++)
-            {
-                value_angle[8 * j] = Write_Theta(angle_array[j, 0])[0];
-                value_angle[8 * j + 1] = Write_Theta(angle_array[j, 0])[1];
-
-                value_angle[8 * j + 2] = Write_Theta(angle_array[j, 1])[0];
-                value_angle[8 * j + 3] = Write_Theta(angle_array[j, 1])[1];
-
-                value_angle[8 * j + 4] = Write_Theta(angle_array[j, 2])[0];
-                value_angle[8 * j + 5] = Write_Theta(angle_array[j, 2])[1];
-
-                value_angle[8 * j + 6] = Write_Theta(angle_array[j, 3])[0];
-                value_angle[8 * j + 7] = Write_Theta(angle_array[j, 3])[1];
-
-                //PrintLog("vect", "value:", Convert.ToString(value_angle[8 * j]));
-                //PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 1]));
-                //PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 2]));
-                //PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 3]));
-                //PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 4]));
-                //PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 5]));
-                //PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 6]));
-                //PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 7]));
-            }
-            plc.WriteDeviceBlock(device, 80, ref value_angle[0]);
             Memory_angle_write(angle_array, value_angle, device, 10);
 
             for (int j = 0; j < 10; j++)
@@ -3582,7 +3558,6 @@ namespace RobotArmHelix
             else
             {
                 MoveL_Function(point1, point2, "D1100");
-
             }
             status_first_time = 0;
             /* Turn on relay */
@@ -3592,10 +3567,16 @@ namespace RobotArmHelix
             if (movepath_status == 1)
             {
                 MoveL_Function(point2, point3, "D1300");
+                MoveL_Function(point3, point1, "D1100");
             }
             /* Turn on relay */
             turn_on_1_pulse_relay(532);
 
+            ret_path = PLCReadbit(Constants.MOVEL_PATH, out movepath_status);
+            if (movepath_status == 1)
+            {
+                turn_on_1_pulse_relay(530);
+            }
         }
 
         class Point2
