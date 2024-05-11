@@ -74,6 +74,7 @@ namespace RobotArmHelix
         public int visible_jogging = 1;
         public int visible_path = 1;
         public int visible_glove = 1;
+        public int status_first_time = 0;
 
 
         private double returnX = 500;
@@ -942,11 +943,55 @@ namespace RobotArmHelix
 
         public void timer2_Tick(object sender, EventArgs e)
         {
-            //joint1.Value = angles_global[0];
-            //joint2.Value = angles_global[1];
-            //joint3.Value = angles_global[2];
-            //joint4.Value = angles_global[3];
-            //joint5.Value = angles_global[4];
+            int[] temp_value1 = new int[5];
+            double t1_glove_path1, t2_glove_path1, t3_glove_path1, t4_glove_path1, t5_glove_path1;
+            int ret = 0;
+
+            int ret_path = 0;
+
+            double[] point1 = new double[3];
+            double[] point2 = new double[3];
+            double[] point3 = new double[3];
+
+            point1[0] = 550;
+            point1[1] = 0.0;
+            point1[2] = 900;
+
+            point2[0] = 0.0;
+            point2[1] = 700.0;
+            point2[2] = 600.0;
+
+            point3[0] = 600.0;
+            point3[1] = 0.0;
+            point3[2] = 800.0;
+
+            int movepath_status;
+
+            /* Read status of Brake and AC Servo */
+            ret = PLCReadbit(Constants.MOVEL_PATH, out movepath_status);
+            if (movepath_status == 1 && status_first_time == 0)
+            {
+                status_first_time += 1;
+                MoveL_Function(point1, point2, "D1100");
+                /* Turn on relay */
+                turn_on_1_pulse_relay(530);
+            }
+            ret_path = PLCReadbit(Constants.MOVEL_PATH, out movepath_status);
+            if (movepath_status == 1 && status_first_time == 1)
+            {
+                MoveL_Function(point2, point3, "D1300");
+                MoveL_Function(point3, point1, "D1100");
+                /* Turn on relay */
+                turn_on_1_pulse_relay(532);
+            }
+
+            ret_path = PLCReadbit(Constants.MOVEL_PATH, out movepath_status);
+            if (movepath_status == 1 && status_first_time == 2)
+            {
+                /* Turn on relay */
+                turn_on_1_pulse_relay(530);
+                status_first_time = 0;
+            }
         }
         public double[] InverseKinematics(Vector3D target, double[] angles)
         {
@@ -3506,77 +3551,7 @@ namespace RobotArmHelix
 
         private void Glove_test_button_Click(object sender, RoutedEventArgs e)
         {
-            ///* Reset error */
-            //turn_on_1_pulse_relay(3200);
-            ///* Turn on relay */
-            //turn_on_1_pulse_relay(600);
-            int[] temp_value1 = new int[5];
-            double t1_glove_path1, t2_glove_path1, t3_glove_path1, t4_glove_path1, t5_glove_path1;
-            int ret = 0;
-
-            int ret_path = 0;
-
-            double[] point1 = new double[3];
-            double[] point2 = new double[3];
-            double[] point3 = new double[3];
-
-            point1[0] = 550;
-            point1[1] = 0.0;
-            point1[2] = 900;
-
-            point2[0] = 0.0;
-            point2[1] = 700.0;
-            point2[2] = 600.0;
-
-            point3[0] = 600.0;
-            point3[1] = 0.0;
-            point3[2] = 800.0;
-
-            int movepath_status;
-            int status_first_time = 0;
-
-            //(t1_glove_path1, t2_glove_path1, t3_glove_path1, t4_glove_path1, t5_glove_path1) = convert_position_angle(point1[0], point1[1], point1[2]);
-            ///* Run */
-            //temp_value1[0] = (int)(Convert.ToDouble(t1_glove_path1 * 100000 + 18000000));
-            //temp_value1[1] = (int)(Convert.ToDouble((t2_glove_path1 - 90) * 100000 + 18000000));
-            //temp_value1[2] = (int)(Convert.ToDouble((t3_glove_path1 + 90) * 100000 + 18000000));
-            //temp_value1[3] = (int)(Convert.ToDouble((t4_glove_path1 + 90) * 100000 + 18000000));
-            //temp_value1[4] = (int)(Convert.ToDouble(t5_glove_path1 * 100000 + 18000000));
-            ///* Write the angle */
-            //for (int ind = 0; ind < 5; ind++)
-            //{
-            //    write_d_mem_32_bit(1400 + 2 * ind, temp_value1[ind]);
-            //}
-            /* Read status of Brake and AC Servo */
-            ret = PLCReadbit(Constants.MOVEL_PATH, out movepath_status);
-            if (movepath_status == 1 || status_first_time == 0)
-            {
-                status_first_time += 1;
-                MoveL_Function(point1, point2, "D1100");
-
-            }
-            else
-            {
-                MoveL_Function(point1, point2, "D1100");
-            }
-            status_first_time = 0;
-            /* Turn on relay */
-            turn_on_1_pulse_relay(530);
-
-            ret_path = PLCReadbit(Constants.MOVEL_PATH, out movepath_status);
-            if (movepath_status == 1)
-            {
-                MoveL_Function(point2, point3, "D1300");
-                MoveL_Function(point3, point1, "D1100");
-            }
-            /* Turn on relay */
-            turn_on_1_pulse_relay(532);
-
-            ret_path = PLCReadbit(Constants.MOVEL_PATH, out movepath_status);
-            if (movepath_status == 1)
-            {
-                turn_on_1_pulse_relay(530);
-            }
+            timer2.Start();
         }
 
         class Point2
