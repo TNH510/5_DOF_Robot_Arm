@@ -2070,10 +2070,6 @@ namespace RobotArmHelix
                     angle_array[t, 2] = (int)(t3 * 100000 + 18000000);
                     angle_array[t, 3] = (int)(t4 * 100000 + 18000000);
                     angle_array[t, 4] = (int)(t5 * 100000 + 18000000);
-
-                    t2 -= 90.0;
-                    t3 += 90.0;
-                    t4 += 90.0;
                 }
                 else
                 {
