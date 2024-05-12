@@ -23,7 +23,7 @@ Control Memory
 | M558   | JOG5_F             |
 | M559   | JOG5_R             |
 | M600   | Adapt Control (K6) |
-|        |                    |
+| M700   | Program status     |
 
 Data memory
 
