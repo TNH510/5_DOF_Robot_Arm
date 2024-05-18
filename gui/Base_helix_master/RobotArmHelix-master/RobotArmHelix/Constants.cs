@@ -45,6 +45,8 @@ namespace RobotArmHelix
         public const string R_STATUS = "M8000"; /*Address of value 17bit contain SERVO, BRAKE, STATUS OF SERVO*/
         public const string R_PATH = "M529"; /*Address of value 17bit contain SERVO, BRAKE, STATUS OF SERVO*/
 
+        public const string MOVEL_PATH = "M700"; /*Address of value 16 for PLC move path1 completed */
+
         public const string R_JOGGINGFORWARD1 = "M550";
         public const string R_JOGGINGINVERSE1 = "M551";
         public const string R_JOGGINGFORWARD2 = "M552";

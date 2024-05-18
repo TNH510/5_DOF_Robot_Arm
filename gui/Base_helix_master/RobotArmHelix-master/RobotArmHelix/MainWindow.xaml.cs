@@ -34,6 +34,7 @@ using RobotArmHelix.Properties;
 using System.Windows.Markup;
 using OxyPlot.Axes;
 using System.ComponentModel;
+using SharpDX;
 /**
 * Author: Gabriele Marini (Gabryxx7)
 * This class load the 3d models of all the parts of the robotic arms and add them to the viewport
@@ -73,6 +74,7 @@ namespace RobotArmHelix
         public int visible_jogging = 1;
         public int visible_path = 1;
         public int visible_glove = 1;
+        public int status_first_time = 0;
 
 
         private double returnX = 500;
@@ -132,7 +134,7 @@ namespace RobotArmHelix
         public bool ds_bttn = false;
         public bool testpos_bttn = true;
 
-        Color oldColor = Colors.White;
+        System.Windows.Media.Color oldColor = Colors.White;
         GeometryModel3D oldSelectedModel = null;
         string basePath = "";
         ModelVisual3D visual;
@@ -575,7 +577,7 @@ namespace RobotArmHelix
                 foreach(string modelName in modelsNames)
                 {
                     var materialGroup = new MaterialGroup();
-                    Color mainColor = Colors.White;
+                    System.Windows.Media.Color mainColor = Colors.White;
                     EmissiveMaterial emissMat = new EmissiveMaterial(new SolidColorBrush(mainColor));
                     DiffuseMaterial diffMat = new DiffuseMaterial(new SolidColorBrush(mainColor));
                     SpecularMaterial specMat = new SpecularMaterial(new SolidColorBrush(mainColor), 200);
@@ -791,18 +793,18 @@ namespace RobotArmHelix
             }
         }
 
-        private Color changeModelColor(Joint pJoint, Color newColor)
+        private System.Windows.Media.Color changeModelColor(Joint pJoint, System.Windows.Media.Color newColor)
         {
             Model3DGroup models = ((Model3DGroup)pJoint.model);
             return changeModelColor(models.Children[0] as GeometryModel3D, newColor);
         }
 
-        private Color changeModelColor(GeometryModel3D pModel, Color newColor)
+        private System.Windows.Media.Color changeModelColor(GeometryModel3D pModel, System.Windows.Media.Color newColor)
         {
             if (pModel == null)
                 return oldColor;
 
-            Color previousColor = Colors.Black;
+            System.Windows.Media.Color previousColor = Colors.Black;
 
             MaterialGroup mg = (MaterialGroup)pModel.Material;
             if (mg.Children.Count > 0)
@@ -844,7 +846,7 @@ namespace RobotArmHelix
 
         private void ViewPort3D_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-           Point mousePos = e.GetPosition(viewPort3d);
+           System.Windows.Point mousePos = e.GetPosition(viewPort3d);
            PointHitTestParameters hitParams = new PointHitTestParameters(mousePos);
            VisualTreeHelper.HitTest(viewPort3d, null, ResultCallback, hitParams);
         }
@@ -941,11 +943,60 @@ namespace RobotArmHelix
 
         public void timer2_Tick(object sender, EventArgs e)
         {
-            //joint1.Value = angles_global[0];
-            //joint2.Value = angles_global[1];
-            //joint3.Value = angles_global[2];
-            //joint4.Value = angles_global[3];
-            //joint5.Value = angles_global[4];
+            int[] temp_value1 = new int[5];
+            double t1_glove_path1, t2_glove_path1, t3_glove_path1, t4_glove_path1, t5_glove_path1;
+            int ret = 0;
+
+            int ret_path = 0;
+
+            double[] point1 = new double[3];
+            double[] point2 = new double[3];
+            double[] point3 = new double[3];
+
+            point1[0] = 550;
+            point1[1] = 0.0;
+            point1[2] = 900;
+
+            point2[0] = 0.0;
+            point2[1] = 700.0;
+            point2[2] = 600.0;
+
+            point3[0] = 600.0;
+            point3[1] = 0.0;
+            point3[2] = 800.0;
+
+            int movepath_status;
+
+            /* Read status of Brake and AC Servo */
+            ret = PLCReadbit(Constants.MOVEL_PATH, out movepath_status);
+            if (movepath_status == 1 && status_first_time == 0)
+            {
+                status_first_time += 1;
+                MoveL_Function(point1, point2, "D1010");
+                /* Turn on relay */
+                turn_on_1_pulse_relay(530);
+            }
+            ret_path = PLCReadbit(Constants.MOVEL_PATH, out movepath_status);
+            if (movepath_status == 1 && status_first_time == 1)
+            {
+                status_first_time += 1;
+                MoveL_Function(point2, point3, "D1100");
+                MoveL_Function(point3, point1, "D1010");
+                /* Turn on relay */
+                turn_on_1_pulse_relay(532);
+            }
+
+            ret_path = PLCReadbit(Constants.MOVEL_PATH, out movepath_status);
+            if (movepath_status == 1 && status_first_time == 2)
+            {
+                status_first_time = 0;
+                /* Turn on relay */
+                turn_on_1_pulse_relay(530);
+            }
+
+ 
+
+
         }
         public double[] InverseKinematics(Vector3D target, double[] angles)
         {
@@ -1275,7 +1326,7 @@ namespace RobotArmHelix
             }
             /* Start timer1 and timer2 */
             // timer1.Start();
-            //Thread1Start();
+            Thread1Start();
             //Thread2Start();
             //timer1.Start();
         }
@@ -1953,28 +2004,36 @@ namespace RobotArmHelix
             }
         }
 
-        private void Tsm_moveL_btn_Click(object sender, RoutedEventArgs e)
+        private void Memory_angle_write(int[,] array, int[] value_angle, string device, int point)
         {
-            move = 2;
+            for (int j = 0; j < point; j++)
+            {
+                value_angle[8 * j] = Write_Theta(array[j, 0])[0];
+                value_angle[8 * j + 1] = Write_Theta(array[j, 0])[1];
+
+                value_angle[8 * j + 2] = Write_Theta(array[j, 1])[0];
+                value_angle[8 * j + 3] = Write_Theta(array[j, 1])[1];
+
+                value_angle[8 * j + 4] = Write_Theta(array[j, 2])[0];
+                value_angle[8 * j + 5] = Write_Theta(array[j, 2])[1];
+
+                value_angle[8 * j + 6] = Write_Theta(array[j, 3])[0];
+                value_angle[8 * j + 7] = Write_Theta(array[j, 3])[1];
+
+                PrintLog("Infor", "Transmission", "Done");
+            }
+            plc.WriteDeviceBlock(device, 8 * point, ref value_angle[0]);
+        }
+
+        private void MoveL_Function(double[] curr_pos, double[] targ_pos, string device)
+        {
             double[] vect_u = new double[3];
-            double[] curr_pos = new double[3];
-            double[] targ_pos = new double[3];
             double t1, t2, t3, t4, t5;
             int[,] angle_array = new int[10, 5];
             double x, y, z;
             int ret;
             int[] value_angle = new int[80];
             int[] value_angle_t5 = new int[20];
-
-            /* Assign corrdination for each array */
-            curr_pos[0] = Convert.ToDouble(Tx.Content);
-            curr_pos[1] = Convert.ToDouble(Ty.Content);
-            curr_pos[2] = Convert.ToDouble(Tz.Content);
-
-            targ_pos[0] = Convert.ToDouble(TbX.Text);
-            targ_pos[1] = Convert.ToDouble(TbY.Text);
-            targ_pos[2] = Convert.ToDouble(TbZ.Text);
-
             /* Referred vector */
             for (int i = 0; i < 3; i++)
             {
@@ -1988,7 +2047,7 @@ namespace RobotArmHelix
                 x = curr_pos[0] + (vect_u[0] / 10) * (t + 1); /* 500 is the actual position of robot following the x axis */
                 y = curr_pos[1] + (vect_u[1] / 10) * (t + 1); /* 0 is the actual position of robot following the y axis */
                 z = curr_pos[2] + (vect_u[2] / 10) * (t + 1); /* 900 is the actual position of robot following the y axis */
-                if(z >= 500 && z <= 1000)
+                if (z >= 500 && z <= 1000)
                 {
                     (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
                     ret = Check_angle(t1, t2, t3, t4, t5);
@@ -2019,36 +2078,42 @@ namespace RobotArmHelix
                 }
 
             }
-            for (int j = 0; j < 10; j++)
-            {
-                value_angle[8 * j] = Write_Theta(angle_array[j, 0])[0];
-                value_angle[8 * j + 1] = Write_Theta(angle_array[j, 0])[1];
+            Memory_angle_write(angle_array, value_angle, device, 10);
 
-                value_angle[8 * j + 2] = Write_Theta(angle_array[j, 1])[0];
-                value_angle[8 * j + 3] = Write_Theta(angle_array[j, 1])[1];
-
-                value_angle[8 * j + 4] = Write_Theta(angle_array[j, 2])[0];
-                value_angle[8 * j + 5] = Write_Theta(angle_array[j, 2])[1];
-
-                value_angle[8 * j + 6] = Write_Theta(angle_array[j, 3])[0];
-                value_angle[8 * j + 7] = Write_Theta(angle_array[j, 3])[1];
-
-                PrintLog("vect", "value:", Convert.ToString(value_angle[8 * j]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 1]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 2]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 3]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 4]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 5]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 6]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 7]));
-
-            }
-            plc.WriteDeviceBlock("D1010", 80, ref value_angle[0]);
             for (int j = 0; j < 10; j++)
             {
                 value_angle_t5[2 * j] = Write_Theta(angle_array[j, 4])[0];
                 value_angle_t5[2 * j + 1] = Write_Theta(angle_array[j, 4])[1];
             }
+        }
+
+        private void Tsm_moveL_btn_Click(object sender, RoutedEventArgs e)
+        {
+            move = 2;
+            double[] vect_u = new double[3];
+            double[] curr_pos = new double[3];
+            double[] targ_pos = new double[3];
+            double t1, t2, t3, t4, t5;
+            int[,] angle_array = new int[10, 5];
+            double x, y, z;
+            int ret;
+            int[] value_angle = new int[80];
+            int[] value_angle_t5 = new int[20];
+
+            /* Assign corrdination for each array */
+            //curr_pos[0] = Convert.ToDouble(Tx.Content);
+            //curr_pos[1] = Convert.ToDouble(Ty.Content);
+            //curr_pos[2] = Convert.ToDouble(Tz.Content);
+
+            curr_pos[0] = 600.0;
+            curr_pos[1] = 0.0;
+            curr_pos[2] = 800.0;
+
+            targ_pos[0] = Convert.ToDouble(TbX.Text);
+            targ_pos[1] = Convert.ToDouble(TbY.Text);
+            targ_pos[2] = Convert.ToDouble(TbZ.Text);
+
+            MoveL_Function(curr_pos, targ_pos, "D1010");
         }
 
         private void Tsm_moveC_btn_Click(object sender, RoutedEventArgs e)
@@ -2239,7 +2304,7 @@ namespace RobotArmHelix
             ErrorLog.AppendText(time.ToString("h:mm:ss") + " - " + level + " - " + namefunction + ": " + msg);
             ErrorLog.AppendText(Environment.NewLine);
         }
-        public void ChangeColorObjectBackground(object objectin, Color color_object)
+        public void ChangeColorObjectBackground(object objectin, System.Windows.Media.Color color_object)
         {
             var button = objectin as Button;
             if (button != null)
@@ -2255,7 +2320,7 @@ namespace RobotArmHelix
                 return;
             }
         }
-        public void ChangeColorObjectForeground(object objectin, Color color_object)
+        public void ChangeColorObjectForeground(object objectin, System.Windows.Media.Color color_object)
         {
             var button = objectin as Button;
             if (button != null)
@@ -2272,7 +2337,7 @@ namespace RobotArmHelix
             }
         }
 
-        public void ChangeColorObjectBorderBrush(object objectin, Color color_object)
+        public void ChangeColorObjectBorderBrush(object objectin, System.Windows.Media.Color color_object)
         {
             var button = objectin as Button;
             if (button != null)
@@ -2362,7 +2427,7 @@ namespace RobotArmHelix
         {
             // Connect to the server
             string host = addr_tb.Text;
-            int port = Convert.ToInt16(port_tb.Text);
+            int port = Convert.ToInt32(port_tb.Text);
 
             try
             {
@@ -3495,27 +3560,7 @@ namespace RobotArmHelix
 
         private void Glove_test_button_Click(object sender, RoutedEventArgs e)
         {
-            /* Reset error */
-            turn_on_1_pulse_relay(3200);
-            /* Turn on relay */
-            turn_on_1_pulse_relay(600);
-            int[] temp_value = new int[5];
-            double t1_glove, t2_glove, t3_glove, t4_glove, t5_glove;
-            double X_test = 550;
-            double Y_test = 0.0;
-            double Z_test = 750.0;
-            (t1_glove, t2_glove, t3_glove, t4_glove, t5_glove) = convert_position_angle(X_test, Y_test, Z_test);
-            /* Run */
-            temp_value[0] = (int)(Convert.ToDouble(t1_glove * 100000 + 18000000));
-            temp_value[1] = (int)(Convert.ToDouble((t2_glove - 90) * 100000 + 18000000));
-            temp_value[2] = (int)(Convert.ToDouble((t3_glove + 90) * 100000 + 18000000));
-            temp_value[3] = (int)(Convert.ToDouble((t4_glove + 90) * 100000 + 18000000));
-            temp_value[4] = (int)(Convert.ToDouble(t5_glove * 100000 + 18000000));
-            /* Write the angle */
-            for (int ind = 0; ind < 5; ind++)
-            {
-                write_d_mem_32_bit(1400 + 2 * ind, temp_value[ind]);
-            }
+            timer2.Start();
         }
 
         class Point2
