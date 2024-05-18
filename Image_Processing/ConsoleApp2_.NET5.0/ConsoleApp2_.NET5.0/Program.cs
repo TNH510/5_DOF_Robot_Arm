@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Diagnostics;
-using System.Net.Sockets;
 
 //int[,] gradient;
-class Program
+internal class Program
 {
     static void Main()
     {
@@ -11,22 +12,34 @@ class Program
         Stopwatch stopwatch = new Stopwatch();
         // Bắt đầu đo thời gian
         stopwatch.Start();
-        Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-        string response_client;
-        // Connect to the server
-        string host = "192.168.0.49";
-        int port = Convert.ToInt32("50010");
+        //// Đường dẫn đến file ảnh BMP
+        //string bmpPath = @"C:\Users\Loc\Desktop\XLA_10-_2_.bmp";
+        //string output = @"C:\Users\Loc\Desktop\ouput.bmp";
+        //int high_threshold = 200;//ngưỡng trên cho canny detect
+        //int low_threshold = 40;//ngưỡng dưới cho canny detect 
+        //int threshold = 50;  // Ngưỡng để chọn các đỉnh trong ma trận Hough
+        //                     // int thre = Convert.ToInt16(text_thres.Text);
+        //                     //ảnh binary cho canny detect
+        //int[,] edges = EdgeDetection.DeTectEdgeByCannyMethod(bmpPath, high_threshold, low_threshold);
 
-        try
-        {
-            clientSocket.Connect(host, port);
-            Console.WriteLine("Connected");
+        //// Lấy số hàng và số cột của mảng
+        //// Khởi tạo một mảng 2 chiều
+        //int width = edges.GetLength(0);
+        //int height = edges.GetLength(1);
 
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Unable to connect");
-        }
+        ////mở rộng các cạnh để triệt tiêu bớt nhiễu    
+        ////int[,] dilation = EdgeDetection.Dilation(edges, 6);
+
+        ////đưa độ dài cạnh về 1 để giảm dung lượng cho biểu đồ hough
+        ////int[,] skeleton = EdgeDetection.EdgeThinning(dilation);
+
+        ////biểu đồ hough
+        //int[,] hough = EdgeDetection.PerformHoughTransform(edges);
+
+        ////vẽ đường thẳng từ biểu đồ hough
+        //int[,] result_2D = EdgeDetection.DrawLines2(hough, threshold, width, height);
+        ////Bitmap result_3D = EdgeDetection.IntToBitmap(result_2D);
+        ////result_3D.Save(output);
         //// Dừng đồng hồ đo thời gian
         stopwatch.Stop();
 
@@ -35,9 +48,8 @@ class Program
 
         // In ra thời gian đã trôi qua
         Console.WriteLine("Thời gian thực thi: " + elapsedTime);
-        //Console.WriteLine("Chuyển đổi thành công.");
+        Console.WriteLine("Chuyển đổi thành công.");
     }
-    
 }
 
 class EdgeDetection
