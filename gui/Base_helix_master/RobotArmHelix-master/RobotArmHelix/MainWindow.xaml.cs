@@ -972,15 +972,16 @@ namespace RobotArmHelix
             if (movepath_status == 1 && status_first_time == 0)
             {
                 status_first_time += 1;
-                MoveL_Function(point1, point2, "D1100");
+                MoveL_Function(point1, point2, "D1010");
                 /* Turn on relay */
                 turn_on_1_pulse_relay(530);
             }
             ret_path = PLCReadbit(Constants.MOVEL_PATH, out movepath_status);
             if (movepath_status == 1 && status_first_time == 1)
             {
-                MoveL_Function(point2, point3, "D1300");
-                MoveL_Function(point3, point1, "D1100");
+                status_first_time += 1;
+                MoveL_Function(point2, point3, "D1100");
+                MoveL_Function(point3, point1, "D1010");
                 /* Turn on relay */
                 turn_on_1_pulse_relay(532);
             }
@@ -988,9 +989,9 @@ namespace RobotArmHelix
             ret_path = PLCReadbit(Constants.MOVEL_PATH, out movepath_status);
             if (movepath_status == 1 && status_first_time == 2)
             {
+                status_first_time = 0;
                 /* Turn on relay */
                 turn_on_1_pulse_relay(530);
-                status_first_time = 0;
             }
 
  
@@ -1325,7 +1326,7 @@ namespace RobotArmHelix
             }
             /* Start timer1 and timer2 */
             // timer1.Start();
-            //Thread1Start();
+            Thread1Start();
             //Thread2Start();
             //timer1.Start();
         }
@@ -2100,15 +2101,19 @@ namespace RobotArmHelix
             int[] value_angle_t5 = new int[20];
 
             /* Assign corrdination for each array */
-            curr_pos[0] = Convert.ToDouble(Tx.Content);
-            curr_pos[1] = Convert.ToDouble(Ty.Content);
-            curr_pos[2] = Convert.ToDouble(Tz.Content);
+            //curr_pos[0] = Convert.ToDouble(Tx.Content);
+            //curr_pos[1] = Convert.ToDouble(Ty.Content);
+            //curr_pos[2] = Convert.ToDouble(Tz.Content);
+
+            curr_pos[0] = 600.0;
+            curr_pos[1] = 0.0;
+            curr_pos[2] = 800.0;
 
             targ_pos[0] = Convert.ToDouble(TbX.Text);
             targ_pos[1] = Convert.ToDouble(TbY.Text);
             targ_pos[2] = Convert.ToDouble(TbZ.Text);
 
-            MoveL_Function(curr_pos, targ_pos, "D1100");
+            MoveL_Function(curr_pos, targ_pos, "D1010");
         }
 
         private void Tsm_moveC_btn_Click(object sender, RoutedEventArgs e)
