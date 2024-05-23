@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
 
 namespace Image_proccessing
@@ -474,7 +475,7 @@ namespace Image_proccessing
 
                 int[,] resultImage = new int[width, height];
                 int count = 0;
-                int[,] theta_rho = new int[1000, 4];
+                int[,] theta_rho = new int[5000, 4];
                 // lấy toàn bộ số điểm vượt ngưỡng 
                 for (int theta = 0; theta < 180; theta++)
                 {
@@ -482,16 +483,16 @@ namespace Image_proccessing
                     {
                         if (houghMatrix[theta, rho] >= threshold)
                         {
-                            theta_rho[count, 0] = theta;
-                            theta_rho[count, 1] = rho;
-                            theta_rho[count, 2] = 0;
-                            theta_rho[count, 3] = houghMatrix[theta, rho];
+                            theta_rho[count, 0] = theta;//góc theta
+                            theta_rho[count, 1] = rho;//khoảng cách từ đường thẳng đến gốc tọa độ
+                            theta_rho[count, 2] = 0;//kiểm tra thử đã được chọn hay chưa
+                            theta_rho[count, 3] = houghMatrix[theta, rho];// giá trị điểm vote
                             count++;
                         }
                     }
                 }
                 //phân loại đường thẳng                
-                int nhom = 6;
+                int nhom = 4;
                 int[,,] ketqua = new int[count, 2, nhom];
                 int[,] line = new int[4, 2];
                 int soluong_nhom = 0;
@@ -515,8 +516,8 @@ namespace Image_proccessing
                             }
                         }
                     }
-                    ketqua[index, 0, i] = theta_rho[max_index, 0];
-                    ketqua[index, 1, i] = theta_rho[max_index, 1];
+                    ketqua[index, 0, i] = theta_rho[max_index, 0];// lấy giá trị theta
+                    ketqua[index, 1, i] = theta_rho[max_index, 1];// lấy giá trị rho
                     theta_rho[max_index, 2] = 1;
                     index++;
                     soluong_nhom++;
@@ -554,7 +555,8 @@ namespace Image_proccessing
                         line[i, 0] = avr_theta1 / (index);
                         line[i, 1] = avr_rho1 / (index);
                     }
-                    if (soluong_nhom >= 4)
+                    // chỉ lấy 4 đường có số lượng đường thẳng nhiều nhất                   
+                    if (soluong_nhom >= 4)// điều kiện thoát vòng lặp
                     {
                         i = nhom;
                     }
@@ -564,6 +566,175 @@ namespace Image_proccessing
                 {
                     int avr_theta = line[i, 0];
                     int avr_rho = line[i, 1];
+                    //vẽ đường thẳng
+                    double radianTheta = avr_theta * Math.PI / 180;
+                    if (avr_theta >= 45 && avr_theta < 135)
+                    {
+                        for (int x = 0; x < width; x++)
+                        {
+                            int y = (int)(((avr_rho - diagonal) - x * Math.Cos(radianTheta)) / Math.Sin(radianTheta));
+                            if (y >= 0 && y < height)
+                            {
+                                //resultImage[x, y] = 255;
+                                if (resultImage[x, y] == 0)
+                                {
+                                    resultImage[x, y] = 255;
+                                    if (y + 1 < resultImage.GetLength(1))
+                                    {
+                                        resultImage[x, y + 1] = 255;
+                                    }
+
+                                }
+                                else if (resultImage[x, y] == 255)
+                                {
+                                    resultImage[x, y] = 10;
+
+                                    if (y + 1 < resultImage.GetLength(1))
+                                    {
+                                        resultImage[x, y + 1] = 10;
+                                    }
+                                }
+                                else if (resultImage[x, y] == 10)
+                                {
+                                    //DO NOTHING
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (int y = 0; y < height; y++)
+                        {
+                            int x = (int)(((avr_rho - diagonal) - y * Math.Sin(radianTheta)) / Math.Cos(radianTheta));
+                            if (x >= 0 && x < width)
+                            {
+                                //resultImage[x, y] = 255;
+                                if (resultImage[x, y] == 0)
+                                {
+                                    resultImage[x, y] = 255;//vẽ line 
+
+                                    if (x + 1 < resultImage.GetLength(0))
+                                    {
+                                        resultImage[x + 1, y] = 255;
+                                    }
+                                }
+                                else if (resultImage[x, y] == 255)
+                                {
+                                    resultImage[x, y] = 10;//giao điểm
+
+                                    if (x + 1 < resultImage.GetLength(0))
+                                    {
+                                        resultImage[x + 1, y] = 10;
+                                    }
+                                }
+                                else if (resultImage[x, y] == 10)
+                                {
+                                    //DO NOTHING
+                                    //nền
+                                }
+                            }
+                        }
+                    }
+                    //
+                }
+
+                return resultImage;
+            }
+            public static int[,] DrawLines3(int[,] houghMatrix, int threshold, int width, int height)
+            {
+                int diagonal = (int)Math.Sqrt(width * width + height * height); // Đường chéo của ảnh
+
+                int[,] resultImage = new int[width, height];
+                int count = 0;
+                int[,] theta_rho = new int[2000, 4];
+                // lấy toàn bộ số điểm vượt ngưỡng 
+                for (int theta = 0; theta < 180; theta++)
+                {
+                    for (int rho = 0; rho < 2 * diagonal; rho++)
+                    {
+                        if (houghMatrix[theta, rho] >= threshold)
+                        {
+                            theta_rho[count, 0] = theta;//góc theta
+                            theta_rho[count, 1] = rho;//khoảng cách từ đường thẳng đến gốc tọa độ
+                            theta_rho[count, 2] = 0;//kiểm tra thử đã được chọn hay chưa
+                            theta_rho[count, 3] = houghMatrix[theta, rho];// giá trị điểm vote
+                            count++;
+                        }
+                    }
+                }
+                //phân loại đường thẳng                
+                int nhom = 10;
+                int[,,] ketqua = new int[count, 2, nhom];
+                int[,] line = new int[4, 2];
+                int soluong_nhom = 0;
+                // phân nhóm
+                for (int i = 0; i < nhom; i++)
+                {
+                    int index = 0;
+                    //lấy số chuẩn cho mỗi nhóm điều kiện phải là số có hough lớn nhất còn lại
+                    int max_value_hough = 0;
+                    int max_index = 0;
+                    for (int j = 0; j < count; j++)
+                    {
+                        if (theta_rho[j, 2] == 0)
+                        {
+                            if (theta_rho[j, 3] > max_value_hough)
+                            {
+                                max_value_hough = theta_rho[j, 3];
+                                max_index = j;
+                            }
+                        }
+                    }
+                    ketqua[index, 0, i] = theta_rho[max_index, 0];// lấy giá trị theta
+                    ketqua[index, 1, i] = theta_rho[max_index, 1];// lấy giá trị rho
+                    theta_rho[max_index, 2] = 1;
+                    index++;
+                    soluong_nhom++;
+                    //phân nhóm
+                    int delta_a = 0;
+                    int delta_p = 0;
+                    int delta_a_threshold = 30;
+                    int delta_p_threshold = 70;
+                    for (int j = 0; j < count; j++)
+                    {
+                        if (theta_rho[j, 2] == 0)
+                        {
+                            delta_a = Math.Abs(ketqua[0, 0, i] - theta_rho[j, 0]);
+                            delta_p = Math.Abs(ketqua[0, 1, i] - theta_rho[j, 1]);
+                            if (((delta_a < delta_a_threshold) || (delta_a > 180 - delta_a_threshold)) && (delta_p < delta_p_threshold))
+                            {
+                                ketqua[index, 0, i] = theta_rho[j, 0];
+                                ketqua[index, 1, i] = theta_rho[j, 1];
+                                theta_rho[j, 2] = 1;
+                                index++;
+                            }
+                        }
+                    }
+
+                    ////tìm đường trung bình trong các nhóm (chỗ này hơi ngu nha)
+                    //int avr_theta1 = 0;
+                    //int avr_rho1 = 0;
+                    //if (index != 0)
+                    //{
+                    //    for (int j = 0; j < index; j++)
+                    //    {
+                    //        avr_theta1 = (avr_theta1 + ketqua[j, 0, i]);
+                    //        avr_rho1 = (avr_rho1 + ketqua[j, 1, i]);
+                    //    }
+                    //    line[i, 0] = avr_theta1 / (index);
+                    //    line[i, 1] = avr_rho1 / (index);
+                    //}
+                    // chỉ lấy 4 đường có số lượng đường thẳng nhiều nhất                   
+                    if (soluong_nhom >= 4)// điều kiện thoát vòng lặp
+                    {
+                        i = nhom;
+                    }
+
+                }
+                for (int i = 0; i < 4; i++)
+                {
+                    int avr_theta = ketqua[0, 0,i];
+                    int avr_rho = ketqua[0, 1,i];
                     //vẽ đường thẳng
                     double radianTheta = avr_theta * Math.PI / 180;
                     if (avr_theta >= 45 && avr_theta < 135)
@@ -899,6 +1070,33 @@ namespace Image_proccessing
 
                 return threshold;
             }
+            public static Bitmap Point_corner(Bitmap Image_Original , int[,] Image_Egde)
+            {
+                Bitmap Image_Result = Image_Original;
+                for(int i =0; i<Image_Egde.GetLength(0);i++)
+                {
+                    for(int j=0; j<Image_Egde.GetLength(1);j++)
+                    {
+                        if (Image_Egde[i,j] == 10)
+                        {
+                            for(int x = i-5;x<i+5;x++)
+                            {
+                                if (x > 0 && x < Image_Egde.GetLength(0))
+                                {
+                                    for (int y = j - 5; y < j + 5; y++)
+                                    {
+                                        if (y > 0 && y < Image_Egde.GetLength(1))
+                                        {
+                                            Image_Result.SetPixel(x, y, Color.Red); 
+                                        }
+                                    }
+                                }    
+                            }                               
+                        }    
+                    }    
+                }
+                return Image_Result;
+            }
         }
         private void button1_Click(object sender, EventArgs e)
         {
@@ -944,12 +1142,15 @@ namespace Image_proccessing
             int[,] hough = EdgeDetection.PerformHoughTransform(edges);
 
             //vẽ đường thẳng từ biểu đồ hough
-            int[,] result = EdgeDetection.DrawLines2(hough, threshold, width, height);
+            int[,] result = EdgeDetection.DrawLines3(hough, threshold, width, height);
 
             // thể hiện lên GUI
+            Bitmap Import_picture = new Bitmap(imagePath);
+            picture1.Image = EdgeDetection.Point_corner(Import_picture, result);
             picture2.Image = EdgeDetection.IntToBitmap(result);
             picture3.Image = EdgeDetection.IntToBitmap(hough);
             picture4.Image = EdgeDetection.IntToBitmap(edges);
+            
 
         }
     }
