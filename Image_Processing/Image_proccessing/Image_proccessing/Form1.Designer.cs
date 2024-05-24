@@ -34,6 +34,14 @@
             this.picture4 = new System.Windows.Forms.PictureBox();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
+            this.Mid_Point_X = new System.Windows.Forms.TextBox();
+            this.Mid_Point_Y = new System.Windows.Forms.TextBox();
+            this.angle1 = new System.Windows.Forms.TextBox();
+            this.angle3 = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.picture1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picture2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picture3)).BeginInit();
@@ -101,11 +109,89 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
+            // Mid_Point_X
+            // 
+            this.Mid_Point_X.Location = new System.Drawing.Point(714, 156);
+            this.Mid_Point_X.Name = "Mid_Point_X";
+            this.Mid_Point_X.Size = new System.Drawing.Size(100, 20);
+            this.Mid_Point_X.TabIndex = 3;
+            this.Mid_Point_X.TextChanged += new System.EventHandler(this.Mid_Point_TextChanged);
+            // 
+            // Mid_Point_Y
+            // 
+            this.Mid_Point_Y.Location = new System.Drawing.Point(714, 197);
+            this.Mid_Point_Y.Name = "Mid_Point_Y";
+            this.Mid_Point_Y.Size = new System.Drawing.Size(100, 20);
+            this.Mid_Point_Y.TabIndex = 3;
+            this.Mid_Point_Y.TextChanged += new System.EventHandler(this.Mid_Point_TextChanged);
+            // 
+            // angle1
+            // 
+            this.angle1.Location = new System.Drawing.Point(714, 236);
+            this.angle1.Name = "angle1";
+            this.angle1.Size = new System.Drawing.Size(100, 20);
+            this.angle1.TabIndex = 3;
+            this.angle1.TextChanged += new System.EventHandler(this.Mid_Point_TextChanged);
+            // 
+            // angle3
+            // 
+            this.angle3.Location = new System.Drawing.Point(714, 275);
+            this.angle3.Name = "angle3";
+            this.angle3.Size = new System.Drawing.Size(100, 20);
+            this.angle3.TabIndex = 3;
+            this.angle3.TextChanged += new System.EventHandler(this.Mid_Point_TextChanged);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(711, 140);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(67, 13);
+            this.label1.TabIndex = 4;
+            this.label1.Text = "Mid_Point_X";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(711, 179);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(67, 13);
+            this.label2.TabIndex = 4;
+            this.label2.Text = "Mid_Point_Y";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(711, 220);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(43, 13);
+            this.label3.TabIndex = 4;
+            this.label3.Text = "Angle 1";
+            this.label3.Click += new System.EventHandler(this.label3_Click);
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(711, 259);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(40, 13);
+            this.label5.TabIndex = 4;
+            this.label5.Text = "Angle2";
+            this.label5.Click += new System.EventHandler(this.label3_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(874, 629);
+            this.ClientSize = new System.Drawing.Size(896, 629);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.angle3);
+            this.Controls.Add(this.angle1);
+            this.Controls.Add(this.Mid_Point_Y);
+            this.Controls.Add(this.Mid_Point_X);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.picture4);
@@ -119,6 +205,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.picture3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.picture4)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -130,6 +217,14 @@
         private System.Windows.Forms.PictureBox picture4;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.TextBox Mid_Point_X;
+        private System.Windows.Forms.TextBox Mid_Point_Y;
+        private System.Windows.Forms.TextBox angle1;
+        private System.Windows.Forms.TextBox angle3;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label5;
     }
 }
 

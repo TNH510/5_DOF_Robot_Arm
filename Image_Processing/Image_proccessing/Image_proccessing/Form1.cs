@@ -15,8 +15,11 @@ namespace Image_proccessing
 
         }
         static int[,] gradient;
+        public static int[,] MidPoint= new int[1,2];
+        public static int[] angle= new int [4];
         class EdgeDetection
         {
+            
             public static int[,] RGB2Gray(Bitmap ColorImage)
             {
 
@@ -734,6 +737,7 @@ namespace Image_proccessing
                 for (int i = 0; i < 4; i++)
                 {
                     int avr_theta = ketqua[0, 0,i];
+                    angle[i] = ketqua[0, 0, i];
                     int avr_rho = ketqua[0, 1,i];
                     //vẽ đường thẳng
                     double radianTheta = avr_theta * Math.PI / 180;
@@ -1073,27 +1077,57 @@ namespace Image_proccessing
             public static Bitmap Point_corner(Bitmap Image_Original , int[,] Image_Egde)
             {
                 Bitmap Image_Result = Image_Original;
-                for(int i =0; i<Image_Egde.GetLength(0);i++)
+                int Mid_Point_X = 0;
+                int Mid_Point_Y = 0;
+                int X = -80;
+                int Y = -80;
+                for(int i =0; i< Image_Egde.GetLength(0);i++)
                 {
                     for(int j=0; j<Image_Egde.GetLength(1);j++)
                     {
-                        if (Image_Egde[i,j] == 10)
+                        if (Image_Egde[i, j] == 10)
                         {
+                            //tìm trọng tâm
+                            if (Math.Sqrt((X - i) * (X - i) + (Y - j) * (Y - j)) > 100)
+                            {
+                                Mid_Point_X += i;
+                                Mid_Point_Y += j;
+                                X = i; Y = j;
+                            }
+                            // 
                             for(int x = i-5;x<i+5;x++)
                             {
                                 if (x > 0 && x < Image_Egde.GetLength(0))
                                 {
                                     for (int y = j - 5; y < j + 5; y++)
                                     {
-                                        if (y > 0 && y < Image_Egde.GetLength(1))
-                                        {
-                                            Image_Result.SetPixel(x, y, Color.Red); 
-                                        }
+                                       if (y > 0 && y < Image_Egde.GetLength(1))
+                                       {
+                                           Image_Result.SetPixel(x, y, Color.Red); 
+                                       }
                                     }
                                 }    
-                            }                               
-                        }    
+                            }
+                        }                              
+                         
                     }    
+                }
+                Mid_Point_X /= 4;
+                Mid_Point_Y /= 4;
+                MidPoint[0,0]= Mid_Point_X;
+                MidPoint[0,1]= Mid_Point_Y;
+                for (int x = Mid_Point_X - 5; x < Mid_Point_X + 5; x++)
+                {
+                    if (x > 0 && x < Image_Egde.GetLength(0))
+                    {
+                        for (int y = Mid_Point_Y - 5; y < Mid_Point_Y + 5; y++)
+                        {
+                            if (y > 0 && y < Image_Egde.GetLength(1))
+                            {
+                                Image_Result.SetPixel(x, y, Color.Red);
+                            }
+                        }
+                    }
                 }
                 return Image_Result;
             }
@@ -1150,7 +1184,23 @@ namespace Image_proccessing
             picture2.Image = EdgeDetection.IntToBitmap(result);
             picture3.Image = EdgeDetection.IntToBitmap(hough);
             picture4.Image = EdgeDetection.IntToBitmap(edges);
-            
+            int x = MidPoint[0,0];
+            Mid_Point_X.Text = Convert.ToString(x);
+            int y = MidPoint[0, 1];
+            Mid_Point_Y.Text = Convert.ToString(y);
+            angle1.Text = Convert.ToString(angle[0]);
+            //angle2.Text = Convert.ToString(angle[1]);
+            angle3.Text = Convert.ToString(angle[2]);
+            //angle4.Text = Convert.ToString(angle[3]);
+        }
+
+        private void Mid_Point_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
 
         }
     }
