@@ -224,7 +224,7 @@ namespace RobotArmHelix
             timer1.Tick += new System.EventHandler(timer1_Tick);
 
             timer2 = new System.Windows.Forms.Timer();
-            timer2.Interval = 500;
+            timer2.Interval = 100;
             timer2.Tick += new System.EventHandler(timer2_Tick);
 
             // Create plot model
@@ -992,27 +992,17 @@ namespace RobotArmHelix
                 point1[2] = Convert.ToDouble(Tz.Content);
 
                 nxt_line = nxt_line + 1;
-                MoveL_Function(point1, point2, "D1010");
+                // MoveL_Function(point1, point2, "D1010");
+                MoveJ_Function(point2, 1010);
                 /* Turn on relay */
-                turn_on_1_pulse_relay(530);
+                // turn_on_1_pulse_relay(530);
+                turn_on_1_pulse_relay(528);
 
             }
-            if(nxt_line == 3)
+            if(nxt_line == totalLines_csv.Length - 1)
             {
                 nxt_line = 0;
             }
-
-            //if (movepath_status == 1 && status_first_time == 0)
-            //{
-            //}
-            //ret_path = PLCReadbit(Constants.MOVEL_PATH, out movepath_status);
-            //if (movepath_status == 1 && status_first_time == 1)
-            //{
-            //    status_first_time += 1;
-            //    MoveL_Function(point1, point2, "D1100");
-            //    /* Turn on relay */
-            //    turn_on_1_pulse_relay(532);
-            //}
 
         }
         public double[] InverseKinematics(Vector3D target, double[] angles)
@@ -2049,6 +2039,63 @@ namespace RobotArmHelix
             plc.WriteDeviceBlock(device, 8 * point, ref value_angle[0]);
         }
 
+        private void MoveJ_Function(double[] targ_pos, int device)
+        {
+            double x, y, z;
+            double t1, t2, t3, t4, t5;
+            int ret;
+            int[] temp_value = new int[5];
+            int[,] angle_array = new int[10, 5];
+            try
+            {
+                x = targ_pos[0];
+                y = targ_pos[1];
+                z = targ_pos[2];
+
+                if (z >= 500 && z <= 1000)
+                {
+                    (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
+                    ret = Check_angle(t1, t2, t3, t4, t5);
+                    if (ret != 0)
+                    {
+                        double theta = 0.0;
+                        if (ret == 1) theta = t1;
+                        else if (ret == 2) theta = t2;
+                        else if (ret == 3) theta = t3;
+                        else if (ret == 4) theta = t4;
+                        else if (ret == 5) theta = t5;
+                        PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
+                        return;
+                    }
+                    t2 -= 90.0;
+                    t3 += 90.0;
+                    t4 += 90.0;
+
+                    int[] value_angle = new int[10];
+                    /* Run */
+                    temp_value[0] = (int)(Convert.ToDouble(t1) * 100000 + 18000000);
+                    temp_value[1] = (int)(Convert.ToDouble(t2) * 100000 + 18000000);
+                    temp_value[2] = (int)(Convert.ToDouble(t3) * 100000 + 18000000);
+                    temp_value[3] = (int)(Convert.ToDouble(t4) * 100000 + 18000000);
+                    temp_value[4] = (int)(Convert.ToDouble(t5) * 100000 + 18000000);
+
+                    /* Write the angle */
+                    for (int ind = 0; ind < 5; ind++)
+                    {
+                        write_d_mem_32_bit(device + 2 * ind, temp_value[ind]);
+                    }
+                }
+                else
+                {
+                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", "Out of range of Z axis"));
+                }
+            }
+            catch (Exception er)
+            {
+                PrintLog("Bug", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", er));
+            }
+        }
+
         private void MoveL_Function(double[] curr_pos, double[] targ_pos, string device)
         {
             double[] vect_u = new double[3];
@@ -2851,7 +2898,8 @@ namespace RobotArmHelix
         {
             RemoveSphereVisuals();
             // Data to be written to the CSV file
-            string[] data = {"500,0,900","0,700,600","0,500,900","500,0,900"};
+            // string[] data = {"500,0,900","500,30,600","500,30,900","0,700,600","0,500,900","500,0,900"};
+            string[] data = { "5000,0,900", "0,700,600", "506,30,1010", "500,0,600", "0,500,900", "500,0,900" };
             // Create the CSV file and write the data
             CreateCSV(filePath, data);
 
