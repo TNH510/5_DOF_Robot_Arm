@@ -80,6 +80,11 @@ namespace RobotArmHelix
         private double returnX = 500;
         private double returnY = 0;
         private double returnZ = 600;
+        // Define the file path
+        public string filePath = "C:\\Users\\daveb\\Desktop\\xe\\test.csv";
+        public string[] fields;
+        public string[] totalLines_csv;
+        private int nxt_line = 0;
 
         private double returnX_update = 500;
         private double returnY_update = 0;
@@ -943,6 +948,7 @@ namespace RobotArmHelix
 
         public void timer2_Tick(object sender, EventArgs e)
         {
+            Console.WriteLine("Hello");
             int[] temp_value1 = new int[5];
             double t1_glove_path1, t2_glove_path1, t3_glove_path1, t4_glove_path1, t5_glove_path1;
             int ret = 0;
@@ -953,49 +959,60 @@ namespace RobotArmHelix
             double[] point2 = new double[3];
             double[] point3 = new double[3];
 
-            point1[0] = 550;
-            point1[1] = 0.0;
-            point1[2] = 900;
+            //point1[0] = 500;
+            //point1[1] = 0.0;
+            //point1[2] = 900;
 
-            point2[0] = 0.0;
-            point2[1] = 700.0;
-            point2[2] = 600.0;
+            //point2[0] = 0.0;
+            //point2[1] = 700.0;
+            //point2[2] = 600.0;
 
-            point3[0] = 600.0;
-            point3[1] = 0.0;
-            point3[2] = 800.0;
+            //point3[0] = 0.0;
+            //point3[1] = 500.0;
+            //point3[2] = 900.0;
 
             int movepath_status;
 
             /* Read status of Brake and AC Servo */
             ret = PLCReadbit(Constants.MOVEL_PATH, out movepath_status);
-            if (movepath_status == 1 && status_first_time == 0)
+
+            if (movepath_status == 1 && (nxt_line < (totalLines_csv.Length - 1))) 
             {
-                status_first_time += 1;
+
+                string line = totalLines_csv[nxt_line + 1];
+
+                Console.WriteLine(line);
+                fields = line.Split(',');
+                point2[0] = Convert.ToDouble(fields[0]);
+                point2[1] = Convert.ToDouble(fields[1]);
+                point2[2] = Convert.ToDouble(fields[2]);
+
+                point1[0] = Convert.ToDouble(Tx.Content);
+                point1[1] = Convert.ToDouble(Ty.Content);
+                point1[2] = Convert.ToDouble(Tz.Content);
+
+                nxt_line = nxt_line + 1;
                 MoveL_Function(point1, point2, "D1010");
                 /* Turn on relay */
                 turn_on_1_pulse_relay(530);
+
             }
-            ret_path = PLCReadbit(Constants.MOVEL_PATH, out movepath_status);
-            if (movepath_status == 1 && status_first_time == 1)
+            if(nxt_line == 3)
             {
-                status_first_time += 1;
-                MoveL_Function(point2, point3, "D1100");
-                MoveL_Function(point3, point1, "D1010");
-                /* Turn on relay */
-                turn_on_1_pulse_relay(532);
+                nxt_line = 0;
             }
 
-            ret_path = PLCReadbit(Constants.MOVEL_PATH, out movepath_status);
-            if (movepath_status == 1 && status_first_time == 2)
-            {
-                status_first_time = 0;
-                /* Turn on relay */
-                turn_on_1_pulse_relay(530);
-            }
-
- 
-
+            //if (movepath_status == 1 && status_first_time == 0)
+            //{
+            //}
+            //ret_path = PLCReadbit(Constants.MOVEL_PATH, out movepath_status);
+            //if (movepath_status == 1 && status_first_time == 1)
+            //{
+            //    status_first_time += 1;
+            //    MoveL_Function(point1, point2, "D1100");
+            //    /* Turn on relay */
+            //    turn_on_1_pulse_relay(532);
+            //}
 
         }
         public double[] InverseKinematics(Vector3D target, double[] angles)
@@ -2020,7 +2037,14 @@ namespace RobotArmHelix
                 value_angle[8 * j + 6] = Write_Theta(array[j, 3])[0];
                 value_angle[8 * j + 7] = Write_Theta(array[j, 3])[1];
 
-                PrintLog("Infor", "Transmission", "Done");
+                PrintLog("vect", "value:", Convert.ToString(value_angle[8 * j]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 1]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 2]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 3]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 4]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 5]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 6]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 7]));
             }
             plc.WriteDeviceBlock(device, 8 * point, ref value_angle[0]);
         }
@@ -2070,7 +2094,7 @@ namespace RobotArmHelix
                     angle_array[t, 1] = (int)(t2 * 100000 + 18000000);
                     angle_array[t, 2] = (int)(t3 * 100000 + 18000000);
                     angle_array[t, 3] = (int)(t4 * 100000 + 18000000);
-                    angle_array[t, 4] = (int)(t5 * 100000 + 18000000);
+                    angle_array[t, 4] = (int)(t5 * 100000);
                 }
                 else
                 {
@@ -2101,13 +2125,13 @@ namespace RobotArmHelix
             int[] value_angle_t5 = new int[20];
 
             /* Assign corrdination for each array */
-            //curr_pos[0] = Convert.ToDouble(Tx.Content);
-            //curr_pos[1] = Convert.ToDouble(Ty.Content);
-            //curr_pos[2] = Convert.ToDouble(Tz.Content);
+            curr_pos[0] = Convert.ToDouble(Tx.Content);
+            curr_pos[1] = Convert.ToDouble(Ty.Content);
+            curr_pos[2] = Convert.ToDouble(Tz.Content);
 
-            curr_pos[0] = 600.0;
-            curr_pos[1] = 0.0;
-            curr_pos[2] = 800.0;
+            //curr_pos[0] = 600.0;
+            //curr_pos[1] = 0.0;
+            //curr_pos[2] = 800.0;
 
             targ_pos[0] = Convert.ToDouble(TbX.Text);
             targ_pos[1] = Convert.ToDouble(TbY.Text);
@@ -2826,6 +2850,13 @@ namespace RobotArmHelix
         private void Clr_Traj_btn_Click(object sender, RoutedEventArgs e)
         {
             RemoveSphereVisuals();
+            // Data to be written to the CSV file
+            string[] data = {"500,0,900","0,700,600","0,500,900","500,0,900"};
+            // Create the CSV file and write the data
+            CreateCSV(filePath, data);
+
+            Console.WriteLine("CSV file created successfully!");
+
         }
 
         private void Open_menu_Click(object sender, RoutedEventArgs e)
@@ -3560,7 +3591,22 @@ namespace RobotArmHelix
 
         private void Glove_test_button_Click(object sender, RoutedEventArgs e)
         {
+            totalLines_csv = File.ReadAllLines(filePath);
+            ErrorLog.AppendText(Convert.ToString(totalLines_csv.Length));
             timer2.Start();
+        }
+
+        static void CreateCSV(string filePath, string[] data)
+        {
+            // Create or overwrite the CSV file
+            using (StreamWriter writer = new StreamWriter(filePath))
+            {
+                foreach (string line in data)
+                {
+                    // Write each line of data to the CSV file
+                    writer.WriteLine(line);
+                }
+            }
         }
 
         class Point2
