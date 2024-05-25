@@ -75,6 +75,7 @@ namespace RobotArmHelix
         public int visible_path = 1;
         public int visible_glove = 1;
         public int status_first_time = 0;
+        private bool write_csv = false;
 
 
         private double returnX = 500;
@@ -91,6 +92,7 @@ namespace RobotArmHelix
         private double returnZ_update = 900;
 
         double t1_test, t2_test, t3_test, t4_test, t5_test;
+        double t5_camera = 0.0;
 
         private int glove_enable = 0;
 
@@ -287,7 +289,7 @@ namespace RobotArmHelix
             if (returnZ >= 500 && returnZ <= 1000)
             {
                 (t1_test, t2_test, t3_test, t4_test, t5_test) = convert_position_angle(returnX, returnY, returnZ);
-                ret = Check_angle(t1_test, t2_test, t3_test, t4_test, t5_test);
+                ret = Check_angle(t1_test, t2_test, t3_test, t4_test, t5_camera);
                 if (ret != 0)
                 {
                     double theta = 0.0;
@@ -295,18 +297,14 @@ namespace RobotArmHelix
                     else if (ret == 2) theta = t2_test;
                     else if (ret == 3) theta = t3_test;
                     else if (ret == 4) theta = t4_test;
-                    else if (ret == 5) theta = t5_test;
+                    else if (ret == 5) theta = t5_camera;
                     PrintLog("\nError", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
                     return;
                 }
                 else
                 {
-                    double[] angles = { t1_test, t2_test - 90.0, t3_test + 90.0, t4_test + 90.0, t5_test };
                     int[] temp_value = new int[5];
 
-                    returnX_update = returnX;
-                    returnY_update = returnY;
-                    returnZ_update = returnZ;
                     if (glove_enable == 1)
                     {
                         int[] value_angle = new int[10];
@@ -315,7 +313,7 @@ namespace RobotArmHelix
                         temp_value[1] = (int)(Convert.ToDouble(t2_test - 90) * 100000 + 18000000);
                         temp_value[2] = (int)(Convert.ToDouble(t3_test + 90) * 100000 + 18000000);
                         temp_value[3] = (int)(Convert.ToDouble(t4_test + 90) * 100000 + 18000000);
-                        temp_value[4] = (int)(Convert.ToDouble(t5_test) * 100000 + 18000000);
+                        temp_value[4] = (int)(Convert.ToDouble(t5_camera) * 100000 + 18000000);
                         /* Write the angle */
                         for (int ind = 0; ind < 5; ind++)
                         {
@@ -906,12 +904,12 @@ namespace RobotArmHelix
                 //x = returnX_update;
                 //y = returnY_update;
 
-                x = 500.0;
-                y = 0.0;
-                z = returnZ_update;
+                x = returnX;
+                y = returnY;
+                z = returnZ;
 
                 (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
-                ret = Check_angle(t1, t2, t3, t4, t5);
+                ret = Check_angle(t1, t2, t3, t4, t5_camera);
                 if (ret != 0)
                 {
                     double theta = 0.0;
@@ -919,7 +917,7 @@ namespace RobotArmHelix
                     else if (ret == 2) theta = t2;
                     else if (ret == 3) theta = t3;
                     else if (ret == 4) theta = t4;
-                    else if (ret == 5) theta = t5;
+                    else if (ret == 5) theta = t5_camera;
                     PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
                     return;
                 }
@@ -933,7 +931,7 @@ namespace RobotArmHelix
                 temp_value[1] = (int)(Convert.ToDouble(t2) * 100000 + 18000000);
                 temp_value[2] = (int)(Convert.ToDouble(t3) * 100000 + 18000000);
                 temp_value[3] = (int)(Convert.ToDouble(t4) * 100000 + 18000000);
-                temp_value[4] = (int)(Convert.ToDouble(t5) * 100000 + 18000000);
+                temp_value[4] = (int)(Convert.ToDouble(t5_camera) * 100000 + 18000000);
                 /* Write the angle */
                 for (int ind = 0; ind < 5; ind++)
                 {
@@ -2636,18 +2634,22 @@ namespace RobotArmHelix
             // UART transmission logic
             while (!worker.CancellationPending)
             {
+                totalLines_csv = File.ReadAllLines(filePath);
                 string receivedData = uart.ReadLine().Trim();
 
                 if (!string.IsNullOrEmpty(receivedData))
                 {
                     string[] numbers = receivedData.Split(',');
 
-                    if (numbers.Length == 3)
+                    Console.WriteLine(receivedData);
+
+                    if (numbers.Length == 4)
                     {
-                        double num1, num2, num3;
+                        double num1, num2, num3, num4;
                         bool success = double.TryParse(numbers[0], out num1);
                         success &= double.TryParse(numbers[1], out num2);
                         success &= double.TryParse(numbers[2], out num3);
+                        success &= double.TryParse(numbers[3], out num4);
                         double theta_test;
                         int ret;
                         int[] temp_value = new int[5];
@@ -2659,15 +2661,21 @@ namespace RobotArmHelix
                                 //returnX = num1 * 20;
                                 //returnY = num2 * 30;
 
-                                returnX = num1 * 20;
-                                returnY = num2 * 20;
-                                returnZ = num3 * 15 + 700;
+                                //returnX = num1 * 20;
+                                //returnY = num2 * 20;
+                                //returnZ = num3 * 15 + 700;
+
+                                returnX = num1;
+                                returnY = num2;
+                                returnZ = num3;
+                                t5_camera = num4;
+
                                 ErrorLog.Text = returnX.ToString() + "\n" + returnY.ToString() + "\n" + returnZ.ToString();
 
                                 if (returnZ >= 500 && returnZ <= 1000)
                                 {
                                     (t1_test, t2_test, t3_test, t4_test, t5_test) = convert_position_angle(returnX, returnY, returnZ);
-                                    ret = Check_angle(t1_test, t2_test, t3_test, t4_test, t5_test);
+                                    ret = Check_angle(t1_test, t2_test, t3_test, t4_test, t5_camera);
                                     if (ret != 0)
                                     {
                                         double theta = 0.0;
@@ -2675,7 +2683,7 @@ namespace RobotArmHelix
                                         else if (ret == 2) theta = t2_test;
                                         else if (ret == 3) theta = t3_test;
                                         else if (ret == 4) theta = t4_test;
-                                        else if (ret == 5) theta = t5_test;
+                                        else if (ret == 5) theta = t5_camera;
                                         PrintLog("\nError", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
                                         return;
                                     }
@@ -2685,6 +2693,14 @@ namespace RobotArmHelix
                                     PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", "Out of range of Z axis"));
                                 }
                             });
+                        }
+                    }
+                    if(write_csv == true)
+                    {
+                        using (StreamWriter writer = new StreamWriter(filePath, true))
+                        {
+                            // Write each line of data to the CSV file
+                            writer.WriteLine(receivedData);
                         }
                     }
                 }
@@ -2760,6 +2776,7 @@ namespace RobotArmHelix
 
                 if (numbers.Length == 3)
                 {
+                    Console.WriteLine(numbers);
                     double num1, num2, num3;
                     bool success = double.TryParse(numbers[0], out num1);
                     success &= double.TryParse(numbers[1], out num2);
@@ -2820,32 +2837,32 @@ namespace RobotArmHelix
             }
         }
 
-    double[] StartReadingData(string receivedData)
-    {
-        int endIndex = receivedData.IndexOf("\r\n");
-        if (endIndex != -1)
+        double[] StartReadingData(string receivedData)
         {
-            string dataSubstring = receivedData.Substring(0, endIndex);
-            string[] numbers = dataSubstring.Split(',');
-
-            try
+            int endIndex = receivedData.IndexOf("\r\n");
+            if (endIndex != -1)
             {
-                axis[0] = double.Parse(numbers[0]);
-                axis[1] = double.Parse(numbers[1]);
-                axis[2] = double.Parse(numbers[2]);
-            }
-            catch (FormatException)
-            {
-                // Xử lý lỗi định dạng
-            }
-        }
-        else
-        {
-            // Không tìm thấy \r\n trong chuỗi
-        }
+                string dataSubstring = receivedData.Substring(0, endIndex);
+                string[] numbers = dataSubstring.Split(',');
 
-        return axis;
-    }
+                try
+                {
+                    axis[0] = double.Parse(numbers[0]);
+                    axis[1] = double.Parse(numbers[1]);
+                    axis[2] = double.Parse(numbers[2]);
+                }
+                catch (FormatException)
+                {
+                    // Xử lý lỗi định dạng
+                }
+            }
+            else
+            {
+                // Không tìm thấy \r\n trong chuỗi
+            }
+
+            return axis;
+        }
 
         // private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         // {
@@ -3600,6 +3617,16 @@ namespace RobotArmHelix
 
         }
 
+        private void Write_csv_Click(object sender, RoutedEventArgs e)
+        {
+            write_csv = true;
+        }
+
+        private void Unwrite_csv_Click(object sender, RoutedEventArgs e)
+        {
+            write_csv = false;
+        }
+
         private void Camera_Close_Click(object sender, RoutedEventArgs e)
         {
 
@@ -3639,15 +3666,21 @@ namespace RobotArmHelix
 
         private void Glove_test_button_Click(object sender, RoutedEventArgs e)
         {
-            totalLines_csv = File.ReadAllLines(filePath);
-            ErrorLog.AppendText(Convert.ToString(totalLines_csv.Length));
             timer2.Start();
         }
 
         static void CreateCSV(string filePath, string[] data)
         {
             // Create or overwrite the CSV file
-            using (StreamWriter writer = new StreamWriter(filePath))
+            //using (StreamWriter writer = new StreamWriter(filePath))
+            //{
+            //    foreach (string line in data)
+            //    {
+            //        // Write each line of data to the CSV file
+            //        writer.WriteLine(line);
+            //    }
+            //}
+            using (StreamWriter writer = new StreamWriter(filePath, true))
             {
                 foreach (string line in data)
                 {
