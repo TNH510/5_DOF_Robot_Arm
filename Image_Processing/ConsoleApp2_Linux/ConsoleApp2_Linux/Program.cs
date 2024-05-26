@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         // Đường dẫn tới bức ảnh màu bitmap
-        string imagePath = @"C:\Users\Loc\Desktop\XLA_05 (2).jpg";
+        string imagePath = @"C:\Users\Loc\Desktop\XLA_10 (2).jpg";
 
         // Đọc bức ảnh màu bitmap
         Bitmap bitmap = new Bitmap(imagePath);
@@ -16,7 +16,7 @@ class Program
         int[,] grayImage = ConvertToGrayScale(bitmap);
 
         // Lưu ảnh mức xám thành file dữ liệu
-        string outputFilePath = @"C:\Users\Loc\Desktop\outputfile5.csv";
+        string outputFilePath = @"C:\Users\Loc\Desktop\5_DOF_Robot_Arm\Image_Processing\outputfile10.csv";
         SaveGrayImageToFile(grayImage, outputFilePath);
 
         Console.WriteLine("Đã chuyển đổi và lưu ảnh thành công!");
