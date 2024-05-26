@@ -72,4 +72,8 @@ Jv3 = [diff(pc3(1),t1) diff(pc3(1),t2) diff(pc3(1),t3) 0 0 ; diff(pc3(2),t1) dif
 Jv4 = [diff(pc4(1),t1) diff(pc4(1),t2) diff(pc4(1),t3) diff(pc4(1),t4) 0 ; diff(pc4(2),t1) diff(pc4(2),t2) diff(pc4(2),t3) diff(pc4(2),t4) 0; diff(pc4(3),t1) diff(pc4(3),t2) diff(pc4(3),t3) diff(pc4(3),t4) 0];
 Jv5 = [diff(pc5(1),t1) diff(pc5(1),t2) diff(pc5(1),t3) diff(pc5(1),t4) diff(pc5(1),t5) ; diff(pc5(2),t1) diff(pc5(2),t2) diff(pc5(2),t3) diff(pc5(2),t4) diff(pc5(2),t5); diff(pc5(3),t1) diff(pc5(3),t2) diff(pc5(3),t3) diff(pc5(3),t4) diff(pc5(3),t5)]
 
-J_plus = simplify(Jv5' * inv((Jv5 * Jv5')))
+J_plus = simplify(Jv5' * inv((Jv5 * Jv5')));
+
+omega = [pi; pi; pi; pi; pi];
+
+vel = Jv5 * omega
