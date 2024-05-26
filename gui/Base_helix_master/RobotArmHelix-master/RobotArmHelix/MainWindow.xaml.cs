@@ -256,6 +256,7 @@ namespace RobotArmHelix
                 WorkerSupportsCancellation = true
             };
             _uartWorker.DoWork += UartWorker_DoWork;
+
         }
 
         private void Timer_Tick_Graph(object sender, EventArgs e)
@@ -284,6 +285,7 @@ namespace RobotArmHelix
 
             //// Refresh plot view
             //plotView.InvalidatePlot();
+
             int ret = 0;
             if (returnZ >= 500 && returnZ <= 1000)
             {
@@ -949,7 +951,6 @@ namespace RobotArmHelix
 
         public void timer2_Tick(object sender, EventArgs e)
         {
-            totalLines_csv = File.ReadAllLines(filePath);
             Console.WriteLine("Hello");
             int[] temp_value1 = new int[5];
             double t1_glove_path1, t2_glove_path1, t3_glove_path1, t4_glove_path1, t5_glove_path1;
@@ -962,6 +963,7 @@ namespace RobotArmHelix
             double[] point3 = new double[3];
 
             int movepath_status;
+            int velocity;
 
             /* Read status of Brake and AC Servo */
             ret = PLCReadbit(Constants.MOVEL_PATH, out movepath_status);
@@ -971,26 +973,90 @@ namespace RobotArmHelix
 
                 string line = totalLines_csv[nxt_line + 1];
 
+                string line1 = totalLines_csv[nxt_line];
+                string line2 = totalLines_csv[nxt_line + 2];
+
+                string[] v1;
+                string[] v2;
+
+                //Console.WriteLine(line);
+                //fields = line.Split(',');
+
+                v1 = line1.Split(',');
+                v2 = line2.Split(',');
+
+                double vel_x, vel_y, vel_z, vel_avg;
+
+                vel_x = (Convert.ToDouble(v2[0]) * 20 - Convert.ToDouble(v1[0]) * 20) / 0.1;
+                vel_y = (Convert.ToDouble(v2[1]) * 20 - Convert.ToDouble(v1[1]) * 20) / 0.1;
+                vel_z = (Convert.ToDouble(v2[2]) * 15 - Convert.ToDouble(v1[2]) * 15) / 0.1;
+
+                vel_avg = Math.Sqrt(vel_x * vel_x + vel_y * vel_y + vel_z * vel_z);
+
                 Console.WriteLine(line);
                 fields = line.Split(',');
-                point2[0] = Convert.ToDouble(fields[0]);
-                point2[1] = Convert.ToDouble(fields[1]);
-                point2[2] = Convert.ToDouble(fields[2]);
+                //point2[0] = Convert.ToDouble(fields[0]);
+                //point2[1] = Convert.ToDouble(fields[1]);
+                //point2[2] = Convert.ToDouble(fields[2]);
 
-                //point2[0] = Convert.ToDouble(fields[0]) * 20;
-                //point2[1] = Convert.ToDouble(fields[1]) * 20;
-                //point2[2] = Convert.ToDouble(fields[2]) * 15 + 700;
+                point2[0] = Convert.ToDouble(fields[0]) * 20;
+                point2[1] = Convert.ToDouble(fields[1]) * 20;
+                point2[2] = Convert.ToDouble(fields[2]) * 15 + 700;
 
                 point1[0] = Convert.ToDouble(Tx.Content);
                 point1[1] = Convert.ToDouble(Ty.Content);
                 point1[2] = Convert.ToDouble(Tz.Content);
 
                 nxt_line = nxt_line + 1;
-                // MoveL_Function(point1, point2, "D1010");
+
+                /*Set speed*/
+                velocity = Convert.ToInt32(vel_avg) * 2000;
+                write_d_mem_32_bit(1008, velocity);
+
+                //MoveL_Function(point1, point2, "D1010");
                 MoveJ_Function(point2, 1010);
-                /* Turn on relay */
-                // turn_on_1_pulse_relay(530);
+                ///* Turn on relay */
+                //turn_on_1_pulse_relay(530);
                 turn_on_1_pulse_relay(528);
+
+                //---------------------------------
+                //(t1_test, t2_test, t3_test, t4_test, t5_test) = convert_position_angle(point2[0], point2[1], point2[2]);
+                //ret = Check_angle(t1_test, t2_test, t3_test, t4_test, t5_camera);
+                //if (ret != 0)
+                //{
+                //    double theta = 0.0;
+                //    if (ret == 1) theta = t1_test;
+                //    else if (ret == 2) theta = t2_test;
+                //    else if (ret == 3) theta = t3_test;
+                //    else if (ret == 4) theta = t4_test;
+                //    else if (ret == 5) theta = t5_camera;
+                //    PrintLog("\nError", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
+                //    return;
+                //}
+                //else
+                //{
+                //    int[] temp_value = new int[5];
+                //    int[] old_value_angle = new int[5];
+                //    if (glove_enable == 1)
+                //    {
+                //        int[] value_angle = new int[10];
+
+                //        /* Get old value angle from PLC */
+                //        old_value_angle[0] = angles_global[0];
+
+                //        /* Run */
+                //        temp_value[0] = (int)(Convert.ToDouble(t1_test) * 100000 + 18000000);
+                //        temp_value[1] = (int)(Convert.ToDouble(t2_test - 90) * 100000 + 18000000);
+                //        temp_value[2] = (int)(Convert.ToDouble(t3_test + 90) * 100000 + 18000000);
+                //        temp_value[3] = (int)(Convert.ToDouble(t4_test + 90) * 100000 + 18000000);
+                //        temp_value[4] = (int)(Convert.ToDouble(t5_camera) * 100000 + 18000000);
+                //        /* Write the angle */
+                //        for (int ind = 0; ind < 5; ind++)
+                //        {
+                //            write_d_mem_32_bit(1400 + 2 * ind, temp_value[ind]);
+                //        }
+                //    }
+                //}
 
             }
             if(nxt_line == totalLines_csv.Length - 1)
@@ -1327,7 +1393,7 @@ namespace RobotArmHelix
             }
             /* Start timer1 and timer2 */
             // timer1.Start();
-            // Thread1Start();
+            Thread1Start();
             // Thread1Start();
             //Thread2Start();
             //timer1.Start();
@@ -2687,13 +2753,13 @@ namespace RobotArmHelix
                                 }
                             });
                         }
-                    }
-                    if(write_csv == true)
-                    {
-                        using (StreamWriter writer = new StreamWriter(filePath, true))
+                        if (write_csv == true)
                         {
-                            // Write each line of data to the CSV file
-                            writer.WriteLine(receivedData);
+                            using (StreamWriter writer = new StreamWriter(filePath, true))
+                            {
+                                // Write each line of data to the CSV file
+                                writer.WriteLine(receivedData);
+                            }
                         }
                     }
                 }
@@ -2909,9 +2975,9 @@ namespace RobotArmHelix
             RemoveSphereVisuals();
             // Data to be written to the CSV file
             // string[] data = {"500,0,900","500,30,600","500,30,900","0,700,600","0,500,900","500,0,900"};
-            string[] data = { "5000,0,900", "0,700,600", "506,30,1010", "500,0,600", "0,500,900", "500,0,900" };
-            // Create the CSV file and write the data
-            CreateCSV(filePath, data);
+            //string[] data = { "5000,0,900", "0,700,600", "506,30,1010", "500,0,600", "0,500,900", "500,0,900" };
+            //// Create the CSV file and write the data
+            //CreateCSV(filePath, data);
 
             Console.WriteLine("CSV file created successfully!");
 
@@ -3659,6 +3725,59 @@ namespace RobotArmHelix
 
         private void Glove_test_button_Click(object sender, RoutedEventArgs e)
         {
+            totalLines_csv = File.ReadAllLines(filePath);
+            
+            for (nxt_line = 0; nxt_line < (totalLines_csv.Length - 1); nxt_line++)
+            {
+
+                string line1 = totalLines_csv[nxt_line];
+                string line2 = totalLines_csv[nxt_line + 1];
+
+                string[] v1;
+                string[] v2;
+
+                //Console.WriteLine(line);
+                //fields = line.Split(',');
+
+                v1 = line1.Split(',');
+                v2 = line2.Split(',');
+
+                double vel_x, vel_y, vel_z, vel_avg;
+
+                vel_x = (Convert.ToDouble(v2[0]) * 20 - Convert.ToDouble(v1[0]) * 20) / 0.1;
+                vel_y = (Convert.ToDouble(v2[1]) * 20 - Convert.ToDouble(v1[1]) * 20) / 0.1;
+                vel_z = (Convert.ToDouble(v2[2]) * 15 - Convert.ToDouble(v1[2]) * 15) / 0.1;
+
+                vel_avg = Math.Sqrt(vel_x * vel_x + vel_y * vel_y + vel_z * vel_z);
+
+                // Update data points
+                var timestamp = DateTime.Now;
+                var dataPoint1 = new DataPoint(nxt_line * 100, (Convert.ToDouble(v2[0]) * 20 - Convert.ToDouble(v1[0]) * 20) / 0.1);
+                var dataPoint2 = new DataPoint(nxt_line * 100, (Convert.ToDouble(v2[1]) * 20 - Convert.ToDouble(v1[1]) * 20) / 0.1);
+                var dataPoint3 = new DataPoint(nxt_line * 100, (Convert.ToDouble(v2[2]) * 15 - Convert.ToDouble(v1[2]) * 15) /0.1);
+                var dataPoint4 = new DataPoint(nxt_line * 100, vel_avg);
+                // Update series
+                //var series1 = (LineSeries)_plotModel.Series[0];
+                //var series2 = (LineSeries)_plotModel.Series[1];
+                //var series3 = (LineSeries)_plotModel.Series[2];
+                var series4 = (LineSeries)_plotModel.Series[0];
+                //series1.Points.Add(dataPoint1);
+                //series2.Points.Add(dataPoint2);
+                //series3.Points.Add(dataPoint3);
+                series4.Points.Add(dataPoint4);
+
+                // Limit number of data points to keep graph responsive
+                if (series4.Points.Count > 100)
+                {
+                    //series1.Points.RemoveAt(0);
+                    //series2.Points.RemoveAt(0);
+                    //series3.Points.RemoveAt(0);
+                    series4.Points.RemoveAt(0);
+                }
+                // Refresh plot view
+                plotView.InvalidatePlot();
+            }
+            
             timer2.Start();
         }
 
