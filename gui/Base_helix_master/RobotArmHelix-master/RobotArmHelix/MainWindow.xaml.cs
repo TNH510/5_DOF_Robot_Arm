@@ -82,7 +82,7 @@ namespace RobotArmHelix
         private double returnY = 0;
         private double returnZ = 600;
         // Define the file path
-        public string filePath = "C:\\Users\\daveb\\Desktop\\xe\\test.csv";
+        public string filePath = "C:\\Users\\daveb\\Desktop\\5_DOF_Robot_Arm\\control_glove\\script_python\\robot_data\\test.csv";
         public string[] fields;
         public string[] totalLines_csv;
         private int nxt_line = 0;
@@ -284,7 +284,6 @@ namespace RobotArmHelix
 
             //// Refresh plot view
             //plotView.InvalidatePlot();
-
             int ret = 0;
             if (returnZ >= 500 && returnZ <= 1000)
             {
@@ -304,10 +303,14 @@ namespace RobotArmHelix
                 else
                 {
                     int[] temp_value = new int[5];
-
+                    int[] old_value_angle = new int[5];
                     if (glove_enable == 1)
                     {
                         int[] value_angle = new int[10];
+
+                        /* Get old value angle from PLC */
+                        // old_value_angle[0] = angles_global[0];
+
                         /* Run */
                         temp_value[0] = (int)(Convert.ToDouble(t1_test) * 100000 + 18000000);
                         temp_value[1] = (int)(Convert.ToDouble(t2_test - 90) * 100000 + 18000000);
@@ -946,6 +949,7 @@ namespace RobotArmHelix
 
         public void timer2_Tick(object sender, EventArgs e)
         {
+            totalLines_csv = File.ReadAllLines(filePath);
             Console.WriteLine("Hello");
             int[] temp_value1 = new int[5];
             double t1_glove_path1, t2_glove_path1, t3_glove_path1, t4_glove_path1, t5_glove_path1;
@@ -956,18 +960,6 @@ namespace RobotArmHelix
             double[] point1 = new double[3];
             double[] point2 = new double[3];
             double[] point3 = new double[3];
-
-            //point1[0] = 500;
-            //point1[1] = 0.0;
-            //point1[2] = 900;
-
-            //point2[0] = 0.0;
-            //point2[1] = 700.0;
-            //point2[2] = 600.0;
-
-            //point3[0] = 0.0;
-            //point3[1] = 500.0;
-            //point3[2] = 900.0;
 
             int movepath_status;
 
@@ -984,6 +976,10 @@ namespace RobotArmHelix
                 point2[0] = Convert.ToDouble(fields[0]);
                 point2[1] = Convert.ToDouble(fields[1]);
                 point2[2] = Convert.ToDouble(fields[2]);
+
+                //point2[0] = Convert.ToDouble(fields[0]) * 20;
+                //point2[1] = Convert.ToDouble(fields[1]) * 20;
+                //point2[2] = Convert.ToDouble(fields[2]) * 15 + 700;
 
                 point1[0] = Convert.ToDouble(Tx.Content);
                 point1[1] = Convert.ToDouble(Ty.Content);
@@ -1331,7 +1327,8 @@ namespace RobotArmHelix
             }
             /* Start timer1 and timer2 */
             // timer1.Start();
-            Thread1Start();
+            // Thread1Start();
+            // Thread1Start();
             //Thread2Start();
             //timer1.Start();
         }
@@ -2634,7 +2631,6 @@ namespace RobotArmHelix
             // UART transmission logic
             while (!worker.CancellationPending)
             {
-                totalLines_csv = File.ReadAllLines(filePath);
                 string receivedData = uart.ReadLine().Trim();
 
                 if (!string.IsNullOrEmpty(receivedData))
@@ -2643,13 +2639,13 @@ namespace RobotArmHelix
 
                     Console.WriteLine(receivedData);
 
-                    if (numbers.Length == 4)
+                    if (numbers.Length == 3)
                     {
                         double num1, num2, num3, num4;
                         bool success = double.TryParse(numbers[0], out num1);
                         success &= double.TryParse(numbers[1], out num2);
                         success &= double.TryParse(numbers[2], out num3);
-                        success &= double.TryParse(numbers[3], out num4);
+                        //success &= double.TryParse(numbers[3], out num4);
                         double theta_test;
                         int ret;
                         int[] temp_value = new int[5];
@@ -2657,18 +2653,15 @@ namespace RobotArmHelix
                         {
                             Dispatcher.Invoke(() =>
                             {
-                                // Cập nhật các giá trị trên giao diện
-                                //returnX = num1 * 20;
-                                //returnY = num2 * 30;
+                                // Update value on GUI
+                                returnX = num1 * 20;
+                                returnY = num2 * 20;
+                                returnZ = num3 * 15 + 700;
 
-                                //returnX = num1 * 20;
-                                //returnY = num2 * 20;
-                                //returnZ = num3 * 15 + 700;
-
-                                returnX = num1;
-                                returnY = num2;
-                                returnZ = num3;
-                                t5_camera = num4;
+                                //returnX = num1;
+                                //returnY = num2;
+                                //returnZ = num3;
+                                //t5_camera = num4;
 
                                 ErrorLog.Text = returnX.ToString() + "\n" + returnY.ToString() + "\n" + returnZ.ToString();
 
