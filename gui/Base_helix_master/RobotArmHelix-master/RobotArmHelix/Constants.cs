@@ -17,17 +17,24 @@ namespace RobotArmHelix
         public const double l4 = 0.0;
         public const double l5 = 230.0;
 
-        public const double T1_LU = 115.0;
-        public const double T1_LD = -95.0;
+        public const double T1_LU = 90.0;
+        public const double T1_LD = -35.0;
 
         public const double T2_LU = 110.0;
-        public const double T2_LD = 30.0;
-        public const double T3_LU = -10.0;
+        public const double T2_LD = 45.0;
+        public const double T3_LU = -80.0;
         public const double T3_LD = -120.0;
         public const double T4_LU = 5.0;
         public const double T4_LD = -105.0;
-        public const double T5_LU = 179.999;
+        public const double T5_LU = 179;
         public const double T5_LD = -180.0;
+
+        public const double X_LU = 90.0;
+        public const double X_LD = 45.0;
+        public const double Y_LU = -80.0;
+        public const double Y_LD = -120.0;
+        public const double Z_LU = 5.0;
+        public const double Z_LD = -105.0;
         //PLC
         public const string R_PLCREADY = "M512"; /*Address of reg Servo ON*/
         public const string R_BRAKE = "M513"; /*Address of reg BRAKE*/
@@ -37,6 +44,8 @@ namespace RobotArmHelix
         public const string R_SETHOME = "M1999"; /*Address of reg BRAKE*/
         public const string R_STATUS = "M8000"; /*Address of value 17bit contain SERVO, BRAKE, STATUS OF SERVO*/
         public const string R_PATH = "M529"; /*Address of value 17bit contain SERVO, BRAKE, STATUS OF SERVO*/
+
+        public const string MOVEL_PATH = "M700"; /*Address of value 16 for PLC move path1 completed */
 
         public const string R_JOGGINGFORWARD1 = "M550";
         public const string R_JOGGINGINVERSE1 = "M551";

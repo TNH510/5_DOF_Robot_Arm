@@ -3,7 +3,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 
 # Đường dẫn đến file CSV
-csv_file = 'data.csv'
+csv_file = 'C:/Users/daveb/Desktop/5_DOF_Robot_Arm/control_glove/script_python/robot_data/test.csv'
 
 # Đọc dữ liệu từ file CSV
 data1 = []

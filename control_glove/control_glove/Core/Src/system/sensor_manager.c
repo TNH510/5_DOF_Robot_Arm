@@ -134,8 +134,10 @@ base_status_t sensor_manager_task(void)
     glv_convert_euler_angle(q0, q1, q2, q3, &pitch, &roll, &yaw);
 
     // Caculate kinematic
+    float robot_x_pos, robot_y_pos, robot_z_pos;
     float x_pos, y_pos, z_pos;
     glv_pos_convert(q0, q1, q2, q3, elbow_angle, &x_pos, &y_pos, &z_pos);
+    glv_robot_pos_convert(x_pos, y_pos, z_pos, &robot_x_pos, &robot_y_pos, &robot_z_pos);
     // glv_pos_shoulder_convert(q0, q1, q2, q3, &x_pos, &y_pos, &z_pos);
 
     static uint32_t tick = 0;
@@ -163,10 +165,11 @@ base_status_t sensor_manager_task(void)
             printf("%0.2f,%0.2f,%0.2f\r\n", pitch, roll, yaw);
             break;
         case 4:
-            printf("%0.2f,%0.2f,%0.2f\r\n", x_pos, y_pos, z_pos);
+            printf("%0.2f,%0.2f,%0.2f\r\n", robot_x_pos, robot_y_pos, robot_z_pos);
             break;
         case 5:
-            printf("%0.2f,%0.2f,%0.2f\r\n", adc_low_pass, (float)adc_value[adc_sample_count], elbow_angle*57.296f);
+            // printf("%0.2f,%0.2f,%0.2f\r\n", adc_low_pass, (float)adc_value[adc_sample_count], elbow_angle*57.296f);
+            printf("%0.2f,%0.2f,%0.2f\r\n", x_pos, y_pos, z_pos);
             break;
         default:
             break;

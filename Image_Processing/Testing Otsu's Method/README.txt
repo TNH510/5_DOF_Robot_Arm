@@ -1,0 +1,1 @@
+TÍnh và vẽ biểu đồ Histogram
