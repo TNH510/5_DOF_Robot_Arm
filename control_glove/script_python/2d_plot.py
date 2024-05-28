@@ -1,9 +1,8 @@
 import csv
-from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 
 # Đường dẫn đến file CSV
-csv_file = 'C:/Users/daveb/Desktop/5_DOF_Robot_Arm/control_glove/script_python/robot_data/test.csv'
+csv_file = 'data.csv'
 
 # Đọc dữ liệu từ file CSV
 data1 = []
@@ -24,16 +23,14 @@ with open(csv_file, 'r') as csvfile:
             except ValueError:
                 pass
 
-# Vẽ đồ thị 3D
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
+# Vẽ đồ thị 2D
+plt.plot(data1, label='Line 1')
+plt.plot(data2, label='Line 2')
+plt.plot(data3, label='Line 3')
 
-ax.scatter(data1, data2, data3)
-
-ax.set_xlabel('num1')
-ax.set_ylabel('num2')
-ax.set_zlabel('num3')
-
-plt.title('Data Visualization')
+plt.xlabel('Time')
+plt.ylabel('Data')
+plt.title('Data Graph')
+plt.legend()
 
 plt.show()

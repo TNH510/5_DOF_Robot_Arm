@@ -2,8 +2,7 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
-using ZedGraph;
-using System.Linq;
+
 
 
 
@@ -1010,8 +1009,6 @@ namespace WindowsFormsApp2
 
         private void process_Click_1(object sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(text1.Text))
-            {
                 int high_threshold = 200;//ngưỡng trên cho canny detect
                 int low_threshold = 40;//ngưỡng dưới cho canny detect 
                 int threshold = 50;  // Ngưỡng để chọn các đỉnh trong ma trận Hough
@@ -1040,21 +1037,7 @@ namespace WindowsFormsApp2
                 picture2.Image = EdgeDetection.IntToBitmap(result);
                 picture3.Image = EdgeDetection.IntToBitmap(hough);
                 picture4.Image = EdgeDetection.IntToBitmap(edges);
-            }
 
-            else
-            {
-                string message = "Nhập thiếu ngưỡng";
-                string caption = "Thông báo";
-                MessageBoxButtons buttons = MessageBoxButtons.OK;
-                MessageBoxIcon icon = MessageBoxIcon.Information;
-
-                MessageBox.Show(message, caption, buttons, icon);
-            }
         }
-
-
-
-       
     }
 }
