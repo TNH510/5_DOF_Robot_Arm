@@ -41,27 +41,31 @@ base_status_t sensor_manager_test(void)
     drv_button_check_event(&g_button_state);
     if (g_button_state == CLICK_SELECT_BUTTON)
     {
-        printf("CLICK_SELECT_BUTTON\r\n");
+        // printf("CLICK_SELECT_BUTTON\r\n");
     }
     else if (g_button_state == HOLD_SELECT_BUTTON)
     {
-        printf("HOLD_SELECT_BUTTON\r\n");
+        // printf("HOLD_SELECT_BUTTON\r\n");
     }
     else if (g_button_state == CLICK_LEFT_BUTTON)
     {
-        printf("CLICK_LEFT_BUTTON\r\n");
+        // printf("CLICK_LEFT_BUTTON\r\n");
+        bsp_gpio_set_pin(LED_RED_GPIO_Port, LED_RED_Pin);
     }
     else if (g_button_state == HOLD_LEFT_BUTTON)
     {
-        printf("HOLD_LEFT_BUTTON\r\n");
+        // printf("HOLD_LEFT_BUTTON\r\n");
+        bsp_gpio_reset_pin(LED_RED_GPIO_Port, LED_RED_Pin);
     }
     else if (g_button_state == CLICK_RIGHT_BUTTON)
     {
-        printf("CLICK_RIGHT_BUTTON\r\n");
+        // printf("CLICK_RIGHT_BUTTON\r\n");
+        bsp_gpio_set_pin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
     }
     else if (g_button_state == HOLD_RIGHT_BUTTON)
     {
-        printf("HOLD_RIGHT_BUTTON\r\n");
+        // printf("HOLD_RIGHT_BUTTON\r\n");
+        bsp_gpio_reset_pin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
     }
 
     return BS_OK;
@@ -89,30 +93,32 @@ base_status_t sensor_manager_task(void)
 {
     // Check event button
     static count = 4;
-    drv_button_check_event(&g_button_state);
-    if (g_button_state == CLICK_SELECT_BUTTON)
-    {
-        count++;
-        if (count == 6)
-        {
-            count = 0;
-        }
-    }
-    else if (g_button_state == HOLD_SELECT_BUTTON)
-    {
-        // Test reset I2C
-        bsp_i2c1_deinit();
+    // drv_button_check_event(&g_button_state);
+    // if (g_button_state == CLICK_SELECT_BUTTON)
+    // {
+    //     count++;
+    //     if (count == 6)
+    //     {
+    //         count = 0;
+    //     }
+    // }
+    // else if (g_button_state == HOLD_SELECT_BUTTON)
+    // {
+    //     // Test reset I2C
+    //     bsp_i2c1_deinit();
 
-        // Wait 1000ms
-        HAL_Delay(1000);
+    //     // Wait 1000ms
+    //     HAL_Delay(1000);
 
-        // Reinit I2C 
-        bsp_i2c1_init();
+    //     // Reinit I2C 
+    //     bsp_i2c1_init();
 
-        // Init sensor
-        drv_imu_init();
-        drv_magnetic_init();
-    }
+    //     // Init sensor
+    //     drv_imu_init();
+    //     drv_magnetic_init();
+    // }
+
+    sensor_manager_test();
 
     // Get imu data
     drv_imu_get_data(&g_imu_data);  

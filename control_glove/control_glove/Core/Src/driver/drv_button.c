@@ -64,22 +64,22 @@ void drv_button_check_event(button_name_t *button_state)
       bsp_button_check_state_one_button(BUTTON_3, drv_button.button_3_interrupt_p, &button[BUTTON_3 - 1]);
 
     /* Export state to global variable */
-    if (drv_button.button_event_button_1 == CLICK_EVENT)  // Left
+    if (drv_button.button_event_button_2 == CLICK_EVENT)  // Left
     {
         *button_state = CLICK_LEFT_BUTTON;
     }
 
-    else if (drv_button.button_event_button_1 == HOLD_EVENT)
+    else if (drv_button.button_event_button_2 == HOLD_EVENT)
     {
         *button_state = HOLD_LEFT_BUTTON;
     }
 
-    if (drv_button.button_event_button_2 == CLICK_EVENT)  // Right
+    if (drv_button.button_event_button_1 == CLICK_EVENT)  // Right
     {
         *button_state = CLICK_RIGHT_BUTTON;
     }
 
-    else if (drv_button.button_event_button_2 == HOLD_EVENT)
+    else if (drv_button.button_event_button_1 == HOLD_EVENT)
     {
         *button_state = HOLD_RIGHT_BUTTON;
     }
