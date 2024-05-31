@@ -59,7 +59,7 @@ with open('data.csv', 'w', newline='') as csvfile:
                     # Ghi dữ liệu vào file CSV
                     writer.writerow([num1, num2, num3])
 
-                    plt.pause(0.1)  # Tạm dừng một chút để đồ thị được cập nhật
+                    plt.pause(0.07)  # Tạm dừng một chút để đồ thị được cập nhật
 
                     # Kiểm tra nếu đạt 200 mẫu dữ liệu, thoát khỏi vòng lặp
                     if len(data1) == 3000:
