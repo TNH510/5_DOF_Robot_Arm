@@ -44,9 +44,15 @@ typedef enum
 typedef struct
 {
     button_event_t button_event_button_1;
+    button_event_t button_event_button_2;
+    button_event_t button_event_button_3;
 
     volatile bool button_1_interrupt;
     bool         *button_1_interrupt_p;
+    volatile bool button_2_interrupt;
+    bool         *button_2_interrupt_p;
+    volatile bool button_3_interrupt;
+    bool         *button_3_interrupt_p;
 } drv_button_t;
 /* Public macros ------------------------------------------------------ */
 

@@ -36,6 +36,37 @@ button_name_t g_button_state;
 
 /* Private prototypes ------------------------------------------------------- */
 /* Public implementations --------------------------------------------------- */
+base_status_t sensor_manager_test(void)
+{
+    drv_button_check_event(&g_button_state);
+    if (g_button_state == CLICK_SELECT_BUTTON)
+    {
+        printf("CLICK_SELECT_BUTTON\r\n");
+    }
+    else if (g_button_state == HOLD_SELECT_BUTTON)
+    {
+        printf("HOLD_SELECT_BUTTON\r\n");
+    }
+    else if (g_button_state == CLICK_LEFT_BUTTON)
+    {
+        printf("CLICK_LEFT_BUTTON\r\n");
+    }
+    else if (g_button_state == HOLD_LEFT_BUTTON)
+    {
+        printf("HOLD_LEFT_BUTTON\r\n");
+    }
+    else if (g_button_state == CLICK_RIGHT_BUTTON)
+    {
+        printf("CLICK_RIGHT_BUTTON\r\n");
+    }
+    else if (g_button_state == HOLD_RIGHT_BUTTON)
+    {
+        printf("HOLD_RIGHT_BUTTON\r\n");
+    }
+
+    return BS_OK;
+}
+
 base_status_t sensor_manager_init(void)
 {
     // Init imu and marg
