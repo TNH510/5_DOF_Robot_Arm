@@ -26,9 +26,15 @@
 #define SW3_Pin GPIO_PIN_3
 #define SW3_GPIO_Port GPIOA
 #define SW3_EXTI_IRQn EXTI3_IRQn
+#define SW1_Pin GPIO_PIN_1
+#define SW1_GPIO_Port GPIOA
+#define SW1_EXTI_IRQn EXTI1_IRQn
+#define SW2_Pin GPIO_PIN_2
+#define SW2_GPIO_Port GPIOA
+#define SW2_EXTI_IRQn EXTI2_IRQn
 
 /* Number of button */
-#define BUTTON_MAX         (1)
+#define BUTTON_MAX         (3)
 /* Public enumerate/structure ----------------------------------------- */
 /**
  * @brief Enum for button events

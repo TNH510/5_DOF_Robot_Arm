@@ -7,3 +7,14 @@
 - Exit AT MODE:
     + MUST DISCONNECT SET PIN FIRST
     + Disconnect VCC and checks
+-----------------------------------------------------------
+Send: AT+RX
+Rp:
+OK+B115200<\r><\n>
+ OK+C150<\r><\n>
+ OK+RP:+8dBm<\r><\n>
+ OK+FU3
+-------------------------------
+AT
+AT+P5
+AT+FU1

@@ -4,7 +4,10 @@
     "bsp_button.h": "c",
     "system_manager.h": "c",
     "system_test.h": "c",
-    "drv_uart.h": "c"
+    "drv_uart.h": "c",
+    "bsp_common.h": "c",
+    "sensor_manager.h": "c",
+    "drv_button.h": "c"
   },
   "C_Cpp_Runner.cCompilerPath": "gcc",
   "C_Cpp_Runner.cppCompilerPath": "g++",

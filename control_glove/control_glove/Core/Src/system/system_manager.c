@@ -28,7 +28,8 @@ base_status_t system_manager_init(void)
 }
 base_status_t system_manager_task(void)
 {
-    return sensor_manager_task();
+    // return sensor_manager_task();
+    return sensor_manager_test();
 }
 
 /* Private implementations -------------------------------------------------- */
