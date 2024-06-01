@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Security.Cryptography.X509Certificates;
@@ -32,7 +33,7 @@ namespace Image_proccessing
                     for (int y = 0; y < height; y++)
                     {
                         Color pixelColor = ColorImage.GetPixel(x, y);
-                        int GrayValue = (int)(pixelColor.R * 0.299 + pixelColor.G * 0.587 + pixelColor.B * 0.114);
+                        int GrayValue = (int)(pixelColor.R );
                         GrayImage[x, y] = GrayValue;
                     }
                 }
@@ -69,6 +70,120 @@ namespace Image_proccessing
                 }
 
                 return BlurImage;
+            }
+            public static int[,] MedianBlur(int[,] image)
+            {
+                int width = image.GetLength(0);
+                int height = image.GetLength(1);
+                int[,] result = new int[width, height];
+
+                // Duyệt qua từng pixel trong ảnh
+                for (int x = 0; x < width; x++)
+                {
+                    for (int y = 0; y < height; y++)
+                    {
+                        // Lấy giá trị của các pixel lân cận
+                        List<int> neighbors = new List<int>();
+
+                        for (int i = -1; i <= 1; i++)
+                        {
+                            for (int j = -1; j <= 1; j++)
+                            {
+                                int neighborX = x + i;
+                                int neighborY = y + j;
+
+                                // Kiểm tra xem pixel lân cận có nằm trong phạm vi ảnh không
+                                if (neighborX >= 0 && neighborX < width && neighborY >= 0 && neighborY < height)
+                                {
+                                    neighbors.Add(image[neighborX, neighborY]);
+                                }
+                            }
+                        }
+
+                        // Sắp xếp các giá trị pixel lân cận theo thứ tự tăng dần
+                        for (int k = 0; k < neighbors.Count - 1; k++)
+                        {
+                            for (int l = k + 1; l < neighbors.Count; l++)
+                            {
+                                if (neighbors[k] > neighbors[l])
+                                {
+                                    int temp = neighbors[k];
+                                    neighbors[k] = neighbors[l];
+                                    neighbors[l] = temp;
+                                }
+                            }
+                        }
+
+                        // Lấy trung vị của các giá trị pixel lân cận
+                        int median = neighbors[neighbors.Count / 2];
+
+                        // Gán giá trị trung vị cho pixel hiện tại
+                        result[x, y] = median;
+                    }
+                }
+
+                return result;
+            }
+            public static int[,] Erosion(int[,] image)
+            {
+                int width = image.GetLength(0);
+                int height = image.GetLength(1);
+                int[,] result = new int[width, height];
+
+                // Duyệt qua từng pixel trong ảnh
+                for (int x = 0; x < width; x++)
+                {
+                    for (int y = 0; y < height; y++)
+                    {
+                        // Kiểm tra xem pixel hiện tại có giá trị 0 hay không
+                        if (image[x, y] == 0)
+                        {
+                            bool isEroded = true;
+
+                            // Duyệt qua các pixel lân cận
+                            for (int i = -1; i <= 1; i++)
+                            {
+                                for (int j = -1; j <= 1; j++)
+                                {
+                                    int neighborX = x + i;
+                                    int neighborY = y + j;
+
+                                    // Kiểm tra xem pixel lân cận có nằm trong phạm vi ảnh không
+                                    if (neighborX >= 0 && neighborX < width && neighborY >= 0 && neighborY < height)
+                                    {
+                                        // Kiểm tra xem pixel lân cận có giá trị 0 hay không
+                                        if (image[neighborX, neighborY] != 0)
+                                        {
+                                            isEroded = false;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if (!isEroded)
+                                {
+                                    break;
+                                }
+                            }
+
+                            // Gán giá trị 0 cho pixel hiện tại nếu nó bị co
+                            if (isEroded)
+                            {
+                                result[x, y] = 0;
+                            }
+                            else
+                            {
+                                result[x, y] = 255;
+                            }
+                        }
+                        else
+                        {
+                            result[x, y] = 255;
+                        }
+                    }
+                }
+
+                return result;
             }
             public static int[,] Canny_Detect(int[,] BlurredImage, int high_threshold, int low_threshold)
             {
@@ -215,28 +330,31 @@ namespace Image_proccessing
                 Bitmap Import_picture = new Bitmap(imagePath);
 
                 int[,] gray = EdgeDetection.RGB2Gray(Import_picture);
-                int[,] blur = EdgeDetection.Blur_Image(gray);
-                Bitmap img_blur = IntToBitmap(blur);
+                //int[,] blur = EdgeDetection.Blur_Image(gray);
+                int[,] blur = gray;
+                //Bitmap img_blur = IntToBitmap(blur);
                 //int threhold = CalculateThreshold(img_blur);
-                int threhold1 = 53;
+                int threhold1 = 63;
                 int threhold2 = 65;
                 for (int i = 0; i < blur.GetLength(0); i++)
                 {
                     for (int j = 0; j < blur.GetLength(1); j++)
                     {
-                        if (blur[i, j] >= threhold1)
-                        {
-                            blur[i, j] = 0;
-                        }
-                        else
+                        if (blur[i, j] == 63)
                         {
                             blur[i, j] = 255;
                         }
+                        else
+                        {
+                            blur[i, j] = 0;
+                        }
                     }
                 }
-                int[,] edges = EdgeDetection.Canny_Detect(blur, high_threshold, low_threshold);
+                blur = MedianBlur(blur);
+               // blur = Erosion(blur);
+                //int[,] edges = EdgeDetection.Canny_Detect(blur, high_threshold, low_threshold);
 
-                return edges;
+                return blur;
             }
             public static Bitmap IntToBitmap(int[,] Binary_Image)
             {
@@ -651,7 +769,7 @@ namespace Image_proccessing
 
                 int[,] resultImage = new int[width, height];
                 int count = 0;
-                int[,] theta_rho = new int[10000, 4];
+                int[,] theta_rho = new int[1000000, 4];
                 // lấy toàn bộ số điểm vượt ngưỡng 
                 for (int theta = 0; theta < 180; theta++)
                 {
@@ -669,7 +787,7 @@ namespace Image_proccessing
                 }
                 //phân loại đường thẳng                
                 int nhom = 10;
-                int[,,] ketqua = new int[count, 2, nhom];
+                int[,,] ketqua = new int[count+1, 2, nhom];
                 int[,] line = new int[4, 2];
                 int soluong_nhom = 0;
                 // phân nhóm
