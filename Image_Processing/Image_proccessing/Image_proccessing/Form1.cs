@@ -124,64 +124,125 @@ namespace Image_proccessing
 
                 return result;
             }
-            public static int[,] Erosion(int[,] image)
+            private static int[,] Erosion(int[,] image)
             {
                 int width = image.GetLength(0);
                 int height = image.GetLength(1);
                 int[,] result = new int[width, height];
-
-                // Duyệt qua từng pixel trong ảnh
-                for (int x = 0; x < width; x++)
-                {
-                    for (int y = 0; y < height; y++)
+                //for (int a =0; a< interations; a++)
+                //{
+                    // Duyệt qua từng pixel trong ảnh
+                    for (int x = 0; x < width; x++)
                     {
-                        // Kiểm tra xem pixel hiện tại có giá trị 0 hay không
-                        if (image[x, y] == 0)
+                        for (int y = 0; y < height; y++)
                         {
-                            bool isEroded = true;
-
-                            // Duyệt qua các pixel lân cận
-                            for (int i = -1; i <= 1; i++)
+                            // Kiểm tra xem pixel hiện tại có giá trị 255 hay không
+                            if (image[x, y] == 255)
                             {
-                                for (int j = -1; j <= 1; j++)
-                                {
-                                    int neighborX = x + i;
-                                    int neighborY = y + j;
+                                bool isEroded = true;
 
-                                    // Kiểm tra xem pixel lân cận có nằm trong phạm vi ảnh không
-                                    if (neighborX >= 0 && neighborX < width && neighborY >= 0 && neighborY < height)
+                                // Duyệt qua các pixel lân cận
+                                for (int i = -1; i <= 1; i++)
+                                {
+                                    for (int j = -1; j <= 1; j++)
                                     {
-                                        // Kiểm tra xem pixel lân cận có giá trị 0 hay không
-                                        if (image[neighborX, neighborY] != 0)
+                                        int neighborX = x + i;
+                                        int neighborY = y + j;
+
+                                        // Kiểm tra xem pixel lân cận có nằm trong phạm vi ảnh không
+                                        if (neighborX >= 0 && neighborX < width && neighborY >= 0 && neighborY < height)
                                         {
-                                            isEroded = false;
-                                            break;
+                                            // Kiểm tra xem pixel lân cận có giá trị 255 hay không
+                                            if (image[neighborX, neighborY] != 255)
+                                            {
+                                                isEroded = false;
+                                                break;
+                                            }
                                         }
+                                    }
+
+                                    if (!isEroded)
+                                    {
+                                        break;
                                     }
                                 }
 
-                                if (!isEroded)
+                                // Gán giá trị 255 cho pixel hiện tại nếu nó không bị co
+                                if (isEroded)
                                 {
-                                    break;
+                                    result[x, y] = 255;
                                 }
-                            }
-
-                            // Gán giá trị 0 cho pixel hiện tại nếu nó bị co
-                            if (isEroded)
-                            {
-                                result[x, y] = 0;
+                                else
+                                {
+                                    result[x, y] = 0;
+                                }
                             }
                             else
                             {
-                                result[x, y] = 255;
+                                result[x, y] = 0;
                             }
                         }
-                        else
+                    }
+                //}    
+                 return result;
+            }
+            private static int[,] Dilation(int[,] image)
+            {
+                int width = image.GetLength(0);
+                int height = image.GetLength(1);
+                int[,] result = new int[width, height];
+                //for (int a=0; a<interations; a++)
+                //{
+                    // Duyệt qua từng pixel trong ảnh
+                    for (int x = 0; x < width; x++)
+                    {
+                        for (int y = 0; y < height; y++)
                         {
-                            result[x, y] = 255;
+                            // Kiểm tra xem pixel hiện tại có giá trị 255 hay không
+                            if (image[x, y] == 255)
+                            {
+                                // Duyệt qua các pixel lân cận
+                                for (int i = -1; i <= 1; i++)
+                                {
+                                    for (int j = -1; j <= 1; j++)
+                                    {
+                                        int neighborX = x + i;
+                                        int neighborY = y + j;
+
+                                        // Kiểm tra xem pixel lân cận có nằm trong phạm vi ảnh không
+                                        if (neighborX >= 0 && neighborX < width && neighborY >= 0 && neighborY < height)
+                                        {
+                                            // Gán giá trị 255 cho pixel lân cận
+                                            result[neighborX, neighborY] = 255;
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
+                //}    
+                return result;
+            }
+            public static int[,] Erosion_Dilation(int[,] image, int iterations_Erosion, int iterations_Dilation)
+            {
+                int[,] result = image;
+                // Thực hiện phép mở rộng (dilation)
+                for (int i = 0; i < iterations_Dilation; i++)
+                {
+                    result = Dilation(result);
                 }
+                // Thực hiện phép co (erosion) trước
+                for (int i = 0; i < iterations_Erosion; i++)
+                {
+                    result = Erosion(result);
+                }
+                for (int i = 0; i < iterations_Dilation; i++)
+                {
+                    result = Dilation(result);
+                }
+
+
+
 
                 return result;
             }
@@ -331,30 +392,31 @@ namespace Image_proccessing
 
                 int[,] gray = EdgeDetection.RGB2Gray(Import_picture);
                 //int[,] blur = EdgeDetection.Blur_Image(gray);
-                int[,] blur = gray;
+                //int[,] blur = gray;
                 //Bitmap img_blur = IntToBitmap(blur);
                 //int threhold = CalculateThreshold(img_blur);
                 int threhold1 = 63;
                 int threhold2 = 65;
-                for (int i = 0; i < blur.GetLength(0); i++)
+                for (int i = 0; i < gray.GetLength(0); i++)
                 {
-                    for (int j = 0; j < blur.GetLength(1); j++)
+                    for (int j = 0; j < gray.GetLength(1); j++)
                     {
-                        if (blur[i, j] == 63)
+                        if (gray[i, j] == 63)
                         {
-                            blur[i, j] = 255;
+                            gray[i, j] = 255;
                         }
                         else
                         {
-                            blur[i, j] = 0;
+                            gray[i, j] = 0;
                         }
                     }
                 }
-                blur = MedianBlur(blur);
-               // blur = Erosion(blur);
-                //int[,] edges = EdgeDetection.Canny_Detect(blur, high_threshold, low_threshold);
+                //blur = MedianBlur(blur);
+                gray = Erosion_Dilation(gray, 9, 4);
 
-                return blur;
+                int[,] edges = EdgeDetection.Canny_Detect(gray, high_threshold, low_threshold);
+
+                return edges;
             }
             public static Bitmap IntToBitmap(int[,] Binary_Image)
             {
