@@ -227,20 +227,21 @@ namespace Image_proccessing
             {
                 int[,] result = image;
                 // Thực hiện phép mở rộng (dilation)
-                for (int i = 0; i < iterations_Dilation; i++)
+                for (int i = 0; i < 1; i++)
                 {
                     result = Dilation(result);
                 }
-                // Thực hiện phép co (erosion) trước
-                for (int i = 0; i < iterations_Erosion; i++)
+                // Thực hiện phép co (erosion) 
+                for (int i = 0; i < iterations_Erosion+1; i++)
                 {
                     result = Erosion(result);
                 }
+                // Thực hiện phép mở rộng (dilation)
                 for (int i = 0; i < iterations_Dilation; i++)
                 {
                     result = Dilation(result);
                 }
-
+                
 
 
 
@@ -401,7 +402,7 @@ namespace Image_proccessing
                 {
                     for (int j = 0; j < gray.GetLength(1); j++)
                     {
-                        if (gray[i, j] == 63)
+                        if (gray[i, j] >= 62 && gray[i, j] <= 66)
                         {
                             gray[i, j] = 255;
                         }
@@ -411,8 +412,8 @@ namespace Image_proccessing
                         }
                     }
                 }
-                //blur = MedianBlur(blur);
-                gray = Erosion_Dilation(gray, 9, 4);
+                //gray = MedianBlur(gray);
+                gray = Erosion_Dilation(gray, 10, 10);
 
                 int[,] edges = EdgeDetection.Canny_Detect(gray, high_threshold, low_threshold);
 
@@ -1418,7 +1419,7 @@ namespace Image_proccessing
             angle3.Text = Convert.ToString(angle[2]);
             //angle4.Text = Convert.ToString(angle[3]);
 
-            
+
             //textBox1.Text = H[0].ToString();
             //textBox2.Text = H[1].ToString();
             //textBox3.Text = H[2].ToString();
@@ -1428,12 +1429,12 @@ namespace Image_proccessing
             //textBox7.Text = H[6].ToString();
 
             //// Dữ liệu hình chữ nhật,tròn, vuông, tam giác
-            //double[,] H1 = new double[4, 7]
+            //double[,] H1 = new double[4, 2]
             //{
-            //    { 3.12312876539246, 6.85381516209359, 9.88575150311941, 10.7838647822104, 15.6771151736907, -14.5406929254356, -21.1913516631291  } ,
-            //    { 3.20469343954819, 10.346963490014, 10.2131978348198, 13.2563928897252, -18.6600719397016, 18.5286332390215, 24.991593246933 } ,
-            //    { 3.18467661863633, 17.3395943883656, 9.90880841836875, 10.8155095284822, -21.1776685117439, -19.485306722665, 34.4426325862341},
-            //    { 3.10917495216815, 7.45148166979752 , 3.07362704873088, 5.00704032046893, 6.31108372681061, -9.73140421171348, -9.36694031488709} ,
+            //    { 1.61102831207702, 3.82396658971506 } ,
+            //    { 1.61102831207702, 3.82396658971506 } ,
+            //    { 1.61102831207702, 3.82396658971506},
+            //    {1.61102831207702, 3.82396658971506} ,
             //};
             //// tính  giá trị chênh lệch, chênh lệch thấp => tương thích cao.
             //double[] D = new double[4] { 0, 0, 0, 0 };
