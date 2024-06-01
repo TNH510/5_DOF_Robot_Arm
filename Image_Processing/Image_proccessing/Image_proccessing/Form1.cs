@@ -217,12 +217,14 @@ namespace Image_proccessing
                 int[,] gray = EdgeDetection.RGB2Gray(Import_picture);
                 int[,] blur = EdgeDetection.Blur_Image(gray);
                 Bitmap img_blur = IntToBitmap(blur);
-                int threhold = CalculateThreshold(img_blur);
+                //int threhold = CalculateThreshold(img_blur);
+                int threhold1 = 53;
+                int threhold2 = 65;
                 for (int i = 0; i < blur.GetLength(0); i++)
                 {
                     for (int j = 0; j < blur.GetLength(1); j++)
                     {
-                        if (blur[i, j] < threhold)
+                        if (blur[i, j] >= threhold1)
                         {
                             blur[i, j] = 0;
                         }
@@ -649,7 +651,7 @@ namespace Image_proccessing
 
                 int[,] resultImage = new int[width, height];
                 int count = 0;
-                int[,] theta_rho = new int[2000, 4];
+                int[,] theta_rho = new int[10000, 4];
                 // lấy toàn bộ số điểm vượt ngưỡng 
                 for (int theta = 0; theta < 180; theta++)
                 {
@@ -1117,6 +1119,69 @@ namespace Image_proccessing
                 return Image_Result;
             }
         }
+        class DetectShape
+        {
+            public double Moment_Calculate(int[,] Binary_image, int i, int j)
+            {
+                double Moment = 0;
+                for (int x = 0; x < Binary_image.GetLength(0); x++)
+                {
+                    for (int y = 0; y < Binary_image.GetLength(1); y++)
+                    {
+                        Moment = Moment + Math.Pow(x, i) * Math.Pow(y, j) * Binary_image[x, y];
+                    }
+                }
+                return Moment;
+            }
+
+            public double CentralMoment1(int[,] Binary_image, int i, int j)
+            {
+                double U_ij = 0;
+                double avr_X = (Moment_Calculate(Binary_image, 1, 0)) / (Moment_Calculate(Binary_image, 0, 0));
+                double avr_Y = (Moment_Calculate(Binary_image, 0, 1)) / (Moment_Calculate(Binary_image, 0, 0));
+                for (int x = 0; x < Binary_image.GetLength(0); x++)
+                {
+                    for (int y = 0; y < Binary_image.GetLength(1); y++)
+                    {
+                        U_ij = U_ij + Math.Pow((x - avr_X), i) * Math.Pow((y - avr_Y), j) * Binary_image[x, y];
+                    }
+                }
+                return U_ij;
+            }
+            public double CentralMoment2(int[,] Binary_image, int i, int j)
+            {
+                double U_ij = CentralMoment1(Binary_image, i, j);
+                double U_00 = CentralMoment1(Binary_image, 0, 0);
+                double N_ij = U_ij / Math.Pow(U_00, (i + j + 2) / 2);
+                return N_ij;
+            }
+            public double[] HuMoment(int[,] Binary_image)
+            {
+                double[] H = new double[7];
+                double N_20 = CentralMoment2(Binary_image, 2, 0);
+                double N_02 = CentralMoment2(Binary_image, 0, 2);
+                double N_11 = CentralMoment2(Binary_image, 1, 1);
+                double N_30 = CentralMoment2(Binary_image, 3, 0);
+                double N_12 = CentralMoment2(Binary_image, 1, 2);
+                double N_03 = CentralMoment2(Binary_image, 0, 3);
+                double N_21 = CentralMoment2(Binary_image, 2, 1);
+                double U_03 = CentralMoment1(Binary_image, 0, 3);
+                H[0] = N_20 + N_02;//
+                H[1] = Math.Pow((N_20 - N_02), 2) + 4 * Math.Pow(N_11, 2);//
+                H[2] = Math.Pow((N_30 - 3 * N_12), 2) + Math.Pow((3 * N_21 - N_03), 2);//
+                H[3] = Math.Pow((N_30 + N_12), 2) + Math.Pow((N_21 + N_03), 2);//
+                H[4] = (N_30 - 3 * N_12) * (N_30 + N_12) * (Math.Pow((N_30 + N_12), 2) - 3 * Math.Pow((N_21 + N_03), 2)) + (3 * N_21 - N_03) * (3 * Math.Pow((N_30 + N_12), 2) - Math.Pow((N_21 + N_03), 2));
+                H[5] = (N_20 - N_02) * (Math.Pow((N_30 + N_12), 2) - Math.Pow((N_21 + N_03), 2) + 4 * N_11 * (N_30 + N_12) * (N_21 + N_03));
+                H[6] = (3 * N_21 - N_03) * (N_30 + N_12) * (Math.Pow((N_30 + N_12), 2) - 3 * Math.Pow((N_21 + N_03), 2)) + (N_30 - 3 * N_12) * (N_21 + N_03) * (3 * Math.Pow((N_30 + N_12), 2) - Math.Pow((N_21 + N_03), 2));
+
+                for (int i = 0; i < 7; i++)
+                {
+                    H[i] = -1 * Math.Sign(H[i]) * Math.Log10(Math.Abs(H[i]));
+                }
+
+                return H;
+            }
+        }
         private void button1_Click(object sender, EventArgs e)
         {
             // Tạo một OpenFileDialog
@@ -1140,12 +1205,13 @@ namespace Image_proccessing
         private void button2_Click(object sender, EventArgs e)
         {
             int high_threshold = 200;//ngưỡng trên cho canny detect
-            int low_threshold = 40;//ngưỡng dưới cho canny detect 
+            int low_threshold = 60;//ngưỡng dưới cho canny detect 
             int threshold = 50;  // Ngưỡng để chọn các đỉnh trong ma trận Hough
                                  // int thre = Convert.ToInt16(text_thres.Text);
                                  //ảnh binary cho canny detect
             int[,] edges = EdgeDetection.DeTectEdgeByCannyMethod(imagePath, high_threshold, low_threshold);
-
+            //DetectShape detectShape = new DetectShape();
+            //double[] H = detectShape.HuMoment(edges);
             // Lấy số hàng và số cột của mảng
             // Khởi tạo một mảng 2 chiều
             int width = edges.GetLength(0);
@@ -1171,6 +1237,62 @@ namespace Image_proccessing
             //angle2.Text = Convert.ToString(angle[1]);
             angle3.Text = Convert.ToString(angle[2]);
             //angle4.Text = Convert.ToString(angle[3]);
+
+            
+            //textBox1.Text = H[0].ToString();
+            //textBox2.Text = H[1].ToString();
+            //textBox3.Text = H[2].ToString();
+            //textBox4.Text = H[3].ToString();
+            //textBox5.Text = H[4].ToString();
+            //textBox6.Text = H[5].ToString();
+            //textBox7.Text = H[6].ToString();
+
+            //// Dữ liệu hình chữ nhật,tròn, vuông, tam giác
+            //double[,] H1 = new double[4, 7]
+            //{
+            //    { 3.12312876539246, 6.85381516209359, 9.88575150311941, 10.7838647822104, 15.6771151736907, -14.5406929254356, -21.1913516631291  } ,
+            //    { 3.20469343954819, 10.346963490014, 10.2131978348198, 13.2563928897252, -18.6600719397016, 18.5286332390215, 24.991593246933 } ,
+            //    { 3.18467661863633, 17.3395943883656, 9.90880841836875, 10.8155095284822, -21.1776685117439, -19.485306722665, 34.4426325862341},
+            //    { 3.10917495216815, 7.45148166979752 , 3.07362704873088, 5.00704032046893, 6.31108372681061, -9.73140421171348, -9.36694031488709} ,
+            //};
+            //// tính  giá trị chênh lệch, chênh lệch thấp => tương thích cao.
+            //double[] D = new double[4] { 0, 0, 0, 0 };
+            //for (int i = 0; i < 4; i++)
+            //{
+            //    for (int j = 0; j < 2; j++)
+            //    {
+            //        D[i] = D[i] + Math.Sqrt((H1[i, j] - H[j]) * (H1[i, j] - H[j]));
+            //        //D[i] = D[i] + Math.Abs((H1[i, j] - H[j]));
+            //    }
+            //}
+            //// tìm giá trị nhỏ nhất
+            //double minValue = D[0]; // Giả sử giá trị đầu tiên là giá trị nhỏ nhất
+            //int minIndex = 0; // Giả sử vị trí đầu tiên là vị trí của giá trị nhỏ nhất
+
+            //for (int i = 1; i < D.Length; i++)
+            //{
+            //    if (D[i] < minValue)
+            //    {
+            //        minValue = D[i];
+            //        minIndex = i;
+            //    }
+            //}
+            //// cho kết quả
+            //switch (minIndex)
+            //{
+            //    case 0:
+            //        textBox8.Text = "HÌNH CHỮ NHẬT";
+            //        break;
+            //    case 1:
+            //        textBox8.Text = "HÌNH TRÒN";
+            //        break;
+            //    case 2:
+            //        textBox8.Text = "HÌNH VUÔNG";
+            //        break;
+            //    case 3:
+            //        textBox8.Text = "HÌNH TAM GIÁC";
+            //        break;
+            //}
         }
 
         private void Mid_Point_TextChanged(object sender, EventArgs e)
@@ -1182,5 +1304,12 @@ namespace Image_proccessing
         {
 
         }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+
     }
 }
