@@ -38,36 +38,10 @@ button_name_t g_button_state;
 /* Public implementations --------------------------------------------------- */
 base_status_t sensor_manager_test(void)
 {
-    drv_button_check_event(&g_button_state);
-    if (g_button_state == CLICK_SELECT_BUTTON)
-    {
-        // printf("CLICK_SELECT_BUTTON\r\n");
-    }
-    else if (g_button_state == HOLD_SELECT_BUTTON)
-    {
-        // printf("HOLD_SELECT_BUTTON\r\n");
-    }
-    else if (g_button_state == CLICK_LEFT_BUTTON)
-    {
-        // printf("CLICK_LEFT_BUTTON\r\n");
-        bsp_gpio_set_pin(LED_RED_GPIO_Port, LED_RED_Pin);
-    }
-    else if (g_button_state == HOLD_LEFT_BUTTON)
-    {
-        // printf("HOLD_LEFT_BUTTON\r\n");
-        bsp_gpio_reset_pin(LED_RED_GPIO_Port, LED_RED_Pin);
-    }
-    else if (g_button_state == CLICK_RIGHT_BUTTON)
-    {
-        // printf("CLICK_RIGHT_BUTTON\r\n");
-        bsp_gpio_set_pin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
-    }
-    else if (g_button_state == HOLD_RIGHT_BUTTON)
-    {
-        // printf("HOLD_RIGHT_BUTTON\r\n");
-        bsp_gpio_reset_pin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
-    }
-
+    uint8_t encode_frame[12];
+    glv_encode_uart_command(0.0000f, 5.00001f, 99.0000f, GLV_CMD_ONLY_POS_TRANSMIT, encode_frame);
+    drv_uart_send_data(encode_frame, sizeof(encode_frame));
+    HAL_Delay(3000);
     return BS_OK;
 }
 
