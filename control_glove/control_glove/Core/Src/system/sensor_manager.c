@@ -39,7 +39,7 @@ button_name_t g_button_state;
 base_status_t sensor_manager_test(void)
 {
     uint8_t encode_frame[12];
-    glv_encode_uart_command(0.0000f, 5.00001f, 99.0000f, GLV_CMD_ONLY_POS_TRANSMIT, encode_frame);
+    glv_encode_uart_command(-6.0f, 7.0f, -99.0f, GLV_CMD_ONLY_POS_TRANSMIT, encode_frame);
     drv_uart_send_data(encode_frame, sizeof(encode_frame));
     HAL_Delay(3000);
     return BS_OK;

@@ -198,7 +198,11 @@ bool glv_encode_uart_command(float x_pos, float y_pos, float z_pos, glv_cmd_t cm
 	frame.start_frame = 0xAA;
 	frame.cmd = (uint8_t) cmd;
 
-	if (encode_pos(x_pos, &frame.x_pos[0]) && encode_pos(y_pos, &frame.y_pos[0]) && encode_pos(z_pos, &frame.z_pos[0]))
+	bool status = encode_pos(x_pos, &frame.x_pos[0]);
+	status &= encode_pos(y_pos, &frame.y_pos[0]);
+	status &= encode_pos(z_pos, &frame.z_pos[0]);
+
+	if (status == true)
 	{
 		/* Caculate CRC */
 		frame.crc = 0xFF;
@@ -235,21 +239,22 @@ static float square(float num)
 static bool encode_pos(float value, uint8_t *result)
 {
 	// Check value
-	if (value < 100.0f && value > 99.9999f) 
+	if (value < 100.0f && value > -99.9999f)
 	{
 		glv_pos_byte_high_t pos_h;
+		uint32_t mul_1000_value = 0;
 
 		// Check value is positive or negative
-		if (value > 0)
+		if (value >= 0)
 		{
 			pos_h.sign_bit = 0;
+			mul_1000_value = (uint32_t)(value * 10000.0f);
 		}
 		else
 		{
 			pos_h.sign_bit = 1;
-		}
-
-		uint32_t mul_1000_value = (uint32_t)(abs(value) * 10000);
+			mul_1000_value = (uint32_t)(value * (-10000.0f));
+		}		
 
 		// Pos value handle
 		pos_h.value = ((uint8_t)((mul_1000_value & 0xFF0000) >> 16)) & 0b01111111;
