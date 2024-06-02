@@ -35,6 +35,7 @@ using System.Windows.Markup;
 using OxyPlot.Axes;
 using System.ComponentModel;
 using SharpDX;
+using SharpDX.Direct3D9;
 /**
 * Author: Gabriele Marini (Gabryxx7)
 * This class load the 3d models of all the parts of the robotic arms and add them to the viewport
@@ -76,6 +77,7 @@ namespace RobotArmHelix
         public int visible_glove = 1;
         public int status_first_time = 0;
         private bool write_csv = false;
+                        int value = 0;
 
 
         private double returnX = 500;
@@ -2458,26 +2460,6 @@ namespace RobotArmHelix
             move = 0;
         }
 
-        //private void helixViewport3D_MouseDown(object sender, MouseButtonEventArgs e)
-        //{
-        //    Point mousePosition = e.GetPosition(viewPort3d);
-
-        //     Find the nearest visual in the 3D scene
-        //    HitTestResult result = VisualTreeHelper.HitTest(viewPort3d, mousePosition);
-        //    RayMeshGeometry3DHitTestResult meshResult = result as RayMeshGeometry3DHitTestResult;
-
-        //    if (meshResult != null)
-        //    {
-        //        Point3D clickedPoint = meshResult.PointHit;
-
-        //         Update the label content on the UI thread
-        //        Dispatcher.Invoke(() =>
-        //        {
-        //            coordinatesLabel.Content = $"Coordinates: ({clickedPoint.X}, {clickedPoint.Y}, {clickedPoint.Z})";
-        //        });
-        //    }
-        //}
-
         private void Press_button(string name, string adr)
         {
             int ret;
@@ -2772,75 +2754,173 @@ namespace RobotArmHelix
             // UART transmission logic
             while (!worker.CancellationPending)
             {
-                string receivedData = uart.ReadLine().Trim();
-
-                if (!string.IsNullOrEmpty(receivedData))
+                if (uart.BytesToRead > 0)
                 {
-                    string[] numbers = receivedData.Split(',');
-
-                    Console.WriteLine(receivedData);
-
-                    if (numbers.Length == 3)
+                    // Read available bytes
+                    byte[] byteArray = new byte[uart.BytesToRead];
+                    uart.Read(byteArray, 0, byteArray.Length);
+                    // Convert the byte array to a hexadecimal string
+                    if (byteArray.Length >= 12)
                     {
-                        double num1, num2, num3, num4;
-                        bool success = double.TryParse(numbers[0], out num1);
-                        success &= double.TryParse(numbers[1], out num2);
-                        success &= double.TryParse(numbers[2], out num3);
-                        //success &= double.TryParse(numbers[3], out num4);
-                        double theta_test;
-                        int ret;
-                        int[] temp_value = new int[5];
-                        if (success)
+                        byte crc_byte = 0x00;
+                        crc_byte = Lc709204fCalculateCrc8Atm(byteArray, 11);
+                        if (crc_byte == byteArray[11])
                         {
-                            Dispatcher.Invoke(() =>
+                            if (byteArray[0] == 0xAA)
                             {
-                                // Update value on GUI
-                                returnX = num1 * 20;
-                                returnY = num2 * 20;
-                                returnZ = num3 * 15 + 700;
-
-                                //returnX = num1;
-                                //returnY = num2;
-                                //returnZ = num3;
-                                //t5_camera = num4;
-
-                                ErrorLog.Text = returnX.ToString() + "\n" + returnY.ToString() + "\n" + returnZ.ToString();
-
-                                if (returnZ >= 500 && returnZ <= 1000)
+                                //onsole.WriteLine(byteArray[0].ToString("X"));
+                                switch (byteArray[1])
                                 {
-                                    (t1_test, t2_test, t3_test, t4_test, t5_test) = convert_position_angle(returnX, returnY, returnZ);
-                                    ret = Check_angle(t1_test, t2_test, t3_test, t4_test, t5_camera);
-                                    if (ret != 0)
-                                    {
-                                        double theta = 0.0;
-                                        if (ret == 1) theta = t1_test;
-                                        else if (ret == 2) theta = t2_test;
-                                        else if (ret == 3) theta = t3_test;
-                                        else if (ret == 4) theta = t4_test;
-                                        else if (ret == 5) theta = t5_camera;
-                                        PrintLog("\nError", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
-                                        return;
-                                    }
+                                    case 0x00:
+                                        int x_pos = 0;
+                                        int y_pos = 0;
+                                        int z_pos = 0;
+                                        double x = 0;
+                                        double y = 0;
+                                        double z = 0;
+                                        x_pos = CombineBytesToInt32(byteArray[2], byteArray[3], byteArray[4]);
+                                        if (x_pos >= 0x800000)
+                                        {
+                                            x = (-1) * (x_pos - 0x800000) / 10000.0;
+                                        }
+                                        y_pos = CombineBytesToInt32(byteArray[5], byteArray[6], byteArray[7]);
+                                        if (y_pos >= 0x800000)
+                                        {
+                                            y = (-1) * (y_pos - 0x800000) / 10000.0;
+                                        }
+                                        z_pos = CombineBytesToInt32(byteArray[8], byteArray[9], byteArray[10]);
+                                        if (z_pos >= 0x800000)
+                                        {
+                                            z = (-1) * (z_pos - 0x800000) / 10000.0;
+                                        }
+
+                                        //Console.WriteLine(x.ToString());
+                                        //Console.WriteLine(y.ToString());
+                                        //Console.WriteLine(z.ToString());
+                                        //Console.WriteLine("---");
+                                        //graph(x, y, z);
+                                        break;
+                                    case 0x01:
+                                        Console.WriteLine("Hello Youtube!!");
+                                        break;
+                                    case 0x02:
+                                        Console.WriteLine("Goodbye Youtube!!");
+                                        break;
+                                    case 0x03:
+                                        Console.WriteLine("Hex value is 0xB");
+                                        break;
+                                    default:
+                                        Console.WriteLine("Hex value is not 0x1, 0x2, 0xA, or 0xB");
+                                        break;
                                 }
-                                else
-                                {
-                                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", "Out of range of Z axis"));
-                                }
-                            });
-                        }
-                        if (write_csv == true)
-                        {
-                            using (StreamWriter writer = new StreamWriter(filePath, true))
-                            {
-                                // Write each line of data to the CSV file
-                                writer.WriteLine(receivedData);
                             }
                         }
+
+                    }
+                    //foreach (byte b in byteArray)
+                    //{
+                    //    Console.WriteLine(string.Format("{0:x2}", b));
+                    //}
+
+                }
+
+                    //    string[] numbers = receivedData.Split(',');
+
+                    //    Console.WriteLine(receivedData);
+
+                    //    if (numbers.Length == 3)
+                    //    {
+                    //        double num1, num2, num3, num4;
+                    //        bool success = double.TryParse(numbers[0], out num1);
+                    //        success &= double.TryParse(numbers[1], out num2);
+                    //        success &= double.TryParse(numbers[2], out num3);
+                    //        //success &= double.TryParse(numbers[3], out num4);
+                    //        double theta_test;
+                    //        int ret;
+                    //        int[] temp_value = new int[5];
+                    //        if (success)
+                    //        {
+                    //            Dispatcher.Invoke(() =>
+                    //            {
+                    //                // Update value on GUI
+                    //                returnX = num1 * 20;
+                    //                returnY = num2 * 20;
+                    //                returnZ = num3 * 15 + 700;
+
+                    //                //returnX = num1;
+                    //                //returnY = num2;
+                    //                //returnZ = num3;
+                    //                //t5_camera = num4;
+
+                    //                ErrorLog.Text = returnX.ToString() + "\n" + returnY.ToString() + "\n" + returnZ.ToString();
+
+                    //                if (returnZ >= 500 && returnZ <= 1000)
+                    //                {
+                    //                    (t1_test, t2_test, t3_test, t4_test, t5_test) = convert_position_angle(returnX, returnY, returnZ);
+                    //                    ret = Check_angle(t1_test, t2_test, t3_test, t4_test, t5_camera);
+                    //                    if (ret != 0)
+                    //                    {
+                    //                        double theta = 0.0;
+                    //                        if (ret == 1) theta = t1_test;
+                    //                        else if (ret == 2) theta = t2_test;
+                    //                        else if (ret == 3) theta = t3_test;
+                    //                        else if (ret == 4) theta = t4_test;
+                    //                        else if (ret == 5) theta = t5_camera;
+                    //                        PrintLog("\nError", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
+                    //                        return;
+                    //                    }
+                    //                }
+                    //                else
+                    //                {
+                    //                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", "Out of range of Z axis"));
+                    //                }
+                    //            });
+                    //        }
+                    //        if (write_csv == true)
+                    //        {
+                    //            using (StreamWriter writer = new StreamWriter(filePath, true))
+                    //            {
+                    //                // Write each line of data to the CSV file
+                    //                writer.WriteLine(receivedData);
+                    //            }
+                    //        }
+                    //    }
+                    //}
+                }
+        }
+        static byte Lc709204fCalculateCrc8Atm(byte[] data, ushort length)
+        {
+            if (data == null)
+                throw new ArgumentNullException(nameof(data));
+
+            byte crc = 0;
+            for (ushort i = 0; i < length; i++)
+            {
+                crc ^= data[i];
+
+                for (byte bit = 0; bit < 8; bit++)
+                {
+                    if ((crc & 0x80) != 0)
+                    {
+                        crc = (byte)((crc << 1) ^ 0x07);
+                    }
+                    else
+                    {
+                        crc <<= 1;
                     }
                 }
             }
+
+            return crc;
         }
 
+        static int CombineBytesToInt32(byte byte1, byte byte2, byte byte3)
+        {
+            // Combine the bytes into an int (32-bit)
+            // The last byte is assumed to be 0 (most significant byte of the 32-bit integer)
+            int combined = (byte1 << 16) | (byte2 << 8) | byte3;
+            return combined;
+        }
         private async void Glove_connect_button_Click(object sender, RoutedEventArgs e)
         {
 
@@ -3854,6 +3934,34 @@ namespace RobotArmHelix
             }
             
             timer2.Start();
+        }
+
+        private void graph(double x, double y, double z)
+        {
+            // Update data points
+            var timestamp = DateTime.Now;
+            var dataPoint1 = new DataPoint(DateTimeAxis.ToDouble(timestamp), x);
+            var dataPoint2 = new DataPoint(DateTimeAxis.ToDouble(timestamp), y);
+            var dataPoint3 = new DataPoint(DateTimeAxis.ToDouble(timestamp), z);
+
+            // Update series
+            var series1 = (LineSeries)_plotModel.Series[0];
+            var series2 = (LineSeries)_plotModel.Series[1];
+            var series3 = (LineSeries)_plotModel.Series[2];
+            series1.Points.Add(dataPoint1);
+            series2.Points.Add(dataPoint2);
+            series3.Points.Add(dataPoint3);
+
+            // Limit number of data points to keep graph responsive
+            if (series1.Points.Count > 100)
+            {
+                series1.Points.RemoveAt(0);
+                series2.Points.RemoveAt(0);
+                series3.Points.RemoveAt(0);
+            }
+
+            // Refresh plot view
+            plotView.InvalidatePlot();
         }
 
         static void CreateCSV(string filePath, string[] data)
