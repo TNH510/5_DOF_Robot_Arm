@@ -36,6 +36,7 @@ typedef struct
 /* Private prototypes ------------------------------------------------------- */
 static float square(float num);
 static bool encode_pos(float value, uint8_t *result);
+static uint8_t crc_8_atm(uint8_t *data, uint16_t length);
 
 /* Public implementations --------------------------------------------------- */
 void glv_convert_euler_angle(float q0, float q1, float q2, float q3, 
@@ -204,9 +205,6 @@ bool glv_encode_uart_command(float x_pos, float y_pos, float z_pos, glv_cmd_t cm
 
 	if (status == true)
 	{
-		/* Caculate CRC */
-		frame.crc = 0xFF;
-
 		// Return result
 		encode_frame[0] = frame.start_frame;
 		encode_frame[1] = frame.cmd;
@@ -219,6 +217,9 @@ bool glv_encode_uart_command(float x_pos, float y_pos, float z_pos, glv_cmd_t cm
 		encode_frame[8] = frame.z_pos[0];
 		encode_frame[9] = frame.z_pos[1];
 		encode_frame[10] = frame.z_pos[2];
+
+		/* Caculate CRC */
+		frame.crc = crc_8_atm(encode_frame, 11);
 		encode_frame[11] = frame.crc;
 
 		return true;
@@ -268,5 +269,28 @@ static bool encode_pos(float value, uint8_t *result)
 	{
 		return false;
 	}
+}
+
+static uint8_t crc_8_atm(uint8_t *data, uint16_t length)
+{
+  uint8_t crc = 0;
+  for (uint16_t i = 0; i < length; i++)
+  {
+    crc ^= data[i];
+
+    for (uint8_t bit = 0; bit < 8; bit++)
+    {
+      if (crc & 0x80)
+      {
+        crc = (crc << 1) ^ 0x07;
+      }
+      else
+      {
+        crc <<= 1;
+      }
+    }
+  }
+
+  return crc;
 }
 /* End of file -------------------------------------------------------------- */
