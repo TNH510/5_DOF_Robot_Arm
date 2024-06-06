@@ -33,17 +33,51 @@ static drv_magnetic_data_t g_magnetic_data = {.XAxis = 0, .YAxis = 0, .ZAxis = 0
 /* Private variables -------------------------------------------------------- */
 static float g_freq = 100;
 button_name_t g_button_state;
+float robot_x_pos, robot_y_pos, robot_z_pos;
+float x_pos, y_pos, z_pos;
+glv_cmd_t g_cmd = GLV_CMD_ONLY_POS_TRANSMIT;
+bool is_cmd_send = false;
+static uint8_t data_index_send = 0;
+static uint8_t encode_frame[19];
 
 /* Private prototypes ------------------------------------------------------- */
 /* Public implementations --------------------------------------------------- */
 base_status_t sensor_manager_test(void)
 {
-    uint8_t encode_frame[12];
-    if (glv_encode_uart_command(-6.0f, 7.0f, -99.0f, GLV_CMD_ONLY_POS_TRANSMIT, encode_frame))
+    drv_button_check_event(&g_button_state);
+    if (g_button_state == CLICK_SELECT_BUTTON)
     {
-        drv_uart_send_data(encode_frame, sizeof(encode_frame));
+        // printf("CLICK_SELECT_BUTTON\r\n");
     }
-    HAL_Delay(3000);
+    else if (g_button_state == HOLD_SELECT_BUTTON)
+    {
+        // printf("HOLD_SELECT_BUTTON\r\n");
+    }
+    else if (g_button_state == CLICK_LEFT_BUTTON)
+    {
+        bsp_gpio_set_pin(LED_RED_GPIO_Port, LED_RED_Pin);
+        g_cmd = GLV_CMD_POS_TRANSMIT_AND_START_RECORD;
+        is_cmd_send = true;
+
+    }
+    else if (g_button_state == HOLD_LEFT_BUTTON)
+    {
+        // printf("HOLD_LEFT_BUTTON\r\n");
+        bsp_gpio_reset_pin(LED_RED_GPIO_Port, LED_RED_Pin);
+    }
+    else if (g_button_state == CLICK_RIGHT_BUTTON)
+    {
+        // printf("CLICK_RIGHT_BUTTON\r\n");
+        bsp_gpio_set_pin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
+        g_cmd = GLV_CMD_POS_TRANSMIT_AND_STOP_RECORD;
+        is_cmd_send = true;
+    }
+    else if (g_button_state == HOLD_RIGHT_BUTTON)
+    {
+        // printf("HOLD_RIGHT_BUTTON\r\n");
+        bsp_gpio_reset_pin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
+    }
+
     return BS_OK;
 }
 
@@ -69,6 +103,7 @@ base_status_t sensor_manager_task(void)
 {
     // Check event button
     static count = 4;
+    sensor_manager_test();
     // drv_button_check_event(&g_button_state);
     // if (g_button_state == CLICK_SELECT_BUTTON)
     // {
@@ -93,8 +128,6 @@ base_status_t sensor_manager_task(void)
     //     drv_imu_init();
     //     drv_magnetic_init();
     // }
-
-    sensor_manager_test();
 
     // Get imu data
     drv_imu_get_data(&g_imu_data);  
@@ -147,46 +180,86 @@ base_status_t sensor_manager_task(void)
     glv_convert_euler_angle(q0, q1, q2, q3, &pitch, &roll, &yaw);
 
     // Caculate kinematic
-    float robot_x_pos, robot_y_pos, robot_z_pos;
-    float x_pos, y_pos, z_pos;
     glv_pos_convert(q0, q1, q2, q3, elbow_angle, &x_pos, &y_pos, &z_pos);
     glv_robot_pos_convert(x_pos, y_pos, z_pos, &robot_x_pos, &robot_y_pos, &robot_z_pos);
     // glv_pos_shoulder_convert(q0, q1, q2, q3, &x_pos, &y_pos, &z_pos);
 
     static uint32_t tick = 0;
-    if (HAL_GetTick() - tick > 100)
+    if (HAL_GetTick() - tick > 10)
     {
         tick = HAL_GetTick();
 
+        if (data_index_send == 0)
+        {
+            glv_encode_uart_command(x_pos, y_pos, z_pos, g_cmd, encode_frame);
+            HAL_Delay(5);
+        }
+
+        if (data_index_send <= 18)
+        {            
+            drv_uart_send_data(encode_frame + data_index_send, 1);
+        }
+
+        data_index_send++;
+
+        if (data_index_send > (18 + 2))
+        {
+            data_index_send = 0;
+        }
+        
         // uint8_t send_data[10] = {0};
         // glv_encrypt_sensor_data(q0, q1, q2, q3, elbow_angle, send_data);
 
         // drv_uart_send_data(send_data, 10);
 
-        switch (count)
-        {
-        case 0:
-            printf("%0.2f,%0.2f,%0.2f\r\n", -g_imu_data.gxrs, -g_imu_data.gyrs, g_imu_data.gzrs);
-            break;
-        case 1:
-            printf("%0.2f,%0.2f,%0.2f\r\n", -g_imu_data.axg, -g_imu_data.ayg, g_imu_data.azg);
-            break;
-        case 2:
-            printf("%0.2f,%0.2f,%0.2f\r\n", g_magnetic_data.XAxis, g_magnetic_data.YAxis, g_magnetic_data.ZAxis);
-            break;
-        case 3:
-            printf("%0.2f,%0.2f,%0.2f\r\n", pitch, roll, yaw);
-            break;
-        case 4:
-            printf("%0.2f,%0.2f,%0.2f\r\n", robot_x_pos, robot_y_pos, robot_z_pos);
-            break;
-        case 5:
-            // printf("%0.2f,%0.2f,%0.2f\r\n", adc_low_pass, (float)adc_value[adc_sample_count], elbow_angle*57.296f);
-            printf("%0.2f,%0.2f,%0.2f\r\n", x_pos, y_pos, z_pos);
-            break;
-        default:
-            break;
-        }
+        // if (is_cmd_send == true)
+        // {
+        //     if (glv_encode_uart_command(x_pos, y_pos, z_pos, g_cmd, encode_frame))
+        //     {
+        //         drv_uart_send_data(encode_frame, sizeof(encode_frame));
+        //     }
+
+        //     g_cmd = GLV_CMD_ONLY_POS_TRANSMIT;
+        //     is_cmd_send = false;
+        // }
+        // else
+        // {
+        //     if (glv_encode_uart_command(x_pos, y_pos, z_pos, GLV_CMD_ONLY_POS_TRANSMIT, encode_frame))
+        //     {
+        //         drv_uart_send_data(encode_frame, sizeof(encode_frame));
+        //     }
+        // }
+
+
+
+        // switch (count)
+        // {
+        // case 0:
+        //     printf("%0.2f,%0.2f,%0.2f\r\n", -g_imu_data.gxrs, -g_imu_data.gyrs, g_imu_data.gzrs);
+        //     break;
+        // case 1:
+        //     printf("%0.2f,%0.2f,%0.2f\r\n", -g_imu_data.axg, -g_imu_data.ayg, g_imu_data.azg);
+        //     break;
+        // case 2:
+        //     printf("%0.2f,%0.2f,%0.2f\r\n", g_magnetic_data.XAxis, g_magnetic_data.YAxis, g_magnetic_data.ZAxis);
+        //     break;
+        // case 3:
+        //     printf("%0.2f,%0.2f,%0.2f\r\n", pitch, roll, yaw);
+        //     break;
+        // case 4:
+        //     // printf("%0.2f,%0.2f,%0.2f\r\n", robot_x_pos, robot_y_pos, robot_z_pos);
+        //     if (glv_encode_uart_command(robot_x_pos, robot_y_pos, robot_z_pos, GLV_CMD_ONLY_POS_TRANSMIT, encode_frame))
+        //     {
+        //         drv_uart_send_data(encode_frame, sizeof(encode_frame));
+        //     }
+        //     break;
+        // case 5:
+        //     // printf("%0.2f,%0.2f,%0.2f\r\n", adc_low_pass, (float)adc_value[adc_sample_count], elbow_angle*57.296f);
+        //     printf("%0.2f,%0.2f,%0.2f\r\n", x_pos, y_pos, z_pos);
+        //     break;
+        // default:
+        //     break;
+        // }
     }
 }
 

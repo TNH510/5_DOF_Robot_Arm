@@ -127,7 +127,8 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-   sensor_manager_test();
+  //  sensor_manager_test();
+  sensor_manager_task();
   //  sensor_manager_test();
     /* USER CODE BEGIN 3 */
   }
