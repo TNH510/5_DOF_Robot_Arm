@@ -21,6 +21,16 @@ extern "C" {
 
 /* Public defines ----------------------------------------------------------- */
 /* Public enumerate/structure ----------------------------------------------- */
+typedef enum
+{
+    GLV_CMD_ONLY_POS_TRANSMIT,
+    GLV_CMD_POS_TRANSMIT_AND_START_RECORD,
+    GLV_CMD_POS_TRANSMIT_AND_STOP_RECORD,
+    GLV_CMD_DELETE_CURRENT_RECORD,
+    GLV_CMD_POS_TRANSMIT_AND_5_AXIS_POSITIVE,
+    GLV_CMD_POS_TRANSMIT_AND_5_AXIS_NEGATIVE,
+} glv_cmd_t;
+
 /* Public macros ------------------------------------------------------------ */
 /* Public variables --------------------------------------------------------- */
 /* Public APIs -------------------------------------------------------------- */
@@ -44,6 +54,8 @@ void glv_encrypt_sensor_data(float q0, float q1, float q2, float q3,
                              float elbow_angle, uint8_t *data);
                              
 float low_pass_filter(float input, float pre_output, float alpha);
+
+bool glv_encode_uart_command(float x_pos, float y_pos, float z_pos, glv_cmd_t cmd, uint8_t *frame);
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus
 } /* extern "C" { */

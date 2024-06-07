@@ -7,7 +7,9 @@
     "drv_uart.h": "c",
     "bsp_common.h": "c",
     "sensor_manager.h": "c",
-    "drv_button.h": "c"
+    "drv_button.h": "c",
+    "glove_algorithm.h": "c",
+    "type_traits": "c"
   },
   "C_Cpp_Runner.cCompilerPath": "gcc",
   "C_Cpp_Runner.cppCompilerPath": "g++",
