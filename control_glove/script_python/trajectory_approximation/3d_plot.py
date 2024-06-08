@@ -1,30 +1,47 @@
-import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
+from scipy.optimize import curve_fit
 
-# Load the CSV file
-file_path = 'C:/Users/daveb/Desktop/5_DOF_Robot_Arm/control_glove/script_python/robot_data/test.csv'
-df = pd.read_csv(file_path, header=None)
+# Generate sample data
+np.random.seed(0)
+x = np.linspace(0, 10, 100)
+y_linear = 2 * x + np.random.normal(0, 1, 100)  # Linear relationship with noise
+y_circular = 3 * np.sin(x) + np.random.normal(0, 1, 100)  # Circular relationship with noise
 
-# Set the column headers to X, Y, Z
-df.columns = ['X', 'Y', 'Z']
+# Linear regression model
+coefficients_linear = np.polyfit(x, y_linear, 1)
+linear_fit = np.poly1d(coefficients_linear)
 
-# Apply transformations
-df['X'] = df['X'] * 20
-df['Y'] = df['Y'] * 20
-df['Z'] = df['Z'] * 15 + 700
+# Circular regression model
+def circular_func(x, a, b, c):
+    return a * np.sin(b * x + c)
 
-# Plot the transformed data in 3D
-fig = plt.figure(figsize=(10, 6))
-ax = fig.add_subplot(111, projection='3d')
+initial_guess = [np.mean(y_circular), 1, 0]  # Initial guess for parameters
+params_circular, _ = curve_fit(circular_func, x, y_circular, p0=initial_guess)
 
-ax.plot(df['X'], df['Y'], df['Z'], label='Trajectory')
+# Generate modified data using the fitted models
+x_modified = np.linspace(0, 10, 100)
+y_modified_linear = linear_fit(x_modified)
+y_modified_circular = circular_func(x_modified, *params_circular)
 
-ax.set_xlabel('X')
-ax.set_ylabel('Y')
-ax.set_zlabel('Z')
-ax.set_title('3D Trajectory of Transformed Values')
-ax.legend()
-ax.grid(True)
+# Plot original and modified data
+plt.figure(figsize=(12, 5))
 
+plt.subplot(1, 2, 1)
+plt.scatter(x, y_linear, label='Original Data')
+plt.plot(x_modified, y_modified_linear, color='red', label='Linear Fit')
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.title('Linear Regression')
+plt.legend()
+
+plt.subplot(1, 2, 2)
+plt.scatter(x, y_circular, label='Original Data')
+plt.plot(x_modified, y_modified_circular, color='green', label='Circular Fit')
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.title('Circular Regression')
+plt.legend()
+
+plt.tight_layout()
 plt.show()
