@@ -1,0 +1,16 @@
+Các bước thực hiện làm 7-DOF Wireless Human Arm Motion-Tracking System
+1. Mục tiêu thiết kế
+- Trên thế giới hiện nay, việc điều khiển các cánh tay robot chủ yếu dựa vào việc lập
+trình trên các phần mềm robot hoặc điều khiển trực tiếp trên
+các thiết bị cầm tay như FlexPendant của hãng ABB, E-controller của Kawasaki,
+SmartPAD của KUKA, ... Điểm chung của các thiết bị này là đều sử dụng các nút nhấn,
+màn hình cảm ứng, ... để thao tác và lập trình các quỹ đạo cho robot. 
+Tuy nhiên, những phương pháp này có nhược điểm là không được tự nhiên và tiện lợi khi phải thực hiện tạo từng quỹ đạo và chạy thử trong không gian thực tế. 
+- Một trong những hướng tiếp cận mới trong việc điều khiển robot hiện nay chính là sử dụng các chuyển động thu được từ cơ thể con người để thực hiện
+điều khiển cánh tay robot. 
+
+TAY MÁY 5 BẬC TỰ DO VÀ ĐIỀU KHIỂN CHUYỂN ĐỘNG BẰNG CỬ ĐỘNG TAY ỨNG DỤNG TRONG XẾP SẢN PHẨM
+
+IMU Motion Capture Method with Adaptive Tremor Attenuation in Teleoperation Robot System
+
+An Open-Source 7-DOF Wireless Human Arm Motion-Tracking System for Use in Robotics Research năm 2020 cho thấy họ đã sử dụng dữ liệu 
