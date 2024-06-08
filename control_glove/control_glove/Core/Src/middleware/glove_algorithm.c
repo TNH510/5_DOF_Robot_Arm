@@ -13,12 +13,30 @@
 
 /* Private includes --------------------------------------------------------- */
 /* Private defines ---------------------------------------------------------- */
+typedef struct 
+{
+	uint8_t start_frame;
+	uint8_t cmd;
+	uint8_t x_pos[3];
+	uint8_t y_pos[3];
+	uint8_t z_pos[3];
+	uint8_t crc;
+} glv_protocol_t;
+
+typedef struct
+{
+    uint8_t value  		: 7;
+    uint8_t sign_bit    : 1;
+} glv_pos_byte_high_t;
+
 /* Private enumerate/structure ---------------------------------------------- */
 /* Private macros ----------------------------------------------------------- */
 /* Public variables --------------------------------------------------------- */
 /* Private variables -------------------------------------------------------- */
 /* Private prototypes ------------------------------------------------------- */
 static float square(float num);
+static bool encode_pos(float value, uint8_t *result);
+static uint8_t crc_8_atm(uint8_t *data, uint16_t length);
 
 /* Public implementations --------------------------------------------------- */
 void glv_convert_euler_angle(float q0, float q1, float q2, float q3, 
@@ -173,9 +191,106 @@ void glv_encrypt_sensor_data(float q0, float q1, float q2, float q3,
 	data[9] = (uint8_t)(elbow_temp & 0xFF);
 }
 
+bool glv_encode_uart_command(float x_pos, float y_pos, float z_pos, glv_cmd_t cmd, uint8_t *encode_frame)
+{
+	glv_protocol_t frame;
+
+	// Set start frame and cmd
+	frame.start_frame = 0xAA;
+	frame.cmd = (uint8_t) cmd;
+
+	bool status = encode_pos(x_pos, &frame.x_pos[0]);
+	status &= encode_pos(y_pos, &frame.y_pos[0]);
+	status &= encode_pos(z_pos, &frame.z_pos[0]);
+
+	if (status == true)
+	{
+		// Return result
+		encode_frame[0] = frame.start_frame;
+		encode_frame[1] = frame.cmd;
+		encode_frame[2] = frame.x_pos[0];
+		encode_frame[3] = frame.x_pos[1];
+		encode_frame[4] = frame.x_pos[2];
+		encode_frame[5] = frame.y_pos[0];
+		encode_frame[6] = frame.y_pos[1];
+		encode_frame[7] = frame.y_pos[2];
+		encode_frame[8] = frame.z_pos[0];
+		encode_frame[9] = frame.z_pos[1];
+		encode_frame[10] = frame.z_pos[2];
+
+		/* Caculate CRC */
+		frame.crc = crc_8_atm(encode_frame, 11);
+		encode_frame[11] = frame.crc;
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+
+}
+
 /* Private implementations -------------------------------------------------- */
 static float square(float num)
 {
 	return (float)(num * num);
+}
+
+static bool encode_pos(float value, uint8_t *result)
+{
+	// Check value
+	if (value < 100.0f && value > -99.9999f)
+	{
+		glv_pos_byte_high_t pos_h;
+		uint32_t mul_1000_value = 0;
+
+		// Check value is positive or negative
+		if (value >= 0)
+		{
+			pos_h.sign_bit = 0;
+			mul_1000_value = (uint32_t)(value * 10000.0f);
+		}
+		else
+		{
+			pos_h.sign_bit = 1;
+			mul_1000_value = (uint32_t)(value * (-10000.0f));
+		}		
+
+		// Pos value handle
+		pos_h.value = ((uint8_t)((mul_1000_value & 0xFF0000) >> 16)) & 0b01111111;
+		result[0] = pos_h.value | (pos_h.sign_bit << 7);
+		result[1] = (uint8_t)((mul_1000_value & 0x00FF00) >> 8);
+		result[2] = (uint8_t)(mul_1000_value & 0x0000FF);
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+static uint8_t crc_8_atm(uint8_t *data, uint16_t length)
+{
+  uint8_t crc = 0;
+  for (uint16_t i = 0; i < length; i++)
+  {
+    crc ^= data[i];
+
+    for (uint8_t bit = 0; bit < 8; bit++)
+    {
+      if (crc & 0x80)
+      {
+        crc = (crc << 1) ^ 0x07;
+      }
+      else
+      {
+        crc <<= 1;
+      }
+    }
+  }
+
+  return crc;
 }
 /* End of file -------------------------------------------------------------- */

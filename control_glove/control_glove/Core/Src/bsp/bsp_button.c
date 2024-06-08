@@ -62,8 +62,10 @@ bool bsp_button_init(button_t *button)
 {
 #ifdef HAVE_BUTTON
 
-    /* Init 1 buttons */
-    if (bsp_button_init_one_button(&button[BUTTON_1 - 1u], BUTTON_1, SW3_GPIO_Port, SW3_Pin) == true)
+    /* Init 3 buttons */
+    if ((bsp_button_init_one_button(&button[BUTTON_1 - 1u], BUTTON_1, SW1_GPIO_Port, SW1_Pin) == true) &&
+        (bsp_button_init_one_button(&button[BUTTON_2 - 1u], BUTTON_2, SW2_GPIO_Port, SW2_Pin) == true) &&
+        (bsp_button_init_one_button(&button[BUTTON_3 - 1u], BUTTON_3, SW3_GPIO_Port, SW3_Pin) == true))
         return true;
     return false;
 #endif

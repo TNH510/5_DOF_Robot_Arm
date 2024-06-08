@@ -26,6 +26,7 @@ extern "C" {
 /* Public APIs -------------------------------------------------------------- */
 base_status_t sensor_manager_init(void);
 base_status_t sensor_manager_task(void);
+base_status_t sensor_manager_test(void);
 
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus
