@@ -55,7 +55,9 @@ void glv_encrypt_sensor_data(float q0, float q1, float q2, float q3,
                              
 float low_pass_filter(float input, float pre_output, float alpha);
 
-bool glv_encode_uart_command(float x_pos, float y_pos, float z_pos, glv_cmd_t cmd, uint8_t *frame);
+bool glv_encode_uart_command(float x_pos, float y_pos, float z_pos, 
+                             float x_vel, float y_vel, float z_vel,
+                                glv_cmd_t cmd, uint8_t *encode_frame);
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus
 } /* extern "C" { */
