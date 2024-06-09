@@ -16,9 +16,9 @@ while True:
     if uart.in_waiting == 19:  # Đảm bảo có đủ 12 byte trong buffer
         data = uart.read(19)  # Đọc 12 byte từ UART
 
-        # x_pos = merge_bytes(data[2], data[3], data[4])
-        y_pos = merge_bytes(data[2], data[3], data[4])
-        # z_pos = merge_bytes(data[8], data[9], data[10])
+        x_pos = merge_bytes(data[2], data[3], data[4])
+        y_pos = merge_bytes(data[5], data[6], data[7])
+        z_pos = merge_bytes(data[8], data[9], data[10])
         # print(hex(data[5]), hex(data[6]), hex(data[7]))
-        print(hex(data[2]), hex(data[3]), hex(data[4]))
-        # print(float(x_pos / 10000), float(y_pos / 10000), float(z_pos / 10000))
+        # print(hex(data[2]), hex(data[3]), hex(data[4]))
+        print(float(x_pos / 10000), float(y_pos / 10000), float(z_pos / 10000))
