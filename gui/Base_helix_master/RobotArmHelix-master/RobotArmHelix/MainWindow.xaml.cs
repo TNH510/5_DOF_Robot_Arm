@@ -2794,11 +2794,11 @@ namespace RobotArmHelix
                                             z = (-1) * (z_pos - 0x800000) / 10000.0;
                                         }
 
-                                        //Console.WriteLine(x.ToString());
-                                        //Console.WriteLine(y.ToString());
-                                        //Console.WriteLine(z.ToString());
-                                        //Console.WriteLine("---");
-                                        //graph(x, y, z);
+                                        Console.WriteLine(x.ToString());
+                                        Console.WriteLine(y.ToString());
+                                        Console.WriteLine(z.ToString());
+                                        Console.WriteLine("---");
+                                        graph(x, y, z);
                                         break;
                                     case 0x01:
                                         Console.WriteLine("Hello Youtube!!");

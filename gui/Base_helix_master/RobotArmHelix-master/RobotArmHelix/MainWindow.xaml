@@ -186,7 +186,7 @@
         <Canvas Margin="613,527,967,285">
             <Image x:Name="CameraImage" Canvas.Left="-604" Canvas.Top="-103" Source="C:\Users\daveb\Desktop\doiten.png" Height="215" Width="292" HorizontalAlignment="Left" VerticalAlignment="Top"/>
         </Canvas>
-        <oxy:PlotView x:Name="plotView" Margin="-2,82,1039,420" />
+        <oxy:PlotView x:Name="plotView" Margin="-2,82,1563,750" />
         <Button x:Name="Test_glove_btn" Content="Test glove" HorizontalAlignment="Left" Margin="798,765,0,0" VerticalAlignment="Top" Width="102" Height="26" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_test_button_Click"/>
         <Button x:Name="Write_csv_btn" Content="Write csv" HorizontalAlignment="Left" Margin="788,638,0,0" VerticalAlignment="Top" Width="100" Height="26" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Write_csv_Click"/>
         <Button x:Name="Unwrite_csv_btn" Content="Unwrite csv" HorizontalAlignment="Left" Margin="925,638,0,0" VerticalAlignment="Top" Width="100" Height="26" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Unwrite_csv_Click"/>
