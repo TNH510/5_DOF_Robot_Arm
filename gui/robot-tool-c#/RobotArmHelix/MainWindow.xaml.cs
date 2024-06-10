@@ -8,22 +8,18 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
+
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+
 using HelixToolkit.Wpf;
 using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Net.Sockets;
 using System.IO.Ports;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using OxyPlot;
 using OxyPlot.Series;
 
@@ -176,7 +172,6 @@ namespace RobotArmHelix
 #endif
         private readonly PlotModel _plotModel;
         private readonly DispatcherTimer _timer;
-        private double _xValue = 0;
         private readonly BackgroundWorker _uartWorker;
 
         public MainWindow()
@@ -429,8 +424,6 @@ namespace RobotArmHelix
         }
         private async void Camera_run()
         {
-            // Perform your desired action here
-            string filepathtosave = @"C:\Users\daveb\Desktop\raw_data\Image\";
             // Start the loop until the timer stops
             using (Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
             {
@@ -520,7 +513,7 @@ namespace RobotArmHelix
 
                     // SaveImageWithAutoName(bitmapImage, filepathtosave, ".png");
                 }
-                catch (Exception ex)
+                catch
                 {
                     //PrintLog("Error", "Unable to connect to", $"{host}:{port}");
                 }
@@ -694,7 +687,7 @@ namespace RobotArmHelix
                 reachingPoint = new Vector3D(Double.Parse(TbX.Text), Double.Parse(TbY.Text), Double.Parse(TbZ.Text));
                 //geom.Transform = new TranslateTransform3D(reachingPoint);
             }
-            catch (Exception exc)
+            catch
             {
 
             }
@@ -825,7 +818,7 @@ namespace RobotArmHelix
                     ((EmissiveMaterial)mg.Children[0]).Color = newColor;
                     ((DiffuseMaterial)mg.Children[1]).Color = newColor;
                 }
-                catch (Exception exc)
+                catch
                 {
                     previousColor = oldColor;
                 }
@@ -842,7 +835,7 @@ namespace RobotArmHelix
                 Model3DGroup models = ((Model3DGroup) pModel);
                 oldSelectedModel = models.Children[0] as GeometryModel3D;
             }
-            catch (Exception exc)
+            catch
             {
                 oldSelectedModel = (GeometryModel3D) pModel;
             }
@@ -898,7 +891,6 @@ namespace RobotArmHelix
         public void timer1_Tick(object sender, EventArgs e)
         {
             double x, y, z;
-            double theta_test;
             double t1, t2, t3, t4, t5;
             int ret;
             int[] temp_value = new int[5];
@@ -955,10 +947,7 @@ namespace RobotArmHelix
         {
             Console.WriteLine("Hello");
             int[] temp_value1 = new int[5];
-            double t1_glove_path1, t2_glove_path1, t3_glove_path1, t4_glove_path1, t5_glove_path1;
             int ret = 0;
-
-            int ret_path = 0;
 
             double[] point1 = new double[3];
             double[] point2 = new double[3];
@@ -1175,10 +1164,7 @@ namespace RobotArmHelix
         {
 
             /* Variables */
-            const int NUM_AFTER_COMMA = 5;
-            uint t1 = 0, t2 = 0, t3 = 0, t4 = 0, t5 = 0;
             int[] value_positon = new int[16];
-            double t1_out, t2_out, t3_out, t4_out, t5_out;
             double t1_dh, t2_dh, t3_dh, t4_dh, x, y, z;
 
             //The base only has rotation and is always at the origin, so the only transform in the transformGroup is the rotation R
@@ -1304,8 +1290,7 @@ namespace RobotArmHelix
         public static (double, double, double, double, double) convert_position_angle(double x, double y, double z)
         {
             double t1, t2, t3, t4, t5, s2, c2, s3, c3, m, n;
-            double roll, pitch;
-            roll = 0.0;
+            double pitch;
             pitch = -Math.PI / 2;
             t1 = Math.Atan2(y, x);
             // t5 = roll - t1;
@@ -1482,7 +1467,6 @@ namespace RobotArmHelix
             visible_glove = (~visible_glove) & 0x01;
             if (visible_glove == 0)
             {
-                Glove_box.Visibility = Visibility.Visible;
                 com_port_list1.Visibility = Visibility.Visible;
                 com_port_list2.Visibility = Visibility.Visible;
                 com_port_list3.Visibility = Visibility.Visible;
@@ -1505,7 +1489,6 @@ namespace RobotArmHelix
             }
             else
             {
-                Glove_box.Visibility = Visibility.Hidden;
                 com_port_list1.Visibility = Visibility.Hidden;
                 com_port_list2.Visibility = Visibility.Hidden;
                 com_port_list3.Visibility = Visibility.Hidden;
@@ -2180,7 +2163,6 @@ namespace RobotArmHelix
 
         private void Move_mod_Function(double[,] tar_pos, string device)
         {
-;
             double t1, t2, t3, t4, t5;
             int[,] angle_array = new int[10, 5];
             double x, y, z;
@@ -2302,10 +2284,7 @@ namespace RobotArmHelix
             double[] vect_u = new double[3];
             double[] curr_pos = new double[3];
             double[] targ_pos = new double[3];
-            double t1, t2, t3, t4, t5;
             int[,] angle_array = new int[10, 5];
-            double x, y, z;
-            int ret;
             int[] value_angle = new int[80];
             int[] value_angle_t5 = new int[20];
 
@@ -2606,7 +2585,7 @@ namespace RobotArmHelix
             return (value_positon2 << 16 | value_positon1) - 18000000;
         }
 
-        private async void TCP_Connect_button_Click(object sender, RoutedEventArgs e)
+        private void TCP_Connect_button_Click(object sender, RoutedEventArgs e)
         {
             // Call the StartClient method to initiate the connection and communication with the server
             StartClient();
@@ -2637,7 +2616,7 @@ namespace RobotArmHelix
 
 
             }
-            catch (Exception ex)
+            catch
             {
                 PrintLog("Error", "Unable to connect to", $"{host}:{port}");
             }
@@ -2645,9 +2624,6 @@ namespace RobotArmHelix
 
         private void TCP_sendata_button_Click(object sender, RoutedEventArgs e)
         {
-
-            string sentencetosend = "1003I?\r\n";
-
             // Send the command to the server
             string commandToSend = data_tb.Text + "\r\n";
             byte[] commandBytes = Encoding.ASCII.GetBytes(commandToSend);
@@ -2699,7 +2675,7 @@ namespace RobotArmHelix
             {
                 // Specify the folder path where you want to save the file
                 string folderPath = @"C:\Users\daveb\Desktop\raw_data\";
-                string test = @"C:\Users\daveb\Desktop\camera_test\aaa.txt";
+
                 // Construct the full file path using Path.Combine
                 string filePath_bmp = System.IO.Path.Combine(folderPath, "response_bmp.txt");
                 string filePath_bytes = System.IO.Path.Combine(folderPath, "response_bytes.txt");
@@ -2921,9 +2897,8 @@ namespace RobotArmHelix
             int combined = (byte1 << 16) | (byte2 << 8) | byte3;
             return combined;
         }
-        private async void Glove_connect_button_Click(object sender, RoutedEventArgs e)
+        private void Glove_connect_button_Click(object sender, RoutedEventArgs e)
         {
-
             _timer.Start();
             uart = new SerialPort();
             uart.PortName = com_port_list1.Text;
@@ -2995,9 +2970,8 @@ namespace RobotArmHelix
                     bool success = double.TryParse(numbers[0], out num1);
                     success &= double.TryParse(numbers[1], out num2);
                     success &= double.TryParse(numbers[2], out num3);
-                    double theta_test;
                     double t1_test, t2_test, t3_test, t4_test, t5_test;
-                    int ret;
+
                     if (success)
                     {
                         Dispatcher.Invoke(() =>
@@ -3077,13 +3051,6 @@ namespace RobotArmHelix
 
             return axis;
         }
-
-        // private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
-        // {
-        //     // Read data from the serial port
-        //     string data = uart.ReadLine();
-        //     PrintLog("Infor", "Data received", data);
-        // }
 
         private void ShowData(object sender, EventArgs e)
         {
@@ -3459,8 +3426,6 @@ namespace RobotArmHelix
                 int[,] SobelY = {{ -1, -2, -1 },
                         { 0, 0, 0 },
                         { 1, 2, 1 }};
-                int white_point = 255;
-                int gray_point = 50;
 
                 // Computing gradient magnitude and gradient angle
                 for (int x = 1; x < width - 1; x++)
