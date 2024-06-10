@@ -2736,7 +2736,7 @@ namespace RobotArmHelix
                     byte[] byteArray = new byte[uart.BytesToRead];
                     uart.Read(byteArray, 0, byteArray.Length);
                     // Convert the byte array to a hexadecimal string
-                    if (byteArray.Length >= 12)
+                    if (byteArray.Length >= 19)
                     {
                         byte crc_byte = 0x00;
                         crc_byte = Lc709204fCalculateCrc8Atm(byteArray, 11);
@@ -2754,21 +2754,31 @@ namespace RobotArmHelix
                                         double x = 0;
                                         double y = 0;
                                         double z = 0;
+
                                         x_pos = CombineBytesToInt32(byteArray[2], byteArray[3], byteArray[4]);
+                                        y_pos = CombineBytesToInt32(byteArray[5], byteArray[6], byteArray[7]);
+                                        z_pos = CombineBytesToInt32(byteArray[8], byteArray[9], byteArray[10]);
+
                                         if (x_pos >= 0x800000)
                                         {
-                                            x = (-1) * (x_pos - 0x800000) / 10000.0;
+                                            x_pos = (x_pos - 0x800000);
+                                            x_pos = (-1) * x_pos;
                                         }
-                                        y_pos = CombineBytesToInt32(byteArray[5], byteArray[6], byteArray[7]);
+                                        x = x_pos / 10000.0;
+
                                         if (y_pos >= 0x800000)
                                         {
-                                            y = (-1) * (y_pos - 0x800000) / 10000.0;
+                                            y_pos = (y_pos - 0x800000);
+                                            y_pos = (-1) * y_pos;
                                         }
-                                        z_pos = CombineBytesToInt32(byteArray[8], byteArray[9], byteArray[10]);
+                                        y = y_pos / 10000.0;
+
                                         if (z_pos >= 0x800000)
                                         {
-                                            z = (-1) * (z_pos - 0x800000) / 10000.0;
+                                            z_pos = (z_pos - 0x800000);
+                                            z_pos = (-1) * z_pos;
                                         }
+                                        z = z_pos / 10000.0;
 
                                         Console.WriteLine(x.ToString());
                                         Console.WriteLine(y.ToString());
