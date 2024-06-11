@@ -76,9 +76,9 @@
             // Binary_Image
             // 
             this.Binary_Image.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.Binary_Image.Location = new System.Drawing.Point(319, 29);
+            this.Binary_Image.Location = new System.Drawing.Point(16, 312);
             this.Binary_Image.Name = "Binary_Image";
-            this.Binary_Image.Size = new System.Drawing.Size(519, 498);
+            this.Binary_Image.Size = new System.Drawing.Size(297, 245);
             this.Binary_Image.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.Binary_Image.TabIndex = 0;
             this.Binary_Image.TabStop = false;
@@ -124,8 +124,8 @@
             // 
             // zGHistogram
             // 
-            this.zGHistogram.Location = new System.Drawing.Point(12, 311);
-            this.zGHistogram.Margin = new System.Windows.Forms.Padding(4);
+            this.zGHistogram.Location = new System.Drawing.Point(320, 29);
+            this.zGHistogram.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.zGHistogram.Name = "zGHistogram";
             this.zGHistogram.ScrollGrace = 0D;
             this.zGHistogram.ScrollMaxX = 0D;
@@ -134,7 +134,7 @@
             this.zGHistogram.ScrollMinX = 0D;
             this.zGHistogram.ScrollMinY = 0D;
             this.zGHistogram.ScrollMinY2 = 0D;
-            this.zGHistogram.Size = new System.Drawing.Size(132, 112);
+            this.zGHistogram.Size = new System.Drawing.Size(538, 528);
             this.zGHistogram.TabIndex = 5;
             this.zGHistogram.UseExtendedPrintDialog = true;
             // 
