@@ -2752,8 +2752,7 @@ namespace RobotArmHelix
                                         double t1, t2, t3, t4, t5;
 
                                         (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
-
-                                        Jacobi_plus = CreateJacobianMatrix(t1, t2, t3, t4, t5);
+                                        Jacobi_plus = CreateJacobianMatrix(t1 * Math.PI / 180.0, t2 * Math.PI / 180.0, t3 * Math.PI / 180.0, t4 * Math.PI / 180.0, t5 * Math.PI / 180.0);
                                         Jacobi_vel = CreateVelocityMatrix(x_vel, y_vel, z_vel);
                                         omega = MultiplyMatrices(Jacobi_plus, Jacobi_vel);
 
@@ -2791,16 +2790,17 @@ namespace RobotArmHelix
                                             {
                                                 using (StreamWriter writer = new StreamWriter(g_csvFilePath, true))
                                                 {
-                                                    string csvLine = $"{x},{y},{z},{x_vel},{y_vel},{z_vel}";
+                                                    // string csvLine = $"{x},{y},{z},{x_vel},{y_vel},{z_vel}";
+                                                    string csvLine = $"{t1},{t2},{t3},{t4},{t5},{x_vel},{y_vel},{z_vel}";
                                                     writer.WriteLine(csvLine);
                                                     Console.WriteLine("Write CSV");
                                                 }
                                             }
 
-                                            graph(Math.Abs(omega[0]) * 5, Math.Abs(omega[1]) * 5, Math.Abs(omega[2] * 5));
+                                            graph(omega[1], omega[2], 0);
                                             Console.WriteLine("---");
 
-                                            // graph(x_vel, y_vel, z_vel);
+                                            // graph(x, y, z);
                                         }
                                         break;
                                     default:
