@@ -32,6 +32,7 @@ using OxyPlot.Axes;
 using System.ComponentModel;
 using SharpDX;
 using SharpDX.Direct3D9;
+using SharpDX.Direct2D1;
 /**
 * Author: Gabriele Marini (Gabryxx7)
 * This class load the 3d models of all the parts of the robotic arms and add them to the viewport
@@ -74,7 +75,9 @@ namespace RobotArmHelix
         public int status_first_time = 0;
         private bool write_csv = false;
                         int value = 0;
-
+        int vel_1_test;
+        double[] point1_test = new double[3];
+        double[] point2_test = new double[3];
 
         private double returnX = 500;
         private double returnY = 0;
@@ -223,7 +226,7 @@ namespace RobotArmHelix
             timer1.Tick += new System.EventHandler(timer1_Tick);
 
             timer2 = new System.Windows.Forms.Timer();
-            timer2.Interval = 100;
+            timer2.Interval = 300;
             timer2.Tick += new System.EventHandler(timer2_Tick);
 
             // Create plot model
@@ -282,52 +285,6 @@ namespace RobotArmHelix
 
             //// Refresh plot view
             //plotView.InvalidatePlot();
-
-            int ret = 0;
-            if (returnZ >= 500 && returnZ <= 1000)
-            {
-                (t1_test, t2_test, t3_test, t4_test, t5_test) = convert_position_angle(returnX, returnY, returnZ);
-                ret = Check_angle(t1_test, t2_test, t3_test, t4_test, t5_camera);
-                if (ret != 0)
-                {
-                    double theta = 0.0;
-                    if (ret == 1) theta = t1_test;
-                    else if (ret == 2) theta = t2_test;
-                    else if (ret == 3) theta = t3_test;
-                    else if (ret == 4) theta = t4_test;
-                    else if (ret == 5) theta = t5_camera;
-                    PrintLog("\nError", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
-                    return;
-                }
-                else
-                {
-                    int[] temp_value = new int[5];
-                    int[] old_value_angle = new int[5];
-                    if (glove_enable == 1)
-                    {
-                        int[] value_angle = new int[10];
-
-                        /* Get old value angle from PLC */
-                        // old_value_angle[0] = angles_global[0];
-
-                        /* Run */
-                        temp_value[0] = (int)(Convert.ToDouble(t1_test) * 100000 + 18000000);
-                        temp_value[1] = (int)(Convert.ToDouble(t2_test - 90) * 100000 + 18000000);
-                        temp_value[2] = (int)(Convert.ToDouble(t3_test + 90) * 100000 + 18000000);
-                        temp_value[3] = (int)(Convert.ToDouble(t4_test + 90) * 100000 + 18000000);
-                        temp_value[4] = (int)(Convert.ToDouble(t5_camera) * 100000 + 18000000);
-                        /* Write the angle */
-                        for (int ind = 0; ind < 5; ind++)
-                        {
-                            write_d_mem_32_bit(1400 + 2 * ind, temp_value[ind]);
-                        }
-                    }
-                }
-            }
-            else
-            {
-                PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", "Out of range of Z axis"));
-            }
         }
 
         public void Task1()
@@ -581,9 +538,9 @@ namespace RobotArmHelix
                 {
                     var materialGroup = new MaterialGroup();
                     System.Windows.Media.Color mainColor = Colors.White;
-                    EmissiveMaterial emissMat = new EmissiveMaterial(new SolidColorBrush(mainColor));
-                    DiffuseMaterial diffMat = new DiffuseMaterial(new SolidColorBrush(mainColor));
-                    SpecularMaterial specMat = new SpecularMaterial(new SolidColorBrush(mainColor), 200);
+                    EmissiveMaterial emissMat = new EmissiveMaterial(new System.Windows.Media.SolidColorBrush(mainColor));
+                    DiffuseMaterial diffMat = new DiffuseMaterial(new System.Windows.Media.SolidColorBrush(mainColor));
+                    SpecularMaterial specMat = new SpecularMaterial(new System.Windows.Media.SolidColorBrush(mainColor), 200);
                     materialGroup.Children.Add(emissMat);
                     materialGroup.Children.Add(diffMat);
                     materialGroup.Children.Add(specMat);
@@ -719,6 +676,71 @@ namespace RobotArmHelix
         /**
          * This methodes execute the FK (Forward Kinematics). It starts from the first joint, the base.
          * */
+        public static double[] MultiplyMatrices(double[,] matrix5x3, double[,] matrix3x1)
+        {
+            int rowsMatrix5x3 = matrix5x3.GetLength(0);
+            int colsMatrix5x3 = matrix5x3.GetLength(1);
+            int rowsMatrix3x1 = matrix3x1.GetLength(0);
+            int colsMatrix3x1 = matrix3x1.GetLength(1);
+
+            if (colsMatrix5x3 != rowsMatrix3x1)
+            {
+                throw new InvalidOperationException("Matrix dimensions do not match for multiplication.");
+            }
+
+            double[] resultMatrix = new double[rowsMatrix5x3];
+
+            for (int i = 0; i < rowsMatrix5x3; i++)
+            {
+                double sum = 0;
+                for (int j = 0; j < colsMatrix5x3; j++)
+                {
+                    sum += matrix5x3[i, j] * matrix3x1[j, 0];
+                }
+                resultMatrix[i] = sum;
+            }
+
+            return resultMatrix;
+        }
+
+        public static double[,] CreateVelocityMatrix(double vx, double vy, double vz)
+        {
+            double[,] matrix = new double[3, 1]
+            {
+            { vx },
+            { vy },
+            { vz }
+            };
+
+            return matrix;
+        }
+
+        public static double[,] CreateJacobianMatrix(double t1, double t2, double t3, double t4, double t5)
+        {
+            double[,] jacobianMatrix = new double[5, 3]
+            {
+                {
+                    -Math.Sin(t1) / (Constants.l3 * Math.Cos(t2 + t3) + Constants.l2 * Math.Cos(t2)),
+                    Math.Cos(t1) / (Constants.l3 * Math.Cos(t2 + t3) + Constants.l2 * Math.Cos(t2)),
+                    0
+                },
+                {
+                    (Math.Cos(t2 + t3) * Math.Cos(t1)) / (Constants.l2 * Math.Sin(t3)),
+                    (Math.Cos(t2 + t3) * Math.Sin(t1)) / (Constants.l2 * Math.Sin(t3)),
+                    Math.Sin(t2 + t3) / (Constants.l2 * Math.Sin(t3))
+                },
+                {
+                    -(Math.Cos(t1) * (Constants.l3 * Math.Cos(t2 + t3) + Constants.l2 * Math.Cos(t2))) / (Constants.l2 * Constants.l3 * Math.Sin(t3)),
+                    -(Math.Sin(t1) * (Constants.l3 * Math.Cos(t2 + t3) + Constants.l2 * Math.Cos(t2))) / (Constants.l2 * Constants.l3 * Math.Sin(t3)),
+                    -(Constants.l3 * Math.Sin(t2 + t3) + Constants.l2 * Math.Sin(t2)) / (Constants.l2 * Constants.l3 * Math.Sin(t3))
+                },
+                { 0, 0, 0 },
+                { 0, 0, 0 }
+            };
+
+            return jacobianMatrix;
+        }
+
         private void execute_fk()
         {
             int[] value_positon = new int[16];
@@ -945,133 +967,57 @@ namespace RobotArmHelix
 
         public void timer2_Tick(object sender, EventArgs e)
         {
-            Console.WriteLine("Hello");
-            int[] temp_value1 = new int[5];
-            int ret = 0;
+            //Console.WriteLine("Hello");
+            //int[] temp_value1 = new int[5];
+            //double t1_glove_path1, t2_glove_path1, t3_glove_path1, t4_glove_path1, t5_glove_path1;
+            //int ret = 0;
 
-            double[] point1 = new double[3];
-            double[] point2 = new double[3];
-            double[] point3 = new double[3];
+            //int ret_path = 0;
 
-            int movepath_status;
-            int velocity;
+            //double[] point1 = new double[3];
+            //double[] point2 = new double[3];
+            //double[] point3 = new double[3];
 
-            /* Read status of Brake and AC Servo */
-            ret = PLCReadbit(Constants.MOVEL_PATH, out movepath_status);
+            //int movepath_status;
+            //int velocity;
 
-            if (movepath_status == 1 && (nxt_line < (totalLines_csv.Length - 1))) 
-            {
+            ///* Read status of Brake and AC Servo */
+            //ret = PLCReadbit(Constants.MOVEL_PATH, out movepath_status);
 
-                string line = totalLines_csv[nxt_line + 1];
+            ////---------------------------------
+            //(t1_test, t2_test, t3_test, t4_test, t5_test) = convert_position_angle(point1_test[0], point1_test[1], point1_test[2]);
+            //ret = Check_angle(t1_test, t2_test, t3_test, t4_test, t5_camera);
+            //if (ret != 0)
+            //{
+            //    double theta = 0.0;
+            //    if (ret == 1) theta = t1_test;
+            //    else if (ret == 2) theta = t2_test;
+            //    else if (ret == 3) theta = t3_test;
+            //    else if (ret == 4) theta = t4_test;
+            //    else if (ret == 5) theta = t5_camera;
+            //    PrintLog("\nError", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
+            //    return;
+            //}
+            //else
+            //{
+            //    int[] temp_value = new int[5];
+            //    if (glove_enable == 1)
+            //    {
+            //        int[] value_angle = new int[10];
 
-                string line1 = totalLines_csv[nxt_line + 1];
-                string line2 = totalLines_csv[nxt_line + 2];
-                string line3 = totalLines_csv[nxt_line + 3];
-                string line4 = totalLines_csv[nxt_line + 4];
-                string line5 = totalLines_csv[nxt_line + 5];
-                string line6 = totalLines_csv[nxt_line + 6];
-                string line7 = totalLines_csv[nxt_line + 7];
-                string line8 = totalLines_csv[nxt_line + 8];
-                string line9 = totalLines_csv[nxt_line + 9];
-                string line10 = totalLines_csv[nxt_line + 10];
-
-                string[] v1;
-                string[] v2;
-
-                //Console.WriteLine(line);
-                //fields = line.Split(',');
-
-                v1 = line1.Split(',');
-                v2 = line2.Split(',');
-
-                double vel_x, vel_y, vel_z, vel_avg;
-
-                vel_x = (Convert.ToDouble(v2[0]) * 20 - Convert.ToDouble(v1[0]) * 20) / 0.1;
-                vel_y = (Convert.ToDouble(v2[1]) * 20 - Convert.ToDouble(v1[1]) * 20) / 0.1;
-                vel_z = (Convert.ToDouble(v2[2]) * 15 - Convert.ToDouble(v1[2]) * 15) / 0.1;
-
-                vel_avg = Math.Sqrt(vel_x * vel_x + vel_y * vel_y + vel_z * vel_z);
-
-                Console.WriteLine(line);
-
-                string[,] pos_str = new string[10, 3];
-                double[,] pos_db = new double[10, 3];
-
-                string[] lines = { line1, line2, line3, line4, line5, line6, line7, line8, line9, line10 };
-
-                for (int i = 0; i < lines.Length; i++)
-                {
-                    string[] splitLine = lines[i].Split(',');
-                    for (int j = 0; j < splitLine.Length; j++)
-                    {
-                        pos_str[i, j] = splitLine[j];
-                    }
-                }
-
-                for (int m = 0; m < 10; m++) 
-                {
-                        pos_db[m, 0] = Convert.ToDouble(pos_str[m, 0]) * 20;
-                        pos_db[m, 1] = Convert.ToDouble(pos_str[m, 1]) * 20;
-                        pos_db[m, 2] = Convert.ToDouble(pos_str[m, 2]) * 15 + 700;
-                }  
-                nxt_line = nxt_line + 10;
-
-                /*Set speed*/
-                velocity = Convert.ToInt32(vel_avg) * 2000 + 200000;
-                write_d_mem_32_bit(1008, velocity);
-
-
-                Move_mod_Function(pos_db, "D1010");
-                //MoveL_Function(point1, point2, "D1010");
-                //MoveJ_Function(point2, 1010);
-                ///* Turn on relay */
-                turn_on_1_pulse_relay(530);
-                //turn_on_1_pulse_relay(528);
-
-                //---------------------------------
-                //(t1_test, t2_test, t3_test, t4_test, t5_test) = convert_position_angle(point2[0], point2[1], point2[2]);
-                //ret = Check_angle(t1_test, t2_test, t3_test, t4_test, t5_camera);
-                //if (ret != 0)
-                //{
-                //    double theta = 0.0;
-                //    if (ret == 1) theta = t1_test;
-                //    else if (ret == 2) theta = t2_test;
-                //    else if (ret == 3) theta = t3_test;
-                //    else if (ret == 4) theta = t4_test;
-                //    else if (ret == 5) theta = t5_camera;
-                //    PrintLog("\nError", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
-                //    return;
-                //}
-                //else
-                //{
-                //    int[] temp_value = new int[5];
-                //    int[] old_value_angle = new int[5];
-                //    if (glove_enable == 1)
-                //    {
-                //        int[] value_angle = new int[10];
-
-                //        /* Get old value angle from PLC */
-                //        old_value_angle[0] = angles_global[0];
-
-                //        /* Run */
-                //        temp_value[0] = (int)(Convert.ToDouble(t1_test) * 100000 + 18000000);
-                //        temp_value[1] = (int)(Convert.ToDouble(t2_test - 90) * 100000 + 18000000);
-                //        temp_value[2] = (int)(Convert.ToDouble(t3_test + 90) * 100000 + 18000000);
-                //        temp_value[3] = (int)(Convert.ToDouble(t4_test + 90) * 100000 + 18000000);
-                //        temp_value[4] = (int)(Convert.ToDouble(t5_camera) * 100000 + 18000000);
-                //        /* Write the angle */
-                //        for (int ind = 0; ind < 5; ind++)
-                //        {
-                //            write_d_mem_32_bit(1400 + 2 * ind, temp_value[ind]);
-                //        }
-                //    }
-                //}
-
-            }
-            if(nxt_line == totalLines_csv.Length - 1)
-            {
-                nxt_line = 0;
-            }
+            //        /* Run */
+            //        temp_value[0] = (int)(Convert.ToDouble(t1_test) * 100000 + 18000000);
+            //        temp_value[1] = (int)(Convert.ToDouble(t2_test - 90) * 100000 + 18000000);
+            //        temp_value[2] = (int)(Convert.ToDouble(t3_test + 90) * 100000 + 18000000);
+            //        temp_value[3] = (int)(Convert.ToDouble(t4_test + 90) * 100000 + 18000000);
+            //        temp_value[4] = (int)(Convert.ToDouble(t5_camera) * 100000 + 18000000);
+            //        /* Write the angle */
+            //        for (int ind = 0; ind < 5; ind++)
+            //        {
+            //            write_d_mem_32_bit(1400 + 2 * ind, temp_value[ind]);
+            //        }
+            //    }
+            //}
 
         }
         public double[] InverseKinematics(Vector3D target, double[] angles)
@@ -1399,7 +1345,7 @@ namespace RobotArmHelix
             }
             /* Start timer1 and timer2 */
             // timer1.Start();
-            Thread1Start();
+            // Thread1Start();
             // Thread1Start();
             //Thread2Start();
             //timer1.Start();
@@ -2477,14 +2423,14 @@ namespace RobotArmHelix
             var button = objectin as Button;
             if (button != null)
             {
-                button.Background = new SolidColorBrush(color_object);
+                button.Background = new System.Windows.Media.SolidColorBrush(color_object);
                 return;
             }
 
             var textbox = objectin as TextBox;
             if (textbox != null)
             {
-                textbox.Background = new SolidColorBrush(color_object);
+                textbox.Background = new System.Windows.Media.SolidColorBrush(color_object);
                 return;
             }
         }
@@ -2493,14 +2439,14 @@ namespace RobotArmHelix
             var button = objectin as Button;
             if (button != null)
             {
-                button.Foreground = new SolidColorBrush(color_object);
+                button.Foreground = new System.Windows.Media.SolidColorBrush(color_object);
                 return;
             }
 
             var textbox = objectin as TextBox;
             if (textbox != null)
             {
-                textbox.Foreground = new SolidColorBrush(color_object);
+                textbox.Foreground = new System.Windows.Media.SolidColorBrush(color_object);
                 return;
             }
         }
@@ -2510,14 +2456,14 @@ namespace RobotArmHelix
             var button = objectin as Button;
             if (button != null)
             {
-                button.BorderBrush = new SolidColorBrush(color_object);
+                button.BorderBrush = new System.Windows.Media.SolidColorBrush(color_object);
                 return;
             }
 
             var textbox = objectin as TextBox;
             if (textbox != null)
             {
-                textbox.BorderBrush = new SolidColorBrush(color_object);
+                textbox.BorderBrush = new System.Windows.Media.SolidColorBrush(color_object);
                 return;
             }
         }
@@ -2711,7 +2657,7 @@ namespace RobotArmHelix
                 640); // Stride = width of the image in bytes
 
             // Create an Image control
-            Image image = new Image();
+            System.Windows.Controls.Image image = new System.Windows.Controls.Image();
             image.Source = bitmapSource;
 
             // Add the Image control to your WPF layout (assuming you have a Grid named "mainGrid" in your XAML)
@@ -2730,6 +2676,7 @@ namespace RobotArmHelix
             // UART transmission logic
             while (!worker.CancellationPending)
             {
+                //Thread.Sleep(150);
                 if (uart.BytesToRead > 0)
                 {
                     // Read available bytes
@@ -2754,10 +2701,23 @@ namespace RobotArmHelix
                                         double x = 0;
                                         double y = 0;
                                         double z = 0;
+                                        double x_vel = 0;
+                                        double y_vel = 0;
+                                        double z_vel = 0;
+                                        double vx = 0;
+                                        double vy = 0;
+                                        double vz = 0;
+                                        double[,] Jacobi_plus = new double[5, 3];
+                                        double[,] Jacobi_vel = new double[3, 1];
+                                        double[] omega = new double[5];
 
                                         x_pos = CombineBytesToInt32(byteArray[2], byteArray[3], byteArray[4]);
                                         y_pos = CombineBytesToInt32(byteArray[5], byteArray[6], byteArray[7]);
                                         z_pos = CombineBytesToInt32(byteArray[8], byteArray[9], byteArray[10]);
+
+                                        x_vel = CombineBytesToInt16Vel(byteArray[12], byteArray[13]) / 100.0; // cm/s
+                                        y_vel = CombineBytesToInt16Vel(byteArray[14], byteArray[15]) / 100.0;
+                                        z_vel = CombineBytesToInt16Vel(byteArray[16], byteArray[17]) / 100.0;
 
                                         if (x_pos >= 0x800000)
                                         {
@@ -2780,99 +2740,83 @@ namespace RobotArmHelix
                                         }
                                         z = z_pos / 10000.0;
 
-                                        Console.WriteLine(x.ToString());
-                                        Console.WriteLine(y.ToString());
-                                        Console.WriteLine(z.ToString());
+                                        Console.WriteLine(x_vel.ToString());
+                                        Console.WriteLine(y_vel.ToString());
+                                        Console.WriteLine(z_vel.ToString());
                                         Console.WriteLine("---");
-                                        graph(x, y, z);
-                                        break;
-                                    case 0x01:
-                                        Console.WriteLine("Hello Youtube!!");
-                                        break;
-                                    case 0x02:
-                                        Console.WriteLine("Goodbye Youtube!!");
-                                        break;
-                                    case 0x03:
-                                        Console.WriteLine("Hex value is 0xB");
+                                        graph(x_vel, y_vel, z_vel);
                                         break;
                                     default:
-                                        Console.WriteLine("Hex value is not 0x1, 0x2, 0xA, or 0xB");
-                                        break;
+                                    Console.WriteLine("Hex value is not 0x1, 0x2, 0xA, or 0xB");
+                                    break;
                                 }
                             }
                         }
-
                     }
-                    //foreach (byte b in byteArray)
-                    //{
-                    //    Console.WriteLine(string.Format("{0:x2}", b));
-                    //}
-
                 }
+            }
+        }
 
-                    //    string[] numbers = receivedData.Split(',');
+        private void adaptive_runtime(double x, double y, double z, double v1, double v2, double v3, double v4, double v5, int enable_stt)
+        {
+            int[] temp_vel = new int[5];
+            double t1_adapt, t2_adapt, t3_adapt, t4_adapt, t5_adapt;
+            int ret = 0;
 
-                    //    Console.WriteLine(receivedData);
+            int ret_path = 0;
 
-                    //    if (numbers.Length == 3)
-                    //    {
-                    //        double num1, num2, num3, num4;
-                    //        bool success = double.TryParse(numbers[0], out num1);
-                    //        success &= double.TryParse(numbers[1], out num2);
-                    //        success &= double.TryParse(numbers[2], out num3);
-                    //        //success &= double.TryParse(numbers[3], out num4);
-                    //        double theta_test;
-                    //        int ret;
-                    //        int[] temp_value = new int[5];
-                    //        if (success)
-                    //        {
-                    //            Dispatcher.Invoke(() =>
-                    //            {
-                    //                // Update value on GUI
-                    //                returnX = num1 * 20;
-                    //                returnY = num2 * 20;
-                    //                returnZ = num3 * 15 + 700;
+            int movepath_status;
+            int velocity;
 
-                    //                //returnX = num1;
-                    //                //returnY = num2;
-                    //                //returnZ = num3;
-                    //                //t5_camera = num4;
+            /* Read status of Brake and AC Servo */
+            ret = PLCReadbit(Constants.MOVEL_PATH, out movepath_status);
 
-                    //                ErrorLog.Text = returnX.ToString() + "\n" + returnY.ToString() + "\n" + returnZ.ToString();
 
-                    //                if (returnZ >= 500 && returnZ <= 1000)
-                    //                {
-                    //                    (t1_test, t2_test, t3_test, t4_test, t5_test) = convert_position_angle(returnX, returnY, returnZ);
-                    //                    ret = Check_angle(t1_test, t2_test, t3_test, t4_test, t5_camera);
-                    //                    if (ret != 0)
-                    //                    {
-                    //                        double theta = 0.0;
-                    //                        if (ret == 1) theta = t1_test;
-                    //                        else if (ret == 2) theta = t2_test;
-                    //                        else if (ret == 3) theta = t3_test;
-                    //                        else if (ret == 4) theta = t4_test;
-                    //                        else if (ret == 5) theta = t5_camera;
-                    //                        PrintLog("\nError", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
-                    //                        return;
-                    //                    }
-                    //                }
-                    //                else
-                    //                {
-                    //                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", "Out of range of Z axis"));
-                    //                }
-                    //            });
-                    //        }
-                    //        if (write_csv == true)
-                    //        {
-                    //            using (StreamWriter writer = new StreamWriter(filePath, true))
-                    //            {
-                    //                // Write each line of data to the CSV file
-                    //                writer.WriteLine(receivedData);
-                    //            }
-                    //        }
-                    //    }
-                    //}
+            ///* đang bỏ qua điều kiện Z --> Phải nhớ để add vô sau */
+            ////---------------------------------
+            (t1_adapt, t2_adapt, t3_adapt, t4_adapt, t5_adapt) = convert_position_angle(x, y, z);
+            ret = Check_angle(t1_adapt, t2_adapt, t3_adapt, t4_adapt, t5_adapt);
+            if (ret != 0)
+            {
+                double theta = 0.0;
+                if (ret == 1) theta = t1_adapt;
+                else if (ret == 2) theta = t2_adapt;
+                else if (ret == 3) theta = t3_adapt;
+                else if (ret == 4) theta = t4_adapt;
+                else if (ret == 5) theta = t5_adapt;
+                //PrintLog("\nError", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
+                return;
+            }
+            else
+            {
+                int[] temp_value = new int[5];
+                if (enable_stt == 1)
+                {
+                    int[] value_angle = new int[10];
+                    /* Run */
+                    temp_value[0] = (int)(Convert.ToDouble(t1_adapt) * 100000 + 18000000);
+                    temp_value[1] = (int)(Convert.ToDouble(t2_adapt - 90) * 100000 + 18000000);
+                    temp_value[2] = (int)(Convert.ToDouble(t3_adapt + 90) * 100000 + 18000000);
+                    temp_value[3] = (int)(Convert.ToDouble(t4_adapt + 90) * 100000 + 18000000);
+                    temp_value[4] = (int)(Convert.ToDouble(t5_adapt) * 100000 + 18000000);
+
+                    temp_vel[0] = (int)(Convert.ToDouble(v1) * 1000);
+                    temp_vel[1] = (int)(Convert.ToDouble(v2) * 1000);
+                    temp_vel[2] = (int)(Convert.ToDouble(v3) * 1000);
+                    temp_vel[3] = (int)(Convert.ToDouble(v4) * 1000);
+                    temp_vel[4] = (int)(Convert.ToDouble(v5) * 1000);
+                    /* Write the angle */
+                    for (int ind = 0; ind < 5; ind++)
+                    {
+                        write_d_mem_32_bit(1400 + 2 * ind, temp_value[ind]);
+                    }
+                    /* Write the angle */
+                    for (int ind = 0; ind < 5; ind++)
+                    {
+                        write_d_mem_32_bit(2100 + 2 * ind, temp_vel[ind]);
+                    }
                 }
+            }
         }
         static byte Lc709204fCalculateCrc8Atm(byte[] data, ushort length)
         {
@@ -2907,9 +2851,19 @@ namespace RobotArmHelix
             int combined = (byte1 << 16) | (byte2 << 8) | byte3;
             return combined;
         }
-        private void Glove_connect_button_Click(object sender, RoutedEventArgs e)
+
+        static Int16 CombineBytesToInt16Vel(byte byte1, byte byte2)
         {
-            _timer.Start();
+            // Combine the bytes into an int (16-bit)
+            // The first byte is the most significant byte
+            Int16 combined = (Int16)((byte1 << 8) | byte2);
+            return combined;
+        }
+
+        private async void Glove_connect_button_Click(object sender, RoutedEventArgs e)
+        {
+
+            //_timer.Start();
             uart = new SerialPort();
             uart.PortName = com_port_list1.Text;
             // Set baud rate
@@ -3094,12 +3048,15 @@ namespace RobotArmHelix
             turn_on_1_pulse_relay(600);
             /* Timer 1 start */
             glove_enable = 1;
+            /* Start timer2 */
+            //timer2.Start();
         }
 
         private void Glove_disable_button_Click(object sender, RoutedEventArgs e)
         {
             /* Timer 1 start */
             glove_enable = 0;
+            //timer2.Stop();
         }
 
         private void Clr_Traj_btn_Click(object sender, RoutedEventArgs e)
@@ -3117,9 +3074,14 @@ namespace RobotArmHelix
 
         private void Open_menu_Click(object sender, RoutedEventArgs e)
         {
-            //Menu_control menuControl = new Menu_control(this);
-            //menuControl.Show();
-            TCP_sendata_button.Visibility = Visibility.Hidden;
+            vel_1_test = Convert.ToInt32(spd_tb.Text) * 1000;
+            /* Write the vel */
+            for (int ind = 0; ind < 5; ind++)
+            {
+                write_d_mem_32_bit(2100 + 2 * ind, vel_1_test);
+            }
+            /* Change vel relay */
+            turn_on_1_pulse_relay(650);
         }
 
         public void turn_on_1_pulse_relay(int device)
@@ -3133,28 +3095,28 @@ namespace RobotArmHelix
             ret = PLCReadbit(device_str, out status);
             if (ret != 0)
             {
-                PrintLog("Error", getName, "Read PLC Fail");
+                //PrintLog("Error", getName, "Read PLC Fail");
                 return;
             }
             /* Reverse bit: status == 1 */
             ret = PLCWritebit(device_str, (~status) & 0x01);
             if (ret != 0)
             {
-                PrintLog("Error", getName, "Write PLC Fail");
+                //PrintLog("Error", getName, "Write PLC Fail");
                 return;
             }
             PLCReadbit(device_str, out readbit);
-            PrintLog("Info", device_str, Convert.ToString(readbit));
+            //PrintLog("Info", device_str, Convert.ToString(readbit));
 
             /* Reverse it into the initial state */
             ret = PLCWritebit(device_str, (~(~status)) & 0x01);
             if (ret != 0)
             {
-                PrintLog("Error", getName, "Write PLC Fail");
+                //PrintLog("Error", getName, "Write PLC Fail");
                 return;
             }
             PLCReadbit(device_str, out readbit);
-            PrintLog("Info", device_str, Convert.ToString(readbit));
+            //PrintLog("Info", device_str, Convert.ToString(readbit));
         }
 
         class EdgeDetection
