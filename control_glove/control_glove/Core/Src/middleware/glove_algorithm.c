@@ -20,6 +20,9 @@ typedef struct
 	uint8_t x_pos[3];
 	uint8_t y_pos[3];
 	uint8_t z_pos[3];
+	uint8_t x_vel[2];
+	uint8_t y_vel[2];
+	uint8_t z_vel[2];
 	uint8_t crc;
 } glv_protocol_t;
 
@@ -36,6 +39,7 @@ typedef struct
 /* Private prototypes ------------------------------------------------------- */
 static float square(float num);
 static bool encode_pos(float value, uint8_t *result);
+static bool encode_vel(float value, uint8_t *result);
 static uint8_t crc_8_atm(uint8_t *data, uint16_t length);
 
 /* Public implementations --------------------------------------------------- */
@@ -191,7 +195,9 @@ void glv_encrypt_sensor_data(float q0, float q1, float q2, float q3,
 	data[9] = (uint8_t)(elbow_temp & 0xFF);
 }
 
-bool glv_encode_uart_command(float x_pos, float y_pos, float z_pos, glv_cmd_t cmd, uint8_t *encode_frame)
+bool glv_encode_uart_command(float x_pos, float y_pos, float z_pos, 
+                             float x_vel, float y_vel, float z_vel,
+                                glv_cmd_t cmd, uint8_t *encode_frame)
 {
 	glv_protocol_t frame;
 
@@ -202,6 +208,10 @@ bool glv_encode_uart_command(float x_pos, float y_pos, float z_pos, glv_cmd_t cm
 	bool status = encode_pos(x_pos, &frame.x_pos[0]);
 	status &= encode_pos(y_pos, &frame.y_pos[0]);
 	status &= encode_pos(z_pos, &frame.z_pos[0]);
+
+	status &= encode_vel(x_vel, &frame.x_vel[0]);
+	status &= encode_vel(y_vel, &frame.y_vel[0]);
+	status &= encode_vel(z_vel, &frame.z_vel[0]);
 
 	if (status == true)
 	{
@@ -217,6 +227,15 @@ bool glv_encode_uart_command(float x_pos, float y_pos, float z_pos, glv_cmd_t cm
 		encode_frame[8] = frame.z_pos[0];
 		encode_frame[9] = frame.z_pos[1];
 		encode_frame[10] = frame.z_pos[2];
+
+		encode_frame[12] = frame.x_vel[0];
+		encode_frame[13] = frame.x_vel[1];
+		encode_frame[14] = frame.y_vel[0];
+		encode_frame[15] = frame.y_vel[1];
+		encode_frame[16] = frame.z_vel[0];
+		encode_frame[17] = frame.z_vel[1];
+
+		encode_frame[18] = 0xFF;
 
 		/* Caculate CRC */
 		frame.crc = crc_8_atm(encode_frame, 11);
@@ -235,6 +254,21 @@ bool glv_encode_uart_command(float x_pos, float y_pos, float z_pos, glv_cmd_t cm
 static float square(float num)
 {
 	return (float)(num * num);
+}
+
+static bool encode_vel(float value, uint8_t *result)
+{
+	// Check value
+	if (value <= 100.0 && value >= -100.0)
+	{
+		result[0] = (uint8_t)((((int32_t)(value * 100.0)) & 0xFF00) >> 8);
+		result[1] = (uint8_t)(((int32_t)(value * 100.0)) & 0x00FF);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 static bool encode_pos(float value, uint8_t *result)
