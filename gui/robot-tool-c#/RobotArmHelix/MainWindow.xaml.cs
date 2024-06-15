@@ -177,7 +177,13 @@ namespace RobotArmHelix
         private const string MODEL_PATH4 = "K4.stl";
         private const string MODEL_PATH5 = "K5.stl";
 #endif
-        private readonly PlotModel _plotModel;
+        private readonly PlotModel _plotModel_position;
+        private readonly PlotModel _plotModel_theta;
+        private readonly PlotModel _plotModel_omega;
+        private readonly PlotModel _plotModel_velocity;
+        private readonly PlotModel _plotModel_robot_pos;
+        private readonly PlotModel _plotModel_glove_pos;
+
         private readonly DispatcherTimer _timer;
         private readonly BackgroundWorker _uartWorker;
 
@@ -235,24 +241,41 @@ namespace RobotArmHelix
             timer2.Tick += new System.EventHandler(timer2_Tick);
 
             // Create plot model
-            _plotModel = new PlotModel { Title = "Real-Time Graph" };
+            _plotModel_position = new PlotModel { Title = "Robot Oxyz" };
+            _plotModel_theta = new PlotModel { Title = "Robot Theta" };
+            _plotModel_omega = new PlotModel { Title = "Robot Omega" };
+            _plotModel_velocity = new PlotModel { Title = "Robot Velocity" };
+            _plotModel_robot_pos = new PlotModel { Title = "Robot Position Oxy" };
+            _plotModel_glove_pos = new PlotModel { Title = "Glove Position" };
 
             // Create line series for each value
-            var series1 = new LineSeries { Title = "Value 1" };
-            var series2 = new LineSeries { Title = "Value 2" };
-            var series3 = new LineSeries { Title = "Value 3" };
+            var series_x_pos = new LineSeries { Title = "x_pos" };
+            var series_y_pos = new LineSeries { Title = "y_pos" };
+            var series_z_pos = new LineSeries { Title = "z_pos" };
+
+            var _scatterSeries_robot_pos = new ScatterSeries
+            {
+                Title = "Robot Position Oxy",
+                MarkerType = MarkerType.Circle, // Loại marker (điểm) để hiển thị
+                MarkerSize = 4, // Kích thước của marker
+                MarkerFill = OxyColors.Blue // Màu sắc của marker
+            };
+
+            // Thêm dữ liệu vào ScatterSeries
+            _plotModel_robot_pos.Series.Add(_scatterSeries_robot_pos);
 
             // Add series to plot model
-            _plotModel.Series.Add(series1);
-            _plotModel.Series.Add(series2);
-            _plotModel.Series.Add(series3);
+            _plotModel_position.Series.Add(series_x_pos);
+            _plotModel_position.Series.Add(series_y_pos);
+            _plotModel_position.Series.Add(series_z_pos);
 
-            // Set up timer to update graph
+            // Set up timer to update plot
             _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
             _timer.Tick += Timer_Tick_Graph;
 
             // Set plot model to PlotView
-            plotView.Model = _plotModel;
+            plotView_position.Model = _plotModel_position;
+            plotView_robot_pos.Model = _plotModel_robot_pos;
 
             // Initialize BackgroundWorker
             _uartWorker = new BackgroundWorker
@@ -273,23 +296,23 @@ namespace RobotArmHelix
             //var dataPoint3 = new DataPoint(DateTimeAxis.ToDouble(timestamp), ((returnZ - 700) / 20));
 
             //// Update series
-            //var series1 = (LineSeries)_plotModel.Series[0];
-            //var series2 = (LineSeries)_plotModel.Series[1];
-            //var series3 = (LineSeries)_plotModel.Series[2];
-            //series1.Points.Add(dataPoint1);
-            //series2.Points.Add(dataPoint2);
-            //series3.Points.Add(dataPoint3);
+            //var series_x_pos = (LineSeries)_plotModel_position.Series[0];
+            //var series_y_pos = (LineSeries)_plotModel_position.Series[1];
+            //var series_z_pos = (LineSeries)_plotModel_position.Series[2];
+            //series_x_pos.Points.Add(dataPoint1);
+            //series_y_pos.Points.Add(dataPoint2);
+            //series_z_pos.Points.Add(dataPoint3);
 
-            //// Limit number of data points to keep graph responsive
-            //if (series1.Points.Count > 100)
+            //// Limit number of data points to keep plot responsive
+            //if (series_x_pos.Points.Count > 100)
             //{
-            //    series1.Points.RemoveAt(0);
-            //    series2.Points.RemoveAt(0);
-            //    series3.Points.RemoveAt(0);
+            //    series_x_pos.Points.RemoveAt(0);
+            //    series_y_pos.Points.RemoveAt(0);
+            //    series_z_pos.Points.RemoveAt(0);
             //}
 
             //// Refresh plot view
-            //plotView.InvalidatePlot();
+            //plotView_position.InvalidatePlot();
         }
 
         public void Task1()
@@ -2797,10 +2820,11 @@ namespace RobotArmHelix
                                                 }
                                             }
 
-                                            graph(omega[1], omega[2], 0);
+                                            plot(omega[1], omega[2], 0);
+                                            scatter(x, y);
                                             Console.WriteLine("---");
 
-                                            // graph(x, y, z);
+                                            // plot(x, y, z);
                                         }
                                         break;
                                     default:
@@ -3114,6 +3138,12 @@ namespace RobotArmHelix
             /* Timer 1 start */
             glove_enable = 0;
             //timer2.Stop();
+        }
+
+        private void Glove_refresh_button_Click(object sender, RoutedEventArgs e)
+        {
+            string[] ports = SerialPort.GetPortNames();
+            com_port_list1.ItemsSource = ports;
         }
 
         private void Clr_Traj_btn_Click(object sender, RoutedEventArgs e)
@@ -3906,31 +3936,31 @@ namespace RobotArmHelix
                 var dataPoint3 = new DataPoint(nxt_line * 100, (Convert.ToDouble(v2[2]) * 15 - Convert.ToDouble(v1[2]) * 15) /0.1);
                 var dataPoint4 = new DataPoint(nxt_line * 100, vel_avg);
                 // Update series
-                //var series1 = (LineSeries)_plotModel.Series[0];
-                //var series2 = (LineSeries)_plotModel.Series[1];
-                //var series3 = (LineSeries)_plotModel.Series[2];
-                var series4 = (LineSeries)_plotModel.Series[0];
-                //series1.Points.Add(dataPoint1);
-                //series2.Points.Add(dataPoint2);
-                //series3.Points.Add(dataPoint3);
+                //var series_x_pos = (LineSeries)_plotModel_position.Series[0];
+                //var series_y_pos = (LineSeries)_plotModel_position.Series[1];
+                //var series_z_pos = (LineSeries)_plotModel_position.Series[2];
+                var series4 = (LineSeries)_plotModel_position.Series[0];
+                //series_x_pos.Points.Add(dataPoint1);
+                //series_y_pos.Points.Add(dataPoint2);
+                //series_z_pos.Points.Add(dataPoint3);
                 series4.Points.Add(dataPoint4);
 
-                // Limit number of data points to keep graph responsive
+                // Limit number of data points to keep plot responsive
                 if (series4.Points.Count > 100)
                 {
-                    //series1.Points.RemoveAt(0);
-                    //series2.Points.RemoveAt(0);
-                    //series3.Points.RemoveAt(0);
+                    //series_x_pos.Points.RemoveAt(0);
+                    //series_y_pos.Points.RemoveAt(0);
+                    //series_z_pos.Points.RemoveAt(0);
                     series4.Points.RemoveAt(0);
                 }
                 // Refresh plot view
-                plotView.InvalidatePlot();
+                plotView_position.InvalidatePlot();
             }
             
             timer2.Start();
         }
 
-        private void graph(double x, double y, double z)
+        private void plot(double x, double y, double z)
         {
             // Update data points
             var timestamp = DateTime.Now;
@@ -3939,23 +3969,37 @@ namespace RobotArmHelix
             var dataPoint3 = new DataPoint(DateTimeAxis.ToDouble(timestamp), z);
 
             // Update series
-            var series1 = (LineSeries)_plotModel.Series[0];
-            var series2 = (LineSeries)_plotModel.Series[1];
-            var series3 = (LineSeries)_plotModel.Series[2];
-            series1.Points.Add(dataPoint1);
-            series2.Points.Add(dataPoint2);
-            series3.Points.Add(dataPoint3);
+            var series_x_pos = (LineSeries)_plotModel_position.Series[0];
+            var series_y_pos = (LineSeries)_plotModel_position.Series[1];
+            var series_z_pos = (LineSeries)_plotModel_position.Series[2];
+            series_x_pos.Points.Add(dataPoint1);
+            series_y_pos.Points.Add(dataPoint2);
+            series_z_pos.Points.Add(dataPoint3);
 
-            // Limit number of data points to keep graph responsive
-            if (series1.Points.Count > 100)
+            // Limit number of data points to keep plot responsive
+            if (series_x_pos.Points.Count > 100)
             {
-                series1.Points.RemoveAt(0);
-                series2.Points.RemoveAt(0);
-                series3.Points.RemoveAt(0);
+                series_x_pos.Points.RemoveAt(0);
+                series_y_pos.Points.RemoveAt(0);
+                series_z_pos.Points.RemoveAt(0);
             }
 
             // Refresh plot view
-            plotView.InvalidatePlot();
+            plotView_position.InvalidatePlot();
+        }
+
+        private void scatter(double x, double y)
+        {
+            // Xóa các điểm dữ liệu cũ
+            // scatterSeries.Points.Clear();
+
+            var _scatterSeries_robot_pos = (ScatterSeries) _plotModel_robot_pos.Series[0];
+
+            // Thêm điểm mới
+            _scatterSeries_robot_pos.Points.Add(new ScatterPoint(x, y));
+
+            // Cập nhật đồ thị
+            plotView_robot_pos.InvalidatePlot(true);
         }
 
         static void CreateCSV(string filePath, string[] data)
