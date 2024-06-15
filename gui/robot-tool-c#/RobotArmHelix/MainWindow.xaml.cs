@@ -84,6 +84,7 @@ namespace RobotArmHelix
         private double returnZ = 600;
         // Define the file path
         public string filePath = "C:\\Users\\daveb\\Desktop\\5_DOF_Robot_Arm\\control_glove\\script_python\\robot_data\\test.csv";
+
         public string[] fields;
         public string[] totalLines_csv;
         private int nxt_line = 0;
@@ -164,6 +165,9 @@ namespace RobotArmHelix
         System.Windows.Forms.Timer timer1;
         System.Windows.Forms.Timer timer2;
 
+        // Tạo một đối tượng StreamWriter để ghi dữ liệu vào tập tin CSV
+        static string g_csvFilePath = "H:\\OneDrive - hcmute.edu.vn\\Desktop\\5_DOF_Robot_Arm\\gui\\robot-tool-c#\\RobotArmHelix\\data\\test.csv";
+
 #if IRB6700
         //directroy of all stl files
         private const string MODEL_PATH0 = "K0.stl";
@@ -183,6 +187,7 @@ namespace RobotArmHelix
             //UART
             string[] ports = SerialPort.GetPortNames();
             com_port_list1.ItemsSource = ports;
+
             // uart.DataReceived += SerialPort_DataReceived;
 
             //// Attach the event handler to the MouseDown event
@@ -2740,11 +2745,63 @@ namespace RobotArmHelix
                                         }
                                         z = z_pos / 10000.0;
 
-                                        Console.WriteLine(x_vel.ToString());
-                                        Console.WriteLine(y_vel.ToString());
-                                        Console.WriteLine(z_vel.ToString());
-                                        Console.WriteLine("---");
-                                        graph(x_vel, y_vel, z_vel);
+                                        x = x * 20;
+                                        y = y * 20;
+                                        z = z * 15 + 700;
+                                        int ret;
+                                        double t1, t2, t3, t4, t5;
+
+                                        (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
+
+                                        Jacobi_plus = CreateJacobianMatrix(t1, t2, t3, t4, t5);
+                                        Jacobi_vel = CreateVelocityMatrix(x_vel, y_vel, z_vel);
+                                        omega = MultiplyMatrices(Jacobi_plus, Jacobi_vel);
+
+                                        ret = Check_angle(t1, t2, t3, t4, t5);
+
+                                        if (ret != 0)
+                                        {
+                                            /* Anti wind-up */
+                                            if (Math.Abs(omega[0]) >= 100.0)
+                                            {
+                                                omega[0] = 100.0;
+                                            }
+                                            if (Math.Abs(omega[1]) >= 100.0)
+                                            {
+                                                omega[1] = 100.0;
+                                            }
+                                            if (Math.Abs(omega[2]) >= 100.0)
+                                            {
+                                                omega[2] = 100.0;
+                                            }
+                                            if (Math.Abs(omega[3]) >= 100.0)
+                                            {
+                                                omega[3] = 100.0;
+                                            }
+                                            if (Math.Abs(omega[4]) >= 100.0)
+                                            {
+                                                omega[4] = 100.0;
+                                            }
+
+                                            Console.WriteLine(x_vel.ToString());
+                                            Console.WriteLine(y_vel.ToString());
+                                            Console.WriteLine(z_vel.ToString());
+
+                                            if (write_csv == true)
+                                            {
+                                                using (StreamWriter writer = new StreamWriter(g_csvFilePath, true))
+                                                {
+                                                    string csvLine = $"{x},{y},{z},{x_vel},{y_vel},{z_vel}";
+                                                    writer.WriteLine(csvLine);
+                                                    Console.WriteLine("Write CSV");
+                                                }
+                                            }
+
+                                            graph(Math.Abs(omega[0]) * 5, Math.Abs(omega[1]) * 5, Math.Abs(omega[2] * 5));
+                                            Console.WriteLine("---");
+
+                                            // graph(x_vel, y_vel, z_vel);
+                                        }
                                         break;
                                     default:
                                     Console.WriteLine("Hex value is not 0x1, 0x2, 0xA, or 0xB");
