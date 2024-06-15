@@ -189,50 +189,6 @@ base_status_t sensor_manager_task(void)
     // Caculate kinematic
     glv_pos_convert(q0, q1, q2, q3, elbow_angle, &x_pos, &y_pos, &z_pos);
 
-    // Caculate velocity
-    x_vel = (x_pos - x_pos_pre) * g_freq;
-    y_vel = (y_pos - y_pos_pre) * g_freq;
-    z_vel = (z_pos - z_pos_pre) * g_freq;
-
-    // Filter for velocity
-    x_vel_pass = low_pass_filter(x_vel, x_vel_pre, 0.01f);
-    y_vel_pass = low_pass_filter(y_vel, y_vel_pre, 0.01f);
-    z_vel_pass = low_pass_filter(z_vel, z_vel_pre, 0.01f);
-
-    if (x_vel_pass > 100)
-    {
-        x_vel_pass = 100;
-    }
-    else if (x_vel_pass < -100)
-    {
-        x_vel_pass = -100;
-    }
-
-    if (y_vel_pass > 100)
-    {
-        y_vel_pass = 100;
-    }
-    else if (y_vel_pass < -100)
-    {
-        y_vel_pass = -100;
-    }
-
-    if (z_vel_pass > 100)
-    {
-        z_vel_pass = 100;
-    }
-    else if (z_vel_pass < -100)
-    {
-        z_vel_pass = -100;
-    }
-
-    x_pos_pre = x_pos;
-    y_pos_pre = y_pos;
-    z_pos_pre = z_pos;
-
-    x_vel_pre = x_vel;
-    y_vel_pre = y_vel;
-    z_vel_pre = z_vel;
     // glv_robot_pos_convert(x_pos, y_pos, z_pos, &robot_x_pos, &robot_y_pos, &robot_z_pos);
     // glv_pos_shoulder_convert(q0, q1, q2, q3, &x_pos, &y_pos, &z_pos);
 
@@ -244,6 +200,51 @@ base_status_t sensor_manager_task(void)
 
         if (data_index_send == 0)
         {
+            // Caculate velocity
+            x_vel = (x_pos - x_pos_pre) / 0.2f;
+            y_vel = (y_pos - y_pos_pre) / 0.2f;
+            z_vel = (z_pos - z_pos_pre) / 0.2f;
+
+            // Filter for velocity
+            x_vel_pass = low_pass_filter(x_vel, x_vel_pre, 0.3f);
+            y_vel_pass = low_pass_filter(y_vel, y_vel_pre, 0.3f);
+            z_vel_pass = low_pass_filter(z_vel, z_vel_pre, 0.3f);
+
+            if (x_vel_pass > 100)
+            {
+                x_vel_pass = 100;
+            }
+            else if (x_vel_pass < -100)
+            {
+                x_vel_pass = -100;
+            }
+
+            if (y_vel_pass > 100)
+            {
+                y_vel_pass = 100;
+            }
+            else if (y_vel_pass < -100)
+            {
+                y_vel_pass = -100;
+            }
+
+            if (z_vel_pass > 100)
+            {
+                z_vel_pass = 100;
+            }
+            else if (z_vel_pass < -100)
+            {
+                z_vel_pass = -100;
+            }
+
+            x_pos_pre = x_pos;
+            y_pos_pre = y_pos;
+            z_pos_pre = z_pos;
+
+            x_vel_pre = x_vel;
+            y_vel_pre = y_vel;
+            z_vel_pre = z_vel;
+
             glv_encode_uart_command(x_pos, y_pos, z_pos, x_vel_pass, y_vel_pass, z_vel_pass, g_cmd, encode_frame);
             HAL_Delay(5);
         }
