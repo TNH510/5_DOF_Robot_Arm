@@ -62,7 +62,7 @@ base_status_t sensor_manager_test(void)
     }
     else if (g_button_state == CLICK_LEFT_BUTTON)
     {
-        bsp_gpio_set_pin(LED_RED_GPIO_Port, LED_RED_Pin);
+        // bsp_gpio_set_pin(LED_RED_GPIO_Port, LED_RED_Pin);
         g_cmd = GLV_CMD_POS_TRANSMIT_AND_START_RECORD;
         is_cmd_send = true;
 
@@ -70,19 +70,19 @@ base_status_t sensor_manager_test(void)
     else if (g_button_state == HOLD_LEFT_BUTTON)
     {
         // printf("HOLD_LEFT_BUTTON\r\n");
-        bsp_gpio_reset_pin(LED_RED_GPIO_Port, LED_RED_Pin);
+        // bsp_gpio_reset_pin(LED_RED_GPIO_Port, LED_RED_Pin);
     }
     else if (g_button_state == CLICK_RIGHT_BUTTON)
     {
         // printf("CLICK_RIGHT_BUTTON\r\n");
-        bsp_gpio_set_pin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
+        // bsp_gpio_set_pin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
         g_cmd = GLV_CMD_POS_TRANSMIT_AND_STOP_RECORD;
         is_cmd_send = true;
     }
     else if (g_button_state == HOLD_RIGHT_BUTTON)
     {
         // printf("HOLD_RIGHT_BUTTON\r\n");
-        bsp_gpio_reset_pin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
+        // bsp_gpio_reset_pin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
     }
 
     return BS_OK;
@@ -245,7 +245,37 @@ base_status_t sensor_manager_task(void)
             y_vel_pre = y_vel;
             z_vel_pre = z_vel;
 
-            glv_encode_uart_command(x_pos, y_pos, z_pos, x_vel_pass, y_vel_pass, z_vel_pass, g_cmd, encode_frame);
+            if ((x_vel_pass > 5 || x_vel_pass < -5) && (y_vel_pass > 5 || y_vel_pass < -5))
+            {
+                bsp_gpio_reset_pin(USER_LED_GPIO_Port, USER_LED_Pin);
+            }
+            else
+            {
+                bsp_gpio_set_pin(USER_LED_GPIO_Port, USER_LED_Pin);
+            }
+
+            if (g_cmd != GLV_CMD_ONLY_POS_TRANSMIT)
+            {
+                glv_encode_uart_command(x_pos, y_pos, z_pos, x_vel_pass, y_vel_pass, z_vel_pass, g_cmd, encode_frame);
+
+                if (g_cmd == GLV_CMD_POS_TRANSMIT_AND_START_RECORD)
+                {
+                    bsp_gpio_set_pin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
+                }
+                else if (g_cmd == GLV_CMD_POS_TRANSMIT_AND_STOP_RECORD)
+                {
+                    bsp_gpio_set_pin(LED_GREEN_GPIO_Port, LED_RED_Pin);
+                }
+
+                g_cmd = GLV_CMD_ONLY_POS_TRANSMIT;
+            }
+            else
+            {
+                glv_encode_uart_command(x_pos, y_pos, z_pos, x_vel_pass, y_vel_pass, z_vel_pass, g_cmd, encode_frame);
+                bsp_gpio_reset_pin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
+                bsp_gpio_reset_pin(LED_GREEN_GPIO_Port, LED_RED_Pin);
+            }
+            
             HAL_Delay(5);
         }
 
