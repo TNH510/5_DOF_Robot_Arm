@@ -2704,7 +2704,7 @@ namespace RobotArmHelix
             // UART transmission logic
             while (!worker.CancellationPending)
             {
-                //Thread.Sleep(150);
+                //Thread.Sleep(100);
                 if (uart.BytesToRead > 0)
                 {
                     // Read available bytes
@@ -2743,9 +2743,9 @@ namespace RobotArmHelix
                                         y_pos = CombineBytesToInt32(byteArray[5], byteArray[6], byteArray[7]);
                                         z_pos = CombineBytesToInt32(byteArray[8], byteArray[9], byteArray[10]);
 
-                                        x_vel = CombineBytesToInt16Vel(byteArray[12], byteArray[13]) / 100.0; // cm/s
-                                        y_vel = CombineBytesToInt16Vel(byteArray[14], byteArray[15]) / 100.0;
-                                        z_vel = CombineBytesToInt16Vel(byteArray[16], byteArray[17]) / 100.0;
+                                        x_vel = CombineBytesToInt16Vel(byteArray[12], byteArray[13]) / 10.0; // cm/s
+                                        y_vel = CombineBytesToInt16Vel(byteArray[14], byteArray[15]) / 10.0;
+                                        z_vel = CombineBytesToInt16Vel(byteArray[16], byteArray[17]) / 10.0;
 
                                         if (x_pos >= 0x800000)
                                         {
@@ -2820,11 +2820,44 @@ namespace RobotArmHelix
                                                 }
                                             }
 
-                                            plot(omega[1], omega[2], 0);
-                                            scatter(x, y);
+                                            plot(omega[0] * 180 / Math.PI, omega[1] * 180 / Math.PI, omega[2] * 180 / Math.PI);
+                                            //plot(x_vel);
+                                            //scatter(x, y);
                                             Console.WriteLine("---");
 
                                             // plot(x, y, z);
+
+                                            //plot(Math.Abs(omega[0]) * 5, Math.Abs(omega[1]) * 5, Math.Abs(omega[2] * 5));
+
+
+                                            //adaptive_runtime(x, y, z, omega[0] * 5, omega[1] * 5, omega[2] * 5, omega[3] * 5, -5 * (omega[2] + omega[3]), glove_enable);
+                                            //adaptive_runtime(x, y, z, 200, 200.0, 200.0, 200.0, 200.0, glove_enable);
+                                            //int[] temp_value = new int[5];
+                                            //int[] value_angle = new int[10];
+                                            ///* Run */
+                                            //temp_value[0] = (int)(Convert.ToDouble(t1) * 100000 + 18000000);
+                                            //temp_value[1] = (int)(Convert.ToDouble(t2 - 90) * 100000 + 18000000);
+                                            //temp_value[2] = (int)(Convert.ToDouble(t3 + 90) * 100000 + 18000000);
+                                            //temp_value[3] = (int)(Convert.ToDouble(t4 + 90) * 100000 + 18000000);
+                                            //temp_value[4] = (int)(Convert.ToDouble(t5) * 100000 + 18000000);
+
+                                            //temp_vel[0] = (int)(Convert.ToDouble(v1) * 1000);
+                                            //temp_vel[1] = (int)(Convert.ToDouble(v2) * 1000);
+                                            //temp_vel[2] = (int)(Convert.ToDouble(v3) * 1000);
+                                            //temp_vel[3] = (int)(Convert.ToDouble(v4) * 1000);
+                                            //temp_vel[4] = (int)(Convert.ToDouble(v5) * 1000);
+                                            ///* Write the angle */
+                                            //for (int ind = 0; ind < 5; ind++)
+                                            //{
+                                            //    write_d_mem_32_bit(1400 + 2 * ind, temp_value[ind]);
+                                            //}
+                                            ///* Write the velocity */
+                                            //for (int ind = 0; ind < 5; ind++)
+                                            //{
+                                            //    write_d_mem_32_bit(2100 + 2 * ind, temp_vel[ind]);
+                                            //}
+                                            ///* Change vel relay */
+                                            //turn_on_1_pulse_relay(650);
                                         }
                                         break;
                                     default:
