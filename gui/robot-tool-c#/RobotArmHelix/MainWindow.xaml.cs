@@ -2700,11 +2700,9 @@ namespace RobotArmHelix
         private void UartWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             BackgroundWorker worker = sender as BackgroundWorker;
-
             // UART transmission logic
             while (!worker.CancellationPending)
             {
-                //Thread.Sleep(100);
                 if (uart.BytesToRead > 0)
                 {
                     // Read available bytes
@@ -2738,6 +2736,11 @@ namespace RobotArmHelix
                                         double[,] Jacobi_plus = new double[5, 3];
                                         double[,] Jacobi_vel = new double[3, 1];
                                         double[] omega = new double[5];
+                                        double omega1_plc = 0.0;
+                                        double omega2_plc = 0.0;
+                                        double omega3_plc = 0.0;
+                                        double omega4_plc = 0.0;
+                                        double omega5_plc = 0.0;
 
                                         x_pos = CombineBytesToInt32(byteArray[2], byteArray[3], byteArray[4]);
                                         y_pos = CombineBytesToInt32(byteArray[5], byteArray[6], byteArray[7]);
@@ -2778,59 +2781,58 @@ namespace RobotArmHelix
                                         Jacobi_plus = CreateJacobianMatrix(t1 * Math.PI / 180.0, t2 * Math.PI / 180.0, t3 * Math.PI / 180.0, t4 * Math.PI / 180.0, t5 * Math.PI / 180.0);
                                         Jacobi_vel = CreateVelocityMatrix(x_vel, y_vel, z_vel);
                                         omega = MultiplyMatrices(Jacobi_plus, Jacobi_vel);
+                                        omega1_plc = omega[0] * 1800 / Math.PI;
+                                        omega2_plc = omega[1] * 1800 / Math.PI;
+                                        omega3_plc = omega[2] * 1800 / Math.PI;
+                                        omega4_plc = -(omega[1] + omega[2]) * 1800 / Math.PI;
+                                        omega5_plc = 0.0; 
+
 
                                         ret = Check_angle(t1, t2, t3, t4, t5);
 
-                                        if (ret != 0)
+                                        if (ret == 0)
                                         {
+
                                             /* Anti wind-up */
-                                            if (Math.Abs(omega[0]) >= 100.0)
+                                            if (Math.Abs(omega1_plc) >= 500)
                                             {
-                                                omega[0] = 100.0;
+                                                omega1_plc = 500;
                                             }
-                                            if (Math.Abs(omega[1]) >= 100.0)
+                                            if (Math.Abs(omega2_plc) >= 500)
                                             {
-                                                omega[1] = 100.0;
+                                                omega2_plc = 500;
                                             }
-                                            if (Math.Abs(omega[2]) >= 100.0)
+                                            if (Math.Abs(omega3_plc) >= 500)
                                             {
-                                                omega[2] = 100.0;
-                                            }
-                                            if (Math.Abs(omega[3]) >= 100.0)
-                                            {
-                                                omega[3] = 100.0;
-                                            }
-                                            if (Math.Abs(omega[4]) >= 100.0)
-                                            {
-                                                omega[4] = 100.0;
+                                                omega3_plc = 500;
                                             }
 
-                                            Console.WriteLine(x_vel.ToString());
-                                            Console.WriteLine(y_vel.ToString());
-                                            Console.WriteLine(z_vel.ToString());
+                                            //Console.WriteLine(x.ToString());
+                                            //Console.WriteLine(y.ToString());
+                                            //Console.WriteLine(z.ToString());
 
-                                            if (write_csv == true)
-                                            {
-                                                using (StreamWriter writer = new StreamWriter(g_csvFilePath, true))
-                                                {
-                                                    // string csvLine = $"{x},{y},{z},{x_vel},{y_vel},{z_vel}";
-                                                    string csvLine = $"{t1},{t2},{t3},{t4},{t5},{x_vel},{y_vel},{z_vel}";
-                                                    writer.WriteLine(csvLine);
-                                                    Console.WriteLine("Write CSV");
-                                                }
-                                            }
+                                            //if (write_csv == true)
+                                            //{
+                                            //    using (StreamWriter writer = new StreamWriter(g_csvFilePath, true))
+                                            //    {
+                                            //        // string csvLine = $"{x},{y},{z},{x_vel},{y_vel},{z_vel}";
+                                            //        string csvLine = $"{t1},{t2},{t3},{t4},{t5},{x_vel},{y_vel},{z_vel}";
+                                            //        writer.WriteLine(csvLine);
+                                            //        Console.WriteLine("Write CSV");
+                                            //    }
+                                            //}
 
-                                            plot(omega[0] * 180 / Math.PI, omega[1] * 180 / Math.PI, omega[2] * 180 / Math.PI);
+                                            //plot(Math.Abs(omega1_plc), Math.Abs(omega2_plc), Math.Abs(omega3_plc));
                                             //plot(x_vel);
                                             //scatter(x, y);
-                                            Console.WriteLine("---");
+                                            //Console.WriteLine("---");
 
-                                            // plot(x, y, z);
+                                            plot(x, y, z);
 
                                             //plot(Math.Abs(omega[0]) * 5, Math.Abs(omega[1]) * 5, Math.Abs(omega[2] * 5));
 
 
-                                            //adaptive_runtime(x, y, z, omega[0] * 5, omega[1] * 5, omega[2] * 5, omega[3] * 5, -5 * (omega[2] + omega[3]), glove_enable);
+                                            adaptive_runtime(x, y, z, Math.Abs(omega1_plc), Math.Abs(omega2_plc), Math.Abs(omega3_plc), Math.Abs(omega4_plc), Math.Abs(omega5_plc), glove_enable);
                                             //adaptive_runtime(x, y, z, 200, 200.0, 200.0, 200.0, 200.0, glove_enable);
                                             //int[] temp_value = new int[5];
                                             //int[] value_angle = new int[10];
@@ -2876,9 +2878,6 @@ namespace RobotArmHelix
             int[] temp_vel = new int[5];
             double t1_adapt, t2_adapt, t3_adapt, t4_adapt, t5_adapt;
             int ret = 0;
-
-            int ret_path = 0;
-
             int movepath_status;
             int velocity;
 
@@ -2889,46 +2888,27 @@ namespace RobotArmHelix
             ///* đang bỏ qua điều kiện Z --> Phải nhớ để add vô sau */
             ////---------------------------------
             (t1_adapt, t2_adapt, t3_adapt, t4_adapt, t5_adapt) = convert_position_angle(x, y, z);
-            ret = Check_angle(t1_adapt, t2_adapt, t3_adapt, t4_adapt, t5_adapt);
-            if (ret != 0)
+            int[] temp_value = new int[5];
+            if (enable_stt == 1)
             {
-                double theta = 0.0;
-                if (ret == 1) theta = t1_adapt;
-                else if (ret == 2) theta = t2_adapt;
-                else if (ret == 3) theta = t3_adapt;
-                else if (ret == 4) theta = t4_adapt;
-                else if (ret == 5) theta = t5_adapt;
-                //PrintLog("\nError", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
-                return;
-            }
-            else
-            {
-                int[] temp_value = new int[5];
-                if (enable_stt == 1)
-                {
-                    int[] value_angle = new int[10];
-                    /* Run */
-                    temp_value[0] = (int)(Convert.ToDouble(t1_adapt) * 100000 + 18000000);
-                    temp_value[1] = (int)(Convert.ToDouble(t2_adapt - 90) * 100000 + 18000000);
-                    temp_value[2] = (int)(Convert.ToDouble(t3_adapt + 90) * 100000 + 18000000);
-                    temp_value[3] = (int)(Convert.ToDouble(t4_adapt + 90) * 100000 + 18000000);
-                    temp_value[4] = (int)(Convert.ToDouble(t5_adapt) * 100000 + 18000000);
+                int[] value_angle = new int[10];
+                /* Run */
+                temp_value[0] = (int)(Convert.ToDouble(t1_adapt) * 100000 + 18000000);
+                temp_value[1] = (int)(Convert.ToDouble(t2_adapt - 90) * 100000 + 18000000);
+                temp_value[2] = (int)(Convert.ToDouble(t3_adapt + 90) * 100000 + 18000000);
+                temp_value[3] = (int)(Convert.ToDouble(t4_adapt + 90) * 100000 + 18000000);
+                temp_value[4] = (int)(Convert.ToDouble(t5_adapt) * 100000 + 18000000);
 
-                    temp_vel[0] = (int)(Convert.ToDouble(v1) * 1000);
-                    temp_vel[1] = (int)(Convert.ToDouble(v2) * 1000);
-                    temp_vel[2] = (int)(Convert.ToDouble(v3) * 1000);
-                    temp_vel[3] = (int)(Convert.ToDouble(v4) * 1000);
-                    temp_vel[4] = (int)(Convert.ToDouble(v5) * 1000);
-                    /* Write the angle */
-                    for (int ind = 0; ind < 5; ind++)
-                    {
-                        write_d_mem_32_bit(1400 + 2 * ind, temp_value[ind]);
-                    }
-                    /* Write the angle */
-                    for (int ind = 0; ind < 5; ind++)
-                    {
-                        write_d_mem_32_bit(2100 + 2 * ind, temp_vel[ind]);
-                    }
+                temp_vel[0] = (int)(Convert.ToDouble(v1) * 1000);
+                temp_vel[1] = (int)(Convert.ToDouble(v2) * 1000);
+                temp_vel[2] = (int)(Convert.ToDouble(v3) * 1000);
+                temp_vel[3] = (int)(Convert.ToDouble(v4) * 1000);
+                temp_vel[4] = (int)(Convert.ToDouble(v5) * 1000);
+                /* Write the angle and velocity */
+                for (int ind = 0; ind < 5; ind++)
+                {
+                    write_d_mem_32_bit(1400 + 2 * ind, temp_value[ind]);
+                    write_d_mem_32_bit(2100 + 2 * ind, temp_vel[ind]);
                 }
             }
         }
@@ -3026,7 +3006,7 @@ namespace RobotArmHelix
             }
             progressbar1.Value = 100;
             uart.Open();
-            //uart.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(Receive);
+
             if (!_uartWorker.IsBusy)
             {
                 _uartWorker.RunWorkerAsync();
