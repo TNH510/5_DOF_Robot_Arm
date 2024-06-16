@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Image_proccessing
 {
@@ -244,23 +245,15 @@ namespace Image_proccessing
             {
                 int[,] result = image;
                 // Thực hiện phép mở rộng (dilation)
-                for (int i = 0; i < 1; i++)
-                {
-                    result = Dilation(result);
-                }
-                // Thực hiện phép co (erosion) 
-                for (int i = 0; i < iterations_Erosion+2; i++)
-                {
-                    result = Erosion(result);
-                }
-                // Thực hiện phép mở rộng (dilation)
                 for (int i = 0; i < iterations_Dilation; i++)
                 {
                     result = Dilation(result);
                 }
-                
-
-
+                // Thực hiện phép co (erosion) 
+                for (int i = 0; i < iterations_Erosion; i++)
+                {
+                    result = Erosion(result);
+                }
 
                 return result;
             }
@@ -404,7 +397,7 @@ namespace Image_proccessing
                 gradient = gradientMagnitude;
                 return Result;
             }
-            public static int[,] DeTectEdgeByCannyMethod(string imagePath, int high_threshold, int low_threshold)
+            public static int[,] DeTectEdgeByCannyMethod(string imagePath, int high_threshold, int low_threshold,string thres)
             {
                 Bitmap Import_picture = new Bitmap(imagePath);
 
@@ -412,18 +405,22 @@ namespace Image_proccessing
                 //gray = EdgeDetection.Blur_Image(gray);
                 //int[,] blur = gray;
                 //Bitmap img_blur = IntToBitmap(blur);
-                int threhold = CalculateThreshold(IntToBitmap(gray));
+                int[] threhold = new int[2];
+                threhold= CalculateTwoThresholds(gray);               
                 //int threhold1 = 63;
                 //int threhold2 = 65;
                 for (int i = 0; i < gray.GetLength(0); i++)
                 {
                     for (int j = 0; j < gray.GetLength(1); j++)
                     {
-                        if (gray[i, j] >= 60 )
+                        if ((gray[i, j] >= threhold[0] - 1 && gray[i, j] <= threhold[1]))
                         {
                             gray[i, j] = 255;
                         }
-
+                        else if ((gray[i, j] >= threhold[1] && gray[i, j] <= 255))
+                        {
+                            gray[i, j] = 255;
+                        }                        
                         else
                         {
                             gray[i, j] = 0;
@@ -431,10 +428,10 @@ namespace Image_proccessing
                     }
                 }
                 //gray = MedianBlur(gray);
-                gray = Erosion_Dilation(gray, 5, 5);
-                string a =  imagePath + "_1.jpg";
-                Bitmap SaveImage = IntToBitmap(gray);
-                SaveImage.Save(a);
+                gray = Erosion_Dilation(gray, 3, 3);
+                //string a =  imagePath + "_1.jpg";
+                //Bitmap SaveImage = IntToBitmap(gray);
+                //SaveImage.Save(a);
                 int[,] edges = EdgeDetection.Canny_Detect(gray, high_threshold, low_threshold);
 
                 return edges;
@@ -478,7 +475,7 @@ namespace Image_proccessing
 
                 return imageArray;
             }
-            public static int[,] PerformHoughTransform(int[,] image)
+            public static int[,] PerformHoughTransform_Rectangle(int[,] image)
             {
                 int width = image.GetLength(0);
                 int height = image.GetLength(1);
@@ -514,15 +511,14 @@ namespace Image_proccessing
                 }
 
                 return houghMatrix;
-            }
-            
+            }           
             public static int[,] DrawLines(int[,] houghMatrix, int threshold, int width, int height)
             {
                 int diagonal = (int)Math.Sqrt(width * width + height * height); // Đường chéo của ảnh
 
                 int[,] resultImage = new int[width, height];
                 int count = 0;
-                int[,] theta_rho = new int[5000, 4];
+                int[,] theta_rho = new int[1000000, 4];
                 // lấy toàn bộ số điểm vượt ngưỡng 
                 for (int theta = 0; theta < 180; theta++)
                 {
@@ -670,54 +666,7 @@ namespace Image_proccessing
                 }
 
                 return resultImage;
-            }
-            
-            private static int CountNeighbors(int x, int y, int[,] image)
-            {
-                int count = 0;
-                for (int j = -1; j <= 1; j++)
-                {
-                    for (int i = -1; i <= 1; i++)
-                    {
-                        if (image[x + i, y + j] == 255)
-                        {
-                            count++;
-                        }
-                    }
-                }
-                return count - 1;
-            }
-            // Đếm số lượng chuyển đổi
-            private static int Transitions(int x, int y, int[,] image)
-            {
-                int count = 0;
-                int[] values = { image[x, y + 1], image[x - 1, y + 1], image[x - 1, y],
-                         image[x - 1, y - 1], image[x, y - 1], image[x + 1, y - 1],
-                         image[x + 1, y], image[x + 1, y + 1], image[x, y + 1] };
-
-                for (int i = 0; i < values.Length - 1; i++)
-                {
-                    if (values[i] == 0 && values[i + 1] == 255)
-                    {
-                        count++;
-                    }
-                }
-                return count;
-            }
-            // Lấy giá trị các điểm lân cận
-            private static int[] GetNeighborPixels(int x, int y, int[,] image)
-            {
-                int[] pixels = new int[9];
-                int index = 0;
-                for (int j = -1; j <= 1; j++)
-                {
-                    for (int i = -1; i <= 1; i++)
-                    {
-                        pixels[index++] = image[x + i, y + j];
-                    }
-                }
-                return pixels;
-            }
+            }         
             public static int CalculateThreshold(Bitmap image)
             {
                 // Tính histogram
@@ -780,7 +729,80 @@ namespace Image_proccessing
 
                 return threshold;
             }
-            public static Bitmap Point_corner(Bitmap Image_Original , int[,] Image_Egde)
+            public static int[] CalculateTwoThresholds(int[,] grayImage)
+            {
+                int[] result = new int[2];
+                int width = grayImage.GetLength(0);
+                int height = grayImage.GetLength(1);
+                int totalPixels = width * height;
+
+                // Tính histogram
+                int[] histogram = new int[256];
+                for (int i = 0; i < width; i++)
+                {
+                    for (int j = 0; j < height; j++)
+                    {
+                        histogram[grayImage[i, j]]++;
+                    }
+                }
+
+                // Tính xác suất
+                double[] probability = new double[256];
+                for (int i = 0; i < 256; i++)
+                {
+                    probability[i] = (double)histogram[i] / totalPixels;
+                }
+
+                // Tìm ngưỡng tối ưu
+                double maxVariance = double.MinValue;
+                int threshold1 = 0;
+                int threshold2 = 0;
+
+                for (int t1 = 0; t1 < 256; t1++)
+                {
+                    for (int t2 = t1 + 1; t2 < 256; t2++)
+                    {
+                        // Các lớp
+                        double w0 = 0, w1 = 0, w2 = 0;
+                        double m0 = 0, m1 = 0, m2 = 0;
+
+                        for (int i = 0; i < t1; i++)
+                        {
+                            w0 += probability[i];
+                            m0 += i * probability[i];
+                        }
+
+                        for (int i = t1; i < t2; i++)
+                        {
+                            w1 += probability[i];
+                            m1 += i * probability[i];
+                        }
+
+                        for (int i = t2; i < 256; i++)
+                        {
+                            w2 += probability[i];
+                            m2 += i * probability[i];
+                        }
+
+                        if (w0 > 0) m0 /= w0;
+                        if (w1 > 0) m1 /= w1;
+                        if (w2 > 0) m2 /= w2;
+
+                        double betweenClassVariance = w0 * w1 * Math.Pow(m0 - m1, 2) + w1 * w2 * Math.Pow(m1 - m2, 2) + w0 * w2 * Math.Pow(m0 - m2, 2);
+
+                        if (betweenClassVariance > maxVariance)
+                        {
+                            maxVariance = betweenClassVariance;
+                            threshold1 = t1;
+                            threshold2 = t2;
+                        }
+                    }
+                }
+                result[0] = threshold1;
+                result[1]= threshold2;
+                return result;
+            }
+            public static Bitmap Point_corner(Bitmap Image_Original , int[,] Image_Egde, int X_circle,int Y_circle)
             {
                 Bitmap Image_Result = Image_Original;
                 int Mid_Point_X = 0;
@@ -835,12 +857,62 @@ namespace Image_proccessing
                         }
                     }
                 }
+                for (int x = X_circle - 5; x < X_circle + 5; x++)
+                {
+                    if (x > 0 && x < Image_Egde.GetLength(0))
+                    {
+                        for (int y = Y_circle - 5; y < Y_circle + 5; y++)
+                        {
+                            if (y > 0 && y < Image_Egde.GetLength(1))
+                            {
+                                Image_Result.SetPixel(x, y, Color.Blue);
+                            }
+                        }
+                    }
+                }
                 return Image_Result;
             }
-        }
-        class DetectShape
-        {
-            public double Moment_Calculate(int[,] Binary_image, int i, int j)
+            public static void PerformHoughTransform_Circle(int[,]image, out int avr_X, out int avr_Y,out int dimention)
+            {
+
+                // Find central_point
+                avr_X = (int) (Moment_Calculate(image, 1, 0) / Moment_Calculate(image, 0, 0));
+                avr_Y = (int) (Moment_Calculate(image, 0, 1) / Moment_Calculate(image, 0, 0));
+
+                //Find Radius.
+                dimention = 0;             
+                int Radius = 0;
+                int count = 0;
+                
+                for (int i =0; i< image.GetLength(0); i+=2)
+                {
+                    int X1 = 0;
+                    int X2 = 0;
+                    int first_point = 0;
+                    for (int j =0; j< image.GetLength(1); j++)
+                    {
+                        if (image[i,j]==255 && first_point==0)
+                        {
+                            X1 = j;
+                            first_point = 1;
+                        }
+                        else if (image[i, j] == 255 && first_point == 1)
+                        {
+                            X2= j;
+                        }
+                    }
+                    if (X2 > X1)
+                    {
+                        Radius += X2 - X1;
+                        count++;
+                    }    
+                    
+                }
+                Radius /= count;
+                dimention = Radius;
+                
+            }
+            public static double Moment_Calculate(int[,] Binary_image, int i, int j)
             {
                 double Moment = 0;
                 for (int x = 0; x < Binary_image.GetLength(0); x++)
@@ -852,8 +924,7 @@ namespace Image_proccessing
                 }
                 return Moment;
             }
-
-            public double CentralMoment1(int[,] Binary_image, int i, int j)
+            public static double CentralMoment1(int[,] Binary_image, int i, int j)
             {
                 double U_ij = 0;
                 double avr_X = (Moment_Calculate(Binary_image, 1, 0)) / (Moment_Calculate(Binary_image, 0, 0));
@@ -867,14 +938,14 @@ namespace Image_proccessing
                 }
                 return U_ij;
             }
-            public double CentralMoment2(int[,] Binary_image, int i, int j)
+            public static double CentralMoment2(int[,] Binary_image, int i, int j)
             {
                 double U_ij = CentralMoment1(Binary_image, i, j);
                 double U_00 = CentralMoment1(Binary_image, 0, 0);
                 double N_ij = U_ij / Math.Pow(U_00, (i + j + 2) / 2);
                 return N_ij;
             }
-            public double HuMoment(int[,] Binary_image)
+            public static double HuMoment(int[,] Binary_image)
             {
                 double H = 0.0;
                 double N_20 = CentralMoment2(Binary_image, 2, 0);
@@ -895,7 +966,9 @@ namespace Image_proccessing
 
                 return H;
             }
+
         }
+        
         private void button1_Click(object sender, EventArgs e)
         {
             // Tạo một OpenFileDialog
@@ -911,38 +984,35 @@ namespace Image_proccessing
                 imagePath = openFileDialog.FileName;
 
                 // Hiển thị ảnh trong PictureBox
-                Image image = Image.FromFile(imagePath);
+                System.Drawing.Image image = System.Drawing.Image.FromFile(imagePath);
                 picture1.Image = image;
             }
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            int high_threshold = 30;//ngưỡng trên cho canny detect
-            int low_threshold = 15;//ngưỡng dưới cho canny detect 
+            int high_threshold = 200;//ngưỡng trên cho canny detect
+            int low_threshold = 50;//ngưỡng dưới cho canny detect 
             int threshold = 50;  // Ngưỡng để chọn các đỉnh trong ma trận Hough
                                  // int thre = Convert.ToInt16(text_thres.Text);
                                  //ảnh binary cho canny detect
-            int[,] edges = EdgeDetection.DeTectEdgeByCannyMethod(imagePath, high_threshold, low_threshold);
+            int[,] edges = EdgeDetection.DeTectEdgeByCannyMethod(imagePath, high_threshold, low_threshold,thres.Text);
             
-            int[,] thresh_image = EdgeDetection.Thresh_image(imagePath);
-              
-            DetectShape detectShape = new DetectShape();
-            double H = detectShape.HuMoment(thresh_image);
+            double H = EdgeDetection.HuMoment(edges);
             // Lấy số hàng và số cột của mảng
             // Khởi tạo một mảng 2 chiều
             int width = edges.GetLength(0);
             int height = edges.GetLength(1);
 
             //biểu đồ hough
-            int[,] hough = EdgeDetection.PerformHoughTransform(edges);
-
+            int[,] hough = EdgeDetection.PerformHoughTransform_Rectangle(edges);
+            EdgeDetection.PerformHoughTransform_Circle(edges,out int X_circle,out int Y_circle, out int dimention);
             //vẽ đường thẳng từ biểu đồ hough
             int[,] result = EdgeDetection.DrawLines(hough, threshold, width, height);
 
             // thể hiện lên GUI
             Bitmap Import_picture = new Bitmap(imagePath);
-            picture1.Image = EdgeDetection.Point_corner(Import_picture, result);
+            picture1.Image = EdgeDetection.Point_corner(Import_picture, result,X_circle,Y_circle);
             picture2.Image = EdgeDetection.IntToBitmap(result);
             picture3.Image = EdgeDetection.IntToBitmap(hough);
             picture4.Image = EdgeDetection.IntToBitmap(edges);
