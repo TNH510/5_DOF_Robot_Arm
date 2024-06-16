@@ -2781,10 +2781,10 @@ namespace RobotArmHelix
                                         Jacobi_plus = CreateJacobianMatrix(t1 * Math.PI / 180.0, t2 * Math.PI / 180.0, t3 * Math.PI / 180.0, t4 * Math.PI / 180.0, t5 * Math.PI / 180.0);
                                         Jacobi_vel = CreateVelocityMatrix(x_vel, y_vel, z_vel);
                                         omega = MultiplyMatrices(Jacobi_plus, Jacobi_vel);
-                                        omega1_plc = omega[0] * 1800 / Math.PI;
-                                        omega2_plc = omega[1] * 1800 / Math.PI;
-                                        omega3_plc = omega[2] * 1800 / Math.PI;
-                                        omega4_plc = -(omega[1] + omega[2]) * 1800 / Math.PI;
+                                        omega1_plc = omega[0] * 1800 * 20 / Math.PI + 100.0;
+                                        omega2_plc = omega[1] * 1800 * 10 / Math.PI + 100.0;
+                                        omega3_plc = omega[2] * 1800 * 10 / Math.PI + 100.0;
+                                        omega4_plc = -(omega[1] + omega[2]) * 180 * 20 / Math.PI + 100.0;
                                         omega5_plc = 0.0; 
 
 
@@ -2794,17 +2794,17 @@ namespace RobotArmHelix
                                         {
 
                                             /* Anti wind-up */
-                                            if (Math.Abs(omega1_plc) >= 500)
+                                            if (Math.Abs(omega1_plc) >= 600)
                                             {
-                                                omega1_plc = 500;
+                                                omega1_plc = 600;
                                             }
-                                            if (Math.Abs(omega2_plc) >= 500)
+                                            if (Math.Abs(omega2_plc) >= 600)
                                             {
-                                                omega2_plc = 500;
+                                                omega2_plc = 600;
                                             }
-                                            if (Math.Abs(omega3_plc) >= 500)
+                                            if (Math.Abs(omega3_plc) >= 600)
                                             {
-                                                omega3_plc = 500;
+                                                omega3_plc = 600;
                                             }
 
                                             //Console.WriteLine(x.ToString());
@@ -2827,7 +2827,7 @@ namespace RobotArmHelix
                                             //scatter(x, y);
                                             //Console.WriteLine("---");
 
-                                            plot(x, y, z);
+                                            // plot(x, y, z);
 
                                             //plot(Math.Abs(omega[0]) * 5, Math.Abs(omega[1]) * 5, Math.Abs(omega[2] * 5));
 
@@ -2859,7 +2859,6 @@ namespace RobotArmHelix
                                             //    write_d_mem_32_bit(2100 + 2 * ind, temp_vel[ind]);
                                             //}
                                             ///* Change vel relay */
-                                            //turn_on_1_pulse_relay(650);
                                         }
                                         break;
                                     default:
@@ -2907,8 +2906,12 @@ namespace RobotArmHelix
                 /* Write the angle and velocity */
                 for (int ind = 0; ind < 5; ind++)
                 {
-                    write_d_mem_32_bit(1400 + 2 * ind, temp_value[ind]);
                     write_d_mem_32_bit(2100 + 2 * ind, temp_vel[ind]);
+                }
+                turn_on_1_pulse_relay(650);
+                for (int ind = 0; ind < 5; ind++)
+                {
+                    write_d_mem_32_bit(1400 + 2 * ind, temp_value[ind]);
                 }
             }
         }
