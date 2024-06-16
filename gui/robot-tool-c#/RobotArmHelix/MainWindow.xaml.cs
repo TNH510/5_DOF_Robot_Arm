@@ -88,8 +88,8 @@ namespace RobotArmHelix
         private double returnY = 0;
         private double returnZ = 600;
         // Define the file path
-        public string filePath = "C:\\Users\\daveb\\Desktop\\5_DOF_Robot_Arm\\control_glove\\script_python\\robot_data\\test.csv";
-        public string savePath = @"C:/Users/daveb/Desktop/5_DOF_Robot_Arm/control_glove/script_python/robot_data/good.csv";
+        public string filePath = @"H:/OneDrive - hcmute.edu.vn/Desktop/5_DOF_Robot_Arm/control_glove/script_python/robot_data/test.csv";
+        public string savePath = @"H:/OneDrive - hcmute.edu.vn/Desktop/5_DOF_Robot_Arm/control_glove/script_python/robot_data/good.csv";
 
         public string[] fields;
         public string[] totalLines_csv;

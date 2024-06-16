@@ -71,6 +71,7 @@ base_status_t sensor_manager_test(void)
     {
         // printf("HOLD_LEFT_BUTTON\r\n");
         // bsp_gpio_reset_pin(LED_RED_GPIO_Port, LED_RED_Pin);
+        g_cmd = GLV_CMD_POS_TRANSMIT_AND_STOP_RECORD;
     }
     else if (g_button_state == CLICK_RIGHT_BUTTON)
     {
