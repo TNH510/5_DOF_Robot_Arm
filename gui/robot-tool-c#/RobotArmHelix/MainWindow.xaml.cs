@@ -2819,12 +2819,11 @@ namespace RobotArmHelix
 
                                             if (write_csv == true)
                                             {
-                                                using (StreamWriter writer = new StreamWriter(g_csvFilePath, true))
+                                                using (StreamWriter writer = new StreamWriter(filePath, true))
                                                 {
                                                     // string csvLine = $"{x},{y},{z},{x_vel},{y_vel},{z_vel}";
                                                     string csvLine = $"{x},{y},{z}";
                                                     writer.WriteLine(csvLine);
-                                                    Console.WriteLine("Write CSV");
                                                 }
                                             }
 
@@ -4115,7 +4114,7 @@ namespace RobotArmHelix
 
         private void Modify_dat_csv_Click(object sender, RoutedEventArgs e)
         {
-            ModifyTrajectory(filePath);
+            ModifyTrajectory(filePath, savePath);
         }
 
         private void Move_Modified_csv_Click(object sender, RoutedEventArgs e)
@@ -4232,7 +4231,7 @@ namespace RobotArmHelix
             }
         }
 
-        private void ModifyTrajectory(string csvFilePath)
+        private void ModifyTrajectory(string csvFilePath, string savepath)
         {
 
             // Đọc dữ liệu từ tệp CSV
@@ -4272,7 +4271,7 @@ namespace RobotArmHelix
                 // Thêm các điểm của segment vào danh sách tất cả các điểm
                 allPoints.AddRange(curve);
             }
-            SaveRegressionResultToCsv(allPoints, savePath, 20);
+            SaveRegressionResultToCsv(allPoints, savepath, 300);
         }
     }
 
