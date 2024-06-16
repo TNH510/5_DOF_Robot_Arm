@@ -154,6 +154,7 @@
                     <oxy:PlotView x:Name="plotView_velocity" Margin="1035,25,28,597" Background="White" Grid.Column="7" />
                     <oxy:PlotView x:Name="plotView_robot_pos" Margin="445,616,603,46" Background="White" Grid.Column="7" />
                     <oxy:PlotView x:Name="plotView_glove_pos" Margin="1035,616,28,46" Grid.Column="7" Background="White" />
+                    <Button x:Name="Test_move_mod" Content="Test move" HorizontalAlignment="Left" Margin="1,601,0,0" VerticalAlignment="Top" Width="90" Height="23" FontSize="11" Click="Test_move_mod_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Grid.Column="5" Grid.ColumnSpan="2"/>
                 </Grid>
             </TabItem>
             <TabItem Header="Monitor">

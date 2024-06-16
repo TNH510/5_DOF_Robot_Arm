@@ -2168,7 +2168,7 @@ namespace RobotArmHelix
                         else if (ret == 3) theta = t3;
                         else if (ret == 4) theta = t4;
                         else if (ret == 5) theta = t5;
-                        PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
+                        //PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
                         return;
                     }
                     t2 -= 90.0;
@@ -2183,7 +2183,7 @@ namespace RobotArmHelix
                 }
                 else
                 {
-                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", "Out of range of Z axis"));
+                    //PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", "Out of range of Z axis"));
                 }
 
             }
@@ -4122,6 +4122,35 @@ namespace RobotArmHelix
 
         }
 
+        private void Test_move_mod_Click(object sender, RoutedEventArgs e)
+        {
+            move = 2;
+            // Initialize a 2D array to hold the CSV data
+            // Assuming you know the size of the array (10 rows and number of columns as per your data)
+            double[,] data = new double[10, 3];
+
+            // Read the file and parse the data
+            using (StreamReader sr = new StreamReader(savePath))
+            {
+                string line;
+                int row = 0;
+
+                while ((line = sr.ReadLine()) != null && row < 10)
+                {
+                    string[] values = line.Split(',');
+
+                    for (int col = 0; col < values.Length; col++)
+                    {
+                        // Trim whitespace and convert to double
+                        data[row, col] = double.Parse(values[col].Trim());
+                        Console.WriteLine(data[row, col]);
+                    }
+                    row++;
+                }
+            }
+            Move_mod_Function(data, "D1010");
+        }
+
         /* Polynomial regression */
         private double EvalPoly(double[] coefficients, double x)
         {
@@ -4208,7 +4237,7 @@ namespace RobotArmHelix
             var config = new CsvConfiguration(CultureInfo.InvariantCulture);
             config.HasHeaderRecord = false; // Thiết lập HasHeaderRecord tại đây
 
-            if (originalCount >= targetCount)
+            if (originalCount > targetCount)
             {
             }
             else
@@ -4240,6 +4269,10 @@ namespace RobotArmHelix
             var length_data = data.Length;
             // Chia dữ liệu thành các đoạn nhỏ hơn, ví dụ: mỗi đoạn chứa 30 điểm
             int segmentSize = 30;
+            if (segmentSize == length_data)
+            {
+                segmentSize = segmentSize + 1;
+            }
             var segments = SplitDataIntoSegments(data, segmentSize);
 
             // Khởi tạo một danh sách để tích lũy tất cả các điểm
@@ -4261,7 +4294,7 @@ namespace RobotArmHelix
                 double[] coeffsZ = PolyFit(t, Z, 10);
 
                 // Tạo giá trị dự đoán cho x, y, z
-                int numPoints = segmentSize;
+                int numPoints = 10;
                 double[] tFit = Enumerable.Range(0, numPoints).Select(i => (double)i / (numPoints - 1)).ToArray();
                 Point3D[] curve = tFit.Select(tt => new Point3D(
                     EvalPoly(coeffsX, tt),
@@ -4271,7 +4304,7 @@ namespace RobotArmHelix
                 // Thêm các điểm của segment vào danh sách tất cả các điểm
                 allPoints.AddRange(curve);
             }
-            SaveRegressionResultToCsv(allPoints, savepath, 300);
+            SaveRegressionResultToCsv(allPoints, savepath, 10);
         }
     }
 
