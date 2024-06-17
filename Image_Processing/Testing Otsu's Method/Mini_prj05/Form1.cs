@@ -217,7 +217,7 @@ namespace Mini_prj05
 
                     // Tính giá trị mức xám cho điểm (x,y)
                     byte gray = (byte)(0.2126 * R + 0.7152 * G + 0.0722 * B);
-                    if (gray < Convert.ToInt16(textBox1.Text))
+                    if (gray == 63)
                     {
                         HinhMucXam.SetPixel(x, y, Color.FromArgb(0, 0, 0));
                     }
