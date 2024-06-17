@@ -1847,14 +1847,14 @@ namespace RobotArmHelix
                 {
                     // Read available bytes
                     byte[] byteArray = new byte[uart.BytesToRead];
-                    uart.Read(byteArray, 0, 19);
+                    uart.Read(byteArray, 0, byteArray.Length);
                     // Convert the byte array to a hexadecimal string
                     if (byteArray.Length >= 19)
                     {
                         byte crc_byte = 0x00;
                         crc_byte = Lc709204fCalculateCrc8Atm(byteArray, 11);
-                        //if (crc_byte == byteArray[11])
-                        //{
+                        if (crc_byte == byteArray[11])
+                        {
                             if (byteArray[0] == 0xAA)
                             {
                                 //onsole.WriteLine(byteArray[0].ToString("X"));
@@ -1974,7 +1974,7 @@ namespace RobotArmHelix
                                     break;
                                 }
                             }
-                       // }
+                       }
                     }
                 }
             }
