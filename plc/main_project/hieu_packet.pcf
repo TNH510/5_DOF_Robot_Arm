@@ -1,0 +1,156 @@
+[Head]
+	Information:
+		Packege Name	QFBP
+		Packege Type	SC
+		Major Version	2
+		Minor Version	23Z
+		Use Major Version	2
+		Use Minor Version	21X
+		File Version	1
+	Project:
+		Project Name	hieu_packet.pcf
+		Project Type	USER
+		Project Comment	
+		Last Update	2024/06/16
+[DATA00]
+	Data Information:
+		XY Address	   0
+	Protocol Data:
+		Use Protocol No	1
+		Protocol Name	hieu_pro
+		Protocol Type	0
+		Maker Name	
+		Kind Name	
+		Model Type	
+		Communication Type	1
+		Send Packet No00	NULL
+		Receive Packet No00	1
+		Receive Packet No01	NULL
+		Receive Packet No02	NULL
+		Receive Packet No03	NULL
+		Receive Packet No04	NULL
+		Receive Packet No05	NULL
+		Receive Packet No06	NULL
+		Receive Packet No07	NULL
+		Receive Packet No08	NULL
+		Receive Packet No09	NULL
+		Receive Packet No10	NULL
+		Receive Packet No11	NULL
+		Receive Packet No12	NULL
+		Receive Packet No13	NULL
+		Receive Packet No14	NULL
+		Receive Packet No15	NULL
+		Buffer Clear	0
+		Retry Count	0
+		Retry Timer	0
+		Stand by Time	0
+		Watch Time	0
+		Reception Time	1
+	Protocol Macro Data:
+		Macro Notation Version	257
+		Macro Definition File Version	0
+		Macro Maker Number	65535
+		Macro Kind Number	255
+		Macro Model Number	255
+		Macro Version	0
+		Macro Explanation	
+		Macro Protocol No	65535
+		Macro Send Packet No00	NULL
+		Macro Receive Packet No00	65535
+		Macro Receive Packet No01	NULL
+		Macro Receive Packet No02	NULL
+		Macro Receive Packet No03	NULL
+		Macro Receive Packet No04	NULL
+		Macro Receive Packet No05	NULL
+		Macro Receive Packet No06	NULL
+		Macro Receive Packet No07	NULL
+		Macro Receive Packet No08	NULL
+		Macro Receive Packet No09	NULL
+		Macro Receive Packet No10	NULL
+		Macro Receive Packet No11	NULL
+		Macro Receive Packet No12	NULL
+		Macro Receive Packet No13	NULL
+		Macro Receive Packet No14	NULL
+		Macro Receive Packet No15	NULL
+	Packet Data:
+		Use Packet No	1
+		Macro Packet No	65535
+		Packet Name	
+		Packet Type	1
+	Element Data:
+		Frame Type	18
+		Element Number	1
+		Element Name	Start Byte
+		Code Type	2
+		Value	AA
+	Element Data:
+		Frame Type	65
+		Element Number	2
+		Element Name	theta1
+		Mode	0
+		Device Code	168
+		Device EX Code	0
+		Device No	3000
+		Device EX No	0
+		Device Mod	0
+		Device EX Mod	0
+		Data Length	1
+		Storage Unit	0
+		Byte Swap	0
+	Element Data:
+		Frame Type	65
+		Element Number	3
+		Element Name	theta2
+		Mode	0
+		Device Code	168
+		Device EX Code	0
+		Device No	3002
+		Device EX No	0
+		Device Mod	0
+		Device EX Mod	0
+		Data Length	1
+		Storage Unit	0
+		Byte Swap	0
+	Element Data:
+		Frame Type	65
+		Element Number	4
+		Element Name	theta3
+		Mode	0
+		Device Code	168
+		Device EX Code	0
+		Device No	3004
+		Device EX No	0
+		Device Mod	0
+		Device EX Mod	0
+		Data Length	1
+		Storage Unit	0
+		Byte Swap	0
+	Element Data:
+		Frame Type	65
+		Element Number	5
+		Element Name	theta4
+		Mode	0
+		Device Code	168
+		Device EX Code	0
+		Device No	3006
+		Device EX No	0
+		Device Mod	0
+		Device EX Mod	0
+		Data Length	1
+		Storage Unit	0
+		Byte Swap	0
+	Element Data:
+		Frame Type	65
+		Element Number	6
+		Element Name	theta5
+		Mode	0
+		Device Code	168
+		Device EX Code	0
+		Device No	3008
+		Device EX No	0
+		Device Mod	0
+		Device EX Mod	0
+		Data Length	1
+		Storage Unit	0
+		Byte Swap	0
+[END]
