@@ -42,6 +42,7 @@ Data memory
 | D1406 --> D1407     | Data for axis 4 adapt_control     |
 | D1408 --> D1409     | Data for axis 5 adapt_control     |
 | D2100 --> D2109     | Data for velocity control         |
+| D3000 --> D3009     | Test receive 5 axis position      |
 
 Temp memory
 
