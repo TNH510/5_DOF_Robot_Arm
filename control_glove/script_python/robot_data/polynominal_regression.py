@@ -33,7 +33,7 @@ t, x, y, z = load_3d_movement_from_csv(csv_file_path)
 T = t.reshape(-1, 1)
 
 # Choose a high degree for the polynomial
-high_degree = 10  # Adjust as needed to increase or decrease the fitting accuracy
+high_degree = 5  # Adjust as needed to increase or decrease the fitting accuracy
 
 # Perform polynomial regression for the high degree and store the model
 model_x = polynomial_regression(T, x, high_degree)
