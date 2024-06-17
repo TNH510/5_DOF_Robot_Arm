@@ -92,11 +92,6 @@ namespace RobotArmHelix
 
         public string[] fields;
         public string[] totalLines_csv;
-        private int nxt_line = 0;
-
-        private double returnX_update = 500;
-        private double returnY_update = 0;
-        private double returnZ_update = 900;
 
         double t1_test, t2_test, t3_test, t4_test, t5_test;
         double t5_camera = 0.0;
@@ -105,7 +100,6 @@ namespace RobotArmHelix
 
         private int servo_status_timer = 0;
         private System.Timers.Timer timer;
-        private int count;
 
         private SerialPort uart = new SerialPort();
         string receivedData;
@@ -131,8 +125,6 @@ namespace RobotArmHelix
         public ActUtlType plc = new();
         List<Joint> joints = null;
         int move = 0; /* move = 1 -> MoveJ, move = 2 -> MoveL */
-
-
 
         bool switchingJoint = false;
         bool isAnimating = false;
@@ -212,9 +204,6 @@ namespace RobotArmHelix
             modelsNames.Add(MODEL_PATH4);
             modelsNames.Add(MODEL_PATH5);
 
-
-#if IRB6700
-#endif
             RoboticArm.Content = Initialize_Environment(modelsNames);
 
             /** Debug sphere to check in which point the joint is rotating**/
@@ -296,7 +285,7 @@ namespace RobotArmHelix
 
         }
 
-        #region Thread
+        #region Thread_Timer
 
         public void Task1()
         {
@@ -361,6 +350,55 @@ namespace RobotArmHelix
 
                 // Sleep for a while to simulate the function taking time
                 Thread.Sleep(1); // Simulate a function execution time of 100 milliseconds
+            }
+        }
+
+        public void timer1_Tick(object sender, EventArgs e)
+        {
+            double x, y, z;
+            double t1, t2, t3, t4, t5;
+            int ret;
+            int[] temp_value = new int[5];
+            try
+            {
+
+                x = returnX;
+                y = returnY;
+                z = returnZ;
+
+                (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
+                ret = Check_angle(t1, t2, t3, t4, t5_camera);
+                if (ret != 0)
+                {
+                    double theta = 0.0;
+                    if (ret == 1) theta = t1;
+                    else if (ret == 2) theta = t2;
+                    else if (ret == 3) theta = t3;
+                    else if (ret == 4) theta = t4;
+                    else if (ret == 5) theta = t5_camera;
+                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
+                    return;
+                }
+                t2 -= 90.0;
+                t3 += 90.0;
+                t4 += 90.0;
+
+                int[] value_angle = new int[10];
+                /* Run */
+                temp_value[0] = (int)(Convert.ToDouble(t1) * 100000 + 18000000);
+                temp_value[1] = (int)(Convert.ToDouble(t2) * 100000 + 18000000);
+                temp_value[2] = (int)(Convert.ToDouble(t3) * 100000 + 18000000);
+                temp_value[3] = (int)(Convert.ToDouble(t4) * 100000 + 18000000);
+                temp_value[4] = (int)(Convert.ToDouble(t5_camera) * 100000 + 18000000);
+                /* Write the angle */
+                for (int ind = 0; ind < 5; ind++)
+                {
+                    write_d_mem_32_bit(1400 + 2 * ind, temp_value[ind]);
+                }
+            }
+            catch (Exception er)
+            {
+                PrintLog("Bug", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", er));
             }
         }
 
@@ -458,43 +496,7 @@ namespace RobotArmHelix
             return RA;
         }
 
-        private void ReachingPoint_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            try
-            {
-                reachingPoint = new Vector3D(Double.Parse(TbX.Text), Double.Parse(TbY.Text), Double.Parse(TbZ.Text)); 
-            }
-            catch
-            {
-
-            }
-        }
-
-        private void joint_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if (isAnimating)
-                return;
-            if(cn_bttn == false)
-            {
-                joints[1].angle = angles_global[0];
-                joints[2].angle = angles_global[1];
-                joints[3].angle = angles_global[2];
-                joints[4].angle = angles_global[3];
-                joints[5].angle = angles_global[4];
-            }
-            else
-            {
-                joints[1].angle = joint1.Value;
-                joints[2].angle = joint2.Value;
-                joints[3].angle = joint3.Value;
-                joints[4].angle = joint4.Value;
-                joints[5].angle = joint5.Value;
-            }
-            execute_fk();
-        }
-        /**
-         * This methodes execute the FK (Forward Kinematics). It starts from the first joint, the base.
-         * */
+        #region Jaocbi
 
         public static double[] MultiplyMatrices(double[,] matrix5x3, double[,] matrix3x1)
         {
@@ -561,82 +563,7 @@ namespace RobotArmHelix
             return jacobianMatrix;
         }
 
-        private void execute_fk()
-        {
-            int[] value_positon = new int[16];
-            uint t1 = 0, t2 = 0, t3 = 0, t4 = 0, t5 = 0;
-            double t1_out, t2_out, t3_out, t4_out, t5_out;
-            if (cn_bttn == true)
-            {
-                double[] angles = { joints[1].angle, joints[2].angle, joints[3].angle, joints[4].angle, joints[5].angle };
-                // Update UI asynchronously using Dispatcher
-                Dispatcher.Invoke(() =>
-                {
-                    /* Update position for robot on GUI */
-                    ForwardKinematics(angles);
-                    /* Update data for slider on GUI */
-                    joint1.Value = angles[0];
-                    joint2.Value = angles[1];
-                    joint3.Value = angles[2];
-                    joint4.Value = angles[3];
-                    joint5.Value = angles[4];
-                });
-            }
-            else
-            {
-                /* Read position of 5 angles */
-                int[] temp_angle = new int[90];
-                plc.ReadDeviceBlock(Constants.R_POSITION_1, 82, out temp_angle[0]);
-
-                value_positon[0] = temp_angle[0];
-                value_positon[1] = temp_angle[1];
-
-                value_positon[2] = temp_angle[20];
-                value_positon[3] = temp_angle[21];
-
-                value_positon[4] = temp_angle[40];
-                value_positon[5] = temp_angle[41];
-
-                value_positon[6] = temp_angle[60];
-                value_positon[7] = temp_angle[61];
-
-                value_positon[8] = temp_angle[80];
-                value_positon[9] = temp_angle[81];
-
-                // Read and convert driver angle value to real position value (was subtracted by 180)
-                t1 = Read_Position((uint)value_positon[0], (uint)value_positon[1]);
-                t2 = Read_Position((uint)value_positon[2], (uint)value_positon[3]);
-                t3 = Read_Position((uint)value_positon[4], (uint)value_positon[5]);
-                t4 = Read_Position((uint)value_positon[6], (uint)value_positon[7]);
-                t5 = Read_Position((uint)value_positon[8], (uint)value_positon[9]);
-
-                // Convert theta read from int to double
-                t1_out = double.Parse(Convert.ToString((int)t1)) / 100000.0;
-                t2_out = double.Parse(Convert.ToString((int)t2)) / 100000.0;
-                t3_out = double.Parse(Convert.ToString((int)t3)) / 100000.0;
-                t4_out = double.Parse(Convert.ToString((int)t4)) / 100000.0;
-                t5_out = double.Parse(Convert.ToString((int)t5)) / 100000.0;
-
-                angles_global[0] = t1_out;
-                angles_global[1] = t2_out;
-                angles_global[2] = t3_out;
-                angles_global[3] = t4_out;
-                angles_global[4] = t5_out;
-                try
-                {
-                    // Update UI asynchronously using Dispatcher
-                    Dispatcher.Invoke(() =>
-                    {
-                        /* Update position for robot on GUI */
-                        ForwardKinematics(angles_global);
-                    });
-                }
-                catch (TaskCanceledException)
-                {
-                    // Ignore the exception
-                }
-            }
-        }
+        #endregion
 
         #region GUI_display
 
@@ -731,113 +658,65 @@ namespace RobotArmHelix
             return HitTestResultBehavior.Continue;
         }
 
-        #endregion
-
-        public void timer1_Tick(object sender, EventArgs e)
+        public void PrintLog(string level, string namefunction, string msg)
         {
-            double x, y, z;
-            double t1, t2, t3, t4, t5;
-            int ret;
-            int[] temp_value = new int[5];
-            try
-            {
-
-                x = returnX;
-                y = returnY;
-                z = returnZ;
-
-                (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
-                ret = Check_angle(t1, t2, t3, t4, t5_camera);
-                if (ret != 0)
-                {
-                    double theta = 0.0;
-                    if (ret == 1) theta = t1;
-                    else if (ret == 2) theta = t2;
-                    else if (ret == 3) theta = t3;
-                    else if (ret == 4) theta = t4;
-                    else if (ret == 5) theta = t5_camera;
-                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
-                    return;
-                }
-                t2 -= 90.0;
-                t3 += 90.0;
-                t4 += 90.0;
-
-                int[] value_angle = new int[10];
-                /* Run */
-                temp_value[0] = (int)(Convert.ToDouble(t1) * 100000 + 18000000);
-                temp_value[1] = (int)(Convert.ToDouble(t2) * 100000 + 18000000);
-                temp_value[2] = (int)(Convert.ToDouble(t3) * 100000 + 18000000);
-                temp_value[3] = (int)(Convert.ToDouble(t4) * 100000 + 18000000);
-                temp_value[4] = (int)(Convert.ToDouble(t5_camera) * 100000 + 18000000);
-                /* Write the angle */
-                for (int ind = 0; ind < 5; ind++)
-                {
-                    write_d_mem_32_bit(1400 + 2 * ind, temp_value[ind]);
-                }
-            }
-            catch (Exception er)
-            {
-                PrintLog("Bug", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", er));
-            }
-        } 
-
-        public bool checkAngles(double[] oldAngles, double[] angles)
-        {
-            for(int i = 0; i <= 4; i++)
-            {
-                if (oldAngles[i] != angles[i])
-                    return false;
-            }
-
-            return true;
-        }
-        
-        public double PartialGradient(Vector3D target, double[] angles, int i)
-        {
-            // Saves the angle,
-            // it will be restored later
-            double angle = angles[i];
-
-            // Gradient : [F(x+SamplingDistance) - F(x)] / h
-            double f_x = DistanceFromTarget(target, angles);
-
-            angles[i] += SamplingDistance;
-            double f_x_plus_d = DistanceFromTarget(target, angles);
-
-            double gradient = (f_x_plus_d - f_x) / SamplingDistance;
-
-            // Restores
-            angles[i] = angle;
-
-            return gradient;
+            DateTime time = DateTime.Now;
+            ErrorLog.AppendText(time.ToString("h:mm:ss") + " - " + level + " - " + namefunction + ": " + msg);
+            ErrorLog.AppendText(Environment.NewLine);
         }
 
-
-        public double DistanceFromTarget(Vector3D target, double[] angles)
+        public void ChangeColorObjectBackground(object objectin, System.Windows.Media.Color color_object)
         {
-            Vector3D point = ForwardKinematics (angles);      
-            return Math.Sqrt(Math.Pow((point.X - target.X), 2.0) + Math.Pow((point.Y - target.Y), 2.0) + Math.Pow((point.Z - target.Z), 2.0));
-        }
-        
-        // Function to calculate the trajectory points (example)
-        private List<Point3D> CalculateTrajectoryLine()
-        {
-            List<Point3D> trajectoryPoints = new List<Point3D>();
-
-            // Example trajectory calculation (replace with your own logic)
-            for (double t = 0; t <= 500; t += 50)
+            var button = objectin as Button;
+            if (button != null)
             {
-                double x = Math.Cos(t); // Replace with your x-coordinate calculation
-                double y = Math.Sin(t); // Replace with your y-coordinate calculation
-                double z = t;            // Replace with your z-coordinate calculation
-
-                trajectoryPoints.Add(new Point3D(x, y, z));
+                button.Background = new System.Windows.Media.SolidColorBrush(color_object);
+                return;
             }
 
-            return trajectoryPoints;
+            var textbox = objectin as TextBox;
+            if (textbox != null)
+            {
+                textbox.Background = new System.Windows.Media.SolidColorBrush(color_object);
+                return;
+            }
         }
-        public Vector3D ForwardKinematics(double [] angles)
+
+        public void ChangeColorObjectForeground(object objectin, System.Windows.Media.Color color_object)
+        {
+            var button = objectin as Button;
+            if (button != null)
+            {
+                button.Foreground = new System.Windows.Media.SolidColorBrush(color_object);
+                return;
+            }
+
+            var textbox = objectin as TextBox;
+            if (textbox != null)
+            {
+                textbox.Foreground = new System.Windows.Media.SolidColorBrush(color_object);
+                return;
+            }
+        }
+
+        public void ChangeColorObjectBorderBrush(object objectin, System.Windows.Media.Color color_object)
+        {
+            var button = objectin as Button;
+            if (button != null)
+            {
+                button.BorderBrush = new System.Windows.Media.SolidColorBrush(color_object);
+                return;
+            }
+
+            var textbox = objectin as TextBox;
+            if (textbox != null)
+            {
+                textbox.BorderBrush = new System.Windows.Media.SolidColorBrush(color_object);
+                return;
+            }
+        }
+
+        public Vector3D ForwardKinematics(double[] angles)
         {
 
             /* Variables */
@@ -868,7 +747,7 @@ namespace RobotArmHelix
             //and again the previous transformation needs to be applied
             F3 = new Transform3DGroup();
             T = new TranslateTransform3D(0, 0, 0);
-            R = new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(joints[2].rotAxisX, - joints[2].rotAxisY, joints[2].rotAxisZ), (angles[1] + 90.0)), new Point3D(joints[2].rotPointX,  - joints[2].rotPointY, joints[2].rotPointZ));
+            R = new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(joints[2].rotAxisX, -joints[2].rotAxisY, joints[2].rotAxisZ), (angles[1] + 90.0)), new Point3D(joints[2].rotPointX, -joints[2].rotPointY, joints[2].rotPointZ));
             F3.Children.Add(T);
             F3.Children.Add(R);
             F3.Children.Add(F2);
@@ -876,7 +755,7 @@ namespace RobotArmHelix
             //as before
             F4 = new Transform3DGroup();
             T = new TranslateTransform3D(0, 0, 0); //1500, 650, 1650
-            R = new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(joints[3].rotAxisX,  - joints[3].rotAxisY, joints[3].rotAxisZ), (angles[2] - 90.0)), new Point3D(joints[3].rotPointX,  - joints[3].rotPointY, joints[3].rotPointZ));
+            R = new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(joints[3].rotAxisX, -joints[3].rotAxisY, joints[3].rotAxisZ), (angles[2] - 90.0)), new Point3D(joints[3].rotPointX, -joints[3].rotPointY, joints[3].rotPointZ));
             F4.Children.Add(T);
             F4.Children.Add(R);
             F4.Children.Add(F3);
@@ -884,7 +763,7 @@ namespace RobotArmHelix
             //as before
             F5 = new Transform3DGroup();
             T = new TranslateTransform3D(0, 0, 0);
-            R = new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(joints[4].rotAxisX, - joints[4].rotAxisY, joints[4].rotAxisZ), angles[3] - 90.0), new Point3D(joints[4].rotPointX,  - joints[4].rotPointY, joints[4].rotPointZ));
+            R = new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(joints[4].rotAxisX, -joints[4].rotAxisY, joints[4].rotAxisZ), angles[3] - 90.0), new Point3D(joints[4].rotPointX, -joints[4].rotPointY, joints[4].rotPointZ));
             F5.Children.Add(T);
             F5.Children.Add(R);
             F5.Children.Add(F4);
@@ -940,21 +819,9 @@ namespace RobotArmHelix
             // Add the ModelVisual3D to the list for later removal
             sphereVisuals.Add(visualtest);
 
-#if IRB6700
-
-#else
-            joints[7].model.Transform = F1; //Cables
-
-            joints[8].model.Transform = F2; //Cables
-
-            joints[6].model.Transform = F3; //The ABB writing
-            joints[9].model.Transform = F3; //Cables
-#endif
-
             return new Vector3D(joints[5].model.Bounds.Location.X, joints[5].model.Bounds.Location.Y, joints[5].model.Bounds.Location.Z);
         }
 
-        // Function to remove all sphere visuals from the viewport
         private void RemoveSphereVisuals()
         {
             foreach (ModelVisual3D visual in sphereVisuals)
@@ -964,428 +831,44 @@ namespace RobotArmHelix
             sphereVisuals.Clear();
         }
 
-        public static (double, double, double, double, double) convert_position_angle(double x, double y, double z)
+        private void ReachingPoint_TextChanged(object sender, TextChangedEventArgs e)
         {
-            double t1, t2, t3, t4, t5, s2, c2, s3, c3, m, n;
-            double pitch;
-            pitch = -Math.PI / 2;
-            t1 = Math.Atan2(y, x);
-            // t5 = roll - t1;
-            t5 = 0.0;
-            m = Math.Sqrt(x * x + y * y);
-            n = z - Constants.l1 + Constants.l5;
-            c3 = (m * m + n * n - Constants.l2 * Constants.l2 - Constants.l3 * Constants.l3) / (2 * Constants.l2 * Constants.l3);
-            /* s3 has 2 value --> take the value of -sin */
-            s3 = Math.Sqrt(1 - c3 * c3);
-            t3 = Math.Atan2(s3, c3);
-            if (t3 >= -Math.PI / 6 && t3 <= (4 * Math.PI) / 9)
+            try
             {
-                /* Do nothing*/
+                reachingPoint = new Vector3D(Double.Parse(TbX.Text), Double.Parse(TbY.Text), Double.Parse(TbZ.Text));
             }
-            else
+            catch
             {
-                s3 = -1 * Math.Sqrt(1 - c3 * c3);
-                t3 = Math.Atan2(s3, c3);
-            }
-            /* Angle 3 */
-            c2 = m * (Constants.l3 * c3 + Constants.l2) + n * (Constants.l3 * s3);
-            s2 = n * (Constants.l3 * c3 + Constants.l2) - m * (Constants.l3 * s3);
-            /* Angle 2 */
-            t2 = Math.Atan2(s2, c2);
-            /* Angle 4 */
-            t4 = pitch - t2 - t3;
-            t1 = t1 / Math.PI * 180.0;
-            t2 = t2 / Math.PI * 180.0;
-            t3 = t3 / Math.PI * 180.0;
-            t4 = t4 / Math.PI * 180.0;
-            t5 = t5 / Math.PI * 180.0;
-            return (t1, t2, t3, t4, t5);
-        }
-        private void ConnectPLC(object sender, RoutedEventArgs e)
-        {
-            /* Change state of the menu */
-            // After connecting, uncheck the "Disconnect" MenuItem
-            DisconnectMenuItem.IsChecked = false;
-            ConnectMenuItem.IsChecked = true;
-            /* Disable slider */
-            joint1.IsEnabled = false;
-            joint2.IsEnabled = false;
-            joint3.IsEnabled = false;
-            joint4.IsEnabled = false;
-            joint5.IsEnabled = false;
-            /* Disable test position button */
-            testpos_bttn = false;
-            /* Change the color of the button when clicked */
-            ChangeColorObjectBackground(TestPos_bttn, Constants.OBJECT_MODIFIED);
-            ChangeColorObjectForeground(TestPos_bttn, Constants.OBJECT_MODIFIED1);
-            ChangeColorObjectBorderBrush(TestPos_bttn, Constants.OBJECT_MODIFIED);
 
-            /* Declare the variable(s) */
-            int ret;
-            /* A logical station number set in Communication Setup Utility - Datasheet - Page 61 */
-            plc.ActLogicalStationNumber = 1;
-            /* Open the connection between PLC and C# - Datasheet - Page 381 */
-            ret = plc.Open();
-            /* Return value
-               Normal termination : 0 is returned.
-               Abnormal termination: Any value other than 0 is returned
-            */
-            if (ret == 0 && cn_bttn == true)
-            {
-                //Connect_button.IsEnabled = false;
-                //Disconnect_button.IsEnabled = true;
-                cn_bttn=false;
-                ds_bttn=true;
-                /* 
-                    Print the log command
-                    MethosBase.GetCurrentMethod returns the action user did.
-                */
-                PrintLog("Info", MethodBase.GetCurrentMethod().Name, "Connect PLC successfully");
             }
-            else if (ds_bttn == true)
-            {
-                PrintLog("Infor", MethodBase.GetCurrentMethod().Name, "PLC was connected");
-            }
-            else
-            {
-                PrintLog("Error", MethodBase.GetCurrentMethod().Name, "Connect PLC unsuccessfully");
-            }
-            /* Read the servo mode */
-            int servo_status;
-            string getName = MethodBase.GetCurrentMethod().Name;
-            /* Read status of Brake and AC Servo */
-            ret = PLCReadbit(Constants.R_SERVO_ON, out servo_status);
-            if (ret != 0)
-            {
-                PrintLog("Error", getName, "Read PLC Fail");
+        }
+
+        private void joint_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (isAnimating)
                 return;
-            }
-            if (servo_status == 0) /* Servo is currently off */
+            if (cn_bttn == false)
             {
-                Servo_button.Content = "Servo: off";
-                ChangeColorObjectBackground(Servo_button, Constants.OBJECT_MODIFIED1);
-                ChangeColorObjectForeground(Servo_button, Constants.OBJECT_MODIFIED);
-                PrintLog("SERVO:", servo_status.ToString(), "OFF");
+                joints[1].angle = angles_global[0];
+                joints[2].angle = angles_global[1];
+                joints[3].angle = angles_global[2];
+                joints[4].angle = angles_global[3];
+                joints[5].angle = angles_global[4];
             }
             else
             {
-                Servo_button.Content = "Servo: on";
-                ChangeColorObjectBackground(Servo_button, Constants.OBJECT_MODIFIED);
-                ChangeColorObjectForeground(Servo_button, Constants.OBJECT_MODIFIED1);
-                PrintLog("SERVO:", servo_status.ToString(), "ON");
+                joints[1].angle = joint1.Value;
+                joints[2].angle = joint2.Value;
+                joints[3].angle = joint3.Value;
+                joints[4].angle = joint4.Value;
+                joints[5].angle = joint5.Value;
             }
-            /* Start timer1 and timer2 */
-            // timer1.Start();
-            // Thread1Start();
-            // Thread1Start();
-            //Thread2Start();
-            //timer1.Start();
+            execute_fk();
         }
 
-        private void DisconnectPLC(object sender, RoutedEventArgs e)
-        {
-            /* Change state of the menu item */
-            // After connecting, uncheck the "Disconnect" MenuItem
-            DisconnectMenuItem.IsChecked = true;
-            ConnectMenuItem.IsChecked = false;
-            /* Stop thread */
-            Thread1isRunning = false;
-            Thread2isRunning = false;
+        #endregion
 
-            /* Enable slider */
-            joint1.IsEnabled = true;
-            joint2.IsEnabled = true;
-            joint3.IsEnabled = true;
-            joint4.IsEnabled = true;
-            joint5.IsEnabled = true;
-
-            /* Disable test position button */
-            testpos_bttn = true;
-            /* Change the color of the button when clicked */
-            ChangeColorObjectBackground(TestPos_bttn, Constants.OBJECT_MODIFIED1);
-            ChangeColorObjectForeground(TestPos_bttn, Constants.OBJECT_MODIFIED);
-            ChangeColorObjectBorderBrush(TestPos_bttn, Constants.OBJECT_MODIFIED);
-            /* Declare the variable(s) */
-            int ret;
-            /* Close the connection between PLC and C# - Datasheet - Page 383 */
-            ret = plc.Close();
-            /* Change the color of the button when clicked */
-            //Disconnect_button.Enabled = false;
-            //Connect_button.Enabled = true;
-            /* 
-                Print the log command
-                MethosBase.GetCurrentMethod returns the action user did.
-            */
-            if (ret == 0 && ds_bttn == true)
-            {
-                //Connect_button.IsEnabled = false;
-                //Disconnect_button.IsEnabled = true;
-                cn_bttn = true;
-                ds_bttn = false;
-                /* 
-                    Print the log command
-                    MethosBase.GetCurrentMethod returns the action user did.
-                */
-                PrintLog("Info", MethodBase.GetCurrentMethod().Name, "Disonnect PLC successfully");
-            }
-            else if (ds_bttn == false)
-            {
-                PrintLog("Infor", MethodBase.GetCurrentMethod().Name, "PLC was disconnected");
-            }
-            else
-            {
-                PrintLog("Error", MethodBase.GetCurrentMethod().Name, "Disconnect PLC unsuccessfully");
-            }
-
-        }
-
-        private void Visible_Glove_Click(object sender, RoutedEventArgs e)
-        {
-            visible_glove = (~visible_glove) & 0x01;
-            if (visible_glove == 0)
-            {
-                com_port_list1.Visibility = Visibility.Visible;
-                com_port_list2.Visibility = Visibility.Visible;
-                com_port_list3.Visibility = Visibility.Visible;
-                com_port_list4.Visibility = Visibility.Visible;
-                com_port_list5.Visibility = Visibility.Visible;
-
-
-                Connect_glove_btn.Visibility = Visibility.Visible;
-                Disconnect_glove_btn.Visibility = Visibility.Visible;
-
-                progressbar1.Visibility = Visibility.Visible;
-
-
-                Glove_name.Visibility = Visibility.Visible;
-                Glove_com.Visibility = Visibility.Visible;
-                Glove_baud.Visibility = Visibility.Visible;
-                Glove_data.Visibility = Visibility.Visible;
-                Glove_parity.Visibility = Visibility.Visible;
-                Glove_stop.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                com_port_list1.Visibility = Visibility.Hidden;
-                com_port_list2.Visibility = Visibility.Hidden;
-                com_port_list3.Visibility = Visibility.Hidden;
-                com_port_list4.Visibility = Visibility.Hidden;
-                com_port_list5.Visibility = Visibility.Hidden;
-
-
-                Connect_glove_btn.Visibility = Visibility.Hidden;
-                Disconnect_glove_btn.Visibility = Visibility.Hidden;
-
-                progressbar1.Visibility = Visibility.Hidden;
-
-
-                Glove_name.Visibility = Visibility.Hidden;
-                Glove_com.Visibility = Visibility.Hidden;
-                Glove_baud.Visibility = Visibility.Hidden;
-                Glove_data.Visibility = Visibility.Hidden;
-                Glove_parity.Visibility = Visibility.Hidden;
-                Glove_stop.Visibility = Visibility.Hidden;
-            }
-        }
-
-        private void Visible_Robot_Click(object sender, RoutedEventArgs e)
-        {
-            visible_robot = (~visible_robot) & 0x01;
-            if(visible_robot == 0)
-            {
-                viewPort3d.Children.Remove(RoboticArm);
-            }
-            else
-            {
-                viewPort3d.Children.Add(RoboticArm);
-            }
-            
-        }
-        private void Visible_Display_Click(object sender, RoutedEventArgs e)
-        {
-            visible_display = (~visible_display) & 0x01;
-            if (visible_display == 0)
-            {
-                J1_lbl.Visibility = Visibility.Hidden;
-                J2_lbl.Visibility = Visibility.Hidden;
-                J3_lbl.Visibility = Visibility.Hidden;
-                J4_lbl.Visibility = Visibility.Hidden;
-                J5_lbl.Visibility = Visibility.Hidden;
-
-                joint1.Visibility = Visibility.Hidden;
-                joint2.Visibility = Visibility.Hidden;
-                joint3.Visibility = Visibility.Hidden;
-                joint4.Visibility = Visibility.Hidden;
-                joint5.Visibility = Visibility.Hidden;
-
-                J1Value.Visibility = Visibility.Hidden;
-                J2Value.Visibility = Visibility.Hidden;
-                J3Value.Visibility = Visibility.Hidden;
-                J4Value.Visibility = Visibility.Hidden;
-                J5Value.Visibility = Visibility.Hidden;
-
-                Tx.Visibility = Visibility.Hidden;
-                Ty.Visibility = Visibility.Hidden;
-                Tz.Visibility = Visibility.Hidden;
-
-                X_lbl.Visibility = Visibility.Hidden;
-                Y_lbl.Visibility = Visibility.Hidden;
-                Z_lbl.Visibility = Visibility.Hidden;
-
-                display_lbl.Visibility = Visibility.Hidden;
-            }
-            else
-            {
-                J1_lbl.Visibility = Visibility.Visible;
-                J2_lbl.Visibility = Visibility.Visible;
-                J3_lbl.Visibility = Visibility.Visible;
-                J4_lbl.Visibility = Visibility.Visible;
-                J5_lbl.Visibility = Visibility.Visible;
-
-                joint1.Visibility = Visibility.Visible;
-                joint2.Visibility = Visibility.Visible;
-                joint3.Visibility = Visibility.Visible;
-                joint4.Visibility = Visibility.Visible;
-                joint5.Visibility = Visibility.Visible;
-
-                J1Value.Visibility = Visibility.Visible;
-                J2Value.Visibility = Visibility.Visible;
-                J3Value.Visibility = Visibility.Visible;
-                J4Value.Visibility = Visibility.Visible;
-                J5Value.Visibility = Visibility.Visible;
-
-                Tx.Visibility = Visibility.Visible;
-                Ty.Visibility = Visibility.Visible;
-                Tz.Visibility = Visibility.Visible;
-
-                X_lbl.Visibility = Visibility.Visible;
-                Y_lbl.Visibility = Visibility.Visible;
-                Z_lbl.Visibility = Visibility.Visible;
-
-                display_lbl.Visibility = Visibility.Visible;
-            }
-
-        }
-
-        private void Visible_Control_Click(object sender, RoutedEventArgs e)
-        {
-            visible_control = (~visible_control) & 0x01;
-            if (visible_control == 0)
-            {
-                Servo_button.Visibility = Visibility.Hidden;
-                ResetError_button.Visibility = Visibility.Hidden;
-                SetHome_button.Visibility = Visibility.Hidden;
-                GoHome_button.Visibility = Visibility.Hidden;
-
-                control_lbl.Visibility = Visibility.Hidden;
-            }
-            else
-            {
-                Servo_button.Visibility = Visibility.Visible;
-                ResetError_button.Visibility = Visibility.Visible;
-                SetHome_button.Visibility = Visibility.Visible;
-                GoHome_button.Visibility = Visibility.Visible;
-
-                control_lbl.Visibility = Visibility.Visible;
-            }
-        }
-        private void Visible_Jogging_Click(object sender, RoutedEventArgs e)
-        {
-            visible_jogging = (~visible_jogging) & 0x01;
-            if (visible_jogging == 0)
-            {
-                Forward_button.Visibility = Visibility.Hidden;
-                Backward_button.Visibility = Visibility.Hidden;
-                Jog_set_speed.Visibility = Visibility.Hidden;
-                joint_tb.Visibility = Visibility.Hidden;
-                Joint_lbl.Visibility = Visibility.Hidden;
-                jog_speed_tb.Visibility = Visibility.Hidden;
-
-
-                jogging_lbl.Visibility = Visibility.Hidden;
-            }
-            else
-            {
-                Forward_button.Visibility = Visibility.Visible;
-                Backward_button.Visibility = Visibility.Visible;
-                Jog_set_speed.Visibility = Visibility.Visible;
-                joint_tb.Visibility = Visibility.Visible;
-                Joint_lbl.Visibility = Visibility.Visible;
-                jog_speed_tb.Visibility = Visibility.Visible;
-
-                jogging_lbl.Visibility = Visibility.Visible;
-            }
-        }
-
-        private void Visible_Path_Click(object sender, RoutedEventArgs e)
-        {
-            visible_path = (~visible_path) & 0x01;
-            if (visible_path == 0)
-            {
-                Tsm_moveJ_btn.Visibility = Visibility.Hidden;
-                Tsm_moveL_btn.Visibility = Visibility.Hidden;
-                Tsm_moveC_btn.Visibility = Visibility.Hidden;
-                Clear_Trajectory_btn.Visibility = Visibility.Hidden;
-                TestPos_bttn.Visibility = Visibility.Hidden;
-                set_const_speed_button.Visibility = Visibility.Hidden;
-                run_btn.Visibility = Visibility.Hidden;
-                EStop_btn.Visibility = Visibility.Hidden;
-
-
-                TbX.Visibility = Visibility.Hidden;
-                TbY.Visibility = Visibility.Hidden;
-                TbZ.Visibility = Visibility.Hidden;
-                spd_tb.Visibility = Visibility.Hidden;
-                TbX1.Visibility = Visibility.Hidden;
-                TbX2.Visibility = Visibility.Hidden;
-                TbY1.Visibility = Visibility.Hidden;
-                TbY2.Visibility = Visibility.Hidden;
-
-                tbX1_lbl.Visibility = Visibility.Hidden;
-                tbX2_lbl.Visibility = Visibility.Hidden;
-                tbY1_lbl.Visibility = Visibility.Hidden;
-                tbY2_lbl.Visibility = Visibility.Hidden;
-                tbX_lbl.Visibility = Visibility.Hidden;
-                tbY_lbl.Visibility = Visibility.Hidden;
-                tbZ_lbl.Visibility = Visibility.Hidden;
-                path_lbl.Visibility = Visibility.Hidden;
-
-
-            }
-            else
-            {
-                Tsm_moveJ_btn.Visibility = Visibility.Visible;
-                Tsm_moveL_btn.Visibility = Visibility.Visible;
-                Tsm_moveC_btn.Visibility = Visibility.Visible;
-                Clear_Trajectory_btn.Visibility = Visibility.Visible;
-                TestPos_bttn.Visibility = Visibility.Visible;
-                set_const_speed_button.Visibility = Visibility.Visible;
-                run_btn.Visibility = Visibility.Visible;
-                EStop_btn.Visibility = Visibility.Visible;
-
-
-                TbX.Visibility = Visibility.Visible;
-                TbY.Visibility = Visibility.Visible;
-                TbZ.Visibility = Visibility.Visible;
-                spd_tb.Visibility = Visibility.Visible;
-                TbX1.Visibility = Visibility.Visible;
-                TbX2.Visibility = Visibility.Visible;
-                TbY1.Visibility = Visibility.Visible;
-                TbY2.Visibility = Visibility.Visible;
-
-                tbX1_lbl.Visibility = Visibility.Visible;
-                tbX2_lbl.Visibility = Visibility.Visible;
-                tbY1_lbl.Visibility = Visibility.Visible;
-                tbY2_lbl.Visibility = Visibility.Visible;
-                tbX_lbl.Visibility = Visibility.Visible;
-                tbY_lbl.Visibility = Visibility.Visible;
-                tbZ_lbl.Visibility = Visibility.Visible;
-
-                path_lbl.Visibility = Visibility.Visible;
-
-            }
-        }
-
+        #region control
         private void Servo_button_click(object sender, RoutedEventArgs e)
         {
             int ret, servo_status;
@@ -1448,7 +931,148 @@ namespace RobotArmHelix
         {
             Press_button(MethodBase.GetCurrentMethod().Name, Constants.R_GOHOME);
         }
+        #endregion
 
+        #region PLC_connect
+        private void ConnectPLC(object sender, RoutedEventArgs e)
+        {
+            /* Change state of the menu */
+            // After connecting, uncheck the "Disconnect" MenuItem
+            DisconnectMenuItem.IsChecked = false;
+            ConnectMenuItem.IsChecked = true;
+            /* Disable slider */
+            joint1.IsEnabled = false;
+            joint2.IsEnabled = false;
+            joint3.IsEnabled = false;
+            joint4.IsEnabled = false;
+            joint5.IsEnabled = false;
+            /* Disable test position button */
+            testpos_bttn = false;
+            /* Change the color of the button when clicked */
+            ChangeColorObjectBackground(TestPos_bttn, Constants.OBJECT_MODIFIED);
+            ChangeColorObjectForeground(TestPos_bttn, Constants.OBJECT_MODIFIED1);
+            ChangeColorObjectBorderBrush(TestPos_bttn, Constants.OBJECT_MODIFIED);
+
+            /* Declare the variable(s) */
+            int ret;
+            /* A logical station number set in Communication Setup Utility - Datasheet - Page 61 */
+            plc.ActLogicalStationNumber = 1;
+            /* Open the connection between PLC and C# - Datasheet - Page 381 */
+            ret = plc.Open();
+            /* Return value
+               Normal termination : 0 is returned.
+               Abnormal termination: Any value other than 0 is returned
+            */
+            if (ret == 0 && cn_bttn == true)
+            {
+                //Connect_button.IsEnabled = false;
+                //Disconnect_button.IsEnabled = true;
+                cn_bttn = false;
+                ds_bttn = true;
+                /* 
+                    Print the log command
+                    MethosBase.GetCurrentMethod returns the action user did.
+                */
+                PrintLog("Info", MethodBase.GetCurrentMethod().Name, "Connect PLC successfully");
+            }
+            else if (ds_bttn == true)
+            {
+                PrintLog("Infor", MethodBase.GetCurrentMethod().Name, "PLC was connected");
+            }
+            else
+            {
+                PrintLog("Error", MethodBase.GetCurrentMethod().Name, "Connect PLC unsuccessfully");
+            }
+            /* Read the servo mode */
+            int servo_status;
+            string getName = MethodBase.GetCurrentMethod().Name;
+            /* Read status of Brake and AC Servo */
+            ret = PLCReadbit(Constants.R_SERVO_ON, out servo_status);
+            if (ret != 0)
+            {
+                PrintLog("Error", getName, "Read PLC Fail");
+                return;
+            }
+            if (servo_status == 0) /* Servo is currently off */
+            {
+                Servo_button.Content = "Servo: off";
+                ChangeColorObjectBackground(Servo_button, Constants.OBJECT_MODIFIED1);
+                ChangeColorObjectForeground(Servo_button, Constants.OBJECT_MODIFIED);
+                PrintLog("SERVO:", servo_status.ToString(), "OFF");
+            }
+            else
+            {
+                Servo_button.Content = "Servo: on";
+                ChangeColorObjectBackground(Servo_button, Constants.OBJECT_MODIFIED);
+                ChangeColorObjectForeground(Servo_button, Constants.OBJECT_MODIFIED1);
+                PrintLog("SERVO:", servo_status.ToString(), "ON");
+            }
+            /* Start timer1 and timer2 */
+            // timer1.Start();
+            // Thread1Start();
+            // Thread1Start();
+            //Thread2Start();
+            //timer1.Start();
+        }
+        private void DisconnectPLC(object sender, RoutedEventArgs e)
+        {
+            /* Change state of the menu item */
+            // After connecting, uncheck the "Disconnect" MenuItem
+            DisconnectMenuItem.IsChecked = true;
+            ConnectMenuItem.IsChecked = false;
+            /* Stop thread */
+            Thread1isRunning = false;
+            Thread2isRunning = false;
+
+            /* Enable slider */
+            joint1.IsEnabled = true;
+            joint2.IsEnabled = true;
+            joint3.IsEnabled = true;
+            joint4.IsEnabled = true;
+            joint5.IsEnabled = true;
+
+            /* Disable test position button */
+            testpos_bttn = true;
+            /* Change the color of the button when clicked */
+            ChangeColorObjectBackground(TestPos_bttn, Constants.OBJECT_MODIFIED1);
+            ChangeColorObjectForeground(TestPos_bttn, Constants.OBJECT_MODIFIED);
+            ChangeColorObjectBorderBrush(TestPos_bttn, Constants.OBJECT_MODIFIED);
+            /* Declare the variable(s) */
+            int ret;
+            /* Close the connection between PLC and C# - Datasheet - Page 383 */
+            ret = plc.Close();
+            /* Change the color of the button when clicked */
+            //Disconnect_button.Enabled = false;
+            //Connect_button.Enabled = true;
+            /* 
+                Print the log command
+                MethosBase.GetCurrentMethod returns the action user did.
+            */
+            if (ret == 0 && ds_bttn == true)
+            {
+                //Connect_button.IsEnabled = false;
+                //Disconnect_button.IsEnabled = true;
+                cn_bttn = true;
+                ds_bttn = false;
+                /* 
+                    Print the log command
+                    MethosBase.GetCurrentMethod returns the action user did.
+                */
+                PrintLog("Info", MethodBase.GetCurrentMethod().Name, "Disonnect PLC successfully");
+            }
+            else if (ds_bttn == false)
+            {
+                PrintLog("Infor", MethodBase.GetCurrentMethod().Name, "PLC was disconnected");
+            }
+            else
+            {
+                PrintLog("Error", MethodBase.GetCurrentMethod().Name, "Disconnect PLC unsuccessfully");
+            }
+
+        }
+        #endregion
+
+        #region Jogging_control
         private void Jog_set_speed_Click(object sender, RoutedEventArgs e)
         {
             int velocity = 0;
@@ -1468,7 +1092,6 @@ namespace RobotArmHelix
                 MessageBox.Show(ex.Message);
             }
         }
-
         private void Forward_button_MouseDown(object sender, MouseButtonEventArgs e)
         {
             int joint = Convert.ToInt16(joint_tb.Text);
@@ -1509,7 +1132,6 @@ namespace RobotArmHelix
                     break;
             }
         }
-
         private void Forward_button_MouseUp(object sender, MouseButtonEventArgs e)
         {
             int joint = Convert.ToInt16(joint_tb.Text);
@@ -1553,7 +1175,6 @@ namespace RobotArmHelix
                     break;
             }
         }
-
         private void Backward_button_MouseDown(object sender, MouseButtonEventArgs e)
         {
             int joint = Convert.ToInt16(joint_tb.Text);
@@ -1595,7 +1216,6 @@ namespace RobotArmHelix
                     break;
             }
         }
-
         private void Backward_button_MouseUp(object sender, MouseButtonEventArgs e)
         {
             int joint = Convert.ToInt16(joint_tb.Text);
@@ -1637,7 +1257,9 @@ namespace RobotArmHelix
                     break;
             }
         }
+        #endregion
 
+        #region path_control
         private void set_const_speed_btn_Click(object sender, RoutedEventArgs e)
         {
             int velocity;
@@ -1652,7 +1274,6 @@ namespace RobotArmHelix
                 MessageBox.Show(ex.Message);
             }
         }
-
         private void Tsm_moveJ_btn_Click(object sender, RoutedEventArgs e)
         {
             move = 1; /* moveJ */
@@ -1751,35 +1372,6 @@ namespace RobotArmHelix
                 }
             }
         }
-
-        private void Memory_angle_write(int[,] array, int[] value_angle, string device, int point)
-        {
-            for (int j = 0; j < point; j++)
-            {
-                value_angle[8 * j] = Write_Theta(array[j, 0])[0];
-                value_angle[8 * j + 1] = Write_Theta(array[j, 0])[1];
-
-                value_angle[8 * j + 2] = Write_Theta(array[j, 1])[0];
-                value_angle[8 * j + 3] = Write_Theta(array[j, 1])[1];
-
-                value_angle[8 * j + 4] = Write_Theta(array[j, 2])[0];
-                value_angle[8 * j + 5] = Write_Theta(array[j, 2])[1];
-
-                value_angle[8 * j + 6] = Write_Theta(array[j, 3])[0];
-                value_angle[8 * j + 7] = Write_Theta(array[j, 3])[1];
-
-                PrintLog("vect", "value:", Convert.ToString(value_angle[8 * j]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 1]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 2]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 3]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 4]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 5]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 6]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 7]));
-            }
-            plc.WriteDeviceBlock(device, 8 * point, ref value_angle[0]);
-        }
-
         private void MoveJ_Function(double[] targ_pos, int device)
         {
             double x, y, z;
@@ -1836,7 +1428,6 @@ namespace RobotArmHelix
                 PrintLog("Bug", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", er));
             }
         }
-
         private void Move_mod_Function(double[,] tar_pos, string device)
         {
             double t1, t2, t3, t4, t5;
@@ -1891,7 +1482,6 @@ namespace RobotArmHelix
                 value_angle_t5[2 * j + 1] = Write_Theta(angle_array[j, 4])[1];
             }
         }
-
         private void MoveL_Function(double[] curr_pos, double[] targ_pos, string device)
         {
             double[] vect_u = new double[3];
@@ -1953,7 +1543,6 @@ namespace RobotArmHelix
                 value_angle_t5[2 * j + 1] = Write_Theta(angle_array[j, 4])[1];
             }
         }
-
         private void Tsm_moveL_btn_Click(object sender, RoutedEventArgs e)
         {
             move = 2;
@@ -1975,130 +1564,17 @@ namespace RobotArmHelix
 
             MoveL_Function(curr_pos, targ_pos, "D1010");
         }
-
-        private void Tsm_moveC_btn_Click(object sender, RoutedEventArgs e)
-        {
-            move = 3;
-            double x1, y1, x2, y2, x_cur, y_cur, z_cur;
-            double[] vect_u = new double[3];
-            double[] curr_pos = new double[3];
-            double[] targ_pos = new double[3];
-            double t1, t2, t3, t4, t5;
-            int[,] angle_array = new int[10, 5];
-            double x, y, z;
-            int ret;
-            int[] value_angle = new int[80];
-            int[] value_angle_t5 = new int[20];
-            x_cur = Convert.ToDouble(Tx.Content);
-            y_cur = Convert.ToDouble(Ty.Content);
-            z_cur = Convert.ToDouble(Tz.Content);
-
-            x1 = Convert.ToDouble(TbX1.Text);
-            y1 = Convert.ToDouble(TbY1.Text);
-
-            x2 = Convert.ToDouble(TbX2.Text);
-            y2 = Convert.ToDouble(TbY2.Text);
-            // Tạo các điểm (x, y)
-            Point2 point1 = new Point2(x_cur, y_cur);
-            Point2 point2 = new Point2(x1, y1);
-            Point2 point3 = new Point2(x2, y2);
-
-            // Tính toán quỹ đạo đường tròn
-            Circle circle = CalculateCircle(point1, point2, point3);
-
-            // In kết quả
-            Console.WriteLine($"Tâm đường tròn: ({circle.Center.X}, {circle.Center.Y})");
-            Console.WriteLine($"Bán kính đường tròn: {circle.Radius}");
-
-            double R = circle.Radius;
-            double a = circle.Center.X;
-            double b = circle.Center.Y;
-            /* Linear Equation */
-            for (int t = 0; t < 9; t++)
-            {
-                x = R * Math.Sin(2 * Math.PI * t / 9) + a;
-                y = R * Math.Cos(2 * Math.PI * t / 9) + b;
-                z = z_cur;
-                (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
-                ret = Check_angle(t1, t2, t3, t4, t5);
-                if (ret != 0)
-                {
-                    double theta = 0.0;
-                    if (ret == 1) theta = t1;
-                    else if (ret == 2) theta = t2;
-                    else if (ret == 3) theta = t3;
-                    else if (ret == 4) theta = t4;
-                    else if (ret == 5) theta = t5;
-                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
-                    return;
-                }
-                t2 -= 90.0;
-                t3 += 90.0;
-                t4 += 90.0;
-                /* Assign value */
-                angle_array[t, 0] = (int)(t1 * 100000 + 18000000);
-                angle_array[t, 1] = (int)(t2 * 100000 + 18000000);
-                angle_array[t, 2] = (int)(t3 * 100000 + 18000000);
-                angle_array[t, 3] = (int)(t4 * 100000 + 18000000);
-                angle_array[t, 4] = (int)(t5 * 100000 + 18000000);
-            }
-            for (int j = 0; j < 9; j++)
-            {
-                value_angle[8 * j] = Write_Theta(angle_array[j, 0])[0];
-                value_angle[8 * j + 1] = Write_Theta(angle_array[j, 0])[1];
-
-                value_angle[8 * j + 2] = Write_Theta(angle_array[j, 1])[0];
-                value_angle[8 * j + 3] = Write_Theta(angle_array[j, 1])[1];
-
-                value_angle[8 * j + 4] = Write_Theta(angle_array[j, 2])[0];
-                value_angle[8 * j + 5] = Write_Theta(angle_array[j, 2])[1];
-
-                value_angle[8 * j + 6] = Write_Theta(angle_array[j, 3])[0];
-                value_angle[8 * j + 7] = Write_Theta(angle_array[j, 3])[1];
-
-                PrintLog("vect", "value:", Convert.ToString(value_angle[8 * j]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 1]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 2]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 3]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 4]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 5]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 6]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 7]));
-            }
-            value_angle[8 * 9] = Write_Theta(angle_array[0, 0])[0];
-            value_angle[8 * 9 + 1] = Write_Theta(angle_array[0, 0])[1];
-
-            value_angle[8 * 9 + 2] = Write_Theta(angle_array[0, 1])[0];
-            value_angle[8 * 9 + 3] = Write_Theta(angle_array[0, 1])[1];
-
-            value_angle[8 * 9 + 4] = Write_Theta(angle_array[0, 2])[0];
-            value_angle[8 * 9 + 5] = Write_Theta(angle_array[0, 2])[1];
-
-            value_angle[8 * 9 + 6] = Write_Theta(angle_array[0, 3])[0];
-            value_angle[8 * 9 + 7] = Write_Theta(angle_array[0, 3])[1];
-
-            plc.WriteDeviceBlock("D1010", 80, ref value_angle[0]);
-            for (int j = 0; j < 10; j++)
-            {
-                value_angle_t5[2 * j] = Write_Theta(angle_array[j, 4])[0];
-                value_angle_t5[2 * j + 1] = Write_Theta(angle_array[j, 4])[1];
-            }
-        }
         private void run_bttn_Click(object sender, RoutedEventArgs e)
         {
             if (move == 1)
             {
-                turn_on_1_pulse_relay(528);
+                // turn_on_1_pulse_relay(528);
+                Press_button(MethodBase.GetCurrentMethod().Name, "M528");
             }
             else if (move == 2)
             {
-                /* Turn on relay */
-                turn_on_1_pulse_relay(530);
-            }
-            else if (move == 3)
-            {
-                /* Turn on relay */
-                turn_on_1_pulse_relay(530);
+                // turn_on_1_pulse_relay(530);
+                Press_button(MethodBase.GetCurrentMethod().Name, "M530");
             }
             if(cn_bttn == false)
             {
@@ -2110,7 +1586,6 @@ namespace RobotArmHelix
             }
             move = 0;
         }
-
         private void Press_button(string name, string adr)
         {
             int ret;
@@ -2129,6 +1604,9 @@ namespace RobotArmHelix
             }
             PrintLog("Info", name, string.Format("Raise {0} Successfully", adr));
         }
+        #endregion
+
+        #region PLC_library_functions
 
         public int PLCReadbit(string adr, out int receive)
         {
@@ -2138,61 +1616,134 @@ namespace RobotArmHelix
         {
             return plc.SetDevice(adr, value);
         }
-        public void PrintLog(string level, string namefunction, string msg)
+
+        #endregion
+
+        #region checking_functions
+        private void execute_fk()
         {
-            DateTime time = DateTime.Now;
-            ErrorLog.AppendText(time.ToString("h:mm:ss") + " - " + level + " - " + namefunction + ": " + msg);
-            ErrorLog.AppendText(Environment.NewLine);
-        }
-        public void ChangeColorObjectBackground(object objectin, System.Windows.Media.Color color_object)
-        {
-            var button = objectin as Button;
-            if (button != null)
+            int[] value_positon = new int[16];
+            uint t1 = 0, t2 = 0, t3 = 0, t4 = 0, t5 = 0;
+            double t1_out, t2_out, t3_out, t4_out, t5_out;
+            if (cn_bttn == true)
             {
-                button.Background = new System.Windows.Media.SolidColorBrush(color_object);
-                return;
+                double[] angles = { joints[1].angle, joints[2].angle, joints[3].angle, joints[4].angle, joints[5].angle };
+                // Update UI asynchronously using Dispatcher
+                Dispatcher.Invoke(() =>
+                {
+                    /* Update position for robot on GUI */
+                    ForwardKinematics(angles);
+                    /* Update data for slider on GUI */
+                    joint1.Value = angles[0];
+                    joint2.Value = angles[1];
+                    joint3.Value = angles[2];
+                    joint4.Value = angles[3];
+                    joint5.Value = angles[4];
+                });
+            }
+            else
+            {
+                /* Read position of 5 angles */
+                int[] temp_angle = new int[90];
+                plc.ReadDeviceBlock(Constants.R_POSITION_1, 82, out temp_angle[0]);
+
+                value_positon[0] = temp_angle[0];
+                value_positon[1] = temp_angle[1];
+
+                value_positon[2] = temp_angle[20];
+                value_positon[3] = temp_angle[21];
+
+                value_positon[4] = temp_angle[40];
+                value_positon[5] = temp_angle[41];
+
+                value_positon[6] = temp_angle[60];
+                value_positon[7] = temp_angle[61];
+
+                value_positon[8] = temp_angle[80];
+                value_positon[9] = temp_angle[81];
+
+                // Read and convert driver angle value to real position value (was subtracted by 180)
+                t1 = Read_Position((uint)value_positon[0], (uint)value_positon[1]);
+                t2 = Read_Position((uint)value_positon[2], (uint)value_positon[3]);
+                t3 = Read_Position((uint)value_positon[4], (uint)value_positon[5]);
+                t4 = Read_Position((uint)value_positon[6], (uint)value_positon[7]);
+                t5 = Read_Position((uint)value_positon[8], (uint)value_positon[9]);
+
+                // Convert theta read from int to double
+                t1_out = double.Parse(Convert.ToString((int)t1)) / 100000.0;
+                t2_out = double.Parse(Convert.ToString((int)t2)) / 100000.0;
+                t3_out = double.Parse(Convert.ToString((int)t3)) / 100000.0;
+                t4_out = double.Parse(Convert.ToString((int)t4)) / 100000.0;
+                t5_out = double.Parse(Convert.ToString((int)t5)) / 100000.0;
+
+                angles_global[0] = t1_out;
+                angles_global[1] = t2_out;
+                angles_global[2] = t3_out;
+                angles_global[3] = t4_out;
+                angles_global[4] = t5_out;
+                try
+                {
+                    // Update UI asynchronously using Dispatcher
+                    Dispatcher.Invoke(() =>
+                    {
+                        /* Update position for robot on GUI */
+                        ForwardKinematics(angles_global);
+                    });
+                }
+                catch (TaskCanceledException)
+                {
+                    // Ignore the exception
+                }
+            }
+        }
+        public bool checkAngles(double[] oldAngles, double[] angles)
+        {
+            for (int i = 0; i <= 4; i++)
+            {
+                if (oldAngles[i] != angles[i])
+                    return false;
             }
 
-            var textbox = objectin as TextBox;
-            if (textbox != null)
-            {
-                textbox.Background = new System.Windows.Media.SolidColorBrush(color_object);
-                return;
-            }
+            return true;
         }
-        public void ChangeColorObjectForeground(object objectin, System.Windows.Media.Color color_object)
+        public static (double, double, double, double, double) convert_position_angle(double x, double y, double z)
         {
-            var button = objectin as Button;
-            if (button != null)
+            double t1, t2, t3, t4, t5, s2, c2, s3, c3, m, n;
+            double pitch;
+            pitch = -Math.PI / 2;
+            t1 = Math.Atan2(y, x);
+            // t5 = roll - t1;
+            t5 = 0.0;
+            m = Math.Sqrt(x * x + y * y);
+            n = z - Constants.l1 + Constants.l5;
+            c3 = (m * m + n * n - Constants.l2 * Constants.l2 - Constants.l3 * Constants.l3) / (2 * Constants.l2 * Constants.l3);
+            /* s3 has 2 value --> take the value of -sin */
+            s3 = Math.Sqrt(1 - c3 * c3);
+            t3 = Math.Atan2(s3, c3);
+            if (t3 >= -Math.PI / 6 && t3 <= (4 * Math.PI) / 9)
             {
-                button.Foreground = new System.Windows.Media.SolidColorBrush(color_object);
-                return;
+                /* Do nothing*/
             }
-
-            var textbox = objectin as TextBox;
-            if (textbox != null)
+            else
             {
-                textbox.Foreground = new System.Windows.Media.SolidColorBrush(color_object);
-                return;
+                s3 = -1 * Math.Sqrt(1 - c3 * c3);
+                t3 = Math.Atan2(s3, c3);
             }
+            /* Angle 3 */
+            c2 = m * (Constants.l3 * c3 + Constants.l2) + n * (Constants.l3 * s3);
+            s2 = n * (Constants.l3 * c3 + Constants.l2) - m * (Constants.l3 * s3);
+            /* Angle 2 */
+            t2 = Math.Atan2(s2, c2);
+            /* Angle 4 */
+            t4 = pitch - t2 - t3;
+            t1 = t1 / Math.PI * 180.0;
+            t2 = t2 / Math.PI * 180.0;
+            t3 = t3 / Math.PI * 180.0;
+            t4 = t4 / Math.PI * 180.0;
+            t5 = t5 / Math.PI * 180.0;
+            return (t1, t2, t3, t4, t5);
         }
 
-        public void ChangeColorObjectBorderBrush(object objectin, System.Windows.Media.Color color_object)
-        {
-            var button = objectin as Button;
-            if (button != null)
-            {
-                button.BorderBrush = new System.Windows.Media.SolidColorBrush(color_object);
-                return;
-            }
-
-            var textbox = objectin as TextBox;
-            if (textbox != null)
-            {
-                textbox.BorderBrush = new System.Windows.Media.SolidColorBrush(color_object);
-                return;
-            }
-        }
         public int[] Write_Theta(int value_angle)
         {
             int[] value_angle_arr = new int[2];
@@ -2200,7 +1751,33 @@ namespace RobotArmHelix
             value_angle_arr[1] = (value_angle >> 16) & 0xFFFF; // byte low for register
             return value_angle_arr;
         }
+        private void Memory_angle_write(int[,] array, int[] value_angle, string device, int point)
+        {
+            for (int j = 0; j < point; j++)
+            {
+                value_angle[8 * j] = Write_Theta(array[j, 0])[0];
+                value_angle[8 * j + 1] = Write_Theta(array[j, 0])[1];
 
+                value_angle[8 * j + 2] = Write_Theta(array[j, 1])[0];
+                value_angle[8 * j + 3] = Write_Theta(array[j, 1])[1];
+
+                value_angle[8 * j + 4] = Write_Theta(array[j, 2])[0];
+                value_angle[8 * j + 5] = Write_Theta(array[j, 2])[1];
+
+                value_angle[8 * j + 6] = Write_Theta(array[j, 3])[0];
+                value_angle[8 * j + 7] = Write_Theta(array[j, 3])[1];
+
+                PrintLog("vect", "value:", Convert.ToString(value_angle[8 * j]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 1]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 2]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 3]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 4]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 5]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 6]));
+                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 7]));
+            }
+            plc.WriteDeviceBlock(device, 8 * point, ref value_angle[0]);
+        }
         public void write_d_mem_32_bit(int device, int data)
         {
             string device_str = "";
@@ -2257,6 +1834,9 @@ namespace RobotArmHelix
             return (value_positon2 << 16 | value_positon1) - 18000000;
         }
 
+        #endregion
+
+        #region uart
         private void UartWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             BackgroundWorker worker = sender as BackgroundWorker;
@@ -2399,6 +1979,7 @@ namespace RobotArmHelix
                 }
             }
         }
+        #endregion
 
         private void adaptive_runtime(double x, double y, double z, double v1, double v2, double v3, double v4, double v5, int enable_stt)
         {
@@ -2442,6 +2023,8 @@ namespace RobotArmHelix
                 }
             }
         }
+
+        #region frame_calculation
         static byte Lc709204fCalculateCrc8Atm(byte[] data, ushort length)
         {
             if (data == null)
@@ -2467,7 +2050,6 @@ namespace RobotArmHelix
 
             return crc;
         }
-
         static int CombineBytesToInt32(byte byte1, byte byte2, byte byte3)
         {
             // Combine the bytes into an int (32-bit)
@@ -2475,7 +2057,6 @@ namespace RobotArmHelix
             int combined = (byte1 << 16) | (byte2 << 8) | byte3;
             return combined;
         }
-
         static Int16 CombineBytesToInt16Vel(byte byte1, byte byte2)
         {
             // Combine the bytes into an int (16-bit)
@@ -2483,6 +2064,9 @@ namespace RobotArmHelix
             Int16 combined = (Int16)((byte1 << 8) | byte2);
             return combined;
         }
+        #endregion
+
+        #region button_function
 
         private async void Glove_connect_button_Click(object sender, RoutedEventArgs e)
         {
@@ -2541,7 +2125,6 @@ namespace RobotArmHelix
                 _uartWorker.RunWorkerAsync();
             }
         }
-
         private void Glove_disconnect_button_Click(object sender, RoutedEventArgs e)
         {
             uart.Close();
@@ -2551,7 +2134,6 @@ namespace RobotArmHelix
                 _uartWorker.CancelAsync();
             }
         }
-
         private void EStop_bttn_Click(object sender, RoutedEventArgs e)
         {
             /* Stop command axis 1 */
@@ -2565,7 +2147,6 @@ namespace RobotArmHelix
             /* Stop command axis 5 */
             turn_on_1_pulse_relay(3280);
         }
-
         private void Glove_enable_button_Click(object sender, RoutedEventArgs e)
         {
             /* Reset error */
@@ -2574,23 +2155,19 @@ namespace RobotArmHelix
             turn_on_1_pulse_relay(600);
             glove_enable = 1;
         }
-
         private void Glove_disable_button_Click(object sender, RoutedEventArgs e)
         {
             glove_enable = 0;
         }
-
         private void Glove_refresh_button_Click(object sender, RoutedEventArgs e)
         {
             string[] ports = SerialPort.GetPortNames();
             com_port_list1.ItemsSource = ports;
         }
-
         private void Clr_Traj_btn_Click(object sender, RoutedEventArgs e)
         {
             RemoveSphereVisuals();
         }
-
         private void Open_menu_Click(object sender, RoutedEventArgs e)
         {
             vel_1_test = Convert.ToInt32(spd_tb.Text) * 1000;
@@ -2602,6 +2179,52 @@ namespace RobotArmHelix
             /* Change vel relay */
             turn_on_1_pulse_relay(650);
         }
+        private void Write_csv_Click(object sender, RoutedEventArgs e)
+        {
+            write_csv = true;
+        }
+        private void Unwrite_csv_Click(object sender, RoutedEventArgs e)
+        {
+            write_csv = false;
+        }
+        private void MenuItemExit_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
+        private void Modify_dat_csv_Click(object sender, RoutedEventArgs e)
+        {
+            ModifyTrajectory(filePath, savePath);
+        }
+        private void Test_move_mod_Click(object sender, RoutedEventArgs e)
+        {
+            move = 2;
+            // Initialize a 2D array to hold the CSV data
+            // Assuming you know the size of the array (10 rows and number of columns as per your data)
+            double[,] data = new double[10, 3];
+
+            // Read the file and parse the data
+            using (StreamReader sr = new StreamReader(savePath))
+            {
+                string line;
+                int row = 0;
+
+                while ((line = sr.ReadLine()) != null && row < 10)
+                {
+                    string[] values = line.Split(',');
+
+                    for (int col = 0; col < values.Length; col++)
+                    {
+                        // Trim whitespace and convert to double
+                        data[row, col] = double.Parse(values[col].Trim());
+                        Console.WriteLine(data[row, col]);
+                    }
+                    row++;
+                }
+            }
+            Move_mod_Function(data, "D1010");
+        }
+
+        #endregion
 
         public void turn_on_1_pulse_relay(int device)
         {
@@ -2633,16 +2256,7 @@ namespace RobotArmHelix
             PLCReadbit(device_str, out readbit);
         }
 
-
-        private void Write_csv_Click(object sender, RoutedEventArgs e)
-        {
-            write_csv = true;
-        }
-
-        private void Unwrite_csv_Click(object sender, RoutedEventArgs e)
-        {
-            write_csv = false;
-        }
+        #region plot_data
 
         private void plot(double x, double y, double z)
         {
@@ -2686,6 +2300,8 @@ namespace RobotArmHelix
             plotView_robot_pos.InvalidatePlot(true);
         }
 
+        #endregion
+
         static void CreateCSV(string filePath, string[] data)
         {
             using (StreamWriter writer = new StreamWriter(filePath, true))
@@ -2697,110 +2313,23 @@ namespace RobotArmHelix
                 }
             }
         }
-
-        class Point2
+        private Point3D[] ReadDataFromCsv(string filePath)
         {
-            public double X { get; set; }
-            public double Y { get; set; }
-
-            public Point2(double x, double y)
+            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
-                X = x;
-                Y = y;
+                HasHeaderRecord = false,
+            };
+
+            using (var reader = new StreamReader(filePath))
+            using (var csv = new CsvReader(reader, config))
+            {
+                var records = csv.GetRecords<CsvPoint>().ToList();
+                return records.Select(r => new Point3D(r.X, r.Y, r.Z)).ToArray();
             }
         }
-        class Circle
-        {
-            public Point2 Center { get; set; }
-            public double Radius { get; set; }
 
-            public Circle(Point2 center, double radius)
-            {
-                Center = center;
-                Radius = radius;
-            }
-        }
-        static Circle CalculateCircle(Point2 point1, Point2 point2, Point2 point3)
-        {
-            double x1 = point1.X;
-            double y1 = point1.Y;
-            double x2 = point2.X;
-            double y2 = point2.Y;
-            double x3 = point3.X;
-            double y3 = point3.Y;
+        #region polynomial_regression
 
-            double x12 = x1 - x2;
-            double x13 = x1 - x3;
-
-            double y12 = y1 - y2;
-            double y13 = y1 - y3;
-
-            double y31 = y3 - y1;
-            double y21 = y2 - y1;
-
-            double x31 = x3 - x1;
-            double x21 = x2 - x1;
-
-            double sx13 = Math.Pow(x1, 2) - Math.Pow(x3, 2);
-            double sy13 = Math.Pow(y1, 2) - Math.Pow(y3, 2);
-
-            double sx21 = Math.Pow(x2, 2) - Math.Pow(x1, 2);
-            double sy21 = Math.Pow(y2, 2) - Math.Pow(y1, 2);
-
-            double f = ((sx13) * (x12) + (sy13) * (x12) + (sx21) * (x13) + (sy21) * (x13)) / (2 * ((y31) * (x12) - (y21) * (x13)));
-            double g = ((sx13) * (y12) + (sy13) * (y12) + (sx21) * (y13) + (sy21) * (y13)) / (2 * ((x31) * (y12) - (x21) * (y13)));
-
-            double c = -Math.Pow(x1, 2) - Math.Pow(y1, 2) - 2 * g * x1 - 2 * f * y1;
-
-            double h = -g;
-            double k = -f;
-            double sqr_of_r = h * h + k * k - c;
-
-            double r = Math.Sqrt(sqr_of_r);
-
-            return new Circle(new Point2(h, k), r);
-        }
-
-        private void MenuItemExit_Click(object sender, RoutedEventArgs e)
-        {
-            Application.Current.Shutdown();
-        }
-
-        private void Modify_dat_csv_Click(object sender, RoutedEventArgs e)
-        {
-            ModifyTrajectory(filePath, savePath);
-        }
-
-        private void Test_move_mod_Click(object sender, RoutedEventArgs e)
-        {
-            move = 2;
-            // Initialize a 2D array to hold the CSV data
-            // Assuming you know the size of the array (10 rows and number of columns as per your data)
-            double[,] data = new double[10, 3];
-
-            // Read the file and parse the data
-            using (StreamReader sr = new StreamReader(savePath))
-            {
-                string line;
-                int row = 0;
-
-                while ((line = sr.ReadLine()) != null && row < 10)
-                {
-                    string[] values = line.Split(',');
-
-                    for (int col = 0; col < values.Length; col++)
-                    {
-                        // Trim whitespace and convert to double
-                        data[row, col] = double.Parse(values[col].Trim());
-                        Console.WriteLine(data[row, col]);
-                    }
-                    row++;
-                }
-            }
-            Move_mod_Function(data, "D1010");
-        }
-
-        /* Polynomial regression */
         private double EvalPoly(double[] coefficients, double x)
         {
             double result = 0;
@@ -2830,21 +2359,6 @@ namespace RobotArmHelix
             public double X { get; set; }
             public double Y { get; set; }
             public double Z { get; set; }
-        }
-
-        private Point3D[] ReadDataFromCsv(string filePath)
-        {
-            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
-            {
-                HasHeaderRecord = false,
-            };
-
-            using (var reader = new StreamReader(filePath))
-            using (var csv = new CsvReader(reader, config))
-            {
-                var records = csv.GetRecords<CsvPoint>().ToList();
-                return records.Select(r => new Point3D(r.X, r.Y, r.Z)).ToArray();
-            }
         }
 
         private IEnumerable<Point3D[]> SplitDataIntoSegments(Point3D[] data, int segmentSize)
@@ -2955,6 +2469,7 @@ namespace RobotArmHelix
             }
             SaveRegressionResultToCsv(allPoints, savepath, 10);
         }
+        #endregion
     }
 
 }

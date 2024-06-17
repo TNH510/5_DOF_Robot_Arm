@@ -40,15 +40,7 @@
                 <MenuItem Command="Copy" HorizontalAlignment="Left" Height="20" Width="150"/>
                 <MenuItem Command="Paste" HorizontalAlignment="Left" Height="20" Width="150"/>
             </MenuItem>
-            <MenuItem Header="_View" Height="20" Width="40">
-                <MenuItem Header="Robot" IsCheckable="True" IsChecked="True" Click="Visible_Robot_Click"/>
-                <MenuItem Header="Display" IsCheckable="True" IsChecked="True" Click="Visible_Display_Click"/>
-                <MenuItem Header="Control" IsCheckable="True" IsChecked="True" Click="Visible_Control_Click"/>
-                <MenuItem Header="Jogging" IsCheckable="True" IsChecked="True" Click="Visible_Jogging_Click"/>
-                <MenuItem Header="Path" IsCheckable="True" IsChecked="True" Click="Visible_Path_Click"/>
-            </MenuItem>
             <MenuItem Header="_Online" Height="20" Width="50">
-                <MenuItem Header="Glove" Height="20" Width="150" Click="Visible_Glove_Click"/>
                 <MenuItem Header="PLC" Height="20" Width="150">
                     <MenuItem x:Name="ConnectMenuItem" Header="Connect to PLC" IsCheckable="True" IsChecked="False" Click="ConnectPLC"/>
                     <MenuItem x:Name="DisconnectMenuItem" Header="Disconnect to PLC" IsCheckable="True" IsChecked="True" Click="DisconnectPLC"/>
@@ -93,19 +85,10 @@
                         <TextBox x:Name="spd_tb" Text="500" HorizontalAlignment="Left" Height="24" TextWrapping="Wrap" VerticalAlignment="Top" Width="50" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Background="{x:Null}" Foreground="#FF007EF9" BorderBrush="{x:Null}" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="88,6,0,0"/>
                         <Button x:Name="Tsm_moveJ_btn" Content="Transmit MoveJ" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Height="23" FontSize="11" Click="Tsm_moveJ_btn_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Margin="7,115,0,0"/>
                         <Button x:Name="Tsm_moveL_btn" Content="Transmit MoveL" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Height="23" FontSize="11" Click="Tsm_moveL_btn_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Margin="124,114,0,0"/>
-                        <TextBox x:Name="TbX1" Text="500" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="50" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" TextChanged="ReachingPoint_TextChanged" Background="{x:Null}" Foreground="#FF007EF9" BorderBrush="{x:Null}" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="257,50,0,0"/>
-                        <TextBox x:Name="TbY1" Text="0" HorizontalAlignment="Left" TextWrapping="Wrap" Width="51" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" TextChanged="ReachingPoint_TextChanged" Background="{x:Null}" Foreground="#FF007EF9" BorderBrush="{x:Null}" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="327,48,0,116"/>
-                        <Label x:Name="tbX1_lbl" Content="X1" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="#FF007EF9" Height="23" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="233,50,0,0"/>
-                        <Label x:Name="tbY1_lbl" Content="Y1" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontFamily="Microsoft Sans Serif" FontWeight="Bold" Margin="304,49,0,0"/>
-                        <TextBox x:Name="TbX2" Text="500" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Width="50" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" TextChanged="ReachingPoint_TextChanged" Background="{x:Null}" Foreground="#FF007EF9" BorderBrush="{x:Null}" FontWeight="Bold" FontFamily="Microsoft Sans Serif" VerticalAlignment="Center" Margin="257,0,0,0"/>
-                        <TextBox x:Name="TbY2" Text="0" HorizontalAlignment="Left" Height="24" TextWrapping="Wrap" Width="51" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" TextChanged="ReachingPoint_TextChanged" Background="{x:Null}" Foreground="#FF007EF9" BorderBrush="{x:Null}" FontWeight="Bold" FontFamily="Microsoft Sans Serif" VerticalAlignment="Center" Margin="327,0,0,0"/>
-                        <Label x:Name="tbX2_lbl" Content="X2" HorizontalAlignment="Left" Foreground="#FF007EF9" Height="23" FontWeight="Bold" FontFamily="Microsoft Sans Serif" VerticalAlignment="Center" Margin="233,0,0,0"/>
-                        <Label x:Name="tbY2_lbl" Content="Y2" HorizontalAlignment="Left" Foreground="#FF007EF9" Height="24" FontFamily="Microsoft Sans Serif" FontWeight="Bold" VerticalAlignment="Center" Margin="304,0,0,0"/>
                         <Button x:Name="run_btn" Content="Run" HorizontalAlignment="Left" VerticalAlignment="Top" Width="90" Height="24" FontSize="11" Click="run_bttn_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF181E36" FontWeight="Bold" BorderBrush="#FF181E36" Background="#FF007EF9" Margin="240,114,0,0"/>
                         <Button x:Name="TestPos_bttn" Content="Test position" HorizontalAlignment="Left" VerticalAlignment="Top" Width="101" Height="23" FontSize="11" Click="TestPos_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Margin="124,153,0,0"/>
                         <Button x:Name="EStop_btn" Content="E-Stop" HorizontalAlignment="Left" VerticalAlignment="Top" Width="90" Height="24" FontSize="11" Click="EStop_bttn_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF181E36" FontWeight="Bold" BorderBrush="#FF181E36" Background="#FF007EF9" Margin="240,150,0,0"/>
                         <Button x:Name="Clear_Trajectory_btn" Content="Clear_Trajectory" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Height="23" FontSize="11" Click="Clr_Traj_btn_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Margin="7,152,0,0"/>
-                        <Button x:Name="Tsm_moveC_btn" Content="Transmit MoveC" HorizontalAlignment="Left" Margin="264,10,0,0" VerticalAlignment="Top" Width="100" Height="23" FontSize="11" Click="Tsm_moveC_btn_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36"/>
                     </Grid>
                     <Grid HorizontalAlignment="Left" Height="138" Margin="55,45,0,0" VerticalAlignment="Top" Width="229" Background="#FFA23414" Grid.Column="6" Grid.ColumnSpan="2">
                         <Label x:Name="control_lbl" Content="CONTROL" HorizontalAlignment="Center" VerticalAlignment="Top" Width="84" Foreground="#FF9EA1B0" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif"/>
