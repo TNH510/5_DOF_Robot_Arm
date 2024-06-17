@@ -1919,55 +1919,55 @@ namespace RobotArmHelix
                                         Jacobi_plus = CreateJacobianMatrix(t1 * Math.PI / 180.0, t2 * Math.PI / 180.0, t3 * Math.PI / 180.0, t4 * Math.PI / 180.0, t5 * Math.PI / 180.0);
                                         Jacobi_vel = CreateVelocityMatrix(x_vel, y_vel, z_vel);
                                         omega = MultiplyMatrices(Jacobi_plus, Jacobi_vel);
-                                        omega1_plc = omega[0] * 1800 * 20 / Math.PI + 100.0;
-                                        omega2_plc = omega[1] * 1800 * 10 / Math.PI + 100.0;
-                                        omega3_plc = omega[2] * 1800 * 10 / Math.PI + 100.0;
-                                        omega4_plc = -(omega[1] + omega[2]) * 180 * 20 / Math.PI + 100.0;
+                                        omega1_plc = omega[0] * 1800 * 15 / Math.PI + 100.0;
+                                        omega2_plc = omega[1] * 1800 * 5 / Math.PI + 50.0;
+                                        omega3_plc = omega[2] * 1800 * 5 / Math.PI + 50.0;
+                                        omega4_plc = -(omega[1] + omega[2]) * 1800 * 20 / Math.PI + 100.0;
                                         omega5_plc = 0.0; 
 
 
-                                        //ret = Check_angle(t1, t2, t3, t4, t5);
+                                        ret = Check_angle(t1, t2, t3, t4, t5);
 
-                                        //if (ret == 0)
-                                        //{
+                                        if (ret == 0)
+                                        {
 
-                                        //    /* Anti wind-up */
-                                        //    if (Math.Abs(omega1_plc) >= 600)
-                                        //    {
-                                        //        omega1_plc = 600;
-                                        //    }
-                                        //    if (Math.Abs(omega2_plc) >= 600)
-                                        //    {
-                                        //        omega2_plc = 600;
-                                        //    }
-                                        //    if (Math.Abs(omega3_plc) >= 600)
-                                        //    {
-                                        //        omega3_plc = 600;
-                                        //    }
+                                           /* Anti wind-up */
+                                           if (Math.Abs(omega1_plc) >= 500)
+                                           {
+                                               omega1_plc = 500;
+                                           }
+                                           if (Math.Abs(omega2_plc) >= 300)
+                                           {
+                                               omega2_plc = 300;
+                                           }
+                                           if (Math.Abs(omega3_plc) >= 300)
+                                           {
+                                               omega3_plc = 300;
+                                           }
 
-                                        //    if (write_csv == true)
-                                        //    {
-                                        //        using (StreamWriter writer = new StreamWriter(filePath, true))
-                                        //        {
-                                        //            // string csvLine = $"{x},{y},{z},{x_vel},{y_vel},{z_vel}";
-                                        //            string csvLine = $"{x},{y},{z}";
-                                        //            writer.WriteLine(csvLine);
-                                        //        }
-                                        //    }
+                                           if (write_csv == true)
+                                           {
+                                               using (StreamWriter writer = new StreamWriter(filePath, true))
+                                               {
+                                                   // string csvLine = $"{x},{y},{z},{x_vel},{y_vel},{z_vel}";
+                                                   string csvLine = $"{x},{y},{z}";
+                                                   writer.WriteLine(csvLine);
+                                               }
+                                           }
 
-                                        //    //plot(Math.Abs(omega1_plc), Math.Abs(omega2_plc), Math.Abs(omega3_plc));
-                                        //    //plot(x_vel);
-                                        //    //scatter(x, y);
-                                        //    //Console.WriteLine("---");
+                                           //plot(Math.Abs(omega1_plc), Math.Abs(omega2_plc), Math.Abs(omega3_plc));
+                                           //plot(x_vel);
+                                           //scatter(x, y);
+                                           //Console.WriteLine("---");
 
                                         //    plot(x, y, z);
 
-                                        //    //plot(Math.Abs(omega[0]) * 5, Math.Abs(omega[1]) * 5, Math.Abs(omega[2] * 5));
+                                           //plot(Math.Abs(omega[0]) * 5, Math.Abs(omega[1]) * 5, Math.Abs(omega[2] * 5));
 
 
-                                        //    adaptive_runtime(x, y, z, Math.Abs(omega1_plc), Math.Abs(omega2_plc), Math.Abs(omega3_plc), Math.Abs(omega4_plc), Math.Abs(omega5_plc), glove_enable);
-                                        //}
-                                    plot(x, y, z);
+                                           adaptive_runtime(x, y, z, Math.Abs(omega1_plc), Math.Abs(omega2_plc), Math.Abs(omega3_plc), Math.Abs(omega4_plc), Math.Abs(omega5_plc), glove_enable);
+                                        }
+                                    // plot(x, y, z);
                                     break;
                                     default:
                                     Console.WriteLine("Hex value is not 0x1, 0x2, 0xA, or 0xB");
