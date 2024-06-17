@@ -35,8 +35,13 @@ legend_entries = {};
 scatter3(x, y, z, 'filled', 'MarkerFaceColor', 'b');
 legend_entries{end+1} = 'Original Trajectory';
 
+cakes_per_person = distribute_cakes(total_cakes, total_people);
+% Hi?n th? k?t qu?
+disp('S? mi?ng bánh m?i ng??i nh?n ???c là:');
+disp(cakes_per_person);
+
 % Loop through each group
-for i = 1:num_groups
+for i = 1:1
     % Select data for the current group
     start_index = (i-1) * group_size + 1;
     if i == num_groups
@@ -57,7 +62,7 @@ for i = 1:num_groups
     coefficients_z = polyfit(t_column, z_group, degree);
     
     % Generate predicted values using polynomial equation
-    t_fit = linspace(t_column(1), t_column(end), group_size);
+    t_fit = linspace(t_column(1), t_column(end), cakes_per_person(i));
     predicted_x_group = polyval(coefficients_x, t_fit);
     predicted_y_group = polyval(coefficients_y, t_fit);
     predicted_z_group = polyval(coefficients_z, t_fit);
@@ -72,3 +77,8 @@ legend(legend_entries, 'Location', 'Best');
 
 % Show plot
 hold off;
+
+% G?i hàm v?i s? l??ng bánh và ng??i b?t k?
+total_cakes = num_samples; % B?n có th? thay ??i s? l??ng bánh
+total_people = num_groups; % B?n có th? thay ??i s? l??ng ng??i
+

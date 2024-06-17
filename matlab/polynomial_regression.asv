@@ -15,6 +15,9 @@ group_size = 30;
 % Number of groups
 num_groups = floor(num_samples / group_size);
 
+% Number of remaining points
+num_remaining_points = mod(num_samples, group_size);
+
 % Degree of the polynomial
 degree = 4;  % Example: 4th degree polynomial
 
@@ -36,8 +39,11 @@ legend_entries{end+1} = 'Original Trajectory';
 for i = 1:num_groups
     % Select data for the current group
     start_index = (i-1) * group_size + 1;
-    ì 
-    end_index = i * group_size;
+    if i == num_groups
+        end_index = i * group_size + num_remaining_points;  % Include remaining points in the last group
+    else
+        end_index = i * group_size;
+    end
     
     t_group = t(start_index:end_index);
     t_column = t_group'; % Chuy?n v? t thành m?t ma tr?n c?t
@@ -66,3 +72,9 @@ legend(legend_entries, 'Location', 'Best');
 
 % Show plot
 hold off;
+
+% G?i hàm v?i s? l??ng bánh và ng??i b?t k?
+total_cakes = 10; % B?n có th? thay ??i s? l??ng bánh
+total_people = 9; % B?n có th? thay ??i s? l??ng ng??i
+
+cakes_per_person = distribute_cakes(total_cakes, total_people);
