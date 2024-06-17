@@ -41,14 +41,10 @@ disp('S? mi?ng bánh m?i ng??i nh?n ???c là:');
 disp(cakes_per_person);
 
 % Loop through each group
-for i = 1:1
+for i = 1:num_groups
     % Select data for the current group
-    start_index = (i-1) * group_size + 1;
-    if i == num_groups
-        end_index = i * group_size + num_remaining_points;  % Include remaining points in the last group
-    else
-        end_index = i * group_size;
-    end
+    start_index = (i-1) * cakes_per_person(i) + 1;
+    end_index = i * cakes_per_person(i);
     
     t_group = t(start_index:end_index);
     t_column = t_group'; % Chuy?n v? t thành m?t ma tr?n c?t
