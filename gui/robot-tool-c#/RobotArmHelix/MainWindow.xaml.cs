@@ -72,6 +72,8 @@ namespace RobotArmHelix
     public partial class MainWindow : System.Windows.Window
    {
 
+        public double[] selectmember = new double[100];
+
         public int visible_robot = 1;
         public int visible_display = 1;
         public int visible_control = 1;
@@ -2350,16 +2352,24 @@ namespace RobotArmHelix
 
             // Number of points per group
             int group_size = 30;
+            /* Data to load to the PLC */
+            int points = 10;
 
             // Chia đều bánh cho mỗi người
             int numGroups = numSamples / group_size;
             // Số bánh còn lại sau khi chia đều
             int num_remaining_points = numSamples % group_size;
             // Degree of the polynomial
-            int degree = 5;  
+            int degree = 2;  
 
             int[] cakes_per_person = DistributeCakes(numSamples, numGroups);
             Console.WriteLine(cakes_per_person.Length);
+
+            /* Calculate the points each group need to have */
+            // Tính số bánh mỗi nhóm nhận
+            int baseCakesPerGroup = points / cakes_per_person.Length;
+            int remainderCakes = points % cakes_per_person.Length;
+
 
             int start_index = 0;
             int end_index = 0;
@@ -2384,62 +2394,89 @@ namespace RobotArmHelix
 
                 // Fit polynomials
                 // Perform polynomial regression for each group
-                var coefficients_x = Fit.Polynomial(t_group, x_group, degree);
-                var coefficients_y = Fit.Polynomial(t_group, y_group, degree);
-                var coefficients_z = Fit.Polynomial(t_group, z_group, degree);
+                var coefficients_x = PolynomialFit.MyPolyfit(t_group, x_group, degree);
+                var coefficients_y = PolynomialFit.MyPolyfit(t_group, y_group, degree);
+                var coefficients_z = PolynomialFit.MyPolyfit(t_group, z_group, degree);
 
-                PrintArray(coefficients_x);
-
-
-                double[] t_fit = Generate.LinearSpaced(cakes_per_person[i], 1, end_index - start_index + 1);
-
+                double[] t_fit = Generate.LinearSpaced(cakes_per_person[i], t_group[0], t_group[t_group.Length - 1]);
 
                 double[] predicted_x_group = new double[cakes_per_person[i]];
                 double[] predicted_y_group = new double[cakes_per_person[i]];
                 double[] predicted_z_group = new double[cakes_per_person[i]];
-
                 for (int j = 0; j < cakes_per_person[i]; j++)
                 {
-                    predicted_x_group[j] = EvaluatePolynomial(coefficients_x, t_fit[j]);
-                    predicted_y_group[j] = EvaluatePolynomial(coefficients_y, t_fit[j]);
-                    predicted_z_group[j] = EvaluatePolynomial(coefficients_z, t_fit[j]);
-                    // Console.WriteLine(predicted_x_group[j].ToString());
+                    predicted_x_group[j] = PolynomialFit.EvaluatePolynomial(coefficients_x, t_fit[j]);
+                    predicted_y_group[j] = PolynomialFit.EvaluatePolynomial(coefficients_y, t_fit[j]);
+                    predicted_z_group[j] = PolynomialFit.EvaluatePolynomial(coefficients_z, t_fit[j]);
+                    //Console.WriteLine(predicted_x_group[j].ToString());
                 }
+                /* Chia bánh cho người nhận */
+                int[] points_each_group = DistributeCakes(points, cakes_per_person.Length);
 
-            }
-        }
+                int middleIndex = cakes_per_person[i] / 2;
+                int startIndex = middleIndex - points_each_group[i] / 2;
 
-        public static double[] MyPolyfit(double[] x, double[] y, int degree)
-        {
-            // Kiểm tra số lượng điểm dữ liệu
-            if (x.Length != y.Length)
-            {
-                throw new ArgumentException("x và y phải có cùng số lượng phần tử");
-            }
-
-            // Xây dựng ma trận Vandermonde
-            var A = Matrix<double>.Build.Dense(x.Length, degree + 1);
-            for (int i = 0; i <= degree; i++)
-            {
-                for (int j = 0; j < x.Length; j++)
+                for (int k = 0; k < points_each_group[i]; k++)
                 {
-                    A[j, i] = Math.Pow(x[j], i);
+                    int memberIndex = startIndex + k;
+                    if (memberIndex >= cakes_per_person[i])
+                    {
+                        memberIndex = cakes_per_person[i] - 1;
+                    }
+                    selectmember[i + k] = predicted_x_group[memberIndex];
+                    Console.WriteLine($"- {predicted_x_group[memberIndex]}");
                 }
+
+
+                //Console.WriteLine(i.ToString());
+                Console.WriteLine("----------------------------------");
             }
-
-            // Chuyển đổi y thành vector
-            Vector<double> yVector = Vector<double>.Build.DenseOfArray(y);
-
-
-            // Giải hệ phương trình tuyến tính A * p = y
-            var p = A.Solve(yVector);
-
-            // Đảo ngược vector hệ số để phù hợp với cách trả về của hàm polyfit của MATLAB
-            var coefficients = p.ToArray();
-            Array.Reverse(coefficients);
-            return coefficients;
+            Console.WriteLine(selectmember.Length.ToString());
         }
 
+
+        public static class PolynomialFit
+        {
+            public static double[] MyPolyfit(double[] x, double[] y, int degree)
+            {
+                // Kiểm tra số lượng điểm dữ liệu
+                if (x.Length != y.Length)
+                {
+                    throw new ArgumentException("x và y phải có cùng số lượng phần tử");
+                }
+
+                // Xây dựng ma trận Vandermonde
+                var A = Matrix<double>.Build.Dense(x.Length, degree + 1);
+                for (int i = 0; i <= degree; i++)
+                {
+                    for (int j = 0; j < x.Length; j++)
+                    {
+                        A[j, i] = Math.Pow(x[j], i);
+                    }
+                }
+
+                // Chuyển đổi y thành vector
+                var yVector = Vector<double>.Build.DenseOfArray(y);
+
+                // Giải hệ phương trình tuyến tính A * p = y
+                var p = A.Solve(yVector);
+
+                // Đảo ngược vector hệ số để phù hợp với cách trả về của hàm polyfit của MATLAB
+                var coefficients = p.ToArray();
+                Array.Reverse(coefficients);
+                return coefficients;
+            }
+
+            public static double EvaluatePolynomial(double[] coefficients, double x)
+            {
+                double result = 0;
+                for (int i = 0; i < coefficients.Length; i++)
+                {
+                    result += coefficients[i] * Math.Pow(x, coefficients.Length - 1 - i);
+                }
+                return result;
+            }
+        }
 
         // Function to print an array (helper method)
         static void PrintArray(double[] array)

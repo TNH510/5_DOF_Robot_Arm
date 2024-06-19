@@ -3,7 +3,7 @@ data = csvread('test.csv');  % Load your CSV file
 num_samples = size(data, 1);  % Number of samples
 
 % Generate a time vector assuming uniform sampling
-t = linspace(0, 1, num_samples);  % Adjust as needed based on your data
+t = linspace(0, 260, num_samples);  % Adjust as needed based on your data
 
 x = data(:, 1);  % First column is x coordinate
 y = data(:, 2);  % Second column is y coordinate
@@ -19,7 +19,7 @@ num_groups = floor(num_samples / group_size);
 num_remaining_points = mod(num_samples, group_size);
 
 % Degree of the polynomial
-degree = 5;  % Example: 4th degree polynomial
+degree = 8;  % Example: 4th degree polynomial
 
 % Initialize figure
 figure;
