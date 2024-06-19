@@ -72,7 +72,9 @@ namespace RobotArmHelix
     public partial class MainWindow : System.Windows.Window
    {
 
-        public double[] selectmember = new double[100];
+        public double[] selectmemberX = new double[100];
+        public double[] selectmemberY = new double[100];
+        public double[] selectmemberZ = new double[100];
 
         public int visible_robot = 1;
         public int visible_display = 1;
@@ -1447,35 +1449,35 @@ namespace RobotArmHelix
                 x = tar_pos[t,0];
                 y = tar_pos[t,1];
                 z = tar_pos[t,2];
-                if (z >= 500 && z <= 1000)
-                {
-                    (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
-                    ret = Check_angle(t1, t2, t3, t4, t5);
-                    if (ret != 0)
-                    {
-                        double theta = 0.0;
-                        if (ret == 1) theta = t1;
-                        else if (ret == 2) theta = t2;
-                        else if (ret == 3) theta = t3;
-                        else if (ret == 4) theta = t4;
-                        else if (ret == 5) theta = t5;
-                        //PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
-                        return;
-                    }
-                    t2 -= 90.0;
-                    t3 += 90.0;
-                    t4 += 90.0;
-                    /* Assign value */
-                    angle_array[t, 0] = (int)(t1 * 100000 + 18000000);
-                    angle_array[t, 1] = (int)(t2 * 100000 + 18000000);
-                    angle_array[t, 2] = (int)(t3 * 100000 + 18000000);
-                    angle_array[t, 3] = (int)(t4 * 100000 + 18000000);
-                    angle_array[t, 4] = (int)(t5 * 100000);
-                }
-                else
-                {
-                    //PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", "Out of range of Z axis"));
-                }
+                //if (z >= 500 && z <= 1000)
+                //{
+                (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
+                if(t1 > Constants.T1_LU) t1 = Constants.T1_LU;
+                else if(t1 < Constants.T1_LD) t1 = Constants.T1_LD;
+
+                if(t2 > Constants.T2_LU) t2 = Constants.T2_LU;
+                else if(t2 < Constants.T2_LD) t2 = Constants.T2_LD;
+
+                if(t3 > Constants.T3_LU) t3 = Constants.T3_LU;
+                else if(t3 < Constants.T3_LD) t3 = Constants.T3_LD;
+
+                if(t4 > Constants.T4_LU) t4 = Constants.T4_LU;
+                else if(t4 < Constants.T4_LD) t4 = Constants.T4_LD;
+
+                t2 -= 90.0;
+                t3 += 90.0;
+                t4 += 90.0;
+                /* Assign value */
+                angle_array[t, 0] = (int)(t1 * 100000 + 18000000);
+                angle_array[t, 1] = (int)(t2 * 100000 + 18000000);
+                angle_array[t, 2] = (int)(t3 * 100000 + 18000000);
+                angle_array[t, 3] = (int)(t4 * 100000 + 18000000);
+                angle_array[t, 4] = (int)(t5 * 100000);
+                //}
+                //else
+                //{
+                //    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", "Out of range of Z axis"));
+                //}
 
             }
             Memory_angle_write(angle_array, value_angle, device, 10);
@@ -2206,26 +2208,17 @@ namespace RobotArmHelix
             // Initialize a 2D array to hold the CSV data
             // Assuming you know the size of the array (10 rows and number of columns as per your data)
             double[,] data = new double[10, 3];
-
-            // Read the file and parse the data
-            using (StreamReader sr = new StreamReader(savePath))
+            for (int t = 0; t < 10; t++)
             {
-                string line;
-                int row = 0;
-
-                while ((line = sr.ReadLine()) != null && row < 10)
-                {
-                    string[] values = line.Split(',');
-
-                    for (int col = 0; col < values.Length; col++)
-                    {
-                        // Trim whitespace and convert to double
-                        data[row, col] = double.Parse(values[col].Trim());
-                        Console.WriteLine(data[row, col]);
-                    }
-                    row++;
-                }
+                data[t, 0] = selectmemberX[t] * 20;
+                data[t, 1] = selectmemberY[t] * 20;
+                data[t, 2] = selectmemberZ[t] * 15 + 700;
+                Console.WriteLine(data[t, 0].ToString());
+                Console.WriteLine(data[t, 1].ToString());
+                Console.WriteLine(data[t, 2].ToString());
+                Console.WriteLine("---");
             }
+
             Move_mod_Function(data, "D1010");
         }
 
@@ -2373,6 +2366,7 @@ namespace RobotArmHelix
 
             int start_index = 0;
             int end_index = 0;
+            int next_gr = 0;
             // Loop through each group
             for (int i = 0; i < numGroups; i++)
             {
@@ -2423,15 +2417,21 @@ namespace RobotArmHelix
                     {
                         memberIndex = cakes_per_person[i] - 1;
                     }
-                    selectmember[i + k] = predicted_x_group[memberIndex];
+                    selectmemberX[next_gr + k] = predicted_x_group[memberIndex];
+                    selectmemberY[next_gr + k] = predicted_y_group[memberIndex];
+                    selectmemberZ[next_gr + k] = predicted_z_group[memberIndex];
+                    next_gr = next_gr + k;
                     Console.WriteLine($"- {predicted_x_group[memberIndex]}");
+                    Console.WriteLine($"- {predicted_y_group[memberIndex]}");
+                    Console.WriteLine($"- {predicted_z_group[memberIndex]}");
+                    Console.WriteLine(points_each_group[i].ToString());
                 }
-
+                next_gr = next_gr + 1;
+                
 
                 //Console.WriteLine(i.ToString());
                 Console.WriteLine("----------------------------------");
             }
-            Console.WriteLine(selectmember.Length.ToString());
         }
 
 
