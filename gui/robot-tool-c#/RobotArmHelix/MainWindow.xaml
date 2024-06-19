@@ -157,37 +157,32 @@
                             <ImageBrush ImageSource="/hinh-nen-windows-10-dep-32.jpg"/>
                         </Grid.Background>
                         <Label x:Name="Glove_name" Content="GLOVE" HorizontalAlignment="Left" Margin="97,0,0,0" VerticalAlignment="Top" Width="84" Foreground="#FF9EA1B0" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif"/>
-                        <Label x:Name="Glove_com" Content="COM PORT" HorizontalAlignment="Left" Margin="34,22,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
-                        <Label x:Name="Glove_baud" Content="BAUD RATE" HorizontalAlignment="Left" Margin="34,54,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
-                        <ComboBox x:Name="com_port_list2" SelectedIndex="0" HorizontalAlignment="Left" Margin="122,56,0,0" VerticalAlignment="Top" Width="70">
+                        <Label x:Name="Glove_com" Content="COM PORT" HorizontalAlignment="Left" Margin="40,50,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                        <Label x:Name="Glove_baud" Content="BAUD RATE" HorizontalAlignment="Left" Margin="40,82,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                        <ComboBox x:Name="com_port_list2" SelectedIndex="0" HorizontalAlignment="Left" Margin="128,84,0,0" VerticalAlignment="Top" Width="70">
                             <ComboBoxItem Content="115200"/>
                             <ComboBoxItem Content="9600"/>
                         </ComboBox>
-                        <Button x:Name="Connect_glove_btn" Content="Connect" HorizontalAlignment="Left" Margin="208,56,0,0" VerticalAlignment="Top" Width="100" Height="28" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_connect_button_Click"/>
-                        <Button x:Name="Disconnect_glove_btn" Content="Disconnect" HorizontalAlignment="Left" Margin="208,93,0,0" VerticalAlignment="Top" Width="100" Height="29" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_disconnect_button_Click" RenderTransformOrigin="0.48,1.838"/>
-                        <Label x:Name="Glove_data" Content="DATA BITS" HorizontalAlignment="Left" Margin="34,85,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
-                        <Label x:Name="Glove_stop" Content="STOP BITS" HorizontalAlignment="Left" Margin="34,117,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
-                        <ComboBox x:Name="com_port_list4" SelectedIndex="0" HorizontalAlignment="Left" Margin="122,119,0,0" VerticalAlignment="Top" Width="70">
+                        <Button x:Name="Connect_glove_btn" Content="Connect" HorizontalAlignment="Left" Margin="214,84,0,0" VerticalAlignment="Top" Width="100" Height="28" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_connect_button_Click"/>
+                        <Button x:Name="Disconnect_glove_btn" Content="Disconnect" HorizontalAlignment="Left" Margin="214,120,0,0" VerticalAlignment="Top" Width="100" Height="29" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_disconnect_button_Click" RenderTransformOrigin="0.48,1.838"/>
+                        <Label x:Name="Glove_data" Content="DATA BITS" HorizontalAlignment="Left" Margin="40,112,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                        <Label x:Name="Glove_stop" Content="STOP BITS" HorizontalAlignment="Left" Margin="40,144,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                        <ComboBox x:Name="com_port_list4" SelectedIndex="0" HorizontalAlignment="Left" Margin="128,146,0,0" VerticalAlignment="Top" Width="70">
                             <ComboBoxItem Content="1"/>
                             <ComboBoxItem Content="2"/>
                         </ComboBox>
-                        <Label x:Name="Glove_parity" Content="PARITY BITS" HorizontalAlignment="Left" Margin="34,150,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
-                        <ComboBox x:Name="com_port_list5" SelectedIndex="0" HorizontalAlignment="Left" Margin="122,152,0,0" VerticalAlignment="Top" Width="70">
+                        <Label x:Name="Glove_parity" Content="PARITY BITS" HorizontalAlignment="Left" Margin="40,178,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                        <ComboBox x:Name="com_port_list5" SelectedIndex="0" HorizontalAlignment="Left" Margin="128,180,0,0" VerticalAlignment="Top" Width="70">
                             <ComboBoxItem Content="None"/>
                             <ComboBoxItem Content="Odd"/>
                             <ComboBoxItem Content="Even"/>
                         </ComboBox>
-                        <ProgressBar x:Name="progressbar1" HorizontalAlignment="Left" Height="23" Margin="41,182,0,0" VerticalAlignment="Top" Width="276"/>
-                        <Button x:Name="Enable_glove_btn" Content="ENBALE" HorizontalAlignment="Left" Margin="395,30,0,0" VerticalAlignment="Top" Width="100" Height="26" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_enable_button_Click"/>
-                        <Button x:Name="Disble_glove_btn" Content="DISABLE" HorizontalAlignment="Left" Margin="395,80,0,0" VerticalAlignment="Top" Width="100" Height="26" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_disable_button_Click" RenderTransformOrigin="0.48,1.838"/>
-                        <Button x:Name="Open_menu_control" Content="open" HorizontalAlignment="Left" Margin="395,122,0,0" VerticalAlignment="Top" Width="100" Height="26" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Open_menu_Click"/>
-                        <Button x:Name="Unwrite_csv_btn" Content="Unwrite csv" HorizontalAlignment="Left" Margin="460,161,0,0" VerticalAlignment="Top" Width="100" Height="26" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Unwrite_csv_Click"/>
-                        <Button x:Name="Write_csv_btn" Content="Write csv" HorizontalAlignment="Left" Margin="352,161,0,0" VerticalAlignment="Top" Width="100" Height="26" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Write_csv_Click"/>
-                        <ComboBox x:Name="com_port_list3" SelectedIndex="0" HorizontalAlignment="Left" Margin="122,86,0,0" VerticalAlignment="Top" Width="70">
+                        <ProgressBar x:Name="progressbar1" HorizontalAlignment="Left" Height="23" Margin="47,210,0,0" VerticalAlignment="Top" Width="276"/>
+                        <ComboBox x:Name="com_port_list3" SelectedIndex="0" HorizontalAlignment="Left" Margin="128,114,0,0" VerticalAlignment="Top" Width="70">
                             <ComboBoxItem Content="8"/>
                             <ComboBoxItem Content="1"/>
                         </ComboBox>
-                        <ComboBox x:Name="com_port_list1" SelectedIndex="0" HorizontalAlignment="Left" Margin="122,24,0,0" VerticalAlignment="Top" Width="70">
+                        <ComboBox x:Name="com_port_list1" SelectedIndex="0" HorizontalAlignment="Left" Margin="128,52,0,0" VerticalAlignment="Top" Width="70">
                             <ComboBox.Background>
                                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                     <GradientStop Color="#FFF0F0F0"/>
@@ -195,8 +190,27 @@
                                 </LinearGradientBrush>
                             </ComboBox.Background>
                         </ComboBox>
-                        <Button x:Name="Refresh_glove_btn" Content="Refresh" HorizontalAlignment="Left" Margin="208,20,0,0" VerticalAlignment="Top" Width="100" Height="26" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_refresh_button_Click" RenderTransformOrigin="0.48,1.838"/>
-                        <Button x:Name="Modify_csv_btn" Content="Modify data" HorizontalAlignment="Left" Margin="352,194,0,0" VerticalAlignment="Top" Width="100" Height="26" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Modify_dat_csv_Click"/>
+                        <Button x:Name="Refresh_glove_btn" Content="Refresh" HorizontalAlignment="Left" Margin="214,48,0,0" VerticalAlignment="Top" Width="100" Height="26" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_refresh_button_Click" RenderTransformOrigin="0.48,1.838"/>
+                    </Grid>
+                    <Grid HorizontalAlignment="Left" Height="299" Margin="598,10,0,0" VerticalAlignment="Top" Width="570">
+                        <Grid.Background>
+                            <ImageBrush ImageSource="/hinh-nen-windows-10-dep-32.jpg"/>
+                        </Grid.Background>
+                        <Label x:Name="Auto_name" Content="AUTO GENERATE" HorizontalAlignment="Center" VerticalAlignment="Top" Width="162" Foreground="#FF9EA1B0" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif"/>
+                        <Button x:Name="Enable_glove_btn" Content="ENBALE" HorizontalAlignment="Left" Margin="332,64,0,0" VerticalAlignment="Top" Width="100" Height="26" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_enable_button_Click"/>
+                        <Button x:Name="Disble_glove_btn" Content="DISABLE" HorizontalAlignment="Left" Margin="332,114,0,0" VerticalAlignment="Top" Width="100" Height="26" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_disable_button_Click" RenderTransformOrigin="0.48,1.838"/>
+                        <Button x:Name="Open_menu_control" Content="open" HorizontalAlignment="Left" Margin="332,156,0,0" VerticalAlignment="Top" Width="100" Height="26" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Open_menu_Click"/>
+                        <Button x:Name="Unwrite_csv_btn" Content="Unwrite csv" HorizontalAlignment="Left" Margin="397,196,0,0" VerticalAlignment="Top" Width="100" Height="26" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Unwrite_csv_Click"/>
+                        <Button x:Name="Write_csv_btn" Content="Write csv" HorizontalAlignment="Left" Margin="289,196,0,0" VerticalAlignment="Top" Width="100" Height="26" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Write_csv_Click"/>
+                        <Button x:Name="Modify_csv_btn" Content="Modify data" HorizontalAlignment="Left" Margin="289,228,0,0" VerticalAlignment="Top" Width="100" Height="26" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Modify_dat_csv_Click"/>
+                        <ComboBox x:Name="program_list" SelectedIndex="0" HorizontalAlignment="Left" Margin="146,96,0,0" VerticalAlignment="Top" Width="70">
+                            <ComboBoxItem Content="115200"/>
+                            <ComboBoxItem Content="9600"/>
+                        </ComboBox>
+                        <Label x:Name="New_program_name" Content="NEW PROGRAM" HorizontalAlignment="Left" Margin="28,62,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                        <Label x:Name="Exist_program_name" Content="EXIST PROGRAM" HorizontalAlignment="Left" Margin="28,94,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                        <Label x:Name="Glove_data_Copy" Content="DATA BITS" HorizontalAlignment="Left" Margin="28,124,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                        <TextBox x:Name="jog_speed_tb_Copy" Text="500" HorizontalAlignment="Left" Height="21.96" Margin="146,62,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="70" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Background="#FFE5E5E5" BorderBrush="#FFACACAC" Foreground="Black" SelectionBrush="White"/>
                     </Grid>
                 </Grid>
             </TabItem>

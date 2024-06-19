@@ -93,8 +93,8 @@ namespace RobotArmHelix
         private double returnY = 0;
         private double returnZ = 600;
         // Define the file path
-        public string filePath = @"H:/OneDrive - hcmute.edu.vn/Desktop/5_DOF_Robot_Arm/control_glove/script_python/robot_data/test.csv";
-        public string savePath = @"H:/OneDrive - hcmute.edu.vn/Desktop/5_DOF_Robot_Arm/control_glove/script_python/robot_data/good.csv";
+        public string filePath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\data\\test.csv";
+        public string savePath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\data\\good.csv";
 
         public string[] fields;
         public string[] totalLines_csv;
@@ -286,7 +286,7 @@ namespace RobotArmHelix
                 WorkerSupportsCancellation = true
             };
             _uartWorker.DoWork += UartWorker_DoWork;
-            
+
             #endregion
 
         }
@@ -1975,6 +1975,19 @@ namespace RobotArmHelix
                                         }
                                     // plot(x, y, z);
                                     break;
+
+                                    case 0x01:
+                                        if (write_csv == true)
+                                        {
+                                            write_csv = false;
+                                        }
+                                        else if (write_csv == false)
+                                        {
+                                            write_csv = true;
+                                        }
+                                        Console.WriteLine(write_csv.ToString());
+                                        Console.WriteLine("Hehe");
+                                    break;
                                     default:
                                     Console.WriteLine("Hex value is not 0x1, 0x2, 0xA, or 0xB");
                                     break;
@@ -2199,24 +2212,32 @@ namespace RobotArmHelix
         }
         private void Modify_dat_csv_Click(object sender, RoutedEventArgs e)
         {
-            Modify_polynomial_regression("C:\\Users\\daveb\\Desktop\\5_DOF_Robot_Arm\\matlab\\test.csv");
+            Modify_polynomial_regression(filePath);
 
         }
         private void Test_move_mod_Click(object sender, RoutedEventArgs e)
         {
             move = 2;
+            int point_csv = 50;
             // Initialize a 2D array to hold the CSV data
             // Assuming you know the size of the array (10 rows and number of columns as per your data)
-            double[,] data = new double[10, 3];
-            for (int t = 0; t < 10; t++)
+            double[,] data = new double[50, 3];
+            for (int t = 0; t < point_csv; t++)
             {
-                data[t, 0] = selectmemberX[t] * 20;
-                data[t, 1] = selectmemberY[t] * 20;
-                data[t, 2] = selectmemberZ[t] * 15 + 700;
+                data[t, 0] = selectmemberX[t];
+                data[t, 1] = selectmemberY[t];
+                data[t, 2] = selectmemberZ[t];
                 Console.WriteLine(data[t, 0].ToString());
                 Console.WriteLine(data[t, 1].ToString());
                 Console.WriteLine(data[t, 2].ToString());
                 Console.WriteLine("---");
+
+                using (StreamWriter writer = new StreamWriter(savePath, true))
+                {
+                    // string csvLine = $"{x},{y},{z},{x_vel},{y_vel},{z_vel}";
+                    string csvLine = $"{data[t, 0]},{data[t, 1]},{data[t, 2]}";
+                    writer.WriteLine(csvLine);
+                }
             }
 
             Move_mod_Function(data, "D1010");
@@ -2344,7 +2365,7 @@ namespace RobotArmHelix
             }
 
             // Number of points per group
-            int group_size = 30;
+            int group_size = 2;
             /* Data to load to the PLC */
             int points = 10;
 
@@ -2367,11 +2388,20 @@ namespace RobotArmHelix
             int start_index = 0;
             int end_index = 0;
             int next_gr = 0;
+            int end_gr = 0;
             // Loop through each group
             for (int i = 0; i < numGroups; i++)
             {
-                start_index = i * cakes_per_person[i] + 1;
-                end_index = end_index + cakes_per_person[i];
+                if(i == 0)
+                {
+                    start_index = 0;
+                    end_index = cakes_per_person[i] - 1;
+                }
+                else
+                {
+                    start_index = end_index + 1;
+                    end_index = end_index + 1 + cakes_per_person[i];
+                }
 
                 // Extract data for the current group
                 double[] t_group = new double[end_index - start_index + 1];
@@ -2409,7 +2439,6 @@ namespace RobotArmHelix
 
                 int middleIndex = cakes_per_person[i] / 2;
                 int startIndex = middleIndex - points_each_group[i] / 2;
-
                 for (int k = 0; k < points_each_group[i]; k++)
                 {
                     int memberIndex = startIndex + k;
@@ -2420,13 +2449,14 @@ namespace RobotArmHelix
                     selectmemberX[next_gr + k] = predicted_x_group[memberIndex];
                     selectmemberY[next_gr + k] = predicted_y_group[memberIndex];
                     selectmemberZ[next_gr + k] = predicted_z_group[memberIndex];
-                    next_gr = next_gr + k;
+                    Console.WriteLine(points_each_group[i].ToString());
+
                     Console.WriteLine($"- {predicted_x_group[memberIndex]}");
                     Console.WriteLine($"- {predicted_y_group[memberIndex]}");
                     Console.WriteLine($"- {predicted_z_group[memberIndex]}");
-                    Console.WriteLine(points_each_group[i].ToString());
+                    end_gr = next_gr + k;
                 }
-                next_gr = next_gr + 1;
+                next_gr = end_gr + 1;
                 
 
                 //Console.WriteLine(i.ToString());
