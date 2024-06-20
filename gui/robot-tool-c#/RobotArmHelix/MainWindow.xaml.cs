@@ -2187,25 +2187,6 @@ namespace RobotArmHelix
         {
             RemoveSphereVisuals();
         }
-        private void Open_menu_Click(object sender, RoutedEventArgs e)
-        {
-            vel_1_test = Convert.ToInt32(spd_tb.Text) * 1000;
-            /* Write the vel */
-            for (int ind = 0; ind < 5; ind++)
-            {
-                write_d_mem_32_bit(2100 + 2 * ind, vel_1_test);
-            }
-            /* Change vel relay */
-            turn_on_1_pulse_relay(650);
-        }
-        private void Write_csv_Click(object sender, RoutedEventArgs e)
-        {
-            write_csv = true;
-        }
-        private void Unwrite_csv_Click(object sender, RoutedEventArgs e)
-        {
-            write_csv = false;
-        }
         private void MenuItemExit_Click(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();

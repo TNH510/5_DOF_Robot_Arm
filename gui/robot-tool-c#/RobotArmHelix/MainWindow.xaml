@@ -48,141 +48,103 @@
             </MenuItem>
         </Menu>
         <!--<Label x:Name="coordinatesLabel" Content="Coordinates: (0, 0, 0)" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,63,0" Foreground="White"/>-->
-        <TabControl Margin="0,23,10,101" Grid.ColumnSpan="2">
-            <TabItem Header="Manual Control" Width="100" Height="22">
+        <TabControl Margin="0,23,10,20" Grid.ColumnSpan="2">
+            <TabItem Header="Control" Width="100" Height="22">
                 <Grid Background="#FFE5E5E5" Margin="0,0,19,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="6*"/>
                         <ColumnDefinition Width="51*"/>
                         <ColumnDefinition Width="15*"/>
                         <ColumnDefinition Width="20*"/>
-                        <ColumnDefinition Width="45*"/>
+                        <ColumnDefinition Width="25*"/>
+                        <ColumnDefinition Width="20*"/>
                         <ColumnDefinition Width="20*"/>
                         <ColumnDefinition Width="110*"/>
                         <ColumnDefinition Width="1618*"/>
                     </Grid.ColumnDefinitions>
-                    <Grid HorizontalAlignment="Left" Height="138" Margin="4,45,0,0" VerticalAlignment="Top" Width="196" Background="#FF1F21AF" Grid.ColumnSpan="6" Grid.Column="1">
+                    <Grid HorizontalAlignment="Left" Height="150" Margin="10,16,0,0" VerticalAlignment="Top" Width="288" Background="#FF1F21AF" Grid.ColumnSpan="8" Grid.Column="1">
                         <Label x:Name="jogging_lbl" Content="JOGGING" HorizontalAlignment="Center" VerticalAlignment="Top" Width="84" Foreground="#FF9EA1B0" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif" RenderTransformOrigin="-0.364,0.248"/>
-                        <Button x:Name="Forward_button" Content="Forward" HorizontalAlignment="Left" Margin="0,115,0,0" VerticalAlignment="Top" Width="90" Height="23" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" MouseDown="Forward_button_MouseDown" MouseUp="Forward_button_MouseUp"/>
-                        <Button x:Name="Jog_set_speed" Content="Set speed" HorizontalAlignment="Left" Margin="1,75,0,0" VerticalAlignment="Top" Width="90" Height="24" FontSize="11" Click="Jog_set_speed_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36"/>
-                        <Button x:Name="Backward_button" Content="Backward" HorizontalAlignment="Left" Margin="106,115,0,0" VerticalAlignment="Top" Width="90" Height="23" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" MouseDown="Backward_button_MouseDown" MouseUp="Backward_button_MouseUp"/>
-                        <TextBox x:Name="joint_tb" Text="1" HorizontalAlignment="Left" Height="24" Margin="41,36,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="32" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Background="{x:Null}" Foreground="#FF007EF9" BorderBrush="{x:Null}" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
-                        <Label x:Name="Joint_lbl" Content="Joint" HorizontalAlignment="Left" Margin="2,36,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="23" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
-                        <TextBox x:Name="jog_speed_tb" Text="500" HorizontalAlignment="Left" Height="24" Margin="109,75,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Background="{x:Null}" Foreground="#FF007EF9" BorderBrush="{x:Null}" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                        <Button x:Name="Forward_button" Content="Forward" HorizontalAlignment="Left" Margin="19,91,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" MouseDown="Forward_button_MouseDown" MouseUp="Forward_button_MouseUp"/>
+                        <Button x:Name="Jog_set_speed" Content="Set speed" HorizontalAlignment="Left" Margin="22,56,0,0" VerticalAlignment="Top" Width="90" Height="24" FontSize="11" Click="Jog_set_speed_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36"/>
+                        <Button x:Name="Backward_button" Content="Backward" HorizontalAlignment="Left" Margin="152,92,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" MouseDown="Backward_button_MouseDown" MouseUp="Backward_button_MouseUp"/>
+                        <TextBox x:Name="joint_tb" Text="1" HorizontalAlignment="Left" Height="24" Margin="66,31,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="32" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Background="{x:Null}" Foreground="#FF007EF9" BorderBrush="{x:Null}" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                        <Label x:Name="Joint_lbl" Content="Joint" HorizontalAlignment="Left" Margin="27,31,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="23" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                        <TextBox x:Name="jog_speed_tb" Text="500" HorizontalAlignment="Left" Height="24" Margin="184,57,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Background="{x:Null}" Foreground="#FF007EF9" BorderBrush="{x:Null}" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
                     </Grid>
-                    <Grid HorizontalAlignment="Left" Height="188" Margin="4,396,0,0" VerticalAlignment="Top" Width="374" Opacity="0.9" Grid.ColumnSpan="7" Grid.Column="1">
+                    <Grid HorizontalAlignment="Left" Height="318" Margin="12,192,0,0" VerticalAlignment="Top" Width="288" Opacity="0.9" Grid.ColumnSpan="8" Grid.Column="1">
                         <Grid.Background>
                             <ImageBrush ImageSource="/hinh-nen-win-10-co-logo-4-mau.jpg"/>
                         </Grid.Background>
-                        <TextBox x:Name="TbX" Text="500" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="50" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" TextChanged="ReachingPoint_TextChanged" Background="{x:Null}" Foreground="#FF007EF9" BorderBrush="{x:Null}" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="30,35,0,0"/>
-                        <TextBox x:Name="TbY" Text="0" HorizontalAlignment="Left" Height="24" TextWrapping="Wrap" VerticalAlignment="Top" Width="51" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" TextChanged="ReachingPoint_TextChanged" Background="{x:Null}" Foreground="#FF007EF9" BorderBrush="{x:Null}" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="100,34,0,0"/>
-                        <TextBox x:Name="TbZ" Text="900" HorizontalAlignment="Left" Height="24" TextWrapping="Wrap" VerticalAlignment="Top"  Width="50" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" TextChanged="ReachingPoint_TextChanged" Background="{x:Null}" Foreground="#FF007EF9" BorderBrush="{x:Null}" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="156,35,0,0"/>
-                        <Label x:Name="tbX_lbl" Content="X" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="#FF007EF9" Height="23" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="9,35,0,0"/>
-                        <Label x:Name="tbY_lbl" Content="Y" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontFamily="Microsoft Sans Serif" FontWeight="Bold" Margin="80,35,0,0"/>
-                        <Label x:Name="tbZ_lbl" Content="Z" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="#FF007EF9" Height="23" FontFamily="Microsoft Sans Serif" FontWeight="Bold" Margin="139,35,0,0"/>
-                        <Label x:Name="path_lbl" Content="PATH" HorizontalAlignment="Left" VerticalAlignment="Top" Width="84" Foreground="#FF9EA1B0" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif" Margin="137,0,0,0"/>
-                        <Button x:Name="set_const_speed_button" Content="Set speed" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Height="24" FontSize="11" Click="set_const_speed_btn_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Margin="0,6,0,0"/>
-                        <TextBox x:Name="spd_tb" Text="500" HorizontalAlignment="Left" Height="24" TextWrapping="Wrap" VerticalAlignment="Top" Width="50" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Background="{x:Null}" Foreground="#FF007EF9" BorderBrush="{x:Null}" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="88,6,0,0"/>
-                        <Button x:Name="Tsm_moveJ_btn" Content="Transmit MoveJ" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Height="23" FontSize="11" Click="Tsm_moveJ_btn_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Margin="7,115,0,0"/>
-                        <Button x:Name="Tsm_moveL_btn" Content="Transmit MoveL" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Height="23" FontSize="11" Click="Tsm_moveL_btn_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Margin="124,114,0,0"/>
-                        <Button x:Name="run_btn" Content="Run" HorizontalAlignment="Left" VerticalAlignment="Top" Width="90" Height="24" FontSize="11" Click="run_bttn_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF181E36" FontWeight="Bold" BorderBrush="#FF181E36" Background="#FF007EF9" Margin="240,114,0,0"/>
-                        <Button x:Name="TestPos_bttn" Content="Test position" HorizontalAlignment="Left" VerticalAlignment="Top" Width="101" Height="23" FontSize="11" Click="TestPos_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Margin="124,153,0,0"/>
-                        <Button x:Name="EStop_btn" Content="E-Stop" HorizontalAlignment="Left" VerticalAlignment="Top" Width="90" Height="24" FontSize="11" Click="EStop_bttn_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF181E36" FontWeight="Bold" BorderBrush="#FF181E36" Background="#FF007EF9" Margin="240,150,0,0"/>
-                        <Button x:Name="Clear_Trajectory_btn" Content="Clear_Trajectory" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Height="23" FontSize="11" Click="Clr_Traj_btn_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Margin="7,152,0,0"/>
+                        <TextBox x:Name="TbX" Text="500" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="50" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" TextChanged="ReachingPoint_TextChanged" Background="{x:Null}" Foreground="#FF007EF9" BorderBrush="{x:Null}" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="66,79,0,0"/>
+                        <TextBox x:Name="TbY" Text="0" HorizontalAlignment="Left" Height="24" TextWrapping="Wrap" VerticalAlignment="Top" Width="51" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" TextChanged="ReachingPoint_TextChanged" Background="{x:Null}" Foreground="#FF007EF9" BorderBrush="{x:Null}" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="139,80,0,0"/>
+                        <TextBox x:Name="TbZ" Text="900" HorizontalAlignment="Left" Height="24" TextWrapping="Wrap" VerticalAlignment="Top"  Width="50" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" TextChanged="ReachingPoint_TextChanged" Background="{x:Null}" Foreground="#FF007EF9" BorderBrush="{x:Null}" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="195,80,0,0"/>
+                        <Label x:Name="tbX_lbl" Content="X" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="#FF007EF9" Height="23" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="45,79,0,0"/>
+                        <Label x:Name="tbY_lbl" Content="Y" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontFamily="Microsoft Sans Serif" FontWeight="Bold" Margin="116,81,0,0"/>
+                        <Label x:Name="tbZ_lbl" Content="Z" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="#FF007EF9" Height="23" FontFamily="Microsoft Sans Serif" FontWeight="Bold" Margin="175,80,0,0"/>
+                        <Label x:Name="path_lbl" Content="PATH" HorizontalAlignment="Left" VerticalAlignment="Top" Width="84" Foreground="#FF9EA1B0" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif" Margin="100,1,0,0"/>
+                        <Button x:Name="set_const_speed_button" Content="Set speed" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Height="24" FontSize="11" Click="set_const_speed_btn_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Margin="66,43,0,0"/>
+                        <TextBox x:Name="spd_tb" Text="500" HorizontalAlignment="Left" Height="24" TextWrapping="Wrap" VerticalAlignment="Top" Width="50" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Background="{x:Null}" Foreground="#FF007EF9" BorderBrush="{x:Null}" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="154,43,0,0"/>
+                        <Button x:Name="Tsm_moveJ_btn" Content="Transmit MoveJ" HorizontalAlignment="Left" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" Click="Tsm_moveJ_btn_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Margin="13,116,0,0"/>
+                        <Button x:Name="Tsm_moveL_btn" Content="Transmit MoveL" HorizontalAlignment="Left" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" Click="Tsm_moveL_btn_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Margin="149,116,0,0"/>
+                        <Button x:Name="run_btn" Content="Run" HorizontalAlignment="Left" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" Click="run_bttn_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF181E36" FontWeight="Bold" BorderBrush="#FF181E36" Background="#FF007EF9" Margin="15,234,0,0"/>
+                        <Button x:Name="TestPos_bttn" Content="Test position" HorizontalAlignment="Left" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" Click="TestPos_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Margin="148,176,0,0"/>
+                        <Button x:Name="EStop_btn" Content="E-Stop" HorizontalAlignment="Left" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" Click="EStop_bttn_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF181E36" FontWeight="Bold" BorderBrush="#FF181E36" Background="#FF007EF9" Margin="148,235,0,0"/>
+                        <Button x:Name="Clear_Trajectory_btn" Content="Clear_Trajectory" HorizontalAlignment="Left" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" Click="Clr_Traj_btn_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Margin="12,176,0,0"/>
                     </Grid>
-                    <Grid HorizontalAlignment="Left" Height="138" Margin="55,45,0,0" VerticalAlignment="Top" Width="229" Background="#FFA23414" Grid.Column="6" Grid.ColumnSpan="2">
+                    <Grid HorizontalAlignment="Left" Height="142" Margin="54,20,0,0" VerticalAlignment="Top" Width="365" Background="#FFA23414" Grid.Column="8">
                         <Label x:Name="control_lbl" Content="CONTROL" HorizontalAlignment="Center" VerticalAlignment="Top" Width="84" Foreground="#FF9EA1B0" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif"/>
-                        <Button x:Name="Servo_button" Content="Servo" HorizontalAlignment="Left" Margin="17,67,0,0" VerticalAlignment="Top" Width="90" Height="23" FontSize="11" Click="Servo_button_click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36"/>
-                        <Button x:Name="ResetError_button" Content="Reset error" HorizontalAlignment="Left" Margin="18,103,0,0" VerticalAlignment="Top" Width="89" Height="23" FontSize="11" Click="ResetError_button_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36"/>
-                        <Button x:Name="SetHome_button" Content="Set home" HorizontalAlignment="Left" Margin="129,67,0,0" VerticalAlignment="Top" Width="90" Height="23" FontSize="11" Click="SetHome_button_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36"/>
-                        <Button x:Name="GoHome_button" Content="Go home" HorizontalAlignment="Left" Margin="129,103,0,0" VerticalAlignment="Top" Width="90" Height="23" FontSize="11" Click="GoHome_button_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36"/>
+                        <Button x:Name="Servo_button" Content="Servo" HorizontalAlignment="Left" Margin="44,40,0,0" VerticalAlignment="Top" Width="119" Height="38" FontSize="11" Click="Servo_button_click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36"/>
+                        <Button x:Name="ResetError_button" Content="Reset error" HorizontalAlignment="Left" Margin="44,91,0,0" VerticalAlignment="Top" Width="117" Height="40" FontSize="11" Click="ResetError_button_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36"/>
+                        <Button x:Name="SetHome_button" Content="Set home" HorizontalAlignment="Left" Margin="214,40,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" Click="SetHome_button_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" RenderTransformOrigin="0.5,0.5">
+                            <Button.RenderTransform>
+                                <TransformGroup>
+                                    <ScaleTransform/>
+                                    <SkewTransform AngleY="0.653"/>
+                                    <RotateTransform/>
+                                    <TranslateTransform Y="-0.655"/>
+                                </TransformGroup>
+                            </Button.RenderTransform>
+                        </Button>
+                        <Button x:Name="GoHome_button" Content="Go home" HorizontalAlignment="Left" Margin="214,91,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" Click="GoHome_button_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36"/>
                     </Grid>
-                    <oxy:PlotView x:Name="plotView_position" Grid.Column="7" Background="White" Cursor="Hand" Margin="445,10,603,597" />
-                    <oxy:PlotView x:Name="plotView_theta" Margin="445,336,603,326" Background="White" Grid.Column="7" />
-                    <oxy:PlotView x:Name="plotView_omega" Margin="1035,336,28,326" Grid.Column="7" Background="White" />
-                    <oxy:PlotView x:Name="plotView_velocity" Margin="1035,25,28,597" Background="White" Grid.Column="7" />
-                    <oxy:PlotView x:Name="plotView_robot_pos" Margin="445,616,603,46" Background="White" Grid.Column="7" />
-                    <oxy:PlotView x:Name="plotView_glove_pos" Margin="1035,616,28,46" Grid.Column="7" Background="White" />
-                    <Button x:Name="Test_move_mod" Content="Test move" HorizontalAlignment="Left" Margin="1,601,0,0" VerticalAlignment="Top" Width="90" Height="23" FontSize="11" Click="Test_move_mod_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Grid.Column="5" Grid.ColumnSpan="2"/>
-                </Grid>
-            </TabItem>
-            <TabItem Header="Monitor">
-                <Grid Background="#FFE5E5E5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="27*"/>
-                        <ColumnDefinition Width="85*"/>
-                        <ColumnDefinition Width="41*"/>
-                        <ColumnDefinition Width="41*"/>
-                        <ColumnDefinition Width="1709*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid HorizontalAlignment="Left" Height="188" Margin="1,10,0,0" VerticalAlignment="Top" Width="296" Background="#FF310C27" Grid.ColumnSpan="4" Grid.Column="1">
-                        <Slider x:Name="joint1" HorizontalAlignment="Left" Margin="37,53,0,0" VerticalAlignment="Top" Width="210"  Maximum="180" Minimum="-180" ValueChanged="joint_ValueChanged" LargeChange="0.1" TickFrequency="0.1" Height="22"/>
-                        <Slider x:Name="joint2" HorizontalAlignment="Left" Margin="37,0,0,0" VerticalAlignment="Center" Width="210" Maximum="180" Minimum="-180" ValueChanged="joint_ValueChanged" LargeChange="0.1" TickFrequency="0.1" Height="22"/>
-                        <Slider x:Name="joint3" HorizontalAlignment="Left" Margin="37,111,0,0" VerticalAlignment="Top" Width="210" Maximum="180" Minimum="-180" ValueChanged="joint_ValueChanged" LargeChange="0.1" TickFrequency="0.1" Height="22"/>
-                        <Slider x:Name="joint4" HorizontalAlignment="Left" Margin="37,139,0,0" VerticalAlignment="Top" Width="210" Maximum="180" Minimum="-180" ValueChanged="joint_ValueChanged" LargeChange="0.1" TickFrequency="0.1" Height="22"/>
-                        <Slider x:Name="joint5" HorizontalAlignment="Left" Margin="37,166,0,0" VerticalAlignment="Top" Width="210" Maximum="180" Minimum="-180" ValueChanged="joint_ValueChanged" LargeChange="0.1" TickFrequency="0.1" Height="22"/>
-                        <Label x:Name="J1_lbl"  Content="J1" HorizontalAlignment="Left" Margin="0,45,0,0" VerticalAlignment="Top" Width="30" Foreground="#FF007EF9" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif"/>
-                        <Label x:Name="J1Value" HorizontalAlignment="Left" Margin="246,51,0,0"  VerticalAlignment="Top" Width="50" Foreground="#FF007EF9" FontSize="10" Content="{Binding Value, ElementName=joint1}" Height="22" ContentStringFormat="{}{0:0.##}" VerticalContentAlignment="Center" FontWeight="Bold" FontFamily="Microsoft Sans Serif"    />
-                        <Label x:Name="J2_lbl" Content="J2" HorizontalAlignment="Left" Margin="0,75,0,0" VerticalAlignment="Top" Width="30" Foreground="#FF007EF9" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif"/>
-                        <Label x:Name="J2Value" HorizontalAlignment="Left" Margin="246,81,0,0"  VerticalAlignment="Top" Width="50" Foreground="#FF007EF9" FontSize="10" Content="{Binding Value, ElementName=joint2}" Height="22" ContentStringFormat="{}{0:0.##}" VerticalContentAlignment="Center" FontWeight="Bold" FontFamily="Microsoft Sans Serif"    />
-                        <Label x:Name="J3_lbl" Content="J3" HorizontalAlignment="Left" Margin="0,103,0,0" VerticalAlignment="Top" Width="30" Foreground="#FF007EF9" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" RenderTransformOrigin="0.44,1.348" FontFamily="Microsoft Sans Serif"/>
-                        <Label x:Name="J3Value" HorizontalAlignment="Left" Margin="246,111,0,0"  VerticalAlignment="Top" Width="50" Foreground="#FF007EF9" FontSize="10" Content="{Binding Value, ElementName=joint3}" Height="22" ContentStringFormat="{}{0:0.##}" VerticalContentAlignment="Center" FontWeight="Bold" FontFamily="Microsoft Sans Serif"    />
-                        <Label x:Name="J4_lbl" Content="J4" HorizontalAlignment="Left" Margin="0,132,0,0" VerticalAlignment="Top" Width="30" Foreground="#FF007EF9" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif"/>
-                        <Label x:Name="J4Value" HorizontalAlignment="Left" Margin="246,136,0,0"  VerticalAlignment="Top" Width="50" Foreground="#FF007EF9" FontSize="10" Content="{Binding Value, ElementName=joint4}" Height="22" ContentStringFormat="{}{0:0.##}" VerticalContentAlignment="Center" FontWeight="Bold" FontFamily="Microsoft Sans Serif"    />
-                        <Label x:Name="J5_lbl" Content="J5" HorizontalAlignment="Left" Margin="0,158,0,0" VerticalAlignment="Top" Width="30" Foreground="#FF007EF9" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif"/>
-                        <Label x:Name="J5Value" HorizontalAlignment="Left" Margin="246,162,0,0"  VerticalAlignment="Top" Width="50" Foreground="#FF007EF9" FontSize="10" Content="{Binding Value, ElementName=joint5}" Height="22" ContentStringFormat="{}{0:0.##}" VerticalContentAlignment="Center" FontWeight="Bold" FontFamily="Microsoft Sans Serif"    />
-                        <Label x:Name="X_lbl" Content="X:" HorizontalAlignment="Left" Margin="5,24,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="25" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
-                        <Label x:Name="Tx" HorizontalAlignment="Left" Margin="23,24,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="25" Width="63" ContentStringFormat="{}{0:0.##}" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
-                        <Label x:Name="Y_lbl" Content="Y:" HorizontalAlignment="Left" Margin="95,24,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="25" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
-                        <Label x:Name="Ty" HorizontalAlignment="Center" Margin="0,24,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="25" Width="68" ContentStringFormat="{}{0:0.##}" FontFamily="Microsoft Sans Serif" FontWeight="Bold"/>
-                        <Label x:Name="Z_lbl" Content="Z:" HorizontalAlignment="Left" Margin="191,24,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="25" FontWeight="Bold" FontFamily="Microsoft Sans Serif" />
-                        <Label x:Name="Tz" HorizontalAlignment="Left" Margin="209,24,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="25" Width="62" ContentStringFormat="{}{0:0.##}" FontFamily="Microsoft Sans Serif" FontWeight="Bold"/>
-                        <Label x:Name="display_lbl" Content="DISPLAY" HorizontalAlignment="Left" Margin="102,0,0,0" VerticalAlignment="Top" Width="84" Foreground="#FF9EA1B0" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif"/>
-                    </Grid>
-                    <h:HelixViewport3D x:Name="viewPort3d" ViewCubeHeight="150" ViewCubeWidth="150" ViewCubeVerticalPosition="Bottom" CoordinateSystemLabelForeground="White" CoordinateSystemVerticalPosition="Center" CoordinateSystemHorizontalPosition="Right" CoordinateSystemHeight="150" CoordinateSystemWidth="150" RenderOptions.BitmapScalingMode="HighQuality" RenderOptions.EdgeMode="Unspecified" BorderBrush="Black" BorderThickness="5" ShowCoordinateSystem="False" ShowFrameRate="False" ShowCameraInfo="False" MouseLeftButtonUp="ViewPort3D_OnMouseLeftButtonUp" MouseLeftButtonDown="ViewPort3D_OnMouseLeftButtonDown" IsManipulationEnabled="True" IsViewCubeEdgeClicksEnabled="True" OpacityMask="#FFC82626" Margin="29,240,72,10" Grid.ColumnSpan="4" Grid.Column="1">
-                        <h:HelixViewport3D.Background>
-                            <ImageBrush TileMode="None" ImageSource="/4485761_codang.jpg"/>
-                        </h:HelixViewport3D.Background>
-                        <!-- Remember to add light to the scene -->
-                        <h:GridLinesVisual3D Width="16000" Length="16000" Thickness="1.5" MinorDistance="100" MajorDistance="400" Fill="#E5CFCECE" />
-                        <h:DefaultLights/>
-                    </h:HelixViewport3D>
-                    <TextBox x:Name="ErrorLog" HorizontalAlignment="Left" Height="193" TextWrapping="Wrap" VerticalAlignment="Top"  Width="406" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" Background="#FF26F10A" Foreground="#FF007EF9" BorderBrush="#FF007EF9" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="328,12,0,0" Grid.Column="4"/>
-                </Grid>
-            </TabItem>
-            <TabItem HorizontalAlignment="Center" Height="22" Header="Auto Control&#xA;" VerticalAlignment="Center" Width="90">
-                <Grid Background="#FFE5E5E5" Margin="0,0,-1,0">
-                    <Grid HorizontalAlignment="Left" Height="299" Margin="10,10,0,0" VerticalAlignment="Top" Width="570">
+                    <oxy:PlotView x:Name="plotView_position" Grid.Column="8" Background="White" Cursor="Hand" Margin="445,10,603,679" />
+                    <oxy:PlotView x:Name="plotView_theta" Margin="445,336,603,360" Background="White" Grid.Column="8" />
+                    <oxy:PlotView x:Name="plotView_omega" Margin="1035,336,28,360" Grid.Column="8" Background="White" />
+                    <oxy:PlotView x:Name="plotView_velocity" Margin="1035,11,28,677" Background="White" Grid.Column="8" />
+                    <oxy:PlotView x:Name="plotView_robot_pos" Margin="445,656,603,46" Background="White" Grid.Column="8" />
+                    <oxy:PlotView x:Name="plotView_glove_pos" Margin="1035,654,28,46" Grid.Column="8" Background="White" />
+                    <Button x:Name="Test_move_mod" Content="Test move" HorizontalAlignment="Left" Margin="72,547,0,0" VerticalAlignment="Top" Width="90" Height="22" FontSize="11" Click="Test_move_mod_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Grid.Column="8"/>
+                    <Grid HorizontalAlignment="Left" Height="316" Margin="55,193,0,0" VerticalAlignment="Top" Width="364" Grid.Column="8">
                         <Grid.Background>
                             <ImageBrush ImageSource="/hinh-nen-windows-10-dep-32.jpg"/>
                         </Grid.Background>
-                        <Label x:Name="Glove_name" Content="GLOVE" HorizontalAlignment="Left" Margin="97,0,0,0" VerticalAlignment="Top" Width="84" Foreground="#FF9EA1B0" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif"/>
-                        <Label x:Name="Glove_com" Content="COM PORT" HorizontalAlignment="Left" Margin="40,50,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
-                        <Label x:Name="Glove_baud" Content="BAUD RATE" HorizontalAlignment="Left" Margin="40,82,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
-                        <ComboBox x:Name="com_port_list2" SelectedIndex="0" HorizontalAlignment="Left" Margin="128,84,0,0" VerticalAlignment="Top" Width="70">
+                        <Label x:Name="Glove_name" Content="GLOVE" HorizontalAlignment="Left" Margin="135,2,0,0" VerticalAlignment="Top" Width="84" Foreground="#FF9EA1B0" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif"/>
+                        <Label x:Name="Glove_com" Content="COM PORT" HorizontalAlignment="Left" Margin="17,50,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                        <Label x:Name="Glove_baud" Content="BAUD RATE" HorizontalAlignment="Left" Margin="17,82,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                        <ComboBox x:Name="com_port_list2" SelectedIndex="0" HorizontalAlignment="Left" Margin="105,84,0,0" VerticalAlignment="Top" Width="70">
                             <ComboBoxItem Content="115200"/>
                             <ComboBoxItem Content="9600"/>
                         </ComboBox>
-                        <Button x:Name="Connect_glove_btn" Content="Connect" HorizontalAlignment="Left" Margin="214,84,0,0" VerticalAlignment="Top" Width="100" Height="28" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_connect_button_Click"/>
-                        <Button x:Name="Disconnect_glove_btn" Content="Disconnect" HorizontalAlignment="Left" Margin="214,120,0,0" VerticalAlignment="Top" Width="100" Height="29" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_disconnect_button_Click" RenderTransformOrigin="0.48,1.838"/>
-                        <Label x:Name="Glove_data" Content="DATA BITS" HorizontalAlignment="Left" Margin="40,112,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
-                        <Label x:Name="Glove_stop" Content="STOP BITS" HorizontalAlignment="Left" Margin="40,144,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
-                        <ComboBox x:Name="com_port_list4" SelectedIndex="0" HorizontalAlignment="Left" Margin="128,146,0,0" VerticalAlignment="Top" Width="70">
+                        <Button x:Name="Connect_glove_btn" Content="Connect" HorizontalAlignment="Left" Margin="198,104,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_connect_button_Click"/>
+                        <Button x:Name="Disconnect_glove_btn" Content="Disconnect" HorizontalAlignment="Left" Margin="197,160,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_disconnect_button_Click" RenderTransformOrigin="0.48,1.838"/>
+                        <Label x:Name="Glove_data" Content="DATA BITS" HorizontalAlignment="Left" Margin="17,112,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                        <Label x:Name="Glove_stop" Content="STOP BITS" HorizontalAlignment="Left" Margin="17,144,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                        <ComboBox x:Name="com_port_list4" SelectedIndex="0" HorizontalAlignment="Left" Margin="105,0,0,0" VerticalAlignment="Center" Width="70">
                             <ComboBoxItem Content="1"/>
                             <ComboBoxItem Content="2"/>
                         </ComboBox>
-                        <Label x:Name="Glove_parity" Content="PARITY BITS" HorizontalAlignment="Left" Margin="40,178,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
-                        <ComboBox x:Name="com_port_list5" SelectedIndex="0" HorizontalAlignment="Left" Margin="128,180,0,0" VerticalAlignment="Top" Width="70">
+                        <Label x:Name="Glove_parity" Content="PARITY BITS" HorizontalAlignment="Left" Margin="17,178,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                        <ComboBox x:Name="com_port_list5" SelectedIndex="0" HorizontalAlignment="Left" Margin="105,180,0,0" VerticalAlignment="Top" Width="70">
                             <ComboBoxItem Content="None"/>
                             <ComboBoxItem Content="Odd"/>
                             <ComboBoxItem Content="Even"/>
                         </ComboBox>
-                        <ProgressBar x:Name="progressbar1" HorizontalAlignment="Left" Height="23" Margin="47,210,0,0" VerticalAlignment="Top" Width="276"/>
-                        <ComboBox x:Name="com_port_list3" SelectedIndex="0" HorizontalAlignment="Left" Margin="128,114,0,0" VerticalAlignment="Top" Width="70">
+                        <ProgressBar x:Name="progressbar1" HorizontalAlignment="Left" Height="23" Margin="49,262,0,0" VerticalAlignment="Top" Width="276"/>
+                        <ComboBox x:Name="com_port_list3" SelectedIndex="0" HorizontalAlignment="Left" Margin="105,114,0,0" VerticalAlignment="Top" Width="70">
                             <ComboBoxItem Content="8"/>
                             <ComboBoxItem Content="1"/>
                         </ComboBox>
-                        <ComboBox x:Name="com_port_list1" SelectedIndex="0" HorizontalAlignment="Left" Margin="128,52,0,0" VerticalAlignment="Top" Width="70">
+                        <ComboBox x:Name="com_port_list1" SelectedIndex="0" HorizontalAlignment="Left" Margin="105,52,0,0" VerticalAlignment="Top" Width="70">
                             <ComboBox.Background>
                                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                     <GradientStop Color="#FFF0F0F0"/>
@@ -190,28 +152,81 @@
                                 </LinearGradientBrush>
                             </ComboBox.Background>
                         </ComboBox>
-                        <Button x:Name="Refresh_glove_btn" Content="Refresh" HorizontalAlignment="Left" Margin="214,48,0,0" VerticalAlignment="Top" Width="100" Height="26" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_refresh_button_Click" RenderTransformOrigin="0.48,1.838"/>
+                        <Button x:Name="Refresh_glove_btn" Content="Refresh" HorizontalAlignment="Left" Margin="198,50,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_refresh_button_Click" RenderTransformOrigin="0.48,1.838"/>
                     </Grid>
-                    <Grid HorizontalAlignment="Left" Height="299" Margin="598,10,0,0" VerticalAlignment="Top" Width="570">
+                    <Grid HorizontalAlignment="Left" Height="299" Margin="3,610,0,0" VerticalAlignment="Top" Width="570" Grid.ColumnSpan="7" Grid.Column="2">
                         <Grid.Background>
                             <ImageBrush ImageSource="/hinh-nen-windows-10-dep-32.jpg"/>
                         </Grid.Background>
                         <Label x:Name="Auto_name" Content="AUTO GENERATE" HorizontalAlignment="Center" VerticalAlignment="Top" Width="162" Foreground="#FF9EA1B0" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif"/>
-                        <Button x:Name="Enable_glove_btn" Content="ENBALE" HorizontalAlignment="Left" Margin="332,64,0,0" VerticalAlignment="Top" Width="100" Height="26" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_enable_button_Click"/>
-                        <Button x:Name="Disble_glove_btn" Content="DISABLE" HorizontalAlignment="Left" Margin="332,114,0,0" VerticalAlignment="Top" Width="100" Height="26" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_disable_button_Click" RenderTransformOrigin="0.48,1.838"/>
-                        <Button x:Name="Open_menu_control" Content="open" HorizontalAlignment="Left" Margin="332,156,0,0" VerticalAlignment="Top" Width="100" Height="26" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Open_menu_Click"/>
-                        <Button x:Name="Unwrite_csv_btn" Content="Unwrite csv" HorizontalAlignment="Left" Margin="397,196,0,0" VerticalAlignment="Top" Width="100" Height="26" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Unwrite_csv_Click"/>
-                        <Button x:Name="Write_csv_btn" Content="Write csv" HorizontalAlignment="Left" Margin="289,196,0,0" VerticalAlignment="Top" Width="100" Height="26" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Write_csv_Click"/>
-                        <Button x:Name="Modify_csv_btn" Content="Modify data" HorizontalAlignment="Left" Margin="289,228,0,0" VerticalAlignment="Top" Width="100" Height="26" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Modify_dat_csv_Click"/>
-                        <ComboBox x:Name="program_list" SelectedIndex="0" HorizontalAlignment="Left" Margin="146,96,0,0" VerticalAlignment="Top" Width="70">
+                        <Button x:Name="Enable_glove_btn" Content="ENBALE" HorizontalAlignment="Left" Margin="37,194,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_enable_button_Click"/>
+                        <Button x:Name="Disble_glove_btn" Content="DISABLE" HorizontalAlignment="Left" Margin="37,246,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_disable_button_Click" RenderTransformOrigin="0.48,1.838"/>
+                        <Button x:Name="Modify_csv_btn" Content="Modify data" HorizontalAlignment="Left" Margin="379,235,0,0" VerticalAlignment="Top" Width="100" Height="26" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Modify_dat_csv_Click"/>
+                        <ComboBox x:Name="program_list" SelectedIndex="0" HorizontalAlignment="Left" Margin="422,63,0,0" VerticalAlignment="Top" Width="70">
                             <ComboBoxItem Content="115200"/>
                             <ComboBoxItem Content="9600"/>
                         </ComboBox>
                         <Label x:Name="New_program_name" Content="NEW PROGRAM" HorizontalAlignment="Left" Margin="28,62,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
-                        <Label x:Name="Exist_program_name" Content="EXIST PROGRAM" HorizontalAlignment="Left" Margin="28,94,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
-                        <Label x:Name="Glove_data_Copy" Content="DATA BITS" HorizontalAlignment="Left" Margin="28,124,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
-                        <TextBox x:Name="jog_speed_tb_Copy" Text="500" HorizontalAlignment="Left" Height="21.96" Margin="146,62,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="70" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Background="#FFE5E5E5" BorderBrush="#FFACACAC" Foreground="Black" SelectionBrush="White"/>
+                        <Label x:Name="Exist_program_name" Content="EXIST PROGRAM" HorizontalAlignment="Left" Margin="304,61,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                        <Label x:Name="Point_save_name" Content="SAVED POINTS" HorizontalAlignment="Left" Margin="37,158,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                        <TextBox x:Name="New_program" Text="500" HorizontalAlignment="Left" Height="21.96" Margin="146,62,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="70" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Background="#FFE5E5E5" BorderBrush="#FFACACAC" Foreground="Black" SelectionBrush="White"/>
+                        <Button x:Name="Save_file_btn" Content="Save" HorizontalAlignment="Left" Margin="68,95,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Modify_dat_csv_Click"/>
+                        <Button x:Name="Delete_data_btn" Content="Delete data" HorizontalAlignment="Left" Margin="276,95,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Modify_dat_csv_Click"/>
+                        <Button x:Name="Refresh_csv_btn" Content="Refresh file" HorizontalAlignment="Left" Margin="406,96,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_refresh_button_Click" RenderTransformOrigin="0.48,1.838"/>
                     </Grid>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Monitor">
+                <Grid Background="#FFE5E5E5" Height="992">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="27*"/>
+                        <ColumnDefinition Width="85*"/>
+                        <ColumnDefinition Width="41*"/>
+                        <ColumnDefinition Width="41*"/>
+                        <ColumnDefinition Width="1709*"/>
+                    </Grid.ColumnDefinitions>
+                    <h:HelixViewport3D x:Name="viewPort3d" ViewCubeHeight="150" ViewCubeWidth="150" ViewCubeVerticalPosition="Bottom" CoordinateSystemLabelForeground="White" CoordinateSystemVerticalPosition="Center" CoordinateSystemHorizontalPosition="Right" CoordinateSystemHeight="150" CoordinateSystemWidth="150" RenderOptions.BitmapScalingMode="HighQuality" RenderOptions.EdgeMode="Unspecified" BorderBrush="Black" BorderThickness="5" ShowCoordinateSystem="False" ShowFrameRate="False" ShowCameraInfo="False" MouseLeftButtonUp="ViewPort3D_OnMouseLeftButtonUp" MouseLeftButtonDown="ViewPort3D_OnMouseLeftButtonDown" IsManipulationEnabled="True" IsViewCubeEdgeClicksEnabled="True" OpacityMask="#FFC82626" Margin="7,38,15,0" Grid.ColumnSpan="5" Height="922" VerticalAlignment="Top">
+                        <h:HelixViewport3D.Background>
+                            <ImageBrush TileMode="None" ImageSource="/4485761_codang.jpg"/>
+                        </h:HelixViewport3D.Background>
+                        <!-- Remember to add light to the scene -->
+                        <h:GridLinesVisual3D Width="16000" Length="16000" Thickness="1.5" MinorDistance="100" MajorDistance="400" Fill="#E5CFCECE" />
+                        <h:DefaultLights/>
+                    </h:HelixViewport3D>
+                    <Grid HorizontalAlignment="Left" Height="389" Margin="14,59,0,0" VerticalAlignment="Top" Width="406" Background="#FF310C27" Grid.ColumnSpan="5">
+                        <Slider x:Name="joint1" HorizontalAlignment="Left" Margin="39,55,0,0" VerticalAlignment="Top" Width="303"  Maximum="180" Minimum="-180" ValueChanged="joint_ValueChanged" LargeChange="0.1" TickFrequency="0.1" Height="22"/>
+                        <Slider x:Name="joint2" Margin="42,121,64,0" VerticalAlignment="Top" Maximum="180" Minimum="-180" ValueChanged="joint_ValueChanged" LargeChange="0.1" TickFrequency="0.1" Height="22"/>
+                        <Slider x:Name="joint3" HorizontalAlignment="Left" Margin="41,189,0,0" VerticalAlignment="Top" Width="301" Maximum="180" Minimum="-180" ValueChanged="joint_ValueChanged" LargeChange="0.1" TickFrequency="0.1" Height="22"/>
+                        <Slider x:Name="joint4" HorizontalAlignment="Left" Margin="41,258,0,0" VerticalAlignment="Top" Width="301" Maximum="180" Minimum="-180" ValueChanged="joint_ValueChanged" LargeChange="0.1" TickFrequency="0.1" Height="22"/>
+                        <Slider x:Name="joint5" HorizontalAlignment="Left" Margin="41,325,0,0" VerticalAlignment="Top" Width="301" Maximum="180" Minimum="-180" ValueChanged="joint_ValueChanged" LargeChange="0.1" TickFrequency="0.1" Height="22" RenderTransformOrigin="0.5,0.5">
+                            <Slider.RenderTransform>
+                                <TransformGroup>
+                                    <ScaleTransform/>
+                                    <SkewTransform/>
+                                    <RotateTransform Angle="-0.082"/>
+                                    <TranslateTransform/>
+                                </TransformGroup>
+                            </Slider.RenderTransform>
+                        </Slider>
+                        <Label x:Name="J1_lbl"  Content="J1" HorizontalAlignment="Left" Margin="3,47,0,0" VerticalAlignment="Top" Width="30" Foreground="#FF007EF9" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif"/>
+                        <Label x:Name="J1Value" HorizontalAlignment="Left" Margin="344,52,0,0"  VerticalAlignment="Top" Width="50" Foreground="#FF007EF9" FontSize="10" Content="{Binding Value, ElementName=joint1}" Height="22" ContentStringFormat="{}{0:0.##}" VerticalContentAlignment="Center" FontWeight="Bold" FontFamily="Microsoft Sans Serif"    />
+                        <Label x:Name="J2_lbl" Content="J2" HorizontalAlignment="Left" Margin="3,116,0,0" VerticalAlignment="Top" Width="30" Foreground="#FF007EF9" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif"/>
+                        <Label x:Name="J2Value" HorizontalAlignment="Left" Margin="347,118,0,0"  VerticalAlignment="Top" Width="50" Foreground="#FF007EF9" FontSize="10" Content="{Binding Value, ElementName=joint2}" Height="22" ContentStringFormat="{}{0:0.##}" VerticalContentAlignment="Center" FontWeight="Bold" FontFamily="Microsoft Sans Serif"    />
+                        <Label x:Name="J3_lbl" Content="J3" HorizontalAlignment="Left" Margin="4,181,0,0" VerticalAlignment="Top" Width="30" Foreground="#FF007EF9" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" RenderTransformOrigin="0.44,1.348" FontFamily="Microsoft Sans Serif"/>
+                        <Label x:Name="J3Value" HorizontalAlignment="Left" Margin="345,186,0,0"  VerticalAlignment="Top" Width="50" Foreground="#FF007EF9" FontSize="10" Content="{Binding Value, ElementName=joint3}" Height="22" ContentStringFormat="{}{0:0.##}" VerticalContentAlignment="Center" FontWeight="Bold" FontFamily="Microsoft Sans Serif"    />
+                        <Label x:Name="J4_lbl" Content="J4" HorizontalAlignment="Left" Margin="4,251,0,0" VerticalAlignment="Top" Width="30" Foreground="#FF007EF9" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif"/>
+                        <Label x:Name="J4Value" HorizontalAlignment="Left" Margin="344,256,0,0"  VerticalAlignment="Top" Width="50" Foreground="#FF007EF9" FontSize="10" Content="{Binding Value, ElementName=joint4}" Height="22" ContentStringFormat="{}{0:0.##}" VerticalContentAlignment="Center" FontWeight="Bold" FontFamily="Microsoft Sans Serif"    />
+                        <Label x:Name="J5_lbl" Content="J5" HorizontalAlignment="Left" VerticalAlignment="Top" Width="30" Foreground="#FF007EF9" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif" Margin="4,318,0,0"/>
+                        <Label x:Name="J5Value" HorizontalAlignment="Left" Margin="344,323,0,0"  VerticalAlignment="Top" Width="50" Foreground="#FF007EF9" FontSize="10" Content="{Binding Value, ElementName=joint5}" Height="22" ContentStringFormat="{}{0:0.##}" VerticalContentAlignment="Center" FontWeight="Bold" FontFamily="Microsoft Sans Serif"    />
+                        <Label x:Name="X_lbl" Content="X:" HorizontalAlignment="Left" Margin="72,25,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="25" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                        <Label x:Name="Tx" HorizontalAlignment="Left" Margin="90,25,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="25" Width="63" ContentStringFormat="{}{0:0.##}" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                        <Label x:Name="Y_lbl" Content="Y:" HorizontalAlignment="Left" Margin="162,25,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="25" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                        <Label x:Name="Ty" HorizontalAlignment="Left" Margin="182,26,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="25" Width="68" ContentStringFormat="{}{0:0.##}" FontFamily="Microsoft Sans Serif" FontWeight="Bold"/>
+                        <Label x:Name="Z_lbl" Content="Z:" HorizontalAlignment="Left" Margin="254,25,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="25" FontWeight="Bold" FontFamily="Microsoft Sans Serif" />
+                        <Label x:Name="Tz" HorizontalAlignment="Left" Margin="276,25,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="25" Width="62" ContentStringFormat="{}{0:0.##}" FontFamily="Microsoft Sans Serif" FontWeight="Bold"/>
+                        <Label x:Name="display_lbl" Content="DISPLAY" HorizontalAlignment="Left" Margin="150,1,0,0" VerticalAlignment="Top" Width="84" Foreground="#FF9EA1B0" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif"/>
+                    </Grid>
+                    <TextBox x:Name="ErrorLog" HorizontalAlignment="Left" Height="432" TextWrapping="Wrap" VerticalAlignment="Top"  Width="408" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" Background="#FF007EF9" Foreground="#FF007EF9" BorderBrush="#FF007EF9" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="12,447,0,0" Grid.ColumnSpan="5"/>
                 </Grid>
             </TabItem>
         </TabControl>
