@@ -1,29 +1,26 @@
-function model = polyfitn(X, y, n)
-    % X: Ma tr?n kích th??c [m x 2] v?i m là s? ?i?m d? li?u
-    % y: Vector kích th??c [m x 1] ch?a các giá tr? m?c tiêu
-    % n: B?c c?a ?a th?c
-    % model: C?u trúc ch?a các h? s? c?a ?a th?c
+function p = myPolyfit(x, y, n)
+    % Hàm myPolyfit tìm các h? s? c?a ?a th?c b?c n sao cho kh?p v?i d? li?u x và y
+    % x: vector ch?a các giá tr? x
+    % y: vector ch?a các giá tr? y t??ng ?ng
+    % n: b?c c?a ?a th?c c?n tìm
     
-    % S? ?i?m d? li?u
-    m = size(X, 1);
-    
-    % Tính s? l??ng h? s? c?a ?a th?c b?c n trong không gian 2 chi?u
-    numCoeffs = (n + 1) * (n + 2) / 2;
-    
-    % Xây d?ng ma tr?n thi?t k?
-    A = zeros(m, numCoeffs);
-    idx = 1;
-    for i = 0:n
-        for j = 0:i
-            A(:, idx) = (X(:, 1).^(i-j)) .* (X(:, 2).^j);
-            idx = idx + 1;
-        end
+    % Ki?m tra s? l??ng ?i?m d? li?u
+    if length(x) ~= length(y)
+        error('x và y ph?i có cùng s? l??ng ph?n t?');
     end
     
-    % Gi?i h? ph??ng trình tuy?n tính ?? tìm các h? s?
-    coeffs = A \ y;
+    % S? l??ng ?i?m d? li?u
+    m = length(x);
     
-    % Tr? v? các h? s? trong m?t c?u trúc
-    model.coeffs = coeffs;
-    model.n = n;
+    % Xây d?ng ma tr?n Vandermonde
+    A = zeros(m, n+1);
+    for i = 0:n
+        A(:, i+1) = x.^i;
+    end
+    
+    % Gi?i h? ph??ng trình tuy?n tính A*p = y
+    p = A\y;
+    
+    % ??o ng??c vector h? s? ?? phù h?p v?i cách tr? v? c?a hàm polyfit c?a MATLAB
+    p = flipud(p);
 end

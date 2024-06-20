@@ -8,7 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -38,6 +37,9 @@ using CsvHelper.Configuration;
 using Accord.Math;
 using MathNet.Numerics.LinearAlgebra.Double;
 using System.Globalization;
+using MathNet.Numerics;
+using System.Data.Common;
+using MathNet.Numerics.LinearAlgebra;
 /**
 * Author: Gabriele Marini (Gabryxx7)
 * This class load the 3d models of all the parts of the robotic arms and add them to the viewport
@@ -67,8 +69,12 @@ namespace RobotArmHelix
     /// <summary>
     /// Interaction logic for UserControl1.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : System.Windows.Window
    {
+
+        public double[] selectmemberX = new double[100];
+        public double[] selectmemberY = new double[100];
+        public double[] selectmemberZ = new double[100];
 
         public int visible_robot = 1;
         public int visible_display = 1;
@@ -87,8 +93,8 @@ namespace RobotArmHelix
         private double returnY = 0;
         private double returnZ = 600;
         // Define the file path
-        public string filePath = @"H:/OneDrive - hcmute.edu.vn/Desktop/5_DOF_Robot_Arm/control_glove/script_python/robot_data/test.csv";
-        public string savePath = @"H:/OneDrive - hcmute.edu.vn/Desktop/5_DOF_Robot_Arm/control_glove/script_python/robot_data/good.csv";
+        public string filePath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\data\\test.csv";
+        public string savePath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\data\\good.csv";
 
         public string[] fields;
         public string[] totalLines_csv;
@@ -280,7 +286,7 @@ namespace RobotArmHelix
                 WorkerSupportsCancellation = true
             };
             _uartWorker.DoWork += UartWorker_DoWork;
-            
+
             #endregion
 
         }
@@ -1443,35 +1449,35 @@ namespace RobotArmHelix
                 x = tar_pos[t,0];
                 y = tar_pos[t,1];
                 z = tar_pos[t,2];
-                if (z >= 500 && z <= 1000)
-                {
-                    (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
-                    ret = Check_angle(t1, t2, t3, t4, t5);
-                    if (ret != 0)
-                    {
-                        double theta = 0.0;
-                        if (ret == 1) theta = t1;
-                        else if (ret == 2) theta = t2;
-                        else if (ret == 3) theta = t3;
-                        else if (ret == 4) theta = t4;
-                        else if (ret == 5) theta = t5;
-                        //PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
-                        return;
-                    }
-                    t2 -= 90.0;
-                    t3 += 90.0;
-                    t4 += 90.0;
-                    /* Assign value */
-                    angle_array[t, 0] = (int)(t1 * 100000 + 18000000);
-                    angle_array[t, 1] = (int)(t2 * 100000 + 18000000);
-                    angle_array[t, 2] = (int)(t3 * 100000 + 18000000);
-                    angle_array[t, 3] = (int)(t4 * 100000 + 18000000);
-                    angle_array[t, 4] = (int)(t5 * 100000);
-                }
-                else
-                {
-                    //PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", "Out of range of Z axis"));
-                }
+                //if (z >= 500 && z <= 1000)
+                //{
+                (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
+                if(t1 > Constants.T1_LU) t1 = Constants.T1_LU;
+                else if(t1 < Constants.T1_LD) t1 = Constants.T1_LD;
+
+                if(t2 > Constants.T2_LU) t2 = Constants.T2_LU;
+                else if(t2 < Constants.T2_LD) t2 = Constants.T2_LD;
+
+                if(t3 > Constants.T3_LU) t3 = Constants.T3_LU;
+                else if(t3 < Constants.T3_LD) t3 = Constants.T3_LD;
+
+                if(t4 > Constants.T4_LU) t4 = Constants.T4_LU;
+                else if(t4 < Constants.T4_LD) t4 = Constants.T4_LD;
+
+                t2 -= 90.0;
+                t3 += 90.0;
+                t4 += 90.0;
+                /* Assign value */
+                angle_array[t, 0] = (int)(t1 * 100000 + 18000000);
+                angle_array[t, 1] = (int)(t2 * 100000 + 18000000);
+                angle_array[t, 2] = (int)(t3 * 100000 + 18000000);
+                angle_array[t, 3] = (int)(t4 * 100000 + 18000000);
+                angle_array[t, 4] = (int)(t5 * 100000);
+                //}
+                //else
+                //{
+                //    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", "Out of range of Z axis"));
+                //}
 
             }
             Memory_angle_write(angle_array, value_angle, device, 10);
@@ -1969,6 +1975,19 @@ namespace RobotArmHelix
                                         }
                                     // plot(x, y, z);
                                     break;
+
+                                    case 0x01:
+                                        if (write_csv == true)
+                                        {
+                                            write_csv = false;
+                                        }
+                                        else if (write_csv == false)
+                                        {
+                                            write_csv = true;
+                                        }
+                                        Console.WriteLine(write_csv.ToString());
+                                        Console.WriteLine("Hehe");
+                                    break;
                                     default:
                                     Console.WriteLine("Hex value is not 0x1, 0x2, 0xA, or 0xB");
                                     break;
@@ -2168,59 +2187,40 @@ namespace RobotArmHelix
         {
             RemoveSphereVisuals();
         }
-        private void Open_menu_Click(object sender, RoutedEventArgs e)
-        {
-            vel_1_test = Convert.ToInt32(spd_tb.Text) * 1000;
-            /* Write the vel */
-            for (int ind = 0; ind < 5; ind++)
-            {
-                write_d_mem_32_bit(2100 + 2 * ind, vel_1_test);
-            }
-            /* Change vel relay */
-            turn_on_1_pulse_relay(650);
-        }
-        private void Write_csv_Click(object sender, RoutedEventArgs e)
-        {
-            write_csv = true;
-        }
-        private void Unwrite_csv_Click(object sender, RoutedEventArgs e)
-        {
-            write_csv = false;
-        }
         private void MenuItemExit_Click(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();
         }
         private void Modify_dat_csv_Click(object sender, RoutedEventArgs e)
         {
-            ModifyTrajectory(filePath, savePath);
+            Modify_polynomial_regression(filePath);
+
         }
         private void Test_move_mod_Click(object sender, RoutedEventArgs e)
         {
             move = 2;
+            int point_csv = 50;
             // Initialize a 2D array to hold the CSV data
             // Assuming you know the size of the array (10 rows and number of columns as per your data)
-            double[,] data = new double[10, 3];
-
-            // Read the file and parse the data
-            using (StreamReader sr = new StreamReader(savePath))
+            double[,] data = new double[50, 3];
+            for (int t = 0; t < point_csv; t++)
             {
-                string line;
-                int row = 0;
+                data[t, 0] = selectmemberX[t];
+                data[t, 1] = selectmemberY[t];
+                data[t, 2] = selectmemberZ[t];
+                Console.WriteLine(data[t, 0].ToString());
+                Console.WriteLine(data[t, 1].ToString());
+                Console.WriteLine(data[t, 2].ToString());
+                Console.WriteLine("---");
 
-                while ((line = sr.ReadLine()) != null && row < 10)
+                using (StreamWriter writer = new StreamWriter(savePath, true))
                 {
-                    string[] values = line.Split(',');
-
-                    for (int col = 0; col < values.Length; col++)
-                    {
-                        // Trim whitespace and convert to double
-                        data[row, col] = double.Parse(values[col].Trim());
-                        Console.WriteLine(data[row, col]);
-                    }
-                    row++;
+                    // string csvLine = $"{x},{y},{z},{x_vel},{y_vel},{z_vel}";
+                    string csvLine = $"{data[t, 0]},{data[t, 1]},{data[t, 2]}";
+                    writer.WriteLine(csvLine);
                 }
             }
+
             Move_mod_Function(data, "D1010");
         }
 
@@ -2313,162 +2313,223 @@ namespace RobotArmHelix
                 }
             }
         }
-        private Point3D[] ReadDataFromCsv(string filePath)
-        {
-            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
-            {
-                HasHeaderRecord = false,
-            };
-
-            using (var reader = new StreamReader(filePath))
-            using (var csv = new CsvReader(reader, config))
-            {
-                var records = csv.GetRecords<CsvPoint>().ToList();
-                return records.Select(r => new Point3D(r.X, r.Y, r.Z)).ToArray();
-            }
-        }
 
         #region polynomial_regression
 
-        private double EvalPoly(double[] coefficients, double x)
+        public void Modify_polynomial_regression(string csvfilepath)
+        {
+
+            // Read all lines from the CSV file
+            var lines = File.ReadAllLines(csvfilepath);
+
+            // Initialize arrays to store the coordinates
+            int numSamples = lines.Length;
+            double[] x = new double[numSamples];
+            double[] y = new double[numSamples];
+            double[] z = new double[numSamples];
+            double[] t = new double[numSamples];
+
+            // Loop through the lines and parse the coordinates
+            for (int i = 0; i < numSamples; i++)
+            {
+                var values = lines[i].Split(',').Select(double.Parse).ToArray();
+                x[i] = values[0];
+                y[i] = values[1];
+                z[i] = values[2];
+            }
+
+            // Generate the time vector assuming uniform sampling
+            for (int i = 0; i < numSamples; i++)
+            {
+                t[i] = (double)i / (numSamples - 1);  // Adjust this if your data requires a different time vector
+                //t[i] = i;  // Adjust this if your data requires a different time vector
+            }
+
+            // Number of points per group
+            int group_size = 2;
+            /* Data to load to the PLC */
+            int points = 10;
+
+            // Chia đều bánh cho mỗi người
+            int numGroups = numSamples / group_size;
+            // Số bánh còn lại sau khi chia đều
+            int num_remaining_points = numSamples % group_size;
+            // Degree of the polynomial
+            int degree = 2;  
+
+            int[] cakes_per_person = DistributeCakes(numSamples, numGroups);
+            Console.WriteLine(cakes_per_person.Length);
+
+            /* Calculate the points each group need to have */
+            // Tính số bánh mỗi nhóm nhận
+            int baseCakesPerGroup = points / cakes_per_person.Length;
+            int remainderCakes = points % cakes_per_person.Length;
+
+
+            int start_index = 0;
+            int end_index = 0;
+            int next_gr = 0;
+            int end_gr = 0;
+            // Loop through each group
+            for (int i = 0; i < numGroups; i++)
+            {
+                if(i == 0)
+                {
+                    start_index = 0;
+                    end_index = cakes_per_person[i] - 1;
+                }
+                else
+                {
+                    start_index = end_index + 1;
+                    end_index = end_index + 1 + cakes_per_person[i];
+                }
+
+                // Extract data for the current group
+                double[] t_group = new double[end_index - start_index + 1];
+                Array.Copy(t, start_index, t_group, 0, cakes_per_person[i]);
+
+                double[] x_group = new double[end_index - start_index + 1];
+                Array.Copy(x, start_index, x_group, 0, cakes_per_person[i]);
+
+                double[] y_group = new double[end_index - start_index + 1];
+                Array.Copy(y, start_index, y_group, 0, cakes_per_person[i]);
+
+                double[] z_group = new double[end_index - start_index + 1];
+                Array.Copy(z, start_index, z_group, 0, cakes_per_person[i]);
+
+                // Fit polynomials
+                // Perform polynomial regression for each group
+                var coefficients_x = PolynomialFit.MyPolyfit(t_group, x_group, degree);
+                var coefficients_y = PolynomialFit.MyPolyfit(t_group, y_group, degree);
+                var coefficients_z = PolynomialFit.MyPolyfit(t_group, z_group, degree);
+
+                double[] t_fit = Generate.LinearSpaced(cakes_per_person[i], t_group[0], t_group[t_group.Length - 1]);
+
+                double[] predicted_x_group = new double[cakes_per_person[i]];
+                double[] predicted_y_group = new double[cakes_per_person[i]];
+                double[] predicted_z_group = new double[cakes_per_person[i]];
+                for (int j = 0; j < cakes_per_person[i]; j++)
+                {
+                    predicted_x_group[j] = PolynomialFit.EvaluatePolynomial(coefficients_x, t_fit[j]);
+                    predicted_y_group[j] = PolynomialFit.EvaluatePolynomial(coefficients_y, t_fit[j]);
+                    predicted_z_group[j] = PolynomialFit.EvaluatePolynomial(coefficients_z, t_fit[j]);
+                    //Console.WriteLine(predicted_x_group[j].ToString());
+                }
+                /* Chia bánh cho người nhận */
+                int[] points_each_group = DistributeCakes(points, cakes_per_person.Length);
+
+                int middleIndex = cakes_per_person[i] / 2;
+                int startIndex = middleIndex - points_each_group[i] / 2;
+                for (int k = 0; k < points_each_group[i]; k++)
+                {
+                    int memberIndex = startIndex + k;
+                    if (memberIndex >= cakes_per_person[i])
+                    {
+                        memberIndex = cakes_per_person[i] - 1;
+                    }
+                    selectmemberX[next_gr + k] = predicted_x_group[memberIndex];
+                    selectmemberY[next_gr + k] = predicted_y_group[memberIndex];
+                    selectmemberZ[next_gr + k] = predicted_z_group[memberIndex];
+                    Console.WriteLine(points_each_group[i].ToString());
+
+                    Console.WriteLine($"- {predicted_x_group[memberIndex]}");
+                    Console.WriteLine($"- {predicted_y_group[memberIndex]}");
+                    Console.WriteLine($"- {predicted_z_group[memberIndex]}");
+                    end_gr = next_gr + k;
+                }
+                next_gr = end_gr + 1;
+                
+
+                //Console.WriteLine(i.ToString());
+                Console.WriteLine("----------------------------------");
+            }
+        }
+
+
+        public static class PolynomialFit
+        {
+            public static double[] MyPolyfit(double[] x, double[] y, int degree)
+            {
+                // Kiểm tra số lượng điểm dữ liệu
+                if (x.Length != y.Length)
+                {
+                    throw new ArgumentException("x và y phải có cùng số lượng phần tử");
+                }
+
+                // Xây dựng ma trận Vandermonde
+                var A = Matrix<double>.Build.Dense(x.Length, degree + 1);
+                for (int i = 0; i <= degree; i++)
+                {
+                    for (int j = 0; j < x.Length; j++)
+                    {
+                        A[j, i] = Math.Pow(x[j], i);
+                    }
+                }
+
+                // Chuyển đổi y thành vector
+                var yVector = Vector<double>.Build.DenseOfArray(y);
+
+                // Giải hệ phương trình tuyến tính A * p = y
+                var p = A.Solve(yVector);
+
+                // Đảo ngược vector hệ số để phù hợp với cách trả về của hàm polyfit của MATLAB
+                var coefficients = p.ToArray();
+                Array.Reverse(coefficients);
+                return coefficients;
+            }
+
+            public static double EvaluatePolynomial(double[] coefficients, double x)
+            {
+                double result = 0;
+                for (int i = 0; i < coefficients.Length; i++)
+                {
+                    result += coefficients[i] * Math.Pow(x, coefficients.Length - 1 - i);
+                }
+                return result;
+            }
+        }
+
+        // Function to print an array (helper method)
+        static void PrintArray(double[] array)
+        {
+            foreach (var item in array)
+            {
+                Console.Write(item + " ");
+            }
+            Console.WriteLine();
+        }
+
+        // Function to evaluate polynomial at a specific value
+        static double EvaluatePolynomial(double[] coefficients, double t)
         {
             double result = 0;
             for (int i = 0; i < coefficients.Length; i++)
             {
-                result += coefficients[i] * Math.Pow(x, i);
+                result += coefficients[i] * Math.Pow(t, i);
             }
             return result;
         }
-        private double[] PolyFit(double[] x, double[] y, int degree)
-        {
-            var vandermonde = new DenseMatrix(x.Length, degree + 1);
-            var coefficients = new double[degree + 1];
-            for (int i = 0; i < x.Length; i++)
-            {
-                for (int j = 0; j <= degree; j++)
-                {
-                    vandermonde[i, j] = Math.Pow(x[i], j);
-                }
-            }
-            var yVector = new DenseVector(y);
-            var coefficientsVector = vandermonde.QR().Solve(yVector);
-            return coefficientsVector.ToArray();
-        }
-        public class CsvPoint
-        {
-            public double X { get; set; }
-            public double Y { get; set; }
-            public double Z { get; set; }
-        }
 
-        private IEnumerable<Point3D[]> SplitDataIntoSegments(Point3D[] data, int segmentSize)
+
+        static int[] DistributeCakes(int totalCakes, int totalPeople)
         {
-            for (int i = 0; i < data.Length; i += segmentSize)
+            // Chia đều bánh cho mỗi người
+            int baseCakesPerPerson = totalCakes / totalPeople;
+            // Số bánh còn lại sau khi chia đều
+            int remainingCakes = totalCakes % totalPeople;
+
+            // Tạo mảng để lưu số miếng bánh mỗi người nhận
+            int[] cakesPerPerson = Enumerable.Repeat(baseCakesPerPerson, totalPeople).ToArray();
+
+            // Phân phối số bánh còn lại cho những người đầu tiên
+            for (int i = 0; i < remainingCakes; i++)
             {
-                yield return data.Skip(i).Take(segmentSize).ToArray();
+                cakesPerPerson[i]++;
             }
+
+            return cakesPerPerson;
         }
 
-        private IEnumerable<Point3D> ExtendData(Point3D[] data, int targetCount)
-        {
-            int originalCount = data.Length;
-            int numSegments = (int)Math.Ceiling((double)targetCount / originalCount);
-            int segmentSize = originalCount * numSegments;
-            var extendedData = new List<Point3D>();
-
-            for (int i = 0; i < numSegments; i++)
-            {
-                foreach (var point in data)
-                {
-                    extendedData.Add(point);
-                }
-            }
-
-            return extendedData.Take(targetCount);
-        }
-
-        private void SaveRegressionResultToCsv(List<Point3D> allPoints, string filePath, int size)
-        {
-
-            // Chuyển đổi List<Point3D> thành Point3D[]
-            Point3D[] data = allPoints.ToArray();
-
-            // Số điểm mục tiêu (300 điểm)
-            int targetCount = size;
-            int originalCount = data.Length;
-
-            var config = new CsvConfiguration(CultureInfo.InvariantCulture);
-            config.HasHeaderRecord = false; // Thiết lập HasHeaderRecord tại đây
-
-            if (originalCount > targetCount)
-            {
-            }
-            else
-            {
-                int delta = 1;
-                while ((originalCount + delta) != targetCount) { delta += 1; }; 
-                // Tăng số lượng điểm để đạt 300 điểm bằng cách chia nhỏ dữ liệu
-                int segmentSize = originalCount + delta;
-                var extendedData = ExtendData(data, segmentSize);
-
-                using (var writer = new StreamWriter(filePath))
-                using (var csv = new CsvWriter(writer, config)) // Sử dụng config đã thiết lập
-                {
-                    foreach (var point in extendedData)
-                    {
-                        csv.WriteRecord(point); // Ghi mỗi điểm vào file CSV
-                        csv.NextRecord();
-                    }
-                }
-            }
-        }
-
-        private void ModifyTrajectory(string csvFilePath, string savepath)
-        {
-
-            // Đọc dữ liệu từ tệp CSV
-            var data = ReadDataFromCsv(csvFilePath);
-
-            var length_data = data.Length;
-            // Chia dữ liệu thành các đoạn nhỏ hơn, ví dụ: mỗi đoạn chứa 30 điểm
-            int segmentSize = 30;
-            if (segmentSize == length_data)
-            {
-                segmentSize = segmentSize + 1;
-            }
-            var segments = SplitDataIntoSegments(data, segmentSize);
-
-            // Khởi tạo một danh sách để tích lũy tất cả các điểm
-            List<Point3D> allPoints = new List<Point3D>();
-
-            foreach (var segment in segments)
-            {
-                // Tạo biến t (biến tham số)
-                double[] t = Enumerable.Range(0, segment.Length).Select(i => (double)i / (segment.Length - 1)).ToArray();
-
-                // Tách các biến độc lập và biến phụ thuộc
-                double[] X = segment.Select(p => p.X).ToArray();
-                double[] Y = segment.Select(p => p.Y).ToArray();
-                double[] Z = segment.Select(p => p.Z).ToArray();
-
-                // Hồi quy đa thức bậc 10 cho từng biến x, y, z theo t
-                double[] coeffsX = PolyFit(t, X, 10);
-                double[] coeffsY = PolyFit(t, Y, 10);
-                double[] coeffsZ = PolyFit(t, Z, 10);
-
-                // Tạo giá trị dự đoán cho x, y, z
-                int numPoints = 10;
-                double[] tFit = Enumerable.Range(0, numPoints).Select(i => (double)i / (numPoints - 1)).ToArray();
-                Point3D[] curve = tFit.Select(tt => new Point3D(
-                    EvalPoly(coeffsX, tt),
-                    EvalPoly(coeffsY, tt),
-                    EvalPoly(coeffsZ, tt))).ToArray();
-
-                // Thêm các điểm của segment vào danh sách tất cả các điểm
-                allPoints.AddRange(curve);
-            }
-            SaveRegressionResultToCsv(allPoints, savepath, 10);
-        }
         #endregion
     }
 
