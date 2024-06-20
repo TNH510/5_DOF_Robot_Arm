@@ -5,6 +5,7 @@ using System.Drawing.Imaging;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
 using static System.Net.Mime.MediaTypeNames;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ProgressBar;
 
 namespace Image_proccessing
 {
@@ -204,7 +205,7 @@ namespace Image_proccessing
                 //}    
                  return result;
             }
-            private static int[,] Dilation(int[,] image)
+            public static int[,] Dilation(int[,] image)
             {
                 int width = image.GetLength(0);
                 int height = image.GetLength(1);
@@ -413,14 +414,14 @@ namespace Image_proccessing
                 {
                     for (int j = 0; j < gray.GetLength(1); j++)
                     {
-                        if ((gray[i, j] >= threhold[0] - 1 && gray[i, j] <= threhold[1]))
+                        if ((gray[i, j] >= threhold[0]))
                         {
                             gray[i, j] = 255;
                         }
-                        else if ((gray[i, j] >= threhold[1] && gray[i, j] <= 255))
-                        {
-                            gray[i, j] = 255;
-                        }                        
+                        //else if ((gray[i, j] >= threhold[1] && gray[i, j] <= 255))
+                        //{
+                        //    gray[i, j] = 255;
+                        //}                        
                         else
                         {
                             gray[i, j] = 0;
@@ -518,7 +519,7 @@ namespace Image_proccessing
 
                 int[,] resultImage = new int[width, height];
                 int count = 0;
-                int[,] theta_rho = new int[1000000, 4];
+                int[,] theta_rho = new int[5000, 4];
                 // lấy toàn bộ số điểm vượt ngưỡng 
                 for (int theta = 0; theta < 180; theta++)
                 {
@@ -582,10 +583,10 @@ namespace Image_proccessing
                             }
                         }
                     }                  
-                    if (soluong_nhom >= 4)// điều kiện thoát vòng lặp
-                    {
-                        i = nhom;
-                    }
+                    //if (soluong_nhom >= 4)// điều kiện thoát vòng lặp
+                    //{
+                    //    i = nhom;
+                    //}
 
                 }
                 for (int i = 0; i < 4; i++)
@@ -667,18 +668,18 @@ namespace Image_proccessing
 
                 return resultImage;
             }         
-            public static int CalculateThreshold(Bitmap image)
+            public static int CalculateThreshold(int[,] image)
             {
                 // Tính histogram
                 int[] histogram = new int[256];
                 int totalPixels = 0;
 
-                for (int y = 0; y < image.Height; y++)
+                for (int x = 0; x < image.GetLength(0); x++)
                 {
-                    for (int x = 0; x < image.Width; x++)
+                    for (int y = 0; y < image.GetLength(1); y++)
                     {
-                        Color pixel = image.GetPixel(x, y);
-                        int grayLevel = (int)(pixel.R);
+                       
+                        int grayLevel = image[x, y];
                         histogram[grayLevel]++;
                         totalPixels++;
                     }
@@ -966,9 +967,77 @@ namespace Image_proccessing
 
                 return H;
             }
+            public static int FindLines(int[,]hough)
+            {
+                //tạo ra 1 biến 3D để thêm thông tin là điểm ảnh đã được duyệt qua chưa
+
+                //đếm xem có bao nhiêu điểm >=55
+                int count_hough_point = 0;
+                for (int i = 0; i < hough.GetLength(0); i++)
+                {
+                    for (int j = 0; j < hough.GetLength(1); j++)
+                    {
+                        if (hough[i, j] >= 55)
+                        {
+                            count_hough_point++;
+                        }
+                    }
+                }
+                //lưu thông tin của ma trận hough có điểm >=55 vào Temp_info
+                int[,] Temp_info = new int[count_hough_point, 4];
+                int count1 = 0;             
+                for (int i =0; i<hough.GetLength(0); i++)
+                {
+                    for (int j =0; j<hough.GetLength(1); j++)
+                    {
+                        if (hough[i,j]>=55)
+                        {
+                            Temp_info[count1, 0] = i;//x
+                            Temp_info[count1, 1] = j;//y
+                            Temp_info[count1, 2] = 0;//nhom
+                            Temp_info[count1, 3] = 0;//check xem da phan loai hay chua
+                            count1++;
+                        }    
+                        
+                    }
+                }
+                //phân nhóm
+                //bốc tk đầu tiên
+                int x=0;
+                int y=0;
+                int nhom = 0;
+                int count = 0;
+                while(count< count_hough_point)
+                {
+                    for (int i = 0; i < count_hough_point; i++)
+                    {
+                        if (Temp_info[i, 3] == 0)//check xem da phan loai hay chua
+                        {
+                            x = Temp_info[i, 0];
+                            y = Temp_info[i, 1];
+                            break;
+                        }
+                    }
+                    //tính toán khoản cách để phâm nhóm 
+                    for (int i = 0; i < count_hough_point; i++)
+                    {
+                        if (Temp_info[i, 3] == 0)//check xem da phan loai hay chua
+                        {
+                            if (Math.Abs(x - Temp_info[i, 0]) < 20 && Math.Abs(y - Temp_info[i, 1]) < 90)
+                            {
+                                Temp_info[i, 2] = nhom;//nhom
+                                Temp_info[i, 3] = 1;//da check
+                                count++;
+                            }
+                        }
+                    }
+                    nhom++;
+                }    
+
+                    return count_hough_point;
+            }
 
         }
-        
         private void button1_Click(object sender, EventArgs e)
         {
             // Tạo một OpenFileDialog
@@ -1006,14 +1075,32 @@ namespace Image_proccessing
 
             //biểu đồ hough
             int[,] hough = EdgeDetection.PerformHoughTransform_Rectangle(edges);
-            EdgeDetection.PerformHoughTransform_Circle(edges,out int X_circle,out int Y_circle, out int dimention);
+            for (int i = 0; i < hough.GetLength(0); i++)
+            {
+                for (int j = 0; j < hough.GetLength(1); j++)
+                {
+                    if (hough[i, j] >= 55)
+                    {
+                        hough[i, j] = 255;
+                    }
+                    else
+                    {
+                        hough[i, j] = 0;
+                    }
+                }
+            }
+            int lines_point = EdgeDetection.FindLines(hough);
+            hough = EdgeDetection.Dilation(hough);
+            //hough = EdgeDetection.Erosion_Dilation(hough, 4, 6);
+            //tách số điểm nổi bật từ biểu đồ hough
+            //EdgeDetection.PerformHoughTransform_Circle(edges,out int X_circle,out int Y_circle, out int dimention);
             //vẽ đường thẳng từ biểu đồ hough
-            int[,] result = EdgeDetection.DrawLines(hough, threshold, width, height);
+            //int[,] result = EdgeDetection.DrawLines(hough, threshold, width, height);
 
             // thể hiện lên GUI
             Bitmap Import_picture = new Bitmap(imagePath);
-            picture1.Image = EdgeDetection.Point_corner(Import_picture, result,X_circle,Y_circle);
-            picture2.Image = EdgeDetection.IntToBitmap(result);
+            picture1.Image = Import_picture;
+            //picture2.Image = EdgeDetection.IntToBitmap(result);
             picture3.Image = EdgeDetection.IntToBitmap(hough);
             picture4.Image = EdgeDetection.IntToBitmap(edges);
             int x = MidPoint[0,0];
@@ -1028,7 +1115,8 @@ namespace Image_proccessing
             textBox1.Text = H.ToString();
 
             // Dữ liệu hình chữ nhật,tròn, vuông
-            if(H>0.000623 && H<0.000628)
+            //0.000674021925773947
+            if (H>0.000623 && H<0.000628)
             { textBox8.Text = "HÌNH TRÒN"; }   
             else if (H>0.000650 && H<0.000658)
             { textBox8.Text = "HÌNH VUÔNG"; }
