@@ -26,8 +26,8 @@ extern "C" {
 /* Public macros ------------------------------------------------------------ */
 /* Public variables --------------------------------------------------------- */
 /* Public APIs -------------------------------------------------------------- */
-base_status_t system_manager_init(void);
-base_status_t system_manager_task(void);
+void system_manager_init(void);
+void system_manager_task(void);
 
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus

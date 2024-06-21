@@ -12,7 +12,9 @@
     "type_traits": "c",
     "drv_magnetic.h": "c",
     "bsp_gpio.h": "c",
-    "main.h": "c"
+    "main.h": "c",
+    "*.txt": "c",
+    "stdint.h": "c"
   },
   "C_Cpp_Runner.cCompilerPath": "gcc",
   "C_Cpp_Runner.cppCompilerPath": "g++",

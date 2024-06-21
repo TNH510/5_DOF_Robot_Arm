@@ -9,30 +9,52 @@
  */
 /* Public includes ---------------------------------------------------------- */
 #include "system_manager.h"
+
 #include "sensor_manager.h"
 
 /* Private includes --------------------------------------------------------- */
 /* Private defines ---------------------------------------------------------- */
 /* Private enumerate/structure ---------------------------------------------- */
+typedef enum
+{
+    SYS_MODE_TEST,
+    SYS_MODE_CALIB,
+    SYS_MODE_RUN,
+} sys_mode_t;
+
 /* Private macros ----------------------------------------------------------- */
 /* Public variables --------------------------------------------------------- */
 /* Private variables -------------------------------------------------------- */
+button_name_t g_button_state = NO_EVENT;
+sys_mode_t     g_mode         = SYS_MODE_TEST;
+
 /* Private prototypes ------------------------------------------------------- */
 /* Public implementations --------------------------------------------------- */
-base_status_t system_manager_init(void)
+void system_manager_init(void)
 {
-    // bsp_gpio_set_pin(LED_RED_GPIO_Port, LED_RED_Pin);
-    // bsp_gpio_set_pin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
-    HAL_Delay(1000);
-    return sensor_manager_init();
+    sensor_manager_init();
 }
-base_status_t system_manager_task(void)
+void system_manager_task(void)
 {
-    // return sensor_manager_task();
-    return sensor_manager_test();
+    drv_button_check_event(&g_button_state);
+
+    switch (g_mode)
+    {
+    case SYS_MODE_TEST:
+        sensor_manager_test(g_button_state);
+        break;
+    case SYS_MODE_CALIB:
+        sensor_manager_calib(g_button_state);
+        break;
+    case SYS_MODE_RUN:
+        sensor_manager_run(g_button_state);
+        break;
+
+    default: 
+        break;
+    }
 }
 
 /* Private implementations -------------------------------------------------- */
-
 
 /* End of file -------------------------------------------------------------- */
