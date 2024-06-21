@@ -9,7 +9,10 @@
     "sensor_manager.h": "c",
     "drv_button.h": "c",
     "glove_algorithm.h": "c",
-    "type_traits": "c"
+    "type_traits": "c",
+    "drv_magnetic.h": "c",
+    "bsp_gpio.h": "c",
+    "main.h": "c"
   },
   "C_Cpp_Runner.cCompilerPath": "gcc",
   "C_Cpp_Runner.cppCompilerPath": "g++",
