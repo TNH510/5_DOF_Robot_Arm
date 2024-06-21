@@ -1,7 +1,7 @@
 /**
  * @file       drv_uart.c
- * @copyright  Copyright (C) 2019 Fiot Co., Ltd. All rights reserved.
- * @license    This project is released under the Fiot License.
+ * @copyright  Copyright (C) HieuTranNgoc
+ * @license    This project is released under HieuTranNgoc License.
  * @version    1.0.0
  * @date       2023-09-05
  * @author     Hieu Tran
@@ -22,8 +22,8 @@
 
 /* Public variables --------------------------------------------------- */
 extern UART_HandleTypeDef huart1;
-extern uint8_t rx_buffer_user[RX_BUFFER_SIZE];
-extern cbuffer_t cb;
+extern uint8_t            rx_buffer_user[RX_BUFFER_SIZE];
+extern cbuffer_t          cb;
 /* Private variables -------------------------------------------------- */
 
 /* Private function prototypes ---------------------------------------- */
@@ -32,7 +32,7 @@ extern cbuffer_t cb;
 
 drv_uart_error_t drv_uart_init(void)
 {
-	bsp_uart_init();
+    bsp_uart_init();
     return DRV_UART_OK;
 }
 
@@ -54,14 +54,14 @@ drv_uart_error_t drv_uart_receive(void)
 
 uint32_t drv_uart_num_unread_cb_data(void)
 {
-	return cb_data_count(&cb);
+    return cb_data_count(&cb);
 }
 
 drv_uart_error_t drv_uart_read_cb_data(uint8_t *handle_data, uint32_t nbytes)
 {
-	cb_read(&cb, handle_data, nbytes);
+    cb_read(&cb, handle_data, nbytes);
 
-	return DRV_UART_OK;
+    return DRV_UART_OK;
 }
 
 void drv_uart_clear_cb(void)

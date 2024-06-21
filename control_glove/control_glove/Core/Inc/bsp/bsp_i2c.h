@@ -1,6 +1,6 @@
 /**
  * @file       bsp_i2c.h
- * @copyright  Copyright (C) 2019 Fiot Co., Ltd. All rights reserved.
+ * @copyright  Copyright (C) HieuTranNgoc
  * @license    This project is released under the QuyLe License.
  * @version    1.0.0
  * @date       2023-08-19
@@ -16,12 +16,12 @@
 #define __BSP_I2C_H
 
 /* Includes ----------------------------------------------------------- */
+#include "bsp_common.h"
 #include "main.h"
 
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
-#include "bsp_common.h"
 /* Public defines ----------------------------------------------------- */
 #define BSP_I2C1    1
 #define BSP_I2C2    1
@@ -48,7 +48,7 @@ bool bsp_i2c1_is_busy(void);
 
 /**
  * @brief Check device is ready or not
- * 
+ *
  * @param address_device    Address of device
  * @return true             Device is ready
  * @return false            Device is not ready
@@ -57,36 +57,36 @@ bool bsp_i2c1_is_device_ready(uint8_t address_device);
 
 /**
  * @brief Write memory in polling mode
- * 
+ *
  * @param address_slave Address of device
  * @param reg_write     Register of device
  * @param data_write    Data want to write
  * @param size_data     Size data want to write
- * @return true         Write success 
+ * @return true         Write success
  * @return false        Write fail
  */
 bool bsp_i2c1_write_mem(uint8_t address_slave, uint8_t reg_write, uint8_t *data_write, uint16_t size_data);
 
 /**
  * @brief Write memory in dma mode
- * 
+ *
  * @param address_slave Address of device
  * @param reg_write     Register of device
  * @param data_write    Data want to write
  * @param size_data     Size data want to write
- * @return true         Write success 
+ * @return true         Write success
  * @return false        Write fail
  */
 bool bsp_i2c1_write_mem_dma(uint8_t address_slave, uint8_t reg_write, uint8_t *data_write, uint16_t size_data);
 
 /**
  * @brief Read memory in polling mode
- * 
+ *
  * @param address_slave Address of device
  * @param reg_read      Register of device
  * @param data_read     Data want to write
  * @param size_data     Size data want to write
- * @return true         Read success 
+ * @return true         Read success
  * @return false        Read fail
  */
 bool bsp_i2c1_read_mem(uint8_t address_slave, uint8_t reg_read, uint8_t *data_read, uint16_t size_data);
@@ -103,7 +103,7 @@ bool bsp_i2c2_is_busy(void);
 
 /**
  * @brief Check device is ready or not
- * 
+ *
  * @param address_device    Address of device
  * @return true             Device is ready
  * @return false            Device is not ready
@@ -112,36 +112,36 @@ bool bsp_i2c2_is_device_ready(uint8_t address_device);
 
 /**
  * @brief Write memory in polling mode
- * 
+ *
  * @param address_slave Address of device
  * @param reg_write     Register of device
  * @param data_write    Data want to write
  * @param size_data     Size data want to write
- * @return true         Write success 
+ * @return true         Write success
  * @return false        Write fail
  */
 bool bsp_i2c2_write_mem(uint8_t address_slave, uint8_t reg_write, uint8_t *data_write, uint16_t size_data);
 
 /**
  * @brief Write memory in dma mode
- * 
+ *
  * @param address_slave Address of device
  * @param reg_write     Register of device
  * @param data_write    Data want to write
  * @param size_data     Size data want to write
- * @return true         Write success 
+ * @return true         Write success
  * @return false        Write fail
  */
 bool bsp_i2c2_write_mem_dma(uint8_t address_slave, uint8_t reg_write, uint8_t *data_write, uint16_t size_data);
 
 /**
  * @brief Read memory in polling mode
- * 
+ *
  * @param address_slave Address of device
  * @param reg_read      Register of device
  * @param data_read     Data want to write
  * @param size_data     Size data want to write
- * @return true         Read success 
+ * @return true         Read success
  * @return false        Read fail
  */
 bool bsp_i2c2_read_mem(uint8_t address_slave, uint8_t reg_read, uint8_t *data_read, uint16_t size_data);
@@ -159,7 +159,7 @@ bool bsp_i2c3_is_busy(void);
 
 /**
  * @brief Check device is ready or not
- * 
+ *
  * @param address_device    Address of device
  * @return true             Device is ready
  * @return false            Device is not ready
@@ -168,48 +168,48 @@ bool bsp_i2c3_is_device_ready(uint8_t address_device);
 
 /**
  * @brief Write memory in polling mode
- * 
+ *
  * @param address_slave Address of device
  * @param reg_write     Register of device
  * @param data_write    Data want to write
  * @param size_data     Size data want to write
- * @return true         Write success 
+ * @return true         Write success
  * @return false        Write fail
  */
 bool bsp_i2c3_write_mem(uint8_t address_slave, uint8_t reg_write, uint8_t *data_write, uint16_t size_data);
 
 /**
  * @brief Write memory in dma mode
- * 
+ *
  * @param address_slave Address of device
  * @param reg_write     Register of device
  * @param data_write    Data want to write
  * @param size_data     Size data want to write
- * @return true         Write success 
+ * @return true         Write success
  * @return false        Write fail
  */
 bool bsp_i2c3_write_mem_dma(uint8_t address_slave, uint8_t reg_write, uint8_t *data_write, uint16_t size_data);
 
 /**
  * @brief Read memory in polling mode
- * 
+ *
  * @param address_slave Address of device
  * @param reg_read      Register of device
  * @param data_read     Data want to write
  * @param size_data     Size data want to write
- * @return true         Read success 
+ * @return true         Read success
  * @return false        Read fail
  */
 bool bsp_i2c3_read_mem(uint8_t address_slave, uint8_t reg_read, uint8_t *data_read, uint16_t size_data);
 #endif
 
 /**
- * @brief Set callback function 
- * 
+ * @brief Set callback function
+ *
  * @param cb Function callback
  */
 void i2c1_mem_dma_set_cplt_callback(void *cb);
 
-#endif  // __BSP_I2C_H
+#endif    // __BSP_I2C_H
 
 /* End of file -------------------------------------------------------- */

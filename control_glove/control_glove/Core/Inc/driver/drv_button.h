@@ -1,7 +1,7 @@
 /**
  * @file       drv_button.h
- * @copyright  Copyright (C) 2019 Fiot Co., Ltd. All rights reserved.
- * @license    This project is released under the Fiot License.
+ * @copyright  Copyright (C) HieuTranNgoc
+ * @license    This project is released under HieuTranNgoc License.
  * @version    1.1.2
  * @date       2023-08-30
  * @author     Hieu Tran
@@ -74,6 +74,6 @@ bool drv_button_init(void);
  */
 void drv_button_check_event(button_name_t *button_state);
 
-#endif  // __DRIVER_BUTTON_H
+#endif    // __DRIVER_BUTTON_H
 
 /* End of file -------------------------------------------------------- */
