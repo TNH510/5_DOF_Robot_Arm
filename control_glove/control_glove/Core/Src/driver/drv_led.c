@@ -1,58 +1,51 @@
 /**
- * @file       system_manager.c
- * @copyright  Copyright (C) 2023 TNH510
+ * @file       drv_led.c
+ * @copyright  Copyright (C) 2024 TNH510
  * @version    1.0.0
- * @date       2023-11
+ * @date       2024-06
  * @author     Hieu Tran Ngoc
- * @brief      System manager for Control Glove project
+ * @brief      Driver for LED control
  * @note       None
  */
 /* Public includes ---------------------------------------------------------- */
-#include "system_manager.h"
-
-#include "sensor_manager.h"
+#include "drv_led.h"
+#include "bsp_gpio.h"
 
 /* Private includes --------------------------------------------------------- */
 /* Private defines ---------------------------------------------------------- */
 /* Private enumerate/structure ---------------------------------------------- */
-typedef enum
-{
-    SYS_MODE_TEST,
-    SYS_MODE_CALIB,
-    SYS_MODE_RUN,
-} sys_mode_t;
-
 /* Private macros ----------------------------------------------------------- */
 /* Public variables --------------------------------------------------------- */
 /* Private variables -------------------------------------------------------- */
-button_name_t g_button_state = NO_EVENT;
-sys_mode_t     g_mode         = SYS_MODE_TEST;
-
 /* Private prototypes ------------------------------------------------------- */
 /* Public implementations --------------------------------------------------- */
-void system_manager_init(void)
+void drv_led_turn_on_red_led(void)
 {
-    sensor_manager_init();
+    bsp_gpio_set_pin(LED_RED_GPIO_Port, LED_RED_Pin);
 }
-void system_manager_task(void)
+
+void drv_led_turn_on_green_led(void)
 {
-    drv_button_check_event(&g_button_state);
+    bsp_gpio_set_pin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
+}
 
-    switch (g_mode)
-    {
-    case SYS_MODE_TEST:
-        sensor_manager_test(g_button_state);
-        break;
-    case SYS_MODE_CALIB:
-        sensor_manager_calib(g_button_state);
-        break;
-    case SYS_MODE_RUN:
-        sensor_manager_run(g_button_state);
-        break;
+void drv_led_turn_on_blue_led(void)
+{
+    bsp_gpio_reset_pin(USER_LED_GPIO_Port, USER_LED_Pin);
+}
 
-    default: 
-        break;
-    }
+void drv_led_turn_off_red_led(void)
+{
+    bsp_gpio_reset_pin(LED_RED_GPIO_Port, LED_RED_Pin);
+}
+void drv_led_turn_off_green_led(void)
+{
+    bsp_gpio_reset_pin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
+}
+
+void drv_led_turn_off_blue_led(void)
+{
+    bsp_gpio_set_pin(USER_LED_GPIO_Port, USER_LED_Pin);
 }
 
 /* Private implementations -------------------------------------------------- */

@@ -1,7 +1,7 @@
 /**
  * @file       drv_button.c
- * @copyright  Copyright (C) 2019 Fiot Co., Ltd. All rights reserved.
- * @license    This project is released under the Fiot License.
+ * @copyright  Copyright (C) HieuTranNgoc
+ * @license    This project is released under HieuTranNgoc License.
  * @version    1.1.2
  * @date       2023-08-30
  * @author     Hieu Tran
@@ -39,16 +39,16 @@ bool drv_button_init(void)
     }
 
     drv_button.button_event_button_1 = INVALID_EVENT;
-    drv_button.button_1_interrupt = false;
-    drv_button.button_1_interrupt_p = &drv_button.button_1_interrupt;
+    drv_button.button_1_interrupt    = false;
+    drv_button.button_1_interrupt_p  = &drv_button.button_1_interrupt;
 
     drv_button.button_event_button_2 = INVALID_EVENT;
-    drv_button.button_2_interrupt = false;
-    drv_button.button_2_interrupt_p = &drv_button.button_2_interrupt;
+    drv_button.button_2_interrupt    = false;
+    drv_button.button_2_interrupt_p  = &drv_button.button_2_interrupt;
 
     drv_button.button_event_button_3 = INVALID_EVENT;
-    drv_button.button_3_interrupt = false;
-    drv_button.button_3_interrupt_p = &drv_button.button_3_interrupt;
+    drv_button.button_3_interrupt    = false;
+    drv_button.button_3_interrupt_p  = &drv_button.button_3_interrupt;
 
     return true;
 }
@@ -57,14 +57,14 @@ void drv_button_check_event(button_name_t *button_state)
 {
     /* State machine for every button */
     drv_button.button_event_button_1 =
-      bsp_button_check_state_one_button(BUTTON_1, drv_button.button_1_interrupt_p, &button[BUTTON_1 - 1]);
+        bsp_button_check_state_one_button(BUTTON_1, drv_button.button_1_interrupt_p, &button[BUTTON_1 - 1]);
     drv_button.button_event_button_2 =
-      bsp_button_check_state_one_button(BUTTON_2, drv_button.button_2_interrupt_p, &button[BUTTON_2 - 1]);
+        bsp_button_check_state_one_button(BUTTON_2, drv_button.button_2_interrupt_p, &button[BUTTON_2 - 1]);
     drv_button.button_event_button_3 =
-      bsp_button_check_state_one_button(BUTTON_3, drv_button.button_3_interrupt_p, &button[BUTTON_3 - 1]);
+        bsp_button_check_state_one_button(BUTTON_3, drv_button.button_3_interrupt_p, &button[BUTTON_3 - 1]);
 
     /* Export state to global variable */
-    if (drv_button.button_event_button_2 == CLICK_EVENT)  // Left
+    if (drv_button.button_event_button_2 == CLICK_EVENT)    // Left
     {
         *button_state = CLICK_LEFT_BUTTON;
     }
@@ -74,7 +74,7 @@ void drv_button_check_event(button_name_t *button_state)
         *button_state = HOLD_LEFT_BUTTON;
     }
 
-    if (drv_button.button_event_button_1 == CLICK_EVENT)  // Right
+    if (drv_button.button_event_button_1 == CLICK_EVENT)    // Right
     {
         *button_state = CLICK_RIGHT_BUTTON;
     }
@@ -84,7 +84,7 @@ void drv_button_check_event(button_name_t *button_state)
         *button_state = HOLD_RIGHT_BUTTON;
     }
 
-    if (drv_button.button_event_button_3 == CLICK_EVENT)  // Select
+    if (drv_button.button_event_button_3 == CLICK_EVENT)    // Select
     {
         *button_state = CLICK_SELECT_BUTTON;
     }
@@ -94,9 +94,8 @@ void drv_button_check_event(button_name_t *button_state)
         *button_state = HOLD_SELECT_BUTTON;
     }
 
-    if ((drv_button.button_event_button_1 == INVALID_EVENT) &&
-        (drv_button.button_event_button_2 == INVALID_EVENT) &&
-        (drv_button.button_event_button_3 == INVALID_EVENT))
+    if ((drv_button.button_event_button_1 == INVALID_EVENT) && (drv_button.button_event_button_2 == INVALID_EVENT)
+        && (drv_button.button_event_button_3 == INVALID_EVENT))
     {
         *button_state = NO_EVENT;
     }

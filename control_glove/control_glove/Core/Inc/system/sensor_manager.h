@@ -18,6 +18,7 @@ extern "C" {
 /* Includes ----------------------------------------------------------------- */
 #include <stdint.h>
 #include "bsp_common.h"
+#include "drv_button.h"
 
 /* Public defines ----------------------------------------------------------- */
 /* Public enumerate/structure ----------------------------------------------- */
@@ -25,8 +26,9 @@ extern "C" {
 /* Public variables --------------------------------------------------------- */
 /* Public APIs -------------------------------------------------------------- */
 base_status_t sensor_manager_init(void);
-base_status_t sensor_manager_task(void);
-base_status_t sensor_manager_test(void);
+base_status_t sensor_manager_run(button_name_t event);
+base_status_t sensor_manager_calib(button_name_t event);
+base_status_t sensor_manager_test(button_name_t event);
 
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus

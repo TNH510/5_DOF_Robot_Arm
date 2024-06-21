@@ -1,39 +1,42 @@
 /**
- * @file       system_manager.h
- * @copyright  Copyright (C) 2023 TNH510
+ * @file       drv_led.h
+ * @copyright  Copyright (C) 2024 TNH510
  * @version    1.0.0
- * @date       2023-11
- * @author     Hieu Tran Ngoc
- * @brief      System manager for Control Glove project
+ * @date       2024-06
+ * @author     Hieu Tran
+ * @brief      Driver for LED control
  * @note       None
  */
 /* Define to prevent recursive inclusion ------------------------------------ */
-#ifndef __SYSTEM_MANAGER_H
-#define __SYSTEM_MANAGER_H
+#ifndef __DRV_LED_H
+#define __DRV_LED_H
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /* Includes ----------------------------------------------------------------- */
 #include <stdint.h>
-#include "bsp_common.h"
-#include "drv_button.h"
-#include "bsp_gpio.h"
+#include "main.h"
 
 /* Public defines ----------------------------------------------------------- */
 /* Public enumerate/structure ----------------------------------------------- */
 /* Public macros ------------------------------------------------------------ */
 /* Public variables --------------------------------------------------------- */
 /* Public APIs -------------------------------------------------------------- */
-void system_manager_init(void);
-void system_manager_task(void);
+void drv_led_turn_on_red_led(void);
+void drv_led_turn_on_green_led(void);
+void drv_led_turn_on_blue_led(void);
+void drv_led_turn_off_red_led(void);
+void drv_led_turn_off_green_led(void);
+void drv_led_turn_off_blue_led(void);
 
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus
 } /* extern "C" { */
 #endif
 
-#endif /* __SYSTEM_MANAGER_H */
+#endif /* __DRV_LED_H */
 
 /* End of file -------------------------------------------------------------- */
