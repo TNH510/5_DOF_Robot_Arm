@@ -285,8 +285,8 @@ static void sensor_manager_test_handle_data(void)
 
         // Low pass filter for RV1
         static float pre_output = 0;
-        adc_low_pass = low_pass_filter(adc_avr_value, pre_output, 0.03f);
-        pre_output = adc_avr_value;
+        adc_low_pass = low_pass_filter(adc_avr_value, pre_output, 0.3f);
+        pre_output = adc_low_pass;
     }
 
     // Caculate elbow angle
