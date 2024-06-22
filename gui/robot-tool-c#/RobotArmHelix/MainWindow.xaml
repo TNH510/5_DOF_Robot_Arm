@@ -49,7 +49,7 @@
         </Menu>
         <!--<Label x:Name="coordinatesLabel" Content="Coordinates: (0, 0, 0)" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,63,0" Foreground="White"/>-->
         <TabControl Margin="0,23,10,20" Grid.ColumnSpan="2">
-            <TabItem Header="Control" Width="100" Height="22">
+            <TabItem Header="Control" Height="22" Margin="0,0,0,2">
                 <Grid Background="#FFE5E5E5" Margin="0,0,19,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="6*"/>
@@ -59,10 +59,11 @@
                         <ColumnDefinition Width="25*"/>
                         <ColumnDefinition Width="20*"/>
                         <ColumnDefinition Width="20*"/>
-                        <ColumnDefinition Width="110*"/>
+                        <ColumnDefinition Width="15*"/>
+                        <ColumnDefinition Width="95*"/>
                         <ColumnDefinition Width="1618*"/>
                     </Grid.ColumnDefinitions>
-                    <Grid HorizontalAlignment="Left" Height="150" Margin="10,16,0,0" VerticalAlignment="Top" Width="288" Background="#FF1F21AF" Grid.ColumnSpan="8" Grid.Column="1">
+                    <Grid HorizontalAlignment="Left" Height="150" Margin="10,16,0,0" VerticalAlignment="Top" Width="288" Background="#FF1F21AF" Grid.ColumnSpan="9" Grid.Column="1">
                         <Label x:Name="jogging_lbl" Content="JOGGING" HorizontalAlignment="Center" VerticalAlignment="Top" Width="84" Foreground="#FF9EA1B0" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif" RenderTransformOrigin="-0.364,0.248"/>
                         <Button x:Name="Forward_button" Content="Forward" HorizontalAlignment="Left" Margin="19,91,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" MouseDown="Forward_button_MouseDown" MouseUp="Forward_button_MouseUp"/>
                         <Button x:Name="Jog_set_speed" Content="Set speed" HorizontalAlignment="Left" Margin="22,56,0,0" VerticalAlignment="Top" Width="90" Height="24" FontSize="11" Click="Jog_set_speed_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36"/>
@@ -71,7 +72,7 @@
                         <Label x:Name="Joint_lbl" Content="Joint" HorizontalAlignment="Left" Margin="27,31,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="23" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
                         <TextBox x:Name="jog_speed_tb" Text="500" HorizontalAlignment="Left" Height="24" Margin="184,57,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Background="{x:Null}" Foreground="#FF007EF9" BorderBrush="{x:Null}" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
                     </Grid>
-                    <Grid HorizontalAlignment="Left" Height="318" Margin="12,192,0,0" VerticalAlignment="Top" Width="288" Opacity="0.9" Grid.ColumnSpan="8" Grid.Column="1">
+                    <Grid HorizontalAlignment="Left" Height="318" Margin="12,192,0,0" VerticalAlignment="Top" Width="288" Opacity="0.9" Grid.ColumnSpan="9" Grid.Column="1">
                         <Grid.Background>
                             <ImageBrush ImageSource="/hinh-nen-win-10-co-logo-4-mau.jpg"/>
                         </Grid.Background>
@@ -91,7 +92,7 @@
                         <Button x:Name="EStop_btn" Content="E-Stop" HorizontalAlignment="Left" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" Click="EStop_bttn_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF181E36" FontWeight="Bold" BorderBrush="#FF181E36" Background="#FF007EF9" Margin="148,235,0,0"/>
                         <Button x:Name="Clear_Trajectory_btn" Content="Clear_Trajectory" HorizontalAlignment="Left" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" Click="Clr_Traj_btn_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Margin="12,176,0,0"/>
                     </Grid>
-                    <Grid HorizontalAlignment="Left" Height="142" Margin="54,20,0,0" VerticalAlignment="Top" Width="365" Background="#FFA23414" Grid.Column="8">
+                    <Grid HorizontalAlignment="Left" Height="142" Margin="54,20,0,0" VerticalAlignment="Top" Width="365" Background="#FFA23414" Grid.Column="9">
                         <Label x:Name="control_lbl" Content="CONTROL" HorizontalAlignment="Center" VerticalAlignment="Top" Width="84" Foreground="#FF9EA1B0" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif"/>
                         <Button x:Name="Servo_button" Content="Servo" HorizontalAlignment="Left" Margin="44,40,0,0" VerticalAlignment="Top" Width="119" Height="38" FontSize="11" Click="Servo_button_click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36"/>
                         <Button x:Name="ResetError_button" Content="Reset error" HorizontalAlignment="Left" Margin="44,91,0,0" VerticalAlignment="Top" Width="117" Height="40" FontSize="11" Click="ResetError_button_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36"/>
@@ -107,14 +108,14 @@
                         </Button>
                         <Button x:Name="GoHome_button" Content="Go home" HorizontalAlignment="Left" Margin="214,91,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" Click="GoHome_button_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36"/>
                     </Grid>
-                    <oxy:PlotView x:Name="plotView_position" Grid.Column="8" Background="White" Cursor="Hand" Margin="445,10,603,679" />
-                    <oxy:PlotView x:Name="plotView_theta" Margin="445,336,603,360" Background="White" Grid.Column="8" />
-                    <oxy:PlotView x:Name="plotView_omega" Margin="1035,336,28,360" Grid.Column="8" Background="White" />
-                    <oxy:PlotView x:Name="plotView_velocity" Margin="1035,11,28,677" Background="White" Grid.Column="8" />
-                    <oxy:PlotView x:Name="plotView_robot_pos" Margin="445,656,603,46" Background="White" Grid.Column="8" />
-                    <oxy:PlotView x:Name="plotView_glove_pos" Margin="1035,654,28,46" Grid.Column="8" Background="White" />
-                    <Button x:Name="Test_move_mod" Content="Test move" HorizontalAlignment="Left" Margin="72,547,0,0" VerticalAlignment="Top" Width="90" Height="22" FontSize="11" Click="Test_move_mod_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Grid.Column="8"/>
-                    <Grid HorizontalAlignment="Left" Height="316" Margin="55,193,0,0" VerticalAlignment="Top" Width="364" Grid.Column="8">
+                    <oxy:PlotView x:Name="plotView_position" Grid.Column="9" Background="White" Cursor="Hand" Margin="445,10,603,679" />
+                    <oxy:PlotView x:Name="plotView_theta" Margin="445,336,603,360" Background="White" Grid.Column="9" />
+                    <oxy:PlotView x:Name="plotView_omega" Margin="1035,336,28,360" Grid.Column="9" Background="White" />
+                    <oxy:PlotView x:Name="plotView_velocity" Margin="1035,11,28,677" Background="White" Grid.Column="9" />
+                    <oxy:PlotView x:Name="plotView_robot_pos" Margin="445,656,603,46" Background="White" Grid.Column="9" />
+                    <oxy:PlotView x:Name="plotView_glove_pos" Margin="1035,654,28,46" Grid.Column="9" Background="White" />
+                    <Button x:Name="Test_move_mod" Content="Test move" HorizontalAlignment="Left" Margin="72,547,0,0" VerticalAlignment="Top" Width="90" Height="22" FontSize="11" Click="Test_move_mod_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Grid.Column="9"/>
+                    <Grid HorizontalAlignment="Left" Height="316" Margin="55,193,0,0" VerticalAlignment="Top" Width="364" Grid.Column="9">
                         <Grid.Background>
                             <ImageBrush ImageSource="/hinh-nen-windows-10-dep-32.jpg"/>
                         </Grid.Background>
@@ -139,7 +140,7 @@
                             <ComboBoxItem Content="Odd"/>
                             <ComboBoxItem Content="Even"/>
                         </ComboBox>
-                        <ProgressBar x:Name="progressbar1" HorizontalAlignment="Left" Height="23" Margin="49,262,0,0" VerticalAlignment="Top" Width="276"/>
+                        <ProgressBar x:Name="progressbar1" HorizontalAlignment="Left" Height="23" Margin="46,263,0,0" VerticalAlignment="Top" Width="276"/>
                         <ComboBox x:Name="com_port_list3" SelectedIndex="0" HorizontalAlignment="Left" Margin="105,114,0,0" VerticalAlignment="Top" Width="70">
                             <ComboBoxItem Content="8"/>
                             <ComboBoxItem Content="1"/>
@@ -154,29 +155,9 @@
                         </ComboBox>
                         <Button x:Name="Refresh_glove_btn" Content="Refresh" HorizontalAlignment="Left" Margin="198,50,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_refresh_button_Click" RenderTransformOrigin="0.48,1.838"/>
                     </Grid>
-                    <Grid HorizontalAlignment="Left" Height="299" Margin="3,610,0,0" VerticalAlignment="Top" Width="570" Grid.ColumnSpan="7" Grid.Column="2">
-                        <Grid.Background>
-                            <ImageBrush ImageSource="/hinh-nen-windows-10-dep-32.jpg"/>
-                        </Grid.Background>
-                        <Label x:Name="Auto_name" Content="AUTO GENERATE" HorizontalAlignment="Center" VerticalAlignment="Top" Width="162" Foreground="#FF9EA1B0" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif"/>
-                        <Button x:Name="Enable_glove_btn" Content="ENBALE" HorizontalAlignment="Left" Margin="37,194,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_enable_button_Click"/>
-                        <Button x:Name="Disble_glove_btn" Content="DISABLE" HorizontalAlignment="Left" Margin="37,246,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_disable_button_Click" RenderTransformOrigin="0.48,1.838"/>
-                        <Button x:Name="Modify_csv_btn" Content="Modify data" HorizontalAlignment="Left" Margin="379,235,0,0" VerticalAlignment="Top" Width="100" Height="26" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Modify_dat_csv_Click"/>
-                        <ComboBox x:Name="program_list" SelectedIndex="0" HorizontalAlignment="Left" Margin="422,63,0,0" VerticalAlignment="Top" Width="70">
-                            <ComboBoxItem Content="115200"/>
-                            <ComboBoxItem Content="9600"/>
-                        </ComboBox>
-                        <Label x:Name="New_program_name" Content="NEW PROGRAM" HorizontalAlignment="Left" Margin="28,62,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
-                        <Label x:Name="Exist_program_name" Content="EXIST PROGRAM" HorizontalAlignment="Left" Margin="304,61,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
-                        <Label x:Name="Point_save_name" Content="SAVED POINTS" HorizontalAlignment="Left" Margin="37,158,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
-                        <TextBox x:Name="New_program" Text="500" HorizontalAlignment="Left" Height="21.96" Margin="146,62,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="70" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Background="#FFE5E5E5" BorderBrush="#FFACACAC" Foreground="Black" SelectionBrush="White"/>
-                        <Button x:Name="Save_file_btn" Content="Save" HorizontalAlignment="Left" Margin="68,95,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Modify_dat_csv_Click"/>
-                        <Button x:Name="Delete_data_btn" Content="Delete data" HorizontalAlignment="Left" Margin="276,95,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Modify_dat_csv_Click"/>
-                        <Button x:Name="Refresh_csv_btn" Content="Refresh file" HorizontalAlignment="Left" Margin="406,96,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_refresh_button_Click" RenderTransformOrigin="0.48,1.838"/>
-                    </Grid>
                 </Grid>
             </TabItem>
-            <TabItem Header="Monitor">
+            <TabItem Header="Monitor" Margin="-2,0,-11,0">
                 <Grid Background="#FFE5E5E5" Height="992">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="27*"/>
@@ -226,7 +207,53 @@
                         <Label x:Name="Tz" HorizontalAlignment="Left" Margin="276,25,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="25" Width="62" ContentStringFormat="{}{0:0.##}" FontFamily="Microsoft Sans Serif" FontWeight="Bold"/>
                         <Label x:Name="display_lbl" Content="DISPLAY" HorizontalAlignment="Left" Margin="150,1,0,0" VerticalAlignment="Top" Width="84" Foreground="#FF9EA1B0" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif"/>
                     </Grid>
-                    <TextBox x:Name="ErrorLog" HorizontalAlignment="Left" Height="432" TextWrapping="Wrap" VerticalAlignment="Top"  Width="408" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" Background="#FF007EF9" Foreground="#FF007EF9" BorderBrush="#FF007EF9" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="12,447,0,0" Grid.ColumnSpan="5"/>
+                    <TextBox x:Name="ErrorLog" HorizontalAlignment="Left" Height="432" TextWrapping="Wrap" VerticalAlignment="Top"  Width="408" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" Background="#FF007EF9" Foreground="Black" BorderBrush="#FF007EF9" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="12,447,0,0" Grid.ColumnSpan="5"/>
+                </Grid>
+            </TabItem>
+            <TabItem Height="25" Header="Program" VerticalAlignment="Center" Margin="10,0,-10,0">
+                <Grid Background="#FFE5E5E5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="4*"/>
+                        <ColumnDefinition Width="115*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid HorizontalAlignment="Left" Height="365" Margin="8,18,0,0" VerticalAlignment="Top" Width="570" Grid.Column="1">
+                        <Grid.Background>
+                            <ImageBrush ImageSource="/hinh-nen-windows-10-dep-32.jpg"/>
+                        </Grid.Background>
+                        <Label x:Name="Auto_name" Content="AUTO GENERATE" HorizontalAlignment="Center" VerticalAlignment="Top" Width="162" Foreground="#FF9EA1B0" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif"/>
+                        <Button x:Name="Enable_glove_btn" Content="ENBALE" HorizontalAlignment="Left" Margin="37,194,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_enable_button_Click"/>
+                        <Button x:Name="Disble_glove_btn" Content="DISABLE" HorizontalAlignment="Left" Margin="37,246,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_disable_button_Click" RenderTransformOrigin="0.48,1.838"/>
+                        <Button x:Name="Modify_csv_btn" Content="Modify data" HorizontalAlignment="Left" Margin="371,266,0,0" VerticalAlignment="Top" Width="100" Height="26" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Modify_dat_csv_Click"/>
+                        <ComboBox x:Name="program_list_name" SelectedIndex="0" HorizontalAlignment="Left" Margin="156,49,0,0" VerticalAlignment="Top" Width="85"/>
+                        <Label x:Name="Exist_program_name" Content="EXIST PROGRAM" HorizontalAlignment="Left" Margin="38,47,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                        <Label x:Name="Point_save_name" Content="SAVED POINTS" HorizontalAlignment="Left" Margin="37,158,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                        <Button x:Name="Create_new_program_btn" Content="New program" HorizontalAlignment="Left" Margin="38,92,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="New_Program_Click"/>
+                        <Button x:Name="Delete_data_btn" Content="Delete data" HorizontalAlignment="Left" Margin="302,92,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Modify_dat_csv_Click"/>
+                        <Button x:Name="Refresh_btn" Content="Refresh file" HorizontalAlignment="Left" Margin="429,92,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Refresh_button_Click" RenderTransformOrigin="0.48,1.838"/>
+                        <Grid HorizontalAlignment="Left" Height="365" Margin="60,610,0,0" VerticalAlignment="Top" Width="570">
+                            <Grid.Background>
+                                <ImageBrush ImageSource="/hinh-nen-windows-10-dep-32.jpg"/>
+                            </Grid.Background>
+                            <Label x:Name="Auto_name1" Content="AUTO GENERATE" HorizontalAlignment="Center" VerticalAlignment="Top" Width="162" Foreground="#FF9EA1B0" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif"/>
+                            <Button x:Name="Enable_glove_btn1" Content="ENBALE" HorizontalAlignment="Left" Margin="37,194,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_enable_button_Click"/>
+                            <Button x:Name="Disble_glove_btn1" Content="DISABLE" HorizontalAlignment="Left" Margin="37,246,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_disable_button_Click" RenderTransformOrigin="0.48,1.838"/>
+                            <Button x:Name="Modify_csv_btn1" Content="Modify data" HorizontalAlignment="Left" Margin="379,235,0,0" VerticalAlignment="Top" Width="100" Height="26" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Modify_dat_csv_Click"/>
+                            <ComboBox x:Name="program_list1" SelectedIndex="0" HorizontalAlignment="Left" Margin="422,63,0,0" VerticalAlignment="Top" Width="70">
+                                <ComboBoxItem Content="115200"/>
+                                <ComboBoxItem Content="9600"/>
+                            </ComboBox>
+                            <Label x:Name="New_program_name1" Content="NEW PROGRAM" HorizontalAlignment="Left" Margin="28,62,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                            <Label x:Name="Exist_program_name1" Content="EXIST PROGRAM" HorizontalAlignment="Left" Margin="304,61,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                            <Label x:Name="Point_save_name1" Content="SAVED POINTS" HorizontalAlignment="Left" Margin="37,158,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                            <TextBox x:Name="New_program1" Text="500" HorizontalAlignment="Left" Height="21.96" Margin="146,62,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="70" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Background="#FFE5E5E5" BorderBrush="#FFACACAC" Foreground="Black" SelectionBrush="White"/>
+                            <Button x:Name="Save_file_btn1" Content="Save" HorizontalAlignment="Left" Margin="68,95,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Modify_dat_csv_Click"/>
+                            <Button x:Name="Delete_data_btn1" Content="Delete data" HorizontalAlignment="Left" Margin="276,95,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Modify_dat_csv_Click"/>
+                            <Button x:Name="Refresh_csv_btn1" Content="Refresh file" HorizontalAlignment="Left" Margin="406,96,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_refresh_button_Click" RenderTransformOrigin="0.48,1.838"/>
+                        </Grid>
+                        <ComboBox x:Name="trajectory_list_name" SelectedIndex="0" HorizontalAlignment="Left" Margin="380,50,0,0" VerticalAlignment="Top" Width="129"/>
+                        <Label x:Name="Exist_trajectory_name" Content="EXIST TRAJECTORY" HorizontalAlignment="Left" Margin="248,48,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                        <Button x:Name="Create_new_trajectory_btn_Copy" Content="New trajectory" HorizontalAlignment="Left" Margin="170,92,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="New_Trajectory_Click"/>
+                    </Grid>
                 </Grid>
             </TabItem>
         </TabControl>

@@ -76,6 +76,10 @@ namespace RobotArmHelix
         public double[] selectmemberY = new double[100];
         public double[] selectmemberZ = new double[100];
 
+        public bool low_pass_init = false;
+        public double x_lpf = 0.0, y_lpf = 0.0, z_lpf = 0.0;
+        public double alpha = 0.5;
+
         public int visible_robot = 1;
         public int visible_display = 1;
         public int visible_control = 1;
@@ -95,6 +99,8 @@ namespace RobotArmHelix
         // Define the file path
         public string filePath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\data\\test.csv";
         public string savePath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\data\\good.csv";
+        public string program_path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\";
+
 
         public string[] fields;
         public string[] totalLines_csv;
@@ -197,6 +203,14 @@ namespace RobotArmHelix
             string[] ports = SerialPort.GetPortNames();
             com_port_list1.ItemsSource = ports;
 
+            //Program list
+            string[] program_list = LayTenTatCaThuMuc(program_path);
+            program_list_name.ItemsSource = program_list;
+
+            //Trajectory list
+            string trajectory_path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + program_list_name.Text + "\\";
+            string[] trajectory_list = LayTenTatCaFileCSV(trajectory_path);
+            trajectory_list_name.ItemsSource = trajectory_list;
             // uart.DataReceived += SerialPort_DataReceived;
 
             //// Attach the event handler to the MouseDown event
@@ -1918,6 +1932,20 @@ namespace RobotArmHelix
                                         x = x * 20;
                                         y = y * 20;
                                         z = z * 15 + 700;
+
+                                        // Position variables through low pass filter
+                                        if(low_pass_init == false)
+                                        {
+                                            x_lpf = x;
+                                            y_lpf = y; 
+                                            z_lpf = z;
+                                            low_pass_init = true;
+                                        }
+
+                                        /* Low pass filter */
+                                        x_lpf = x_lpf * (1 - alpha) + x * alpha;
+                                        y_lpf = y_lpf * (1 - alpha) + y * alpha;
+                                        z_lpf = z_lpf * (1 - alpha) + z * alpha;
                                         int ret;
                                         double t1, t2, t3, t4, t5;
 
@@ -1953,20 +1981,27 @@ namespace RobotArmHelix
 
                                            if (write_csv == true)
                                            {
-                                               using (StreamWriter writer = new StreamWriter(filePath, true))
-                                               {
-                                                   // string csvLine = $"{x},{y},{z},{x_vel},{y_vel},{z_vel}";
-                                                   string csvLine = $"{x},{y},{z}";
-                                                   writer.WriteLine(csvLine);
-                                               }
-                                           }
+
+                                                Dispatcher.Invoke(() =>
+                                                {
+                                                    string save_path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + program_list_name.Text + "\\" + trajectory_list_name.Text + ".csv";
+                                                    using (StreamWriter writer = new StreamWriter(save_path, true))
+                                                    {
+                                                        // string csvLine = $"{x},{y},{z},{x_vel},{y_vel},{z_vel}";
+                                                        string csvLine = $"{x_lpf},{y_lpf},{z_lpf}";
+                                                        writer.WriteLine(csvLine);
+                                                    }
+                                                });
+                                               
+                                            }
 
                                            //plot(Math.Abs(omega1_plc), Math.Abs(omega2_plc), Math.Abs(omega3_plc));
                                            //plot(x_vel);
                                            //scatter(x, y);
                                            //Console.WriteLine("---");
 
-                                        //    plot(x, y, z);
+                                           plot(x_lpf, y_lpf, z_lpf);
+                                           //plot(x, y, z);
 
                                            //plot(Math.Abs(omega[0]) * 5, Math.Abs(omega[1]) * 5, Math.Abs(omega[2] * 5));
 
@@ -1980,6 +2015,7 @@ namespace RobotArmHelix
                                         if (write_csv == true)
                                         {
                                             write_csv = false;
+                                            low_pass_init = false;
                                         }
                                         else if (write_csv == false)
                                         {
@@ -2302,6 +2338,99 @@ namespace RobotArmHelix
         }
 
         #endregion
+
+
+        public static string[] LayTenTatCaThuMuc(string duongDan)
+        {
+            try
+            {
+                // Lấy tất cả các thư mục trong đường dẫn và chỉ lấy tên thư mục (không bao gồm đường dẫn đầy đủ)
+                string[] duongDanThuMuc = Directory.GetDirectories(duongDan);
+                string[] tenThuMuc = new string[duongDanThuMuc.Length];
+
+                for (int i = 0; i < duongDanThuMuc.Length; i++)
+                {
+                    tenThuMuc[i] = Path.GetFileName(duongDanThuMuc[i]);
+                }
+
+                return tenThuMuc;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Có lỗi xảy ra: " + e.Message);
+                return new string[0]; // Trả về mảng rỗng nếu có lỗi
+            }
+        }
+
+        public static string[] LayTenTatCaFileCSV(string duongDanThuMuc)
+        {
+            try
+            {
+                // Lấy tất cả các file CSV trong thư mục
+                string[] duongDanFileCSV = Directory.GetFiles(duongDanThuMuc, "*.csv");
+                string[] tenFileCSV = new string[duongDanFileCSV.Length];
+
+                for (int i = 0; i < duongDanFileCSV.Length; i++)
+                {
+                    tenFileCSV[i] = Path.GetFileNameWithoutExtension(duongDanFileCSV[i]);
+                }
+
+                return tenFileCSV;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Có lỗi xảy ra: " + e.Message);
+                return new string[0]; // Trả về mảng rỗng nếu có lỗi
+            }
+        }
+
+        private void New_Program_Click(object sender, RoutedEventArgs e)
+        {
+            string duongDanCoSo = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\";
+            string tenThuMuc = "program";
+            string duongDanDayDu = Path.Combine(duongDanCoSo, tenThuMuc);
+            int soThuTu = 0;
+
+            while (Directory.Exists(duongDanDayDu))
+            {
+                soThuTu++;
+                duongDanDayDu = Path.Combine(duongDanCoSo, $"{tenThuMuc}_{soThuTu}");
+            }
+            Directory.CreateDirectory(duongDanDayDu);
+        }
+        private void New_Trajectory_Click(object sender, RoutedEventArgs e)
+        {
+            string duongDanCoSo = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + program_list_name.Text + "\\";
+            string tenTrajectory = "trajectory" + ".csv";
+            string duongDanDayDu = Path.Combine(duongDanCoSo, tenTrajectory);
+            string tenFileKhongDuoi = Path.GetFileNameWithoutExtension(duongDanDayDu);
+            int soThuTu = 0;
+
+            // Kiểm tra và tạo tên file duy nhất
+            while (File.Exists(duongDanDayDu))
+            {
+                soThuTu++;
+                string duoiFile = Path.GetExtension(tenTrajectory);
+                duongDanDayDu = Path.Combine(duongDanCoSo, $"{tenFileKhongDuoi}_{soThuTu}{duoiFile}");
+            }
+
+            // Tạo mới file CSV
+            using (StreamWriter writer = new StreamWriter(duongDanDayDu, false))
+            {
+
+            }
+        }
+
+        private void Refresh_button_Click(object sender, RoutedEventArgs e)
+        {
+            string trajectory_path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + program_list_name.Text + "\\";
+            //Program list
+            string[] program_list = LayTenTatCaThuMuc(program_path);
+            program_list_name.ItemsSource = program_list;
+            //Trajectory list
+            string[] trajectory_list = LayTenTatCaFileCSV(trajectory_path);
+            trajectory_list_name.ItemsSource = trajectory_list;
+        }
 
         static void CreateCSV(string filePath, string[] data)
         {
