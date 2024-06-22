@@ -2193,7 +2193,8 @@ namespace RobotArmHelix
         }
         private void Modify_dat_csv_Click(object sender, RoutedEventArgs e)
         {
-            Modify_polynomial_regression(filePath);
+            //Modify_polynomial_regression(filePath);
+            Modify_low_pass_filter(filePath);
 
         }
         private void Test_move_mod_Click(object sender, RoutedEventArgs e)
@@ -2320,7 +2321,7 @@ namespace RobotArmHelix
         {
 
             // Read all lines from the CSV file
-            var lines = File.ReadAllLines(csvfilepath);
+            var lines = File.ReadAllLines(csvfilepath); // n numbers
 
             // Initialize arrays to store the coordinates
             int numSamples = lines.Length;
@@ -2342,22 +2343,21 @@ namespace RobotArmHelix
             for (int i = 0; i < numSamples; i++)
             {
                 t[i] = (double)i / (numSamples - 1);  // Adjust this if your data requires a different time vector
-                //t[i] = i;  // Adjust this if your data requires a different time vector
             }
 
             // Number of points per group
-            int group_size = 2;
+            int group_size = 10;
             /* Data to load to the PLC */
-            int points = 10;
+            int points = 50;
 
             // Chia đều bánh cho mỗi người
             int numGroups = numSamples / group_size;
             // Số bánh còn lại sau khi chia đều
             int num_remaining_points = numSamples % group_size;
             // Degree of the polynomial
-            int degree = 2;  
+            int degree = 4;  
 
-            int[] cakes_per_person = DistributeCakes(numSamples, numGroups);
+            int[] cakes_per_person = DistributeCakes(numSamples, numGroups); // Số điểm nhận được của mỗi nhóm
             Console.WriteLine(cakes_per_person.Length);
 
             /* Calculate the points each group need to have */
@@ -2365,25 +2365,34 @@ namespace RobotArmHelix
             int baseCakesPerGroup = points / cakes_per_person.Length;
             int remainderCakes = points % cakes_per_person.Length;
 
-
             int start_index = 0;
             int end_index = 0;
             int next_gr = 0;
             int end_gr = 0;
+            int last_gr = 0;
             // Loop through each group
             for (int i = 0; i < numGroups; i++)
             {
-                if(i == 0)
+                end_gr = end_gr + cakes_per_person[i];
+                if (i == 0)
                 {
                     start_index = 0;
-                    end_index = cakes_per_person[i] - 1;
+                    end_index = cakes_per_person[0] - 1;
                 }
                 else
                 {
-                    start_index = end_index + 1;
-                    end_index = end_index + 1 + cakes_per_person[i];
-                }
 
+                    if (i % 2 == 0)  // nếu i chẵn
+                    {
+                        start_index = end_index - 1;
+                        end_index = end_gr - 1;
+                    }
+                    else  // nếu i lẻ
+                    {
+                        start_index = end_index;
+                        end_index = end_gr;
+                    }
+                }
                 // Extract data for the current group
                 double[] t_group = new double[end_index - start_index + 1];
                 Array.Copy(t, start_index, t_group, 0, cakes_per_person[i]);
@@ -2401,7 +2410,7 @@ namespace RobotArmHelix
                 // Perform polynomial regression for each group
                 var coefficients_x = PolynomialFit.MyPolyfit(t_group, x_group, degree);
                 var coefficients_y = PolynomialFit.MyPolyfit(t_group, y_group, degree);
-                var coefficients_z = PolynomialFit.MyPolyfit(t_group, z_group, degree);
+                var coefficients_z = PolynomialFit.MyPolyfit(t_group, z_group, degree - 2);
 
                 double[] t_fit = Generate.LinearSpaced(cakes_per_person[i], t_group[0], t_group[t_group.Length - 1]);
 
@@ -2413,7 +2422,6 @@ namespace RobotArmHelix
                     predicted_x_group[j] = PolynomialFit.EvaluatePolynomial(coefficients_x, t_fit[j]);
                     predicted_y_group[j] = PolynomialFit.EvaluatePolynomial(coefficients_y, t_fit[j]);
                     predicted_z_group[j] = PolynomialFit.EvaluatePolynomial(coefficients_z, t_fit[j]);
-                    //Console.WriteLine(predicted_x_group[j].ToString());
                 }
                 /* Chia bánh cho người nhận */
                 int[] points_each_group = DistributeCakes(points, cakes_per_person.Length);
@@ -2427,6 +2435,7 @@ namespace RobotArmHelix
                     {
                         memberIndex = cakes_per_person[i] - 1;
                     }
+
                     selectmemberX[next_gr + k] = predicted_x_group[memberIndex];
                     selectmemberY[next_gr + k] = predicted_y_group[memberIndex];
                     selectmemberZ[next_gr + k] = predicted_z_group[memberIndex];
@@ -2435,10 +2444,10 @@ namespace RobotArmHelix
                     Console.WriteLine($"- {predicted_x_group[memberIndex]}");
                     Console.WriteLine($"- {predicted_y_group[memberIndex]}");
                     Console.WriteLine($"- {predicted_z_group[memberIndex]}");
-                    end_gr = next_gr + k;
+                    last_gr = k;
                 }
-                next_gr = end_gr + 1;
-                
+                next_gr = next_gr + last_gr + 1;
+
 
                 //Console.WriteLine(i.ToString());
                 Console.WriteLine("----------------------------------");
@@ -2531,6 +2540,79 @@ namespace RobotArmHelix
         }
 
         #endregion
+
+        #region low_pass_filter
+        public void Modify_low_pass_filter(string csvfilepath)
+        {
+            // Read all lines from the CSV file
+            var lines = File.ReadAllLines(csvfilepath); // n numbers
+
+            // Initialize arrays to store the coordinates
+            int numSamples = lines.Length;
+            double[] x = new double[numSamples];
+            double[] y = new double[numSamples];
+            double[] z = new double[numSamples];
+            double[] t = new double[numSamples];
+
+
+            double[] low_passX = new double[numSamples];
+            double[] low_passY = new double[numSamples];
+            double[] low_passZ = new double[numSamples];
+
+            // Loop through the lines and parse the coordinates
+            for (int i = 0; i < numSamples; i++)
+            {
+                var values = lines[i].Split(',').Select(double.Parse).ToArray();
+                x[i] = values[0];
+                y[i] = values[1];
+                z[i] = values[2];
+            }
+
+            /* Data to load to the PLC */
+            double alpha = 0.5;
+            int points_lpf = 100;
+
+            for (int k = 0; k < numSamples; k++)
+            {
+                /* Low pass filter*/
+                if(k == 0)
+                {
+                    low_passX[k] = x[k];
+                    low_passY[k] = y[k];
+                    low_passZ[k] = z[k];
+                }
+                else
+                {
+                    low_passX[k] = low_passX[k - 1] * (1 - alpha) + x[k] * alpha;
+                    low_passY[k] = low_passY[k - 1] * (1 - alpha) + y[k] * alpha;
+                    low_passZ[k] = low_passZ[k - 1] * (1 - alpha) + z[k] * alpha;
+                }
+            }
+            /* Take points for saving in PLC */
+            double step = (double)numSamples / points_lpf;
+
+            for (int j = 0; j < points_lpf; j++)
+            {
+                int jump = LamTronSoThapPhan(j * step);
+                selectmemberX[j] = low_passX[jump];
+                selectmemberY[j] = low_passY[jump];
+                selectmemberZ[j] = low_passZ[jump];
+            }
+        }
+        public static int LamTronSoThapPhan(double so)
+        {
+            if (so - Math.Floor(so) < 0.5)
+            {
+                return (int)Math.Floor(so);
+            }
+            else
+            {
+                return (int)Math.Ceiling(so);
+            }
+        }
+
+        #endregion
+
     }
 
 }
