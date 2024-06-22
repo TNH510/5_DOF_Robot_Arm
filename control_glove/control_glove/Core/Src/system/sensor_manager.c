@@ -17,6 +17,7 @@
 
 #include "bsp_timer.h"
 #include "bsp_adc.h"
+#include "bsp_i2c.h"
 
 #include "glove_algorithm.h"
 // #include "MadgwickAHRS.h"
@@ -62,7 +63,10 @@ static void sensor_manager_run_handle_data(void);
 static void sensor_manager_test_handle_data(void);
 static void sensor_manager_run_button_change(button_name_t event);
 static void sensor_manager_test_button_change(button_name_t event);
+
+#ifdef I2C_RECOVERY
 static void sensor_manager_i2c_recovery(void);
+#endif
 
 /* Public implementations --------------------------------------------------- */
 base_status_t sensor_manager_init(void)
@@ -180,9 +184,9 @@ base_status_t sensor_manager_run(button_name_t event)
             y_pos_pre = y_pos;
             z_pos_pre = z_pos;
 
-            x_vel_pre = x_vel;
-            y_vel_pre = y_vel;
-            z_vel_pre = z_vel;
+            x_vel_pre = x_vel_pass;
+            y_vel_pre = y_vel_pass;
+            z_vel_pre = z_vel_pass;
 
             if (g_cmd != GLV_CMD_ONLY_POS_TRANSMIT)
             {
@@ -209,6 +213,8 @@ base_status_t sensor_manager_run(button_name_t event)
             data_index_send = 0;
         }
     }
+
+    return BS_OK;
 }
 
 /* Private implementations -------------------------------------------------- */
@@ -238,8 +244,8 @@ static void sensor_manager_run_handle_data(void)
 
         // Low pass filter for RV1
         static float pre_output = 0;
-        adc_low_pass = low_pass_filter(adc_avr_value, pre_output, 0.03f);
-        pre_output = adc_avr_value;
+        adc_low_pass = low_pass_filter(adc_avr_value, pre_output, 0.3f);
+        pre_output = adc_low_pass;
     }
 
     // Caculate elbow angle
@@ -352,6 +358,7 @@ static void sensor_manager_test_button_change(button_name_t event)
     }
 }
 
+#ifdef I2C_RECOVERY
 static void sensor_manager_i2c_recovery(void)
 {
     // Test reset I2C
@@ -367,5 +374,6 @@ static void sensor_manager_i2c_recovery(void)
     drv_imu_init();
     drv_magnetic_init();   
 }
+#endif
 
 /* End of file -------------------------------------------------------------- */
