@@ -114,7 +114,6 @@
                     <oxy:PlotView x:Name="plotView_velocity" Margin="1035,11,28,677" Background="White" Grid.Column="9" />
                     <oxy:PlotView x:Name="plotView_robot_pos" Margin="445,656,603,46" Background="White" Grid.Column="9" />
                     <oxy:PlotView x:Name="plotView_glove_pos" Margin="1035,654,28,46" Grid.Column="9" Background="White" />
-                    <Button x:Name="Test_move_mod" Content="Test move" HorizontalAlignment="Left" Margin="72,547,0,0" VerticalAlignment="Top" Width="90" Height="22" FontSize="11" Click="Test_move_mod_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Grid.Column="9"/>
                     <Grid HorizontalAlignment="Left" Height="316" Margin="55,193,0,0" VerticalAlignment="Top" Width="364" Grid.Column="9">
                         <Grid.Background>
                             <ImageBrush ImageSource="/hinh-nen-windows-10-dep-32.jpg"/>
@@ -221,14 +220,14 @@
                             <ImageBrush ImageSource="/hinh-nen-windows-10-dep-32.jpg"/>
                         </Grid.Background>
                         <Label x:Name="Auto_name" Content="AUTO GENERATE" HorizontalAlignment="Center" VerticalAlignment="Top" Width="162" Foreground="#FF9EA1B0" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif"/>
-                        <Button x:Name="Enable_glove_btn" Content="ENBALE" HorizontalAlignment="Left" Margin="37,194,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_enable_button_Click"/>
-                        <Button x:Name="Disble_glove_btn" Content="DISABLE" HorizontalAlignment="Left" Margin="37,246,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_disable_button_Click" RenderTransformOrigin="0.48,1.838"/>
+                        <Button x:Name="Enable_glove_btn" Content="ENABLE" HorizontalAlignment="Left" Margin="36,251,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_enable_button_Click"/>
+                        <Button x:Name="Disble_glove_btn" Content="DISABLE" HorizontalAlignment="Left" Margin="36,303,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_disable_button_Click" RenderTransformOrigin="0.48,1.838"/>
                         <Button x:Name="Modify_csv_btn" Content="Modify data" HorizontalAlignment="Left" Margin="371,266,0,0" VerticalAlignment="Top" Width="100" Height="26" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Modify_dat_csv_Click"/>
                         <ComboBox x:Name="program_list_name" SelectedIndex="0" HorizontalAlignment="Left" Margin="156,49,0,0" VerticalAlignment="Top" Width="85"/>
                         <Label x:Name="Exist_program_name" Content="EXIST PROGRAM" HorizontalAlignment="Left" Margin="38,47,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
-                        <Label x:Name="Point_save_name" Content="SAVED POINTS" HorizontalAlignment="Left" Margin="37,158,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                        <Label x:Name="Point_save_name" Content="SAVED POINTS:" HorizontalAlignment="Left" Margin="37,158,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
                         <Button x:Name="Create_new_program_btn" Content="New program" HorizontalAlignment="Left" Margin="38,92,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="New_Program_Click"/>
-                        <Button x:Name="Delete_data_btn" Content="Delete data" HorizontalAlignment="Left" Margin="302,92,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Modify_dat_csv_Click"/>
+                        <Button x:Name="Delete_data_btn" Content="Delete data" HorizontalAlignment="Left" Margin="302,92,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Delete_dat_csv_Click"/>
                         <Button x:Name="Refresh_btn" Content="Refresh file" HorizontalAlignment="Left" Margin="429,92,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Refresh_button_Click" RenderTransformOrigin="0.48,1.838"/>
                         <Grid HorizontalAlignment="Left" Height="365" Margin="60,610,0,0" VerticalAlignment="Top" Width="570">
                             <Grid.Background>
@@ -253,7 +252,14 @@
                         <ComboBox x:Name="trajectory_list_name" SelectedIndex="0" HorizontalAlignment="Left" Margin="380,50,0,0" VerticalAlignment="Top" Width="129"/>
                         <Label x:Name="Exist_trajectory_name" Content="EXIST TRAJECTORY" HorizontalAlignment="Left" Margin="248,48,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
                         <Button x:Name="Create_new_trajectory_btn_Copy" Content="New trajectory" HorizontalAlignment="Left" Margin="170,92,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="New_Trajectory_Click"/>
+                        <Button x:Name="Test_move_mod" Content="Test move" HorizontalAlignment="Left" Margin="232,266,0,0" VerticalAlignment="Top" Width="90" Height="22" FontSize="11" Click="Test_move_mod_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36"/>
+                        <Label x:Name="Status_name" Content="STATUS:" HorizontalAlignment="Left" Margin="38,185,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                        <Label x:Name="Status_mode_name" Content="OK" HorizontalAlignment="Left" Margin="99,185,0,0" VerticalAlignment="Top" Foreground="#FF00F90F" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                        <Label x:Name="CSV_name" Content="CSV STATUS:" HorizontalAlignment="Left" Margin="37,210,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                        <Label x:Name="Saving_stt_name" Content="Waiting..." HorizontalAlignment="Left" Margin="127,211,0,0" VerticalAlignment="Top" Foreground="#FFF7F900" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                        <Label x:Name="Saving_point_name" Content="0" HorizontalAlignment="Left" Margin="142,158,0,0" VerticalAlignment="Top" Foreground="#FF00F90F" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
                     </Grid>
+                    <oxy:PlotView x:Name="plotView_theta_Copy" Margin="672,45,598,650" Background="White" Grid.Column="1" />
                 </Grid>
             </TabItem>
         </TabControl>

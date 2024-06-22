@@ -88,7 +88,8 @@ namespace RobotArmHelix
         public int visible_glove = 1;
         public int status_first_time = 0;
         private bool write_csv = false;
-                        int value = 0;
+        private bool wrt_stt = true;
+        int value = 0;
         int vel_1_test;
         double[] point1_test = new double[3];
         double[] point2_test = new double[3];
@@ -173,9 +174,6 @@ namespace RobotArmHelix
         int movements = 10;
         System.Windows.Forms.Timer timer1;
         System.Windows.Forms.Timer timer2;
-
-        // Tạo một đối tượng StreamWriter để ghi dữ liệu vào tập tin CSV
-        static string g_csvFilePath = "H:\\OneDrive - hcmute.edu.vn\\Desktop\\5_DOF_Robot_Arm\\gui\\robot-tool-c#\\RobotArmHelix\\data\\test.csv";
 
 #if IRB6700
         //directroy of all stl files
@@ -1965,48 +1963,67 @@ namespace RobotArmHelix
                                         if (ret == 0)
                                         {
 
-                                           /* Anti wind-up */
-                                           if (Math.Abs(omega1_plc) >= 500)
-                                           {
-                                               omega1_plc = 500;
-                                           }
-                                           if (Math.Abs(omega2_plc) >= 300)
-                                           {
-                                               omega2_plc = 300;
-                                           }
-                                           if (Math.Abs(omega3_plc) >= 300)
-                                           {
-                                               omega3_plc = 300;
-                                           }
+                                            /* Anti wind-up */
+                                            if (Math.Abs(omega1_plc) >= 500)
+                                            {
+                                                omega1_plc = 500;
+                                            }
+                                            if (Math.Abs(omega2_plc) >= 300)
+                                            {
+                                                omega2_plc = 300;
+                                            }
+                                            if (Math.Abs(omega3_plc) >= 300)
+                                            {
+                                                omega3_plc = 300;
+                                            }
 
-                                           if (write_csv == true)
-                                           {
+                                            if (write_csv == true)
+                                            {
 
                                                 Dispatcher.Invoke(() =>
                                                 {
                                                     string save_path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + program_list_name.Text + "\\" + trajectory_list_name.Text + ".csv";
-                                                    using (StreamWriter writer = new StreamWriter(save_path, true))
+                                                    /* Check file existing having data or not to warn the user */
+                                                    // Read all lines from the CSV file
+                                                    var lines = File.ReadAllLines(save_path); // n numbers
+                                                    int num = lines.Length;
+                                                    Saving_point_name.Content = num.ToString();
+
+                                                    if (wrt_stt == false)
                                                     {
-                                                        // string csvLine = $"{x},{y},{z},{x_vel},{y_vel},{z_vel}";
-                                                        string csvLine = $"{x_lpf},{y_lpf},{z_lpf}";
-                                                        writer.WriteLine(csvLine);
+                                                        Saving_stt_name.Content = "Pending...";
+                                                        Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(247, 249, 0));
+                                                        Status_mode_name.Content = "File has data inside!! Please add new or delete data!!";
+                                                        Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 0, 0));
+                                                    }
+                                                    else if(wrt_stt == true)
+                                                    {
+                                                        Saving_stt_name.Content = "Writing...";
+                                                        Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 0, 0));
+                                                        Status_mode_name.Content = "Valid";
+                                                        Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(247, 249, 0));
+
+                                                        using (StreamWriter writer = new StreamWriter(save_path, true))
+                                                        {
+                                                            string csvLine = $"{x_lpf},{y_lpf},{z_lpf}";
+                                                            writer.WriteLine(csvLine);
+                                                        }
                                                     }
                                                 });
-                                               
                                             }
 
-                                           //plot(Math.Abs(omega1_plc), Math.Abs(omega2_plc), Math.Abs(omega3_plc));
-                                           //plot(x_vel);
-                                           //scatter(x, y);
-                                           //Console.WriteLine("---");
+                                            //plot(Math.Abs(omega1_plc), Math.Abs(omega2_plc), Math.Abs(omega3_plc));
+                                            //plot(x_vel);
+                                            //scatter(x, y);
+                                            //Console.WriteLine("---");
 
-                                           plot(x_lpf, y_lpf, z_lpf);
-                                           //plot(x, y, z);
+                                            plot(x_lpf, y_lpf, z_lpf);
+                                            //plot(x, y, z);
 
-                                           //plot(Math.Abs(omega[0]) * 5, Math.Abs(omega[1]) * 5, Math.Abs(omega[2] * 5));
+                                            //plot(Math.Abs(omega[0]) * 5, Math.Abs(omega[1]) * 5, Math.Abs(omega[2] * 5));
 
 
-                                           adaptive_runtime(x, y, z, Math.Abs(omega1_plc), Math.Abs(omega2_plc), Math.Abs(omega3_plc), Math.Abs(omega4_plc), Math.Abs(omega5_plc), glove_enable);
+                                            adaptive_runtime(x, y, z, Math.Abs(omega1_plc), Math.Abs(omega2_plc), Math.Abs(omega3_plc), Math.Abs(omega4_plc), Math.Abs(omega5_plc), glove_enable);
                                         }
                                     // plot(x, y, z);
                                     break;
@@ -2015,11 +2032,18 @@ namespace RobotArmHelix
                                         if (write_csv == true)
                                         {
                                             write_csv = false;
+                                            wrt_stt = false;
                                             low_pass_init = false;
+                                            Dispatcher.Invoke(() =>
+                                            {
+                                                string save_path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + program_list_name.Text + "\\" + trajectory_list_name.Text + ".csv";
+                                                Modify_low_pass_filter(save_path);
+                                            });
                                         }
                                         else if (write_csv == false)
                                         {
                                             write_csv = true;
+                                            
                                         }
                                         Console.WriteLine(write_csv.ToString());
                                         Console.WriteLine("Hehe");
@@ -2230,7 +2254,42 @@ namespace RobotArmHelix
         private void Modify_dat_csv_Click(object sender, RoutedEventArgs e)
         {
             //Modify_polynomial_regression(filePath);
-            Modify_low_pass_filter(filePath);
+            // Modify_low_pass_filter(filePath);
+
+            if (write_csv == false)
+            {
+
+                Dispatcher.Invoke(() =>
+                {
+                    string save_path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + program_list_name.Text + "\\" + trajectory_list_name.Text + ".csv";
+                    /* Check file existing having data or not to warn the user */
+                    // Read all lines from the CSV file
+                    var lines = File.ReadAllLines(save_path); // n numbers
+                    int num = lines.Length;
+                    Saving_point_name.Content = num.ToString();
+                    if (num > 0)
+                    {
+                        Saving_stt_name.Content = "Pending...";
+                        Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(247, 249, 0));
+                        Status_mode_name.Content = "File has data inside!! Please add new or delete data!!";
+                        Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 0, 0));
+                    }
+                    else
+                    {
+                        Saving_stt_name.Content = "Writing...";
+                        Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 0, 0));
+                        Status_mode_name.Content = "Valid";
+                        Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 255, 0));
+
+                        using (StreamWriter writer = new StreamWriter(save_path, true))
+                        {
+                            string csvLine = $"{x_lpf},{y_lpf},{z_lpf}";
+                            writer.WriteLine(csvLine);
+                        }
+                    }
+                });
+            }
+
 
         }
         private void Test_move_mod_Click(object sender, RoutedEventArgs e)
@@ -2239,23 +2298,12 @@ namespace RobotArmHelix
             int point_csv = 50;
             // Initialize a 2D array to hold the CSV data
             // Assuming you know the size of the array (10 rows and number of columns as per your data)
-            double[,] data = new double[50, 3];
+            double[,] data = new double[100, 3];
             for (int t = 0; t < point_csv; t++)
             {
                 data[t, 0] = selectmemberX[t];
                 data[t, 1] = selectmemberY[t];
                 data[t, 2] = selectmemberZ[t];
-                Console.WriteLine(data[t, 0].ToString());
-                Console.WriteLine(data[t, 1].ToString());
-                Console.WriteLine(data[t, 2].ToString());
-                Console.WriteLine("---");
-
-                using (StreamWriter writer = new StreamWriter(savePath, true))
-                {
-                    // string csvLine = $"{x},{y},{z},{x_vel},{y_vel},{z_vel}";
-                    string csvLine = $"{data[t, 0]},{data[t, 1]},{data[t, 2]}";
-                    writer.WriteLine(csvLine);
-                }
             }
 
             Move_mod_Function(data, "D1010");
@@ -2398,8 +2446,19 @@ namespace RobotArmHelix
             }
             Directory.CreateDirectory(duongDanDayDu);
         }
+
+        private void Delete_dat_csv_Click(object sender, RoutedEventArgs e)
+        {
+            wrt_stt = true;
+            string delete_path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + program_list_name.Text + "\\" + trajectory_list_name.Text + ".csv";
+
+            // Clear the file contents
+            File.WriteAllText(delete_path, string.Empty);
+        }
+
         private void New_Trajectory_Click(object sender, RoutedEventArgs e)
         {
+            wrt_stt = true;
             string duongDanCoSo = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + program_list_name.Text + "\\";
             string tenTrajectory = "trajectory" + ".csv";
             string duongDanDayDu = Path.Combine(duongDanCoSo, tenTrajectory);
@@ -2681,7 +2740,7 @@ namespace RobotArmHelix
             double[] x = new double[numSamples];
             double[] y = new double[numSamples];
             double[] z = new double[numSamples];
-            double[] t = new double[numSamples];
+            //double[] t = new double[numSamples];
 
 
             double[] low_passX = new double[numSamples];
@@ -2700,23 +2759,6 @@ namespace RobotArmHelix
             /* Data to load to the PLC */
             double alpha = 0.5;
             int points_lpf = 100;
-
-            for (int k = 0; k < numSamples; k++)
-            {
-                /* Low pass filter*/
-                if(k == 0)
-                {
-                    low_passX[k] = x[k];
-                    low_passY[k] = y[k];
-                    low_passZ[k] = z[k];
-                }
-                else
-                {
-                    low_passX[k] = low_passX[k - 1] * (1 - alpha) + x[k] * alpha;
-                    low_passY[k] = low_passY[k - 1] * (1 - alpha) + y[k] * alpha;
-                    low_passZ[k] = low_passZ[k - 1] * (1 - alpha) + z[k] * alpha;
-                }
-            }
             /* Take points for saving in PLC */
             double step = (double)numSamples / points_lpf;
 
