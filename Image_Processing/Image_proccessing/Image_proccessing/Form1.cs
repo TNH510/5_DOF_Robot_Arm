@@ -1062,7 +1062,7 @@ namespace Image_proccessing
                 {
                     for (int j = 0; j < hough.GetLength(1); j++)
                     {
-                        if (hough[i, j] >= 55)
+                        if (hough[i, j] >= 60)
                         {
                             count_hough_point++;
                         }
@@ -1075,7 +1075,7 @@ namespace Image_proccessing
                 {
                     for (int j = 0; j < hough.GetLength(1); j++)
                     {
-                        if (hough[i, j] >= 55)
+                        if (hough[i, j] >= 60)
                         {
                             Temp_info[count1, 0] = i;//x
                             Temp_info[count1, 1] = j;//y
@@ -1184,32 +1184,77 @@ namespace Image_proccessing
             }
             public static int[,] Find_corner_info(int[,] Lines)
             {// tìm ra tọa độ của các điểm góc
-                int[,] corner=new int[Lines.GetLength(0),2];
+                int[,] corner=new int[Lines.GetLength(0)+1,2];
                 int count = 0;
-                
-                for (int i = 0; i < 2; i++)
+                if (Lines.GetLength(0) ==4)
                 {
-                    int diagonal = 800;// (int)Math.Sqrt(width * width + height * height), width=480, height=640
-                    double Radian_Theta = Lines[i, 0] * Math.PI / 180;
-                    int rho = Lines[i, 1];
-                    
-                    for (int j = 2; j < 4; j++)
-                    {                       
-                        double Radian_Theta1 = Lines[j, 0] * Math.PI / 180;
-                        int rho1 = Lines[j, 1];
-                        if ((Math.Abs(rho - rho1) > 10 ) && (i != j ))//
+                    int center_X = 0;
+                    int center_Y = 0;
+                    for (int i = 0; i < 2; i++)
+                    {
+                        int diagonal = 800;// (int)Math.Sqrt(width * width + height * height), width=480, height=640
+                        double Radian_Theta = Lines[i, 0] * Math.PI / 180;
+                        int rho = Lines[i, 1];
+
+                        for (int j = 2; j < 4; j++)
+                        {
+                            double Radian_Theta1 = Lines[j, 0] * Math.PI / 180;
+                            int rho1 = Lines[j, 1];
+                            
+                            if ((Math.Abs(rho - rho1) > 10) && (i != j))//
+                            {
+                                //giải phương trình
+                                //int y = (int)(((avr_rho - diagonal) - x * Math.Cos(radianTheta)) / Math.Sin(radianTheta));
+                                double tu = ((rho - diagonal) * Math.Sin(Radian_Theta1)) - ((rho1 - diagonal) * Math.Sin(Radian_Theta));
+                                double mau = Math.Cos(Radian_Theta) * Math.Sin(Radian_Theta1) - Math.Cos(Radian_Theta1) * Math.Sin(Radian_Theta);
+                                int x = (int)((tu / mau));
+                                int y = (int)(((rho1 - diagonal) - x * Math.Cos(Radian_Theta1)) / Math.Sin(Radian_Theta1));
+                                corner[count, 0] = x;
+                                center_X += x;
+                                
+                                corner[count, 1] = y;
+                                center_Y += y;
+                                count++;
+                            }
+                        }
+                    }
+                    corner[4, 0] = center_X / count;
+                    corner[4, 1] = center_Y / count;
+                }
+                else if (Lines.GetLength(0) == 3)// tam giác
+                {
+                    for (int i = 0; i < 3; i++)
+                    {
+                        int diagonal = 800;// (int)Math.Sqrt(width * width + height * height), width=480, height=640
+                        double Radian_Theta = Lines[i, 0] * Math.PI / 180;
+                        int rho = Lines[i, 1];
+                        double Radian_Theta1;
+                        int rho1;
+                        if (i == 2)
+                        {
+                            Radian_Theta1 = Lines[0, 0] * Math.PI / 180;
+                            rho1 = Lines[0, 1];
+                        }
+                        else
+                        {
+                            Radian_Theta1 = Lines[i+1, 0] * Math.PI / 180;
+                            rho1 = Lines[i+1, 1];
+                        }
+                        
+                        if ((Math.Abs(rho - rho1) > 10))//
                         {
                             //giải phương trình
                             //int y = (int)(((avr_rho - diagonal) - x * Math.Cos(radianTheta)) / Math.Sin(radianTheta));
                             double tu = ((rho - diagonal) * Math.Sin(Radian_Theta1)) - ((rho1 - diagonal) * Math.Sin(Radian_Theta));
-                            double mau = Math.Cos(Radian_Theta)*Math.Sin(Radian_Theta1) - Math.Cos(Radian_Theta1)*Math.Sin(Radian_Theta);
+                            double mau = Math.Cos(Radian_Theta) * Math.Sin(Radian_Theta1) - Math.Cos(Radian_Theta1) * Math.Sin(Radian_Theta);
                             int x = (int)((tu / mau));
                             int y = (int)(((rho1 - diagonal) - x * Math.Cos(Radian_Theta1)) / Math.Sin(Radian_Theta1));
-                            corner[count, 0] = x; 
+                            corner[count, 0] = x;
                             corner[count, 1] = y;
                             count++;
                         }
-                    }                                     
+                        
+                    }
                 }
                 return corner;
             }
