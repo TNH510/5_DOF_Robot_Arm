@@ -7,7 +7,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ProgressBar;
-
+using Lokdeptrai;
 namespace Image_proccessing
 {
     public partial class Form1 : Form
@@ -18,6 +18,7 @@ namespace Image_proccessing
             InitializeComponent();
 
         }
+        
         static int[,] gradient;
         public static int[,] MidPoint= new int[1,2];
         public static int[] angle= new int [4];
@@ -1299,6 +1300,8 @@ namespace Image_proccessing
             int[,] lines = EdgeDetection.Find_line_info(hough);
             int[,] result = EdgeDetection.Drawline2(lines);
             int[,] corner = EdgeDetection.Find_corner_info(lines);
+            
+            int[,] abc = Image_Processing.Find_line_info1(hough);
             //for (int i = 0; i < hough.GetLength(0); i++)
             //{
             //    for (int j = 0; j < hough.GetLength(1); j++)
