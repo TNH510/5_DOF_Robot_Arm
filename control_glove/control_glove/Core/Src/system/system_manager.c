@@ -26,6 +26,7 @@ typedef enum
 /* Public variables --------------------------------------------------------- */
 /* Private variables -------------------------------------------------------- */
 button_name_t g_button_state = NO_EVENT;
+button_name_t g_button_state_pre = NO_EVENT;
 sys_mode_t     g_mode         = SYS_MODE_TEST;
 
 /* Private prototypes ------------------------------------------------------- */
@@ -33,6 +34,7 @@ sys_mode_t     g_mode         = SYS_MODE_TEST;
 void system_manager_init(void)
 {
     sensor_manager_init();
+    printf("SYS_MODE_TEST\r\n");
 }
 void system_manager_task(void)
 {
@@ -41,18 +43,35 @@ void system_manager_task(void)
     switch (g_mode)
     {
     case SYS_MODE_TEST:
-        sensor_manager_test(g_button_state);
+        // sensor_manager_test(g_button_state);
+        if (g_button_state_pre != HOLD_SELECT_BUTTON && g_button_state == HOLD_SELECT_BUTTON)
+        {
+            g_mode = SYS_MODE_CALIB;
+            printf("SYS_MODE_CALIB\r\n");
+        }
         break;
     case SYS_MODE_CALIB:
-        sensor_manager_calib(g_button_state);
+        // sensor_manager_calib(g_button_state);
+        if (g_button_state_pre != HOLD_SELECT_BUTTON && g_button_state == HOLD_SELECT_BUTTON)
+        {
+            g_mode = SYS_MODE_RUN;
+            printf("SYS_MODE_RUN\r\n");
+        }
         break;
     case SYS_MODE_RUN:
-        sensor_manager_run(g_button_state);
+        // sensor_manager_run(g_button_state);
+        if (g_button_state_pre != HOLD_SELECT_BUTTON && g_button_state == HOLD_SELECT_BUTTON)
+        {
+            g_mode = SYS_MODE_TEST;
+            printf("SYS_MODE_TEST\r\n");
+        }
         break;
 
     default: 
         break;
     }
+
+    g_button_state_pre = g_button_state;
 }
 
 /* Private implementations -------------------------------------------------- */
