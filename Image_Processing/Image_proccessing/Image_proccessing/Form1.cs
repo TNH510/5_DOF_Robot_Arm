@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
 using static System.Net.Mime.MediaTypeNames;
@@ -668,6 +669,90 @@ namespace Image_proccessing
 
                 return resultImage;
             }         
+            public static int [,] Drawline2(int[,]line)
+            {
+                int diagonal = 800;
+                int width = 640;
+                int height = 480;
+                int[,] resultImage= new int[width, height];
+                for (int i = 0; i < 4; i++)
+                {
+                    int avr_theta = line[i,0];                   
+                    int avr_rho = line[i,1];
+                    //vẽ đường thẳng
+                    double radianTheta = avr_theta * Math.PI / 180;
+                    if (avr_theta >= 45 && avr_theta < 135)
+                    {
+                        for (int x = 0; x < width; x++)
+                        {
+                            int y = (int)(((avr_rho - diagonal) - x * Math.Cos(radianTheta)) / Math.Sin(radianTheta));
+                            if (y >= 0 && y < height)
+                            {
+                                //resultImage[x, y] = 255;
+                                if (resultImage[x, y] == 0)
+                                {
+                                    resultImage[x, y] = 255;
+                                    if (y + 1 < resultImage.GetLength(1))
+                                    {
+                                        resultImage[x, y + 1] = 255;
+                                    }
+
+                                }
+                                else if (resultImage[x, y] == 255)
+                                {
+                                    resultImage[x, y] = 10;
+
+                                    if (y + 1 < resultImage.GetLength(1))
+                                    {
+                                        resultImage[x, y + 1] = 10;
+                                    }
+                                }
+                                else if (resultImage[x, y] == 10)
+                                {
+                                    //DO NOTHING
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (int y = 0; y < height; y++)
+                        {
+                            int x = (int)(((avr_rho - diagonal) - y * Math.Sin(radianTheta)) / Math.Cos(radianTheta));
+                            if (x >= 0 && x < width)
+                            {
+                                //resultImage[x, y] = 255;
+                                if (resultImage[x, y] == 0)
+                                {
+                                    resultImage[x, y] = 255;//vẽ line 
+
+                                    if (x + 1 < resultImage.GetLength(0))
+                                    {
+                                        resultImage[x + 1, y] = 255;
+                                    }
+                                }
+                                else if (resultImage[x, y] == 255)
+                                {
+                                    resultImage[x, y] = 10;//giao điểm
+
+                                    if (x + 1 < resultImage.GetLength(0))
+                                    {
+                                        resultImage[x + 1, y] = 10;
+                                    }
+                                }
+                                else if (resultImage[x, y] == 10)
+                                {
+                                    //DO NOTHING
+                                    //nền
+                                }
+                            }
+                        }
+                    }
+                    //
+                }
+
+                return resultImage;
+            }
             public static int CalculateThreshold(int[,] image)
             {
                 // Tính histogram
@@ -967,12 +1052,12 @@ namespace Image_proccessing
 
                 return H;
             }
-            public static int FindLines(int[,]hough)
+            public static int[,] Find_line_info(int[,] hough)
             {
                 //tạo ra 1 biến 3D để thêm thông tin là điểm ảnh đã được duyệt qua chưa
-
                 //đếm xem có bao nhiêu điểm >=55
                 int count_hough_point = 0;
+
                 for (int i = 0; i < hough.GetLength(0); i++)
                 {
                     for (int j = 0; j < hough.GetLength(1); j++)
@@ -984,37 +1069,40 @@ namespace Image_proccessing
                     }
                 }
                 //lưu thông tin của ma trận hough có điểm >=55 vào Temp_info
-                int[,] Temp_info = new int[count_hough_point, 4];
-                int count1 = 0;             
-                for (int i =0; i<hough.GetLength(0); i++)
+                int[,] Temp_info = new int[count_hough_point, 5];
+                int count1 = 0;
+                for (int i = 0; i < hough.GetLength(0); i++)
                 {
-                    for (int j =0; j<hough.GetLength(1); j++)
+                    for (int j = 0; j < hough.GetLength(1); j++)
                     {
-                        if (hough[i,j]>=55)
+                        if (hough[i, j] >= 55)
                         {
                             Temp_info[count1, 0] = i;//x
                             Temp_info[count1, 1] = j;//y
                             Temp_info[count1, 2] = 0;//nhom
                             Temp_info[count1, 3] = 0;//check xem da phan loai hay chua
+                            Temp_info[count1, 4] = hough[i, j];//giá trị nổi bật
                             count1++;
-                        }    
-                        
+                        }
+
                     }
                 }
                 //phân nhóm
                 //bốc tk đầu tiên
-                int x=0;
-                int y=0;
+                int x = 0;
+                int y = 0;
                 int nhom = 0;
                 int count = 0;
-                while(count< count_hough_point)
+                while (count < count_hough_point)
                 {
+                    int distance = 0;
                     for (int i = 0; i < count_hough_point; i++)
                     {
                         if (Temp_info[i, 3] == 0)//check xem da phan loai hay chua
                         {
                             x = Temp_info[i, 0];
                             y = Temp_info[i, 1];
+                            distance= Math.Abs( y - 800);
                             break;
                         }
                     }
@@ -1023,7 +1111,7 @@ namespace Image_proccessing
                     {
                         if (Temp_info[i, 3] == 0)//check xem da phan loai hay chua
                         {
-                            if (Math.Abs(x - Temp_info[i, 0]) < 20 && Math.Abs(y - Temp_info[i, 1]) < 90)
+                            if ((((Math.Abs(x - Temp_info[i, 0]) < 20) && Math.Abs(y - Temp_info[i, 1]) < 90)) || ((Math.Abs(x - Temp_info[i, 0]) > 170) && (Math.Abs(Math.Abs(Temp_info[i, 1] - 800)-distance)<80)))
                             {
                                 Temp_info[i, 2] = nhom;//nhom
                                 Temp_info[i, 3] = 1;//da check
@@ -1032,11 +1120,99 @@ namespace Image_proccessing
                         }
                     }
                     nhom++;
-                }    
+                }
+                // tìm ra giá trị vote cao nhất ở mỗi nhóm
+                int max_value;
+                int[,] Temp_Result = new int[nhom, 2];//x,y
+                for (int i = 0; i < nhom; i++)
+                {
+                    //tìm ra giá trị lớn nhất
+                    max_value = 0;
+                    int theta = 0;
+                    for (int j = 0; j < count_hough_point; j++)
+                    {
+                        if (Temp_info[j, 4] > max_value && Temp_info[j, 2] == i)
+                        {
+                            max_value = Temp_info[j, 4];
+                            theta= Temp_info[j, 0];
+                        }
+                    }
+                    //tìm những đường thẳng có giá trị bằng với max_value
+                    int avr_x = 0;
+                    int avr_y = 0;
+                    int count2 = 0;
+                    for (int j = 0; j < count_hough_point; j++)
+                    {
+                        if (Temp_info[j, 4] == max_value && Temp_info[j, 2] == i && Math.Abs(theta- Temp_info[j, 0])<10)
+                        {
+                            avr_x += Temp_info[j, 0];
+                            avr_y += Temp_info[j, 1];
+                            count2++;
+                        }
+                    }
+                    Temp_Result[i, 0] = avr_x / count2;
+                    Temp_Result[i, 1] = avr_y / count2;
+                }
+                //Lọc ra các đường dùng được
+                int number_lines = Temp_Result.GetLength(0);
+                
+                //int count3 = 0;//đếm số lượng đường có alpha < 5 độ
+                //for (int i =0; i<number_lines;i++)
+                //{
+                //    if(Temp_Result[i, 0]<3)
+                //    {
+                //        count3++;
+                //    }    
+                //}
 
-                    return count_hough_point;
+                int[,] Final_Result=new int [number_lines,2];
+                //int count4 = 0;
+                for (int i = 0; i < number_lines; i++)
+                {
+                    //if (Temp_Result[i, 0] < 3)
+                    //{
+                    //    //bỏ qua những điểm có alpha < 5 độ
+                    //}
+                    //else
+                    //{
+                        Final_Result[i, 0] = Temp_Result[i, 0];
+                        Final_Result[i, 1] = Temp_Result[i, 1];
+                        //count4++;
+                    //}
+                }
+                return Final_Result;
             }
-
+            public static int[,] Find_corner_info(int[,] Lines)
+            {// tìm ra tọa độ của các điểm góc
+                int[,] corner=new int[Lines.GetLength(0),2];
+                int count = 0;
+                
+                for (int i = 0; i < 2; i++)
+                {
+                    int diagonal = 800;// (int)Math.Sqrt(width * width + height * height), width=480, height=640
+                    double Radian_Theta = Lines[i, 0] * Math.PI / 180;
+                    int rho = Lines[i, 1];
+                    
+                    for (int j = 2; j < 4; j++)
+                    {                       
+                        double Radian_Theta1 = Lines[j, 0] * Math.PI / 180;
+                        int rho1 = Lines[j, 1];
+                        if ((Math.Abs(rho - rho1) > 10 ) && (i != j ))//
+                        {
+                            //giải phương trình
+                            //int y = (int)(((avr_rho - diagonal) - x * Math.Cos(radianTheta)) / Math.Sin(radianTheta));
+                            double tu = ((rho - diagonal) * Math.Sin(Radian_Theta1)) - ((rho1 - diagonal) * Math.Sin(Radian_Theta));
+                            double mau = Math.Cos(Radian_Theta)*Math.Sin(Radian_Theta1) - Math.Cos(Radian_Theta1)*Math.Sin(Radian_Theta);
+                            int x = (int)((tu / mau));
+                            int y = (int)(((rho1 - diagonal) - x * Math.Cos(Radian_Theta1)) / Math.Sin(Radian_Theta1));
+                            corner[count, 0] = x; 
+                            corner[count, 1] = y;
+                            count++;
+                        }
+                    }                                     
+                }
+                return corner;
+            }
         }
         private void button1_Click(object sender, EventArgs e)
         {
@@ -1074,23 +1250,25 @@ namespace Image_proccessing
             int height = edges.GetLength(1);
 
             //biểu đồ hough
-            int[,] hough = EdgeDetection.PerformHoughTransform_Rectangle(edges);
-            for (int i = 0; i < hough.GetLength(0); i++)
-            {
-                for (int j = 0; j < hough.GetLength(1); j++)
-                {
-                    if (hough[i, j] >= 55)
-                    {
-                        hough[i, j] = 255;
-                    }
-                    else
-                    {
-                        hough[i, j] = 0;
-                    }
-                }
-            }
-            int lines_point = EdgeDetection.FindLines(hough);
-            hough = EdgeDetection.Dilation(hough);
+            int[,] hough = EdgeDetection.PerformHoughTransform_Rectangle(edges);            
+            int[,] lines = EdgeDetection.Find_line_info(hough);
+            int[,] result = EdgeDetection.Drawline2(lines);
+            int[,] corner = EdgeDetection.Find_corner_info(lines);
+            //for (int i = 0; i < hough.GetLength(0); i++)
+            //{
+            //    for (int j = 0; j < hough.GetLength(1); j++)
+            //    {
+            //        if (hough[i, j] >= 55)
+            //        {
+            //            hough[i, j] = 255;
+            //        }
+            //        else
+            //        {
+            //            hough[i, j] = 0;
+            //        }
+            //    }
+            //}
+            //hough = EdgeDetection.Dilation(hough);
             //hough = EdgeDetection.Erosion_Dilation(hough, 4, 6);
             //tách số điểm nổi bật từ biểu đồ hough
             //EdgeDetection.PerformHoughTransform_Circle(edges,out int X_circle,out int Y_circle, out int dimention);
@@ -1099,8 +1277,28 @@ namespace Image_proccessing
 
             // thể hiện lên GUI
             Bitmap Import_picture = new Bitmap(imagePath);
+            // chấm đỏ
+            for (int i = 0; i < corner.GetLength(0); i++)
+            {
+
+                int X1 = corner[i,0] ;
+                int Y1 = corner[i,1] ;
+                        for (int x1 = X1 - 2; x1 < X1 + 2; x1++)
+                        {
+                            if (x1 > 0 && x1 < Import_picture.Width)
+                            {
+                                for (int y1 = Y1 - 2; y1 < Y1 + 2; y1++)
+                                {
+                                    if (y1 > 0 && y1 < Import_picture.Height)
+                                    {
+                                        Import_picture.SetPixel(x1, y1, Color.Red);
+                                    }
+                                }
+                            }
+                        }
+            }
             picture1.Image = Import_picture;
-            //picture2.Image = EdgeDetection.IntToBitmap(result);
+            picture2.Image = EdgeDetection.IntToBitmap(result);
             picture3.Image = EdgeDetection.IntToBitmap(hough);
             picture4.Image = EdgeDetection.IntToBitmap(edges);
             int x = MidPoint[0,0];
