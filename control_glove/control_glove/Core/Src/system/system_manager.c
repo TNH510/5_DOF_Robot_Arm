@@ -33,6 +33,8 @@ sys_mode_t     g_mode         = SYS_MODE_TEST;
 /* Public implementations --------------------------------------------------- */
 void system_manager_init(void)
 {
+    // Do not delete this delay because IMU will be init failed
+    HAL_Delay(1000);
     sensor_manager_init();
     printf("SYS_MODE_TEST\r\n");
 }
@@ -43,7 +45,7 @@ void system_manager_task(void)
     switch (g_mode)
     {
     case SYS_MODE_TEST:
-        // sensor_manager_test(g_button_state);
+        sensor_manager_test(g_button_state);
         if (g_button_state_pre != HOLD_SELECT_BUTTON && g_button_state == HOLD_SELECT_BUTTON)
         {
             g_mode = SYS_MODE_CALIB;

@@ -95,7 +95,7 @@ base_status_t sensor_manager_test(button_name_t event)
     sensor_manager_test_handle_data();
 
     static uint32_t tick_test = 0;
-    if (HAL_GetTick() - tick_test > 300)
+    if (HAL_GetTick() - tick_test > 200)
     {
         tick_test = HAL_GetTick();
         switch (g_sensor_test_mode)
