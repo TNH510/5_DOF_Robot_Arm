@@ -96,6 +96,9 @@
     <Reference Include="HelixToolkit.Wpf, Version=2.24.0.0, Culture=neutral, PublicKeyToken=52aa3500039caf0d, processorArchitecture=MSIL">
       <HintPath>..\packages\HelixToolkit.Wpf.2.24.0\lib\net462\HelixToolkit.Wpf.dll</HintPath>
     </Reference>
+    <Reference Include="Lokdeptrai">
+      <HintPath>..\..\..\..\camera_test\Lokdeptrai.dll</HintPath>
+    </Reference>
     <Reference Include="MathNet.Numerics, Version=5.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MathNet.Numerics.5.0.0\lib\net48\MathNet.Numerics.dll</HintPath>
     </Reference>
@@ -223,6 +226,8 @@
     <Resource Include="hinh-nen-win-10-dep-nhat-32.jpg" />
     <Resource Include="hinh-nen-windows-10-dep-32.jpg" />
     <Resource Include="hinh-nen-win-10-co-logo-4-mau.jpg" />
+    <Resource Include="image\113.bmp" />
+    <Resource Include="image\120.bmp" />
     <Content Include="lib\HelixToolkit.dll" />
     <Content Include="lib\HelixToolkit.pdb" />
     <Content Include="lib\HelixToolkit.Wpf.dll" />

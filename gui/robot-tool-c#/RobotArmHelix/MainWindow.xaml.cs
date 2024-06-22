@@ -40,6 +40,7 @@ using System.Globalization;
 using MathNet.Numerics;
 using System.Data.Common;
 using MathNet.Numerics.LinearAlgebra;
+using Lokdeptrai;
 /**
 * Author: Gabriele Marini (Gabryxx7)
 * This class load the 3d models of all the parts of the robotic arms and add them to the viewport
@@ -243,6 +244,9 @@ namespace RobotArmHelix
 
             double[] angles = { joints[1].angle, joints[2].angle, joints[3].angle, joints[4].angle, joints[5].angle };
             ForwardKinematics(angles);
+
+            // Set the source of the Image control to display an image file
+            displayedImage.Source = new BitmapImage(new Uri("C:\\Users\\daveb\\Desktop\\5_DOF_Robot_Arm\\gui\\robot-tool-c#\\RobotArmHelix\\image\\113.bmp"));
 
             #region Timer_Declaration
 
@@ -2454,6 +2458,55 @@ namespace RobotArmHelix
 
             // Clear the file contents
             File.WriteAllText(delete_path, string.Empty);
+        }
+
+        private void Process_image_button_Click(object sender, RoutedEventArgs e)
+        {
+            string filePath = "C:\\Users\\daveb\\Desktop\\5_DOF_Robot_Arm\\gui\\robot-tool-c#\\RobotArmHelix\\image\\113.bmp";
+            int[,] pixelArray = ConvertBmpTo2DArray(filePath);
+            int[,] hello = Lokdeptrai.Image_Processing.Point_corner(pixelArray);
+            // In ra mảng 2 chiều để kiểm tra kết quả
+            for (int i = 0; i < hello.GetLength(0); i++)
+            {
+                for (int j = 0; j < hello.GetLength(1); j++)
+                {
+                    Console.Write(hello[i, j] + " ");
+                }
+                Console.WriteLine();
+            }
+        }
+
+        public static int[,] ConvertBmpTo2DArray(string filePath)
+        {
+            // Tạo BitmapImage từ đường dẫn file
+            BitmapImage bitmapImage = new BitmapImage(new Uri(filePath, UriKind.Absolute));
+
+            // Tạo WriteableBitmap từ BitmapImage để có thể truy cập các pixel
+            WriteableBitmap writeableBitmap = new WriteableBitmap(bitmapImage);
+
+            int width = writeableBitmap.PixelWidth;
+            int height = writeableBitmap.PixelHeight;
+            int stride = writeableBitmap.BackBufferStride;
+            int bytesPerPixel = (writeableBitmap.Format.BitsPerPixel + 7) / 8;
+
+            byte[] pixelData = new byte[height * stride];
+            writeableBitmap.CopyPixels(pixelData, stride, 0);
+
+            int[,] pixelArray = new int[height, width];
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    int index = y * stride + x * bytesPerPixel;
+                    byte blue = pixelData[index];
+                    byte green = pixelData[index + 1];
+                    byte red = pixelData[index + 2];
+                    int grayscaleValue = (int)((red * 0.3) + (green * 0.59) + (blue * 0.11));
+                    pixelArray[y, x] = grayscaleValue;
+                }
+            }
+
+            return pixelArray;
         }
 
         private void New_Trajectory_Click(object sender, RoutedEventArgs e)

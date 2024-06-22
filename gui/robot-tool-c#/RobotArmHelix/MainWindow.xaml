@@ -154,6 +154,10 @@
                         </ComboBox>
                         <Button x:Name="Refresh_glove_btn" Content="Refresh" HorizontalAlignment="Left" Margin="198,50,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_refresh_button_Click" RenderTransformOrigin="0.48,1.838"/>
                     </Grid>
+                    <Grid HorizontalAlignment="Left" Height="228" Margin="12,526,0,0" VerticalAlignment="Top" Width="363" Background="#FFA23414" Grid.Column="1" Grid.ColumnSpan="9">
+                        <Image x:Name="displayedImage" HorizontalAlignment="Left" Height="147" Margin="11,11,0,0" VerticalAlignment="Top" Width="333"/>
+                        <Button x:Name="Process_image_btn" Content="Process" HorizontalAlignment="Left" Margin="3,184,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Process_image_button_Click" RenderTransformOrigin="0.48,1.838"/>
+                    </Grid>
                 </Grid>
             </TabItem>
             <TabItem Header="Monitor" Margin="-2,0,-11,0">
@@ -259,7 +263,7 @@
                         <Label x:Name="Saving_stt_name" Content="Waiting..." HorizontalAlignment="Left" Margin="127,211,0,0" VerticalAlignment="Top" Foreground="#FFF7F900" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
                         <Label x:Name="Saving_point_name" Content="0" HorizontalAlignment="Left" Margin="142,158,0,0" VerticalAlignment="Top" Foreground="#FF00F90F" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
                     </Grid>
-                    <oxy:PlotView x:Name="plotView_theta_Copy" Margin="672,45,598,650" Background="White" Grid.Column="1" />
+                    <oxy:PlotView x:Name="plotView_theta_Copy" Margin="646,31,536,610" Background="White" Grid.Column="1" />
                 </Grid>
             </TabItem>
         </TabControl>
