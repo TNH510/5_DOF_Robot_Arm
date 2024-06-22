@@ -53,7 +53,7 @@ void system_manager_task(void)
         }
         break;
     case SYS_MODE_CALIB:
-        // sensor_manager_calib(g_button_state);
+        sensor_manager_calib(g_button_state);
         if (g_button_state_pre != HOLD_SELECT_BUTTON && g_button_state == HOLD_SELECT_BUTTON)
         {
             g_mode = SYS_MODE_RUN;
@@ -61,7 +61,7 @@ void system_manager_task(void)
         }
         break;
     case SYS_MODE_RUN:
-        // sensor_manager_run(g_button_state);
+        sensor_manager_run(g_button_state);
         if (g_button_state_pre != HOLD_SELECT_BUTTON && g_button_state == HOLD_SELECT_BUTTON)
         {
             g_mode = SYS_MODE_TEST;
