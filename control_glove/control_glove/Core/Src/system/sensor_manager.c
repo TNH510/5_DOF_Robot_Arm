@@ -22,6 +22,7 @@
 #include "glove_algorithm.h"
 // #include "MadgwickAHRS.h"
 #include "MahonyAHRS.h"
+#include "drv_led.h"
 
 /* Private includes --------------------------------------------------------- */
 /* Private defines ---------------------------------------------------------- */
@@ -57,6 +58,7 @@ static uint8_t data_index_send = 0;
 static uint8_t encode_frame[19];
 
 static uint8_t g_sensor_test_mode = 0;
+static bool g_is_yaw_angle_calib = false;
 
 /* Private prototypes ------------------------------------------------------- */
 static void sensor_manager_run_handle_data(void);
@@ -90,7 +92,17 @@ base_status_t sensor_manager_init(void)
 
 base_status_t sensor_manager_calib(button_name_t event)
 {
+    if (g_is_yaw_angle_calib == false && event == CLICK_LEFT_BUTTON)
+    {
+        g_is_yaw_angle_calib = true;
+    }
+
     return BS_OK;
+}
+
+bool sensor_manager_is_yaw_angle_calib()
+{
+    return g_is_yaw_angle_calib;
 }
 
 base_status_t sensor_manager_test(button_name_t event)
@@ -221,7 +233,11 @@ base_status_t sensor_manager_run(button_name_t event)
 static void sensor_manager_run_handle_data(void)
 {
     // Get imu data
-    drv_imu_get_data(&g_imu_data);  
+    if (drv_imu_get_data(&g_imu_data) != BS_OK) 
+    {
+        drv_led_turn_on_red_led();
+        drv_led_turn_off_green_led();
+    } 
 
     // Get marg data
     drv_magnetic_get_data(&g_magnetic_data);
@@ -268,7 +284,11 @@ static void sensor_manager_run_handle_data(void)
 static void sensor_manager_test_handle_data(void)
 {
     // Get imu data
-    drv_imu_get_data(&g_imu_data);  
+    if (drv_imu_get_data(&g_imu_data) != BS_OK) 
+    {
+        drv_led_turn_on_red_led();
+        drv_led_turn_off_green_led();
+    } 
 
     // Get marg data
     drv_magnetic_get_data(&g_magnetic_data);
