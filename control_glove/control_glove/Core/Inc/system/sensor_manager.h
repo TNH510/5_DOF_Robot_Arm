@@ -28,6 +28,7 @@ extern "C" {
 base_status_t sensor_manager_init(void);
 base_status_t sensor_manager_run(button_name_t event);
 base_status_t sensor_manager_calib(button_name_t event);
+base_status_t sensor_manager_update_data(void);
 base_status_t sensor_manager_test(button_name_t event);
 bool          sensor_manager_is_yaw_angle_calib();
 

@@ -59,12 +59,14 @@ static uint8_t encode_frame[19];
 
 static uint8_t g_sensor_test_mode = 0;
 static bool g_is_yaw_angle_calib = false;
+static float g_yaw_angle_calib_result = 0.0f;
 
 /* Private prototypes ------------------------------------------------------- */
 static void sensor_manager_run_handle_data(void);
 static void sensor_manager_test_handle_data(void);
 static void sensor_manager_run_button_change(button_name_t event);
 static void sensor_manager_test_button_change(button_name_t event);
+static float sensor_manager_caculate_current_yaw(void);
 
 #ifdef I2C_RECOVERY
 static void sensor_manager_i2c_recovery(void);
@@ -90,12 +92,28 @@ base_status_t sensor_manager_init(void)
     return BS_OK;
 }
 
+base_status_t sensor_manager_update_data(void)
+{
+    sensor_manager_test_handle_data();
+    return BS_OK;
+}
+
 base_status_t sensor_manager_calib(button_name_t event)
 {
-    if (g_is_yaw_angle_calib == false && event == CLICK_LEFT_BUTTON)
-    {
-        g_is_yaw_angle_calib = true;
-    }
+    // if (event == CLICK_LEFT_BUTTON)
+    // {
+        g_yaw_angle_calib_result = sensor_manager_caculate_current_yaw();
+        printf("Yaw Calib: %0.2f\r\n", g_yaw_angle_calib_result);
+
+        // if (g_is_yaw_angle_calib == false)
+        // {
+        //     g_is_yaw_angle_calib = true;
+        // }
+        // else
+        // {
+        //     g_is_yaw_angle_calib = false;
+        // }
+    // }
 
     return BS_OK;
 }
@@ -376,6 +394,32 @@ static void sensor_manager_test_button_change(button_name_t event)
             g_sensor_test_mode = 0;
         }
     }
+}
+
+static float sensor_manager_caculate_current_yaw(void)
+{
+    // First Quadrant
+    if (x_pos > 0 && y_pos > 0)
+    {
+        g_yaw_angle_calib_result = asin(y_pos/sqrt(x_pos * x_pos + y_pos * y_pos));
+    }
+    // II
+    else if (x_pos < 0 && y_pos > 0)
+    {
+        g_yaw_angle_calib_result = M_PI - asin(y_pos/sqrt(x_pos * x_pos + y_pos * y_pos));
+    }
+    // III
+    else if (x_pos < 0 && y_pos < 0)
+    {
+        g_yaw_angle_calib_result = M_PI + asin(-y_pos/sqrt(x_pos * x_pos + y_pos * y_pos));
+    }
+    // IV
+    else if (x_pos > 0 && y_pos < 0)
+    {
+        g_yaw_angle_calib_result = 2 * M_PI - asin(-y_pos/sqrt(x_pos * x_pos + y_pos * y_pos));
+    }
+
+    return g_yaw_angle_calib_result * 180.0 / M_PI; 
 }
 
 #ifdef I2C_RECOVERY
