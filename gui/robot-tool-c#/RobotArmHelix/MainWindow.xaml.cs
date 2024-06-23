@@ -41,6 +41,7 @@ using MathNet.Numerics;
 using System.Data.Common;
 using MathNet.Numerics.LinearAlgebra;
 using Lokdeptrai;
+using System.Windows.Shell;
 /**
 * Author: Gabriele Marini (Gabryxx7)
 * This class load the 3d models of all the parts of the robotic arms and add them to the viewport
@@ -73,9 +74,9 @@ namespace RobotArmHelix
     public partial class MainWindow : System.Windows.Window
    {
 
-        public double[] selectmemberX = new double[100];
-        public double[] selectmemberY = new double[100];
-        public double[] selectmemberZ = new double[100];
+        public double[] selectmemberX = new double[500];
+        public double[] selectmemberY = new double[500];
+        public double[] selectmemberZ = new double[500];
 
         public bool low_pass_init = false;
         public double x_lpf = 0.0, y_lpf = 0.0, z_lpf = 0.0;
@@ -1454,14 +1455,14 @@ namespace RobotArmHelix
         private void Move_mod_Function(double[,] tar_pos, string device)
         {
             double t1, t2, t3, t4, t5;
-            int[,] angle_array = new int[10, 5];
+            int[,] angle_array = new int[100, 5];
             double x, y, z;
             int ret;
-            int[] value_angle = new int[80];
-            int[] value_angle_t5 = new int[20];
+            int[] value_angle = new int[800];
+            int[] value_angle_t5 = new int[200];
 
             /* Linear Equation */
-            for (int t = 0; t < 10; t++)
+            for (int t = 0; t < 100; t++)
             {
                 x = tar_pos[t,0];
                 y = tar_pos[t,1];
@@ -1497,13 +1498,13 @@ namespace RobotArmHelix
                 //}
 
             }
-            Memory_angle_write(angle_array, value_angle, device, 10);
+            Memory_angle_write(angle_array, value_angle, device, 100);
 
-            for (int j = 0; j < 10; j++)
-            {
-                value_angle_t5[2 * j] = Write_Theta(angle_array[j, 4])[0];
-                value_angle_t5[2 * j + 1] = Write_Theta(angle_array[j, 4])[1];
-            }
+            //for (int j = 0; j < 100; j++)
+            //{
+            //    value_angle_t5[2 * j] = Write_Theta(angle_array[j, 4])[0];
+            //    value_angle_t5[2 * j + 1] = Write_Theta(angle_array[j, 4])[1];
+            //}
         }
         private void MoveL_Function(double[] curr_pos, double[] targ_pos, string device)
         {
@@ -1589,6 +1590,19 @@ namespace RobotArmHelix
         }
         private void run_bttn_Click(object sender, RoutedEventArgs e)
         {
+            /* Set speed for PLC */
+            int velocity;
+            try
+            {
+                velocity = Convert.ToInt32(spd_tb.Text) * 1000;
+                write_d_mem_32_bit(1008, velocity);
+                PrintLog("Info", MethodBase.GetCurrentMethod().Name, "Set Velocity successfully");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
             if (move == 1)
             {
                 // turn_on_1_pulse_relay(528);
@@ -2265,10 +2279,10 @@ namespace RobotArmHelix
         private void Test_move_mod_Click(object sender, RoutedEventArgs e)
         {
             move = 2;
-            int point_csv = 10;
+            int point_csv = 100;
             // Initialize a 2D array to hold the CSV data
             // Assuming you know the size of the array (10 rows and number of columns as per your data)
-            double[,] data = new double[10, 3];
+            double[,] data = new double[100, 3];
             for (int t = 0; t < point_csv; t++)
             {
                 data[t, 0] = selectmemberX[t];
@@ -2818,16 +2832,25 @@ namespace RobotArmHelix
             }
 
             /* Data to load to the PLC */
-            int points_lpf = 10;
+            int points_lpf = 100;
             /* Take points for saving in PLC */
             double step = (double)numSamples / points_lpf;
 
             for (int j = 0; j < points_lpf; j++)
             {
                 int jump = LamTronSoThapPhan(j * step);
-                selectmemberX[j] = x[jump];
-                selectmemberY[j] = y[jump];
-                selectmemberZ[j] = z[jump];
+                if (j >= numSamples - 1)
+                {
+                    selectmemberX[j] = x[numSamples - 1];
+                    selectmemberY[j] = y[numSamples - 1];
+                    selectmemberZ[j] = z[numSamples - 1];
+                }
+                else
+                {
+                    selectmemberX[j] = x[jump];
+                    selectmemberY[j] = y[jump];
+                    selectmemberZ[j] = z[jump];
+                }
             }
         }
         public static int LamTronSoThapPhan(double so)
