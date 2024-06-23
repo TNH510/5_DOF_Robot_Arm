@@ -260,6 +260,7 @@ namespace RobotArmHelix
 
             // Create plot model
             _plotModel_position = new PlotModel { Title = "Robot Oxyz" };
+            //_plotModel_lpf_trajectory = new PlotModel { Title = "LPF Trajectory Oxyz" };
             _plotModel_theta = new PlotModel { Title = "Robot Theta" };
             _plotModel_omega = new PlotModel { Title = "Robot Omega" };
             _plotModel_velocity = new PlotModel { Title = "Robot Velocity" };
@@ -1789,14 +1790,14 @@ namespace RobotArmHelix
                 value_angle[8 * j + 6] = Write_Theta(array[j, 3])[0];
                 value_angle[8 * j + 7] = Write_Theta(array[j, 3])[1];
 
-                PrintLog("vect", "value:", Convert.ToString(value_angle[8 * j]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 1]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 2]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 3]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 4]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 5]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 6]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 7]));
+                //PrintLog("vect", "value:", Convert.ToString(value_angle[8 * j]));
+                //PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 1]));
+                //PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 2]));
+                //PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 3]));
+                //PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 4]));
+                //PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 5]));
+                //PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 6]));
+                //PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 7]));
             }
             plc.WriteDeviceBlock(device, 8 * point, ref value_angle[0]);
         }
@@ -2021,7 +2022,7 @@ namespace RobotArmHelix
                                             //scatter(x, y);
                                             //Console.WriteLine("---");
 
-                                            plot(x_lpf, y_lpf, z_lpf);
+                                            //plot(x_lpf, y_lpf, z_lpf);
                                             //plot(x, y, z);
 
                                             //plot(Math.Abs(omega[0]) * 5, Math.Abs(omega[1]) * 5, Math.Abs(omega[2] * 5));
@@ -2258,56 +2259,25 @@ namespace RobotArmHelix
         private void Modify_dat_csv_Click(object sender, RoutedEventArgs e)
         {
             //Modify_polynomial_regression(filePath);
-            // Modify_low_pass_filter(filePath);
-
-            if (write_csv == false)
-            {
-
-                Dispatcher.Invoke(() =>
-                {
-                    string save_path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + program_list_name.Text + "\\" + trajectory_list_name.Text + ".csv";
-                    /* Check file existing having data or not to warn the user */
-                    // Read all lines from the CSV file
-                    var lines = File.ReadAllLines(save_path); // n numbers
-                    int num = lines.Length;
-                    Saving_point_name.Content = num.ToString();
-                    if (num > 0)
-                    {
-                        Saving_stt_name.Content = "Pending...";
-                        Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(247, 249, 0));
-                        Status_mode_name.Content = "File has data inside!! Please add new or delete data!!";
-                        Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 0, 0));
-                    }
-                    else
-                    {
-                        Saving_stt_name.Content = "Writing...";
-                        Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 0, 0));
-                        Status_mode_name.Content = "Valid";
-                        Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 255, 0));
-
-                        using (StreamWriter writer = new StreamWriter(save_path, true))
-                        {
-                            string csvLine = $"{x_lpf},{y_lpf},{z_lpf}";
-                            writer.WriteLine(csvLine);
-                        }
-                    }
-                });
-            }
-
-
+            string path_csv = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + program_list_name.Text + "\\" + trajectory_list_name.Text + ".csv";
+            Modify_low_pass_filter(path_csv);
         }
         private void Test_move_mod_Click(object sender, RoutedEventArgs e)
         {
             move = 2;
-            int point_csv = 50;
+            int point_csv = 10;
             // Initialize a 2D array to hold the CSV data
             // Assuming you know the size of the array (10 rows and number of columns as per your data)
-            double[,] data = new double[100, 3];
+            double[,] data = new double[10, 3];
             for (int t = 0; t < point_csv; t++)
             {
                 data[t, 0] = selectmemberX[t];
                 data[t, 1] = selectmemberY[t];
                 data[t, 2] = selectmemberZ[t];
+
+                Console.WriteLine(selectmemberX[t].ToString());
+                Console.WriteLine(selectmemberY[t].ToString());
+                Console.WriteLine(selectmemberZ[t].ToString());
             }
 
             Move_mod_Function(data, "D1010");
@@ -2373,6 +2343,35 @@ namespace RobotArmHelix
 
             // Refresh plot view
             plotView_position.InvalidatePlot();
+        }
+
+
+        private void plot_lpf(double x, double y, double z)
+        {
+            // Update data points
+            var timestamp = DateTime.Now;
+            var dataPoint1 = new DataPoint(DateTimeAxis.ToDouble(timestamp), x);
+            var dataPoint2 = new DataPoint(DateTimeAxis.ToDouble(timestamp), y);
+            var dataPoint3 = new DataPoint(DateTimeAxis.ToDouble(timestamp), z);
+
+            // Update series
+            var series_x_pos = (LineSeries)_plotModel_position.Series[0];
+            var series_y_pos = (LineSeries)_plotModel_position.Series[1];
+            var series_z_pos = (LineSeries)_plotModel_position.Series[2];
+            series_x_pos.Points.Add(dataPoint1);
+            series_y_pos.Points.Add(dataPoint2);
+            series_z_pos.Points.Add(dataPoint3);
+
+            // Limit number of data points to keep plot responsive
+            if (series_x_pos.Points.Count > 100)
+            {
+                series_x_pos.Points.RemoveAt(0);
+                series_y_pos.Points.RemoveAt(0);
+                series_z_pos.Points.RemoveAt(0);
+            }
+
+            // Refresh plot view
+            plotView_lpf_trajectory.InvalidatePlot();
         }
 
         private void scatter(double x, double y)
@@ -2507,6 +2506,20 @@ namespace RobotArmHelix
             }
 
             return pixelArray;
+        }
+
+        private void Plot_dat_csv_Click(object sender, RoutedEventArgs e)
+        {
+            string save_path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + program_list_name.Text + "\\" + trajectory_list_name.Text + ".csv";
+            /* Check file existing having data or not to warn the user */
+            // Read all lines from the CSV file
+            var lines = File.ReadAllLines(save_path); // n numbers
+            int num = lines.Length;
+            for(int i = 0; i < num; i++)
+            {
+                var values = lines[i].Split(',').Select(double.Parse).ToArray();
+                plot_lpf(values[0], values[1], values[2]);
+            }
         }
 
         private void New_Trajectory_Click(object sender, RoutedEventArgs e)
@@ -2795,11 +2808,6 @@ namespace RobotArmHelix
             double[] z = new double[numSamples];
             //double[] t = new double[numSamples];
 
-
-            double[] low_passX = new double[numSamples];
-            double[] low_passY = new double[numSamples];
-            double[] low_passZ = new double[numSamples];
-
             // Loop through the lines and parse the coordinates
             for (int i = 0; i < numSamples; i++)
             {
@@ -2810,17 +2818,16 @@ namespace RobotArmHelix
             }
 
             /* Data to load to the PLC */
-            double alpha = 0.5;
-            int points_lpf = 100;
+            int points_lpf = 10;
             /* Take points for saving in PLC */
             double step = (double)numSamples / points_lpf;
 
             for (int j = 0; j < points_lpf; j++)
             {
                 int jump = LamTronSoThapPhan(j * step);
-                selectmemberX[j] = low_passX[jump];
-                selectmemberY[j] = low_passY[jump];
-                selectmemberZ[j] = low_passZ[jump];
+                selectmemberX[j] = x[jump];
+                selectmemberY[j] = y[jump];
+                selectmemberZ[j] = z[jump];
             }
         }
         public static int LamTronSoThapPhan(double so)

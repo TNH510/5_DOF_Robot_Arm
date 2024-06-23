@@ -154,10 +154,6 @@
                         </ComboBox>
                         <Button x:Name="Refresh_glove_btn" Content="Refresh" HorizontalAlignment="Left" Margin="198,50,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_refresh_button_Click" RenderTransformOrigin="0.48,1.838"/>
                     </Grid>
-                    <Grid HorizontalAlignment="Left" Height="228" Margin="12,526,0,0" VerticalAlignment="Top" Width="363" Background="#FFA23414" Grid.Column="1" Grid.ColumnSpan="9">
-                        <Image x:Name="displayedImage" HorizontalAlignment="Left" Height="147" Margin="11,11,0,0" VerticalAlignment="Top" Width="333"/>
-                        <Button x:Name="Process_image_btn" Content="Process" HorizontalAlignment="Left" Margin="3,184,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Process_image_button_Click" RenderTransformOrigin="0.48,1.838"/>
-                    </Grid>
                 </Grid>
             </TabItem>
             <TabItem Header="Monitor" Margin="-2,0,-11,0">
@@ -224,9 +220,9 @@
                             <ImageBrush ImageSource="/hinh-nen-windows-10-dep-32.jpg"/>
                         </Grid.Background>
                         <Label x:Name="Auto_name" Content="AUTO GENERATE" HorizontalAlignment="Center" VerticalAlignment="Top" Width="162" Foreground="#FF9EA1B0" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif"/>
-                        <Button x:Name="Enable_glove_btn" Content="ENABLE" HorizontalAlignment="Left" Margin="36,251,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_enable_button_Click"/>
-                        <Button x:Name="Disble_glove_btn" Content="DISABLE" HorizontalAlignment="Left" Margin="36,303,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_disable_button_Click" RenderTransformOrigin="0.48,1.838"/>
-                        <Button x:Name="Modify_csv_btn" Content="Modify data" HorizontalAlignment="Left" Margin="371,266,0,0" VerticalAlignment="Top" Width="100" Height="26" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Modify_dat_csv_Click"/>
+                        <Button x:Name="Enable_glove_btn" Content="ENABLE RUNTIME" HorizontalAlignment="Left" Margin="36,251,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_enable_button_Click"/>
+                        <Button x:Name="Disble_glove_btn" Content="DISABLE RUNTIME" HorizontalAlignment="Left" Margin="36,303,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_disable_button_Click" RenderTransformOrigin="0.48,1.838"/>
+                        <Button x:Name="Modify_csv_btn" Content="Modify data" HorizontalAlignment="Left" Margin="196,303,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Modify_dat_csv_Click"/>
                         <ComboBox x:Name="program_list_name" SelectedIndex="0" HorizontalAlignment="Left" Margin="156,49,0,0" VerticalAlignment="Top" Width="85"/>
                         <Label x:Name="Exist_program_name" Content="EXIST PROGRAM" HorizontalAlignment="Left" Margin="38,47,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
                         <Label x:Name="Point_save_name" Content="SAVED POINTS:" HorizontalAlignment="Left" Margin="37,158,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
@@ -256,14 +252,19 @@
                         <ComboBox x:Name="trajectory_list_name" SelectedIndex="0" HorizontalAlignment="Left" Margin="380,50,0,0" VerticalAlignment="Top" Width="129"/>
                         <Label x:Name="Exist_trajectory_name" Content="EXIST TRAJECTORY" HorizontalAlignment="Left" Margin="248,48,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
                         <Button x:Name="Create_new_trajectory_btn_Copy" Content="New trajectory" HorizontalAlignment="Left" Margin="170,92,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="New_Trajectory_Click"/>
-                        <Button x:Name="Test_move_mod" Content="Test move" HorizontalAlignment="Left" Margin="232,266,0,0" VerticalAlignment="Top" Width="90" Height="22" FontSize="11" Click="Test_move_mod_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36"/>
+                        <Button x:Name="Test_move_mod" Content="Move trajectory" HorizontalAlignment="Left" Margin="196,250,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" Click="Test_move_mod_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36"/>
                         <Label x:Name="Status_name" Content="STATUS:" HorizontalAlignment="Left" Margin="38,185,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
                         <Label x:Name="Status_mode_name" Content="OK" HorizontalAlignment="Left" Margin="99,185,0,0" VerticalAlignment="Top" Foreground="#FF00F90F" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
                         <Label x:Name="CSV_name" Content="CSV STATUS:" HorizontalAlignment="Left" Margin="37,210,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
                         <Label x:Name="Saving_stt_name" Content="Waiting..." HorizontalAlignment="Left" Margin="127,211,0,0" VerticalAlignment="Top" Foreground="#FFF7F900" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
                         <Label x:Name="Saving_point_name" Content="0" HorizontalAlignment="Left" Margin="142,158,0,0" VerticalAlignment="Top" Foreground="#FF00F90F" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
+                        <Button x:Name="Plot_lpf_btn" Content="Show data" HorizontalAlignment="Left" Margin="247,171,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Plot_dat_csv_Click"/>
                     </Grid>
-                    <oxy:PlotView x:Name="plotView_theta_Copy" Margin="646,31,536,610" Background="White" Grid.Column="1" />
+                    <oxy:PlotView x:Name="plotView_lpf_trajectory" Margin="590,19,520,482" Background="White" Grid.Column="1" />
+                    <Grid HorizontalAlignment="Left" Height="397" Margin="9,493,0,0" VerticalAlignment="Top" Width="567" Background="#FFA23414" Grid.Column="1">
+                        <Image x:Name="displayedImage" HorizontalAlignment="Left" Height="293" Margin="11,11,0,0" VerticalAlignment="Top" Width="542"/>
+                        <Button x:Name="Process_image_btn" Content="Process" HorizontalAlignment="Left" Margin="31,316,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Process_image_button_Click" RenderTransformOrigin="0.48,1.838"/>
+                    </Grid>
                 </Grid>
             </TabItem>
         </TabControl>
