@@ -2375,7 +2375,7 @@ namespace RobotArmHelix
             //Modify_polynomial_regression(filePath);
             string path_csv = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + program_list_name.Text + "\\" + trajectory_list_name.Text + ".csv";
             Modify_low_pass_filter(path_csv);
-
+            
             move = 2;
             int point_csv = 100;
             // Initialize a 2D array to hold the CSV data
@@ -2386,6 +2386,8 @@ namespace RobotArmHelix
                 data[t, 0] = selectmemberX[t];
                 data[t, 1] = selectmemberY[t];
                 data[t, 2] = selectmemberZ[t];
+
+                plot(velmember[t], 0, 0);
 
                 Console.WriteLine(selectmemberX[t].ToString());
                 Console.WriteLine(selectmemberY[t].ToString());
@@ -2995,14 +2997,14 @@ namespace RobotArmHelix
             /* Take points for saving in PLC */
             double step = (double) numSamples / points_lpf;
 
-            for (int j = 0; j < points_lpf; j++)
+            for (int j = 0; j < 50; j++)
             {
                 int jump = LamTronSoThapPhan(j * step);
                 if (j >= numSamples - 1)
                 {
-                    selectmemberX[j] = x[numSamples - 1];
-                    selectmemberY[j] = y[numSamples - 1];
-                    selectmemberZ[j] = z[numSamples - 1];
+                    selectmemberX[49] = x[numSamples - 1];
+                    selectmemberY[49] = y[numSamples - 1]; 
+                    selectmemberZ[49] = z[numSamples - 1];
                     velmember[j] = 0;
                 }
                 else
@@ -3011,16 +3013,16 @@ namespace RobotArmHelix
                     int numSamples70 = numSamples - numSamples30;
                     if (j == numSamples30)
                     {
-                        for (int m = 0; m <= j; m++)
+                        for (int m = 0; m < j; m++)
                         {
-                            velmember[m] = (int)((50 / 3) * m);
+                            velmember[m] = (int)((vel_max / numSamples30) * m);
                         }
                     }
                     else if (j == numSamples70)
                     {
-                        for (int n = 0; n < vel_max - j; n++)
+                        for (int n = 0; n < numSamples30; n++)
                         {
-                            velmember[n + numSamples70] = (int)(vel_max - (50 / 3) * n);
+                            velmember[n + numSamples70] = (int)(vel_max - (vel_max / numSamples30) * n);
                         }
                     }
                     else
