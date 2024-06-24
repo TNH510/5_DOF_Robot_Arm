@@ -40,7 +40,8 @@ static uint16_t adc_value[10] = {0};
 float adc_avr_value;
 static float adc_low_pass = 0.0f;
 static uint8_t adc_sample_count = 0;
-float elbow_angle = 66.0;
+float elbow_angle_deg = 0.0;
+float elbow_angle_rad = 0.0;
 
 float robot_x_pos, robot_y_pos, robot_z_pos;
 float x_pos, y_pos, z_pos;
@@ -144,7 +145,7 @@ base_status_t sensor_manager_test(button_name_t event)
             printf("%0.2f,%0.2f,%0.2f\r\n", x_pos, y_pos, z_pos);
             break;
         case 5:
-            printf("%0.2f,%0.2f,%0.2f\r\n", adc_low_pass, (float)adc_value[adc_sample_count], elbow_angle*57.296f);
+            printf("%0.2f,%0.2f,%0.2f\r\n", adc_low_pass, (float)adc_value[adc_sample_count], elbow_angle_deg);
             break;
         default:
             break;
@@ -277,7 +278,8 @@ static void sensor_manager_run_handle_data(void)
     }
 
     // Caculate elbow angle
-    elbow_angle = adc_avr_value * 0.0013189f - 1.1519173f; 
+    elbow_angle_deg = (adc_avr_value - 3093) / (-14.2f); 
+    elbow_angle_rad =  elbow_angle_deg * 0.0174533f;
 
     // Get sample freq 
     bsp_timer_tick_stop(&g_freq);
@@ -290,7 +292,7 @@ static void sensor_manager_run_handle_data(void)
                         g_magnetic_data.XAxis, g_magnetic_data.YAxis, g_magnetic_data.ZAxis);
 
     // Caculate kinematic
-    glv_pos_convert(q0, q1, q2, q3, elbow_angle, &x_pos, &y_pos, &z_pos);
+    glv_pos_convert(q0, q1, q2, q3, elbow_angle_rad, &x_pos, &y_pos, &z_pos);
 }
 
 static void sensor_manager_test_handle_data(void)
@@ -328,7 +330,8 @@ static void sensor_manager_test_handle_data(void)
     }
 
     // Caculate elbow angle
-    elbow_angle = adc_avr_value * 0.0013189f - 1.1519173f; 
+    elbow_angle_deg = (adc_avr_value - 3093) / (-14.2f);  
+    elbow_angle_rad =  elbow_angle_deg * 0.0174533f;
 
     // Get sample freq 
     bsp_timer_tick_stop(&g_freq);
@@ -344,7 +347,7 @@ static void sensor_manager_test_handle_data(void)
     glv_convert_euler_angle(q0, q1, q2, q3, &pitch, &roll, &yaw);
 
     // Caculate kinematic
-    glv_pos_convert(q0, q1, q2, q3, elbow_angle, &x_pos, &y_pos, &z_pos);
+    glv_pos_convert(q0, q1, q2, q3, elbow_angle_rad, &x_pos, &y_pos, &z_pos);
 }
 
 static void sensor_manager_run_button_change(button_name_t event)
