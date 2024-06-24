@@ -77,6 +77,7 @@ namespace RobotArmHelix
         public double[] selectmemberX = new double[500];
         public double[] selectmemberY = new double[500];
         public double[] selectmemberZ = new double[500];
+        public double[] velmember = new double[500];
 
         public bool low_pass_init = false;
         public int plc_csv = 0;
@@ -95,6 +96,19 @@ namespace RobotArmHelix
         public int visible_glove = 1;
         public int status_first_time = 0;
         private bool write_csv = false;
+        
+        private byte pre_byte_arr1 = 0x00;
+        public enum tracjectory_mode_t
+        {
+            MODE_IDLE, 
+            MODE_ONLY_CONTROL,
+            MODE_WAITING_START_RECORD, 
+            MODE_START_RECORD_DATA,
+            MODE_DELETE_LAST_DATA,
+            MODE_AUTO_CONTROL_RUN,
+            MODE_AUTO_CONTROL_STOP
+        }
+
         int value = 0;
         int vel_1_test;
         public int csv_lines = 0;
@@ -1933,6 +1947,10 @@ namespace RobotArmHelix
                         {
                             if (byteArray[0] == 0xAA)
                             {
+
+                                pre_byte_arr1 = byteArray[1];
+                                
+
                                 //onsole.WriteLine(byteArray[0].ToString("X"));
                                 switch (byteArray[1])
                                 {
@@ -1964,7 +1982,7 @@ namespace RobotArmHelix
                                         y_vel = CombineBytesToInt16Vel(byteArray[14], byteArray[15]) / 10.0;
                                         z_vel = CombineBytesToInt16Vel(byteArray[16], byteArray[17]) / 10.0;
 
-                                        plot(x_vel, y_vel, z_vel);
+                                        //plot(x_vel, y_vel, z_vel);
 
                                         if (x_pos >= 0x800000)
                                         {
@@ -2011,9 +2029,9 @@ namespace RobotArmHelix
                                         Jacobi_plus = CreateJacobianMatrix(t1 * Math.PI / 180.0, t2 * Math.PI / 180.0, t3 * Math.PI / 180.0, t4 * Math.PI / 180.0, t5 * Math.PI / 180.0);
                                         Jacobi_vel = CreateVelocityMatrix(x_vel, y_vel, z_vel);
                                         omega = MultiplyMatrices(Jacobi_plus, Jacobi_vel);
-                                        omega1_plc = omega[0] * 1800 * 15 / Math.PI + 100.0;
-                                        omega2_plc = omega[1] * 1800 * 5 / Math.PI + 50.0;
-                                        omega3_plc = omega[2] * 1800 * 5 / Math.PI + 50.0;
+                                        omega1_plc = omega[0] * 1800 * 35 / Math.PI + 100.0;
+                                        omega2_plc = omega[1] * 1800 * 15 / Math.PI + 150.0;
+                                        omega3_plc = omega[2] * 1800 * 15 / Math.PI + 150.0;
                                         omega4_plc = -(omega[1] + omega[2]) * 1800 * 20 / Math.PI + 100.0;
                                         omega5_plc = 0.0; 
 
@@ -2030,17 +2048,17 @@ namespace RobotArmHelix
                                                 Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 255, 0));
                                             });
                                             /* Anti wind-up */
-                                            if (Math.Abs(omega1_plc) >= 500)
+                                            if (Math.Abs(omega1_plc) >= 1000)
                                             {
-                                                omega1_plc = 500;
+                                                omega1_plc = 1000;
                                             }
-                                            if (Math.Abs(omega2_plc) >= 300)
+                                            if (Math.Abs(omega2_plc) >= 600)
                                             {
-                                                omega2_plc = 300;
+                                                omega2_plc = 600;
                                             }
-                                            if (Math.Abs(omega3_plc) >= 300)
+                                            if (Math.Abs(omega3_plc) >= 600)
                                             {
-                                                omega3_plc = 300;
+                                                omega3_plc = 600;
                                             }
 
                                             if (write_csv == true)
@@ -2069,25 +2087,14 @@ namespace RobotArmHelix
                                                             writer.WriteLine(csvLine);
                                                         }
                                                     });
-
                                                 }
                                             }
-
-                                            //plot(Math.Abs(omega1_plc), Math.Abs(omega2_plc), Math.Abs(omega3_plc));
-                                            //plot(x_vel);
-                                            //scatter(x, y);
-                                            //Console.WriteLine("---");
-
-                                            //plot(x_lpf, y_lpf, z_lpf);
-                                            //plot(x, y, z);
-
-                                            //plot(Math.Abs(omega[0]) * 5, Math.Abs(omega[1]) * 5, Math.Abs(omega[2] * 5));
-
 
                                             adaptive_runtime(x, y, z, Math.Abs(omega1_plc), Math.Abs(omega2_plc), Math.Abs(omega3_plc), Math.Abs(omega4_plc), Math.Abs(omega5_plc), glove_enable);
                                         }
                                         else
                                         {
+
                                             Dispatcher.Invoke(() =>
                                             {
                                                 Saving_stt_name.Content = "";
@@ -2095,26 +2102,35 @@ namespace RobotArmHelix
                                                 Status_mode_name.Content = "DATA FAIL";
                                                 Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 0, 0));
                                             });
+
                                         }
                                     // plot(x, y, z);
                                     break;
 
                                     case 0x01:
+
                                         if (write_csv == true)
                                         {
+
                                             write_csv = false;
                                             low_pass_init = false;
                                             plc_en = false;
                                             plc_stt++;
+
+                                            Dispatcher.Invoke(() =>
+                                            {
                                             Name_csv.Content = plc_program_arr[plc_stt].ToString();
                                             Name_csv.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 255, 0));
+                                            });
+
+
                                         }
                                         else
                                         {
+
                                             write_csv = true;
                                             plc_en = true;
 
-                                            
                                         }
                                         Console.WriteLine(write_csv.ToString());
                                         Console.WriteLine("Hehe");
@@ -2327,38 +2343,56 @@ namespace RobotArmHelix
         {
             //Modify_polynomial_regression(filePath);
             string path_csv = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + program_list_name.Text + "\\" + trajectory_list_name.Text + ".csv";
-            //Modify_low_pass_filter(path_csv);
-            
+            Modify_low_pass_filter(path_csv);
 
-            if (write_csv == false)
+            move = 2;
+            int point_csv = 100;
+            // Initialize a 2D array to hold the CSV data
+            // Assuming you know the size of the array (10 rows and number of columns as per your data)
+            double[,] data = new double[100, 3];
+            for (int t = 0; t < point_csv; t++)
             {
-                if (plc_en == false)
-                {
+                data[t, 0] = selectmemberX[t];
+                data[t, 1] = selectmemberY[t];
+                data[t, 2] = selectmemberZ[t];
 
-                    Dispatcher.Invoke(() =>
-                    {
-                        /* Find data*/
-
-                        string duongDanCoSo = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + "plc\\";
-                        string tenTrajectory = plc_program_arr[plc_stt];
-                        string duongDanDayDu = Path.Combine(duongDanCoSo, tenTrajectory);
-                        string tenFileKhongDuoi = Path.GetFileNameWithoutExtension(duongDanDayDu);
-
-                        Saving_stt_name.Content = "Writing...";
-                        Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 0, 0));
-                        Status_mode_name.Content = "Valid";
-                        Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 255, 0));
-
-                        using (StreamWriter writer = new StreamWriter(duongDanDayDu, true))
-                        {
-                            string csvLine = $"{x_lpf},{y_lpf},{z_lpf}";
-                            writer.WriteLine(csvLine);
-                        }
-                    });
-
-                }
+                Console.WriteLine(selectmemberX[t].ToString());
+                Console.WriteLine(selectmemberY[t].ToString());
+                Console.WriteLine(selectmemberZ[t].ToString());
             }
-            plc_stt++;
+
+            Move_mod_Function(data, "D1010");
+
+
+            //if (write_csv == false)
+            //{
+            //    if (plc_en == false)
+            //    {
+
+            //        Dispatcher.Invoke(() =>
+            //        {
+            //            /* Find data*/
+
+            //            string duongDanCoSo = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + "plc\\";
+            //            string tenTrajectory = plc_program_arr[plc_stt];
+            //            string duongDanDayDu = Path.Combine(duongDanCoSo, tenTrajectory);
+            //            string tenFileKhongDuoi = Path.GetFileNameWithoutExtension(duongDanDayDu);
+
+            //            Saving_stt_name.Content = "Writing...";
+            //            Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 0, 0));
+            //            Status_mode_name.Content = "Valid";
+            //            Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 255, 0));
+
+            //            using (StreamWriter writer = new StreamWriter(duongDanDayDu, true))
+            //            {
+            //                string csvLine = $"{x_lpf},{y_lpf},{z_lpf}";
+            //                writer.WriteLine(csvLine);
+            //            }
+            //        });
+
+            //    }
+            //}
+            //plc_stt++;
         }
         private void Test_move_mod_Click(object sender, RoutedEventArgs e)
         {
@@ -2926,8 +2960,9 @@ namespace RobotArmHelix
 
             /* Data to load to the PLC */
             int points_lpf = 100;
+            int vel_max = 500;
             /* Take points for saving in PLC */
-            double step = (double)numSamples / points_lpf;
+            double step = (double) numSamples / points_lpf;
 
             for (int j = 0; j < points_lpf; j++)
             {
@@ -2937,9 +2972,30 @@ namespace RobotArmHelix
                     selectmemberX[j] = x[numSamples - 1];
                     selectmemberY[j] = y[numSamples - 1];
                     selectmemberZ[j] = z[numSamples - 1];
+                    velmember[j] = 0;
                 }
                 else
                 {
+                    int numSamples30 = (int)(numSamples * 0.3);
+                    int numSamples70 = numSamples - numSamples30;
+                    if (j == numSamples30)
+                    {
+                        for (int m = 0; m <= j; m++)
+                        {
+                            velmember[m] = (int)((50 / 3) * m);
+                        }
+                    }
+                    else if (j == numSamples70)
+                    {
+                        for (int n = 0; n < vel_max - j; n++)
+                        {
+                            velmember[n + numSamples70] = (int)(vel_max - (50 / 3) * n);
+                        }
+                    }
+                    else
+                    {
+                        velmember[j] = vel_max;
+                    }
                     selectmemberX[j] = x[jump];
                     selectmemberY[j] = y[jump];
                     selectmemberZ[j] = z[jump];
