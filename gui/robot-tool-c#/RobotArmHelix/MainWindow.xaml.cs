@@ -2997,14 +2997,14 @@ namespace RobotArmHelix
             /* Take points for saving in PLC */
             double step = (double) numSamples / points_lpf;
 
-            for (int j = 0; j < 50; j++)
+            for (int j = 0; j < points_lpf; j++)
             {
                 int jump = LamTronSoThapPhan(j * step);
                 if (j >= numSamples - 1)
                 {
-                    selectmemberX[49] = x[numSamples - 1];
-                    selectmemberY[49] = y[numSamples - 1]; 
-                    selectmemberZ[49] = z[numSamples - 1];
+                    selectmemberX[j] = x[numSamples - 1];
+                    selectmemberY[j] = y[numSamples - 1]; 
+                    selectmemberZ[j] = z[numSamples - 1];
                     velmember[j] = 0;
                 }
                 else
