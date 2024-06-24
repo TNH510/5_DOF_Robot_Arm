@@ -228,6 +228,7 @@
     <Resource Include="hinh-nen-win-10-co-logo-4-mau.jpg" />
     <Resource Include="image\113.bmp" />
     <Resource Include="image\120.bmp" />
+    <Resource Include="image\bg_cv.jpg" />
     <Content Include="lib\HelixToolkit.dll" />
     <Content Include="lib\HelixToolkit.pdb" />
     <Content Include="lib\HelixToolkit.Wpf.dll" />

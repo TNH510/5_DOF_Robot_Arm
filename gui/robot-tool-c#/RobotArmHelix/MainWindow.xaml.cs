@@ -79,8 +79,13 @@ namespace RobotArmHelix
         public double[] selectmemberZ = new double[500];
 
         public bool low_pass_init = false;
+        public int plc_csv = 0;
         public double x_lpf = 0.0, y_lpf = 0.0, z_lpf = 0.0;
         public double alpha = 0.5;
+
+        public string[] plc_program_arr = { "home.csv", "conveyor1_in.csv", "conveyor1_out.csv", "conveyor2_in.csv", "conveyor2_out.csv", "conveyor3_in.csv", "conveyor3_out.csv", "conveyor4_in.csv", "conveyor4_out.csv" };
+        public int plc_stt = 0;
+        public bool plc_en = false;
 
         public int visible_robot = 1;
         public int visible_display = 1;
@@ -90,9 +95,9 @@ namespace RobotArmHelix
         public int visible_glove = 1;
         public int status_first_time = 0;
         private bool write_csv = false;
-        private bool wrt_stt = true;
         int value = 0;
         int vel_1_test;
+        public int csv_lines = 0;
         double[] point1_test = new double[3];
         double[] point2_test = new double[3];
 
@@ -307,6 +312,10 @@ namespace RobotArmHelix
 
             #endregion
 
+
+            /* Check csv files */
+            string[] csvfiles = LayTenTatCaFileCSV(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" +"plc\\");
+            plc_stt = csvfiles.Length;
         }
 
         #region Thread_Timer
@@ -1456,6 +1465,7 @@ namespace RobotArmHelix
         {
             double t1, t2, t3, t4, t5;
             int[,] angle_array = new int[100, 5];
+            int[] vel_array = new int[100];
             double x, y, z;
             int ret;
             int[] value_angle = new int[800];
@@ -1467,8 +1477,6 @@ namespace RobotArmHelix
                 x = tar_pos[t,0];
                 y = tar_pos[t,1];
                 z = tar_pos[t,2];
-                //if (z >= 500 && z <= 1000)
-                //{
                 (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
                 if(t1 > Constants.T1_LU) t1 = Constants.T1_LU;
                 else if(t1 < Constants.T1_LD) t1 = Constants.T1_LD;
@@ -1485,19 +1493,29 @@ namespace RobotArmHelix
                 t2 -= 90.0;
                 t3 += 90.0;
                 t4 += 90.0;
+
                 /* Assign value */
                 angle_array[t, 0] = (int)(t1 * 100000 + 18000000);
                 angle_array[t, 1] = (int)(t2 * 100000 + 18000000);
                 angle_array[t, 2] = (int)(t3 * 100000 + 18000000);
                 angle_array[t, 3] = (int)(t4 * 100000 + 18000000);
                 angle_array[t, 4] = (int)(t5 * 100000);
-                //}
-                //else
-                //{
-                //    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", "Out of range of Z axis"));
-                //}
 
+                /* Write velocity */
+                if(t <= (int )csv_lines * 0.3)
+                {
+                    vel_array[t] = 100;
+                }
+                else if( t >= (int ) csv_lines * 0.7)
+                {
+                    vel_array[t] = 100;    
+                }
+                else
+                {
+                    vel_array[t] = 1000;
+                }
             }
+
             Memory_angle_write(angle_array, value_angle, device, 100);
 
             //for (int j = 0; j < 100; j++)
@@ -1804,14 +1822,6 @@ namespace RobotArmHelix
                 value_angle[8 * j + 6] = Write_Theta(array[j, 3])[0];
                 value_angle[8 * j + 7] = Write_Theta(array[j, 3])[1];
 
-                //PrintLog("vect", "value:", Convert.ToString(value_angle[8 * j]));
-                //PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 1]));
-                //PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 2]));
-                //PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 3]));
-                //PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 4]));
-                //PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 5]));
-                //PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 6]));
-                //PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 7]));
             }
             plc.WriteDeviceBlock(device, 8 * point, ref value_angle[0]);
         }
@@ -1981,7 +1991,13 @@ namespace RobotArmHelix
 
                                         if (ret == 0)
                                         {
-
+                                            Dispatcher.Invoke(() =>
+                                            {
+                                                Saving_stt_name.Content = "Writing...";
+                                                Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 0, 0));
+                                                Status_mode_name.Content = "DATA OK";
+                                                Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 255, 0));
+                                            });
                                             /* Anti wind-up */
                                             if (Math.Abs(omega1_plc) >= 500)
                                             {
@@ -1998,37 +2014,32 @@ namespace RobotArmHelix
 
                                             if (write_csv == true)
                                             {
-
-                                                Dispatcher.Invoke(() =>
+                                                if(plc_en == true)
                                                 {
-                                                    string save_path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + program_list_name.Text + "\\" + trajectory_list_name.Text + ".csv";
-                                                    /* Check file existing having data or not to warn the user */
-                                                    // Read all lines from the CSV file
-                                                    var lines = File.ReadAllLines(save_path); // n numbers
-                                                    int num = lines.Length;
-                                                    Saving_point_name.Content = num.ToString();
 
-                                                    if (wrt_stt == false)
-                                                    {
-                                                        Saving_stt_name.Content = "Pending...";
-                                                        Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(247, 249, 0));
-                                                        Status_mode_name.Content = "File has data inside!! Please add new or delete data!!";
-                                                        Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 0, 0));
-                                                    }
-                                                    else if(wrt_stt == true)
-                                                    {
-                                                        Saving_stt_name.Content = "Writing...";
-                                                        Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 0, 0));
-                                                        Status_mode_name.Content = "Valid";
-                                                        Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(247, 249, 0));
+                                                    Dispatcher.Invoke(() =>
+                                                    { 
+                                                        /**/
+                                                        string duongDanCoSo = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + "plc\\";
+                                                        string tenTrajectory = plc_program_arr[plc_stt];
+                                                        string duongDanDayDu = Path.Combine(duongDanCoSo, tenTrajectory);
+                                                        string tenFileKhongDuoi = Path.GetFileNameWithoutExtension(duongDanDayDu);
 
-                                                        using (StreamWriter writer = new StreamWriter(save_path, true))
+                                                        if (File.Exists(duongDanDayDu))
+                                                        {
+                                                            var lines = File.ReadAllLines(duongDanDayDu); // n numbers
+                                                            int num = lines.Length;
+                                                            Saving_point_name.Content = num.ToString();
+                                                        }
+
+                                                        using (StreamWriter writer = new StreamWriter(duongDanDayDu, true))
                                                         {
                                                             string csvLine = $"{x_lpf},{y_lpf},{z_lpf}";
                                                             writer.WriteLine(csvLine);
                                                         }
-                                                    }
-                                                });
+                                                    });
+
+                                                }
                                             }
 
                                             //plot(Math.Abs(omega1_plc), Math.Abs(omega2_plc), Math.Abs(omega3_plc));
@@ -2044,6 +2055,16 @@ namespace RobotArmHelix
 
                                             adaptive_runtime(x, y, z, Math.Abs(omega1_plc), Math.Abs(omega2_plc), Math.Abs(omega3_plc), Math.Abs(omega4_plc), Math.Abs(omega5_plc), glove_enable);
                                         }
+                                        else
+                                        {
+                                            Dispatcher.Invoke(() =>
+                                            {
+                                                Saving_stt_name.Content = "";
+                                                Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 0, 0));
+                                                Status_mode_name.Content = "DATA FAIL";
+                                                Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 0, 0));
+                                            });
+                                        }
                                     // plot(x, y, z);
                                     break;
 
@@ -2051,21 +2072,22 @@ namespace RobotArmHelix
                                         if (write_csv == true)
                                         {
                                             write_csv = false;
-                                            wrt_stt = false;
                                             low_pass_init = false;
-                                            Dispatcher.Invoke(() =>
-                                            {
-                                                string save_path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + program_list_name.Text + "\\" + trajectory_list_name.Text + ".csv";
-                                                Modify_low_pass_filter(save_path);
-                                            });
+                                            plc_en = false;
+                                            plc_stt++;
+                                            Name_csv.Content = plc_program_arr[plc_stt].ToString();
+                                            Name_csv.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 255, 0));
                                         }
-                                        else if (write_csv == false)
+                                        else
                                         {
                                             write_csv = true;
+                                            plc_en = true;
+
                                             
                                         }
                                         Console.WriteLine(write_csv.ToString());
                                         Console.WriteLine("Hehe");
+                                        Console.WriteLine(plc_stt.ToString());
                                     break;
                                     default:
                                     Console.WriteLine("Hex value is not 0x1, 0x2, 0xA, or 0xB");
@@ -2274,7 +2296,38 @@ namespace RobotArmHelix
         {
             //Modify_polynomial_regression(filePath);
             string path_csv = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + program_list_name.Text + "\\" + trajectory_list_name.Text + ".csv";
-            Modify_low_pass_filter(path_csv);
+            //Modify_low_pass_filter(path_csv);
+            
+
+            if (write_csv == false)
+            {
+                if (plc_en == false)
+                {
+
+                    Dispatcher.Invoke(() =>
+                    {
+                        /* Find data*/
+
+                        string duongDanCoSo = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + "plc\\";
+                        string tenTrajectory = plc_program_arr[plc_stt];
+                        string duongDanDayDu = Path.Combine(duongDanCoSo, tenTrajectory);
+                        string tenFileKhongDuoi = Path.GetFileNameWithoutExtension(duongDanDayDu);
+
+                        Saving_stt_name.Content = "Writing...";
+                        Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 0, 0));
+                        Status_mode_name.Content = "Valid";
+                        Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 255, 0));
+
+                        using (StreamWriter writer = new StreamWriter(duongDanDayDu, true))
+                        {
+                            string csvLine = $"{x_lpf},{y_lpf},{z_lpf}";
+                            writer.WriteLine(csvLine);
+                        }
+                    });
+
+                }
+            }
+            plc_stt++;
         }
         private void Test_move_mod_Click(object sender, RoutedEventArgs e)
         {
@@ -2383,9 +2436,6 @@ namespace RobotArmHelix
                 series_y_pos.Points.RemoveAt(0);
                 series_z_pos.Points.RemoveAt(0);
             }
-
-            // Refresh plot view
-            plotView_lpf_trajectory.InvalidatePlot();
         }
 
         private void scatter(double x, double y)
@@ -2466,11 +2516,14 @@ namespace RobotArmHelix
 
         private void Delete_dat_csv_Click(object sender, RoutedEventArgs e)
         {
-            wrt_stt = true;
-            string delete_path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + program_list_name.Text + "\\" + trajectory_list_name.Text + ".csv";
+            string delete_path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + "plc\\" + plc_program_arr[plc_stt];
 
             // Clear the file contents
-            File.WriteAllText(delete_path, string.Empty);
+            File.Delete(delete_path); // Xóa file nếu nó tồn tại
+            if(plc_stt > 0)
+            {
+                plc_stt = plc_stt - 1;
+            }
         }
 
         private void Process_image_button_Click(object sender, RoutedEventArgs e)
@@ -2536,9 +2589,18 @@ namespace RobotArmHelix
             }
         }
 
+        private void Enable_plc_button_Click(object sender, RoutedEventArgs e)
+        {
+            plc_en = true;
+        }
+
+        private void Disable_plc_button_Click(object sender, RoutedEventArgs e)
+        {
+            plc_en = false;
+        }
+
         private void New_Trajectory_Click(object sender, RoutedEventArgs e)
         {
-            wrt_stt = true;
             string duongDanCoSo = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + program_list_name.Text + "\\";
             string tenTrajectory = "trajectory" + ".csv";
             string duongDanDayDu = Path.Combine(duongDanCoSo, tenTrajectory);
@@ -2817,10 +2879,10 @@ namespace RobotArmHelix
 
             // Initialize arrays to store the coordinates
             int numSamples = lines.Length;
+            csv_lines = lines.Length;
             double[] x = new double[numSamples];
             double[] y = new double[numSamples];
             double[] z = new double[numSamples];
-            //double[] t = new double[numSamples];
 
             // Loop through the lines and parse the coordinates
             for (int i = 0; i < numSamples; i++)
@@ -2852,6 +2914,8 @@ namespace RobotArmHelix
                     selectmemberZ[j] = z[jump];
                 }
             }
+
+
         }
         public static int LamTronSoThapPhan(double so)
         {
