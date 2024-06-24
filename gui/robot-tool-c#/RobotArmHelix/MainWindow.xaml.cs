@@ -1950,6 +1950,10 @@ namespace RobotArmHelix
                         {
                             if (byteArray[0] == 0xAA)
                             {
+                                // Position variables (double)
+                                double x = 0, y = 0, z = 0;
+                                // Omega placeholders
+                                double omega1_plc = 0.0, omega2_plc = 0.0, omega3_plc = 0.0, omega4_plc = 0.0, omega5_plc = 0.0;
                                 // Always check cmd
                                 cur_cmd = byteArray[1];
 
@@ -1967,11 +1971,6 @@ namespace RobotArmHelix
 
                                 case tracjectory_mode_t.MODE_ONLY_CONTROL:
                                 Console.WriteLine("MODE_ONLY_CONTROL");
-                                // Position variables (double)
-                                double x = 0, y = 0, z = 0;
-                                // Omega placeholders
-                                double omega1_plc = 0.0, omega2_plc = 0.0, omega3_plc = 0.0, omega4_plc = 0.0, omega5_plc = 0.0;
-
                                 // Handle only control here
                                 if(update_pos_vel_data(byteArray, out x, out y, out z, out omega1_plc, out omega2_plc,  out omega3_plc, out omega4_plc, out omega5_plc))
                                 {
@@ -1981,6 +1980,7 @@ namespace RobotArmHelix
                                 if (csv_write_enable == true)
                                 {
                                     g_trajectory_mode= tracjectory_mode_t.MODE_WAITING_START_RECORD;
+                                    
                                 }
                                 else if (glove_enable == 0)
                                 {
@@ -1993,6 +1993,10 @@ namespace RobotArmHelix
                                 Console.WriteLine("MODE_WAITING_START_RECORD");
 
                                 // Handle Waiting start record here
+                                if(update_pos_vel_data(byteArray, out x, out y, out z, out omega1_plc, out omega2_plc,  out omega3_plc, out omega4_plc, out omega5_plc))
+                                {
+                                    adaptive_runtime(x, y, z, omega1_plc, omega2_plc, omega3_plc, omega4_plc, omega5_plc);
+                                }
 
                                 if (plc_stt <= 8 && pre_cmd == 0 && cur_cmd == 1)
                                 {
@@ -2002,6 +2006,7 @@ namespace RobotArmHelix
                                     {
                                         plc_stt = 8;
                                     }
+                                    
                                 }
                                 else if (csv_write_enable == false)
                                 {
@@ -2014,8 +2019,31 @@ namespace RobotArmHelix
                                 Console.WriteLine("MODE_START_RECORD_DATA");
                                 Console.WriteLine("Trajectory"+ plc_stt.ToString());
 
-                                // Handle start record here
+                                // Handle only control here
+                                if(update_pos_vel_data(byteArray, out x, out y, out z, out omega1_plc, out omega2_plc,  out omega3_plc, out omega4_plc, out omega5_plc))
+                                {
+                                    adaptive_runtime(x, y, z, omega1_plc, omega2_plc, omega3_plc, omega4_plc, omega5_plc);
+                                }
+                                Dispatcher.Invoke(() =>
+                                { 
+                                   /**/
+                                   string duongDanCoSo = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + "plc\\";
+                                   string tenTrajectory = plc_program_arr[plc_stt];
+                                   string duongDanDayDu = Path.Combine(duongDanCoSo, tenTrajectory);
+                                   string tenFileKhongDuoi = Path.GetFileNameWithoutExtension(duongDanDayDu);
 
+                                   if (File.Exists(duongDanDayDu))
+                                   {
+                                       var lines = File.ReadAllLines(duongDanDayDu); // n numbers
+                                       int num = lines.Length;
+                                       Saving_point_name.Content = num.ToString();
+                                   }
+                                   using (StreamWriter writer = new StreamWriter(duongDanDayDu, true))
+                                   {
+                                       string csvLine = $"{x_lpf},{y_lpf},{z_lpf}";
+                                       writer.WriteLine(csvLine);
+                                   }
+                                });
                                 if (pre_cmd == 0x01 && cur_cmd == 0x00)
                                 {
                                     g_trajectory_mode = tracjectory_mode_t.MODE_WAITING_START_RECORD;
