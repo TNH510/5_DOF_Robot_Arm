@@ -1544,20 +1544,6 @@ namespace RobotArmHelix
                 angle_array[t, 2] = (int)(t3 * 100000 + 18000000);
                 angle_array[t, 3] = (int)(t4 * 100000 + 18000000);
                 angle_array[t, 4] = (int)(t5 * 100000);
-
-                /* Write velocity */
-                if(t <= (int )csv_lines * 0.3)
-                {
-                    vel_array[t] = 100;
-                }
-                else if( t >= (int ) csv_lines * 0.7)
-                {
-                    vel_array[t] = 100;    
-                }
-                else
-                {
-                    vel_array[t] = 1000;
-                }
             }
 
             Memory_angle_write(angle_array, value_angle, device, 100);
@@ -2180,10 +2166,20 @@ namespace RobotArmHelix
             /* Read status of Brake and AC Servo */
             ret = PLCReadbit(Constants.MOVEL_PATH, out movepath_status);
 
-
             ///* đang bỏ qua điều kiện Z --> Phải nhớ để add vô sau */
             ////---------------------------------
             (t1_adapt, t2_adapt, t3_adapt, t4_adapt, t5_adapt) = convert_position_angle(x, y, z);
+
+            double[] angles_csv = { t1_adapt, t2_adapt - 90, t3_adapt + 90, t4_adapt + 90, t5_adapt };
+            double[] glv_quaternion = { 0, 0, 0, 1 };
+
+            // Update UI asynchronously using Dispatcher
+            Dispatcher.Invoke(() =>
+            {
+                /* Update position for robot on GUI */
+                ForwardKinematics(angles_csv, glv_quaternion);
+            });
+
             int[] temp_value = new int[5];
             int[] value_angle = new int[10];
             /* Run */
@@ -2381,19 +2377,22 @@ namespace RobotArmHelix
             // Initialize a 2D array to hold the CSV data
             // Assuming you know the size of the array (10 rows and number of columns as per your data)
             double[,] data = new double[100, 3];
+            double[] vel = new double[100];
             for (int t = 0; t < point_csv; t++)
             {
                 data[t, 0] = selectmemberX[t];
                 data[t, 1] = selectmemberY[t];
                 data[t, 2] = selectmemberZ[t];
-
+                vel[t] = velmember[t];
                 plot(velmember[t], 0, 0);
 
-                Console.WriteLine(selectmemberX[t].ToString());
-                Console.WriteLine(selectmemberY[t].ToString());
-                Console.WriteLine(selectmemberZ[t].ToString());
-            }
 
+                //Console.WriteLine(velmember[t].ToString());
+                //Console.WriteLine(selectmemberX[t].ToString());
+                //Console.WriteLine(selectmemberY[t].ToString());
+                //Console.WriteLine(selectmemberZ[t].ToString());
+            }
+            Console.WriteLine(velmember[42].ToString());
             Move_mod_Function(data, "D1010");
 
 
@@ -3011,23 +3010,20 @@ namespace RobotArmHelix
                 {
                     int numSamples30 = (int)(numSamples * 0.3);
                     int numSamples70 = numSamples - numSamples30;
-                    if (j == numSamples30)
+                    if (j < numSamples30)
                     {
-                        for (int m = 0; m < j; m++)
-                        {
-                            velmember[m] = (int)((vel_max / numSamples30) * m);
-                        }
+                        velmember[j] = (int)((vel_max / numSamples30) * j);
                     }
-                    else if (j == numSamples70)
+                    else if (j < numSamples70)
                     {
-                        for (int n = 0; n < numSamples30; n++)
-                        {
-                            velmember[n + numSamples70] = (int)(vel_max - (vel_max / numSamples30) * n);
-                        }
+                        // Set to vel_max
+                        velmember[j] = vel_max;
                     }
                     else
                     {
-                        velmember[j] = vel_max;
+                        // Linearly ramp down from vel_max to 0
+                        int n = j - numSamples70;
+                        velmember[j] = (int)(vel_max - (vel_max / numSamples30) * n);
                     }
                     selectmemberX[j] = x[jump];
                     selectmemberY[j] = y[jump];
