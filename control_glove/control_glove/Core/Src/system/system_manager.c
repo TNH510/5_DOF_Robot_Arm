@@ -71,30 +71,30 @@ void system_manager_task(void)
         }
         break;
     case SYS_MODE_CALIB:
-        // // Set Mode Calib LED state
-        // if (sensor_manager_is_yaw_angle_calib() == true)
-        // {
-            //  drv_led_turn_on_red_led();
+        // Set Mode Calib LED state
+        if (sensor_manager_is_yaw_angle_calib() == true)
+        {
+            drv_led_turn_on_red_led();
             sensor_manager_update_data();
             drv_led_turn_on_green_led();
-        // }
-        // else
-        // {
+        }
+        else
+        {
             static uint32_t tick_red_led = 0;
             if (HAL_GetTick() - tick_red_led > 500)
             {
-                // if (HAL_GetTick() - tick_red_led > 1000)
-                // {
-                //     drv_led_turn_on_red_led();
+                if (HAL_GetTick() - tick_red_led > 1000)
+                {
+                    drv_led_turn_on_red_led();
                     tick_red_led = HAL_GetTick();
-                // }
-                // else
-                // {
+                }
+                else
+                {
                     sensor_manager_calib(g_button_state);
-                //     drv_led_turn_off_red_led();
-                // }
+                    drv_led_turn_off_red_led();
+                }
             }
-        // }
+        }
 
         if (g_button_state_pre != HOLD_SELECT_BUTTON && g_button_state == HOLD_SELECT_BUTTON)
         {

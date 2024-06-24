@@ -100,20 +100,14 @@ base_status_t sensor_manager_update_data(void)
 
 base_status_t sensor_manager_calib(button_name_t event)
 {
-    // if (event == CLICK_LEFT_BUTTON)
-    // {
+    if (event == CLICK_LEFT_BUTTON)
+    {
         g_yaw_angle_calib_result = sensor_manager_caculate_current_yaw();
-        printf("Yaw Calib: %0.2f\r\n", g_yaw_angle_calib_result);
+        printf("Yaw Calib: %0.2f\r\n", g_yaw_angle_calib_result * 180.0 / M_PI);
+        glv_set_init_yaw(g_yaw_angle_calib_result);
 
-        // if (g_is_yaw_angle_calib == false)
-        // {
-        //     g_is_yaw_angle_calib = true;
-        // }
-        // else
-        // {
-        //     g_is_yaw_angle_calib = false;
-        // }
-    // }
+        g_is_yaw_angle_calib = true;
+    }
 
     return BS_OK;
 }
@@ -419,7 +413,7 @@ static float sensor_manager_caculate_current_yaw(void)
         g_yaw_angle_calib_result = 2 * M_PI - asin(-y_pos/sqrt(x_pos * x_pos + y_pos * y_pos));
     }
 
-    return g_yaw_angle_calib_result * 180.0 / M_PI; 
+    return g_yaw_angle_calib_result; 
 }
 
 #ifdef I2C_RECOVERY
