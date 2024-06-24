@@ -86,7 +86,7 @@ namespace RobotArmHelix
 
         public string[] plc_program_arr = { "home.csv", "conveyor1_in.csv", "conveyor1_out.csv", "conveyor2_in.csv", "conveyor2_out.csv", "conveyor3_in.csv", "conveyor3_out.csv", "conveyor4_in.csv", "conveyor4_out.csv" };
         public int plc_stt = 0;
-        public bool plc_en = false;
+        public bool csv_write_enable = false;
 
         public int visible_robot = 1;
         public int visible_display = 1;
@@ -98,6 +98,9 @@ namespace RobotArmHelix
         private bool write_csv = false;
         
         private byte pre_byte_arr1 = 0x00;
+
+        public byte pre_cmd = 0x00;
+        public byte cur_cmd = 0x00;
         public enum tracjectory_mode_t
         {
             MODE_IDLE, 
@@ -105,9 +108,9 @@ namespace RobotArmHelix
             MODE_WAITING_START_RECORD, 
             MODE_START_RECORD_DATA,
             MODE_DELETE_LAST_DATA,
-            MODE_AUTO_CONTROL_RUN,
-            MODE_AUTO_CONTROL_STOP
         }
+
+        tracjectory_mode_t g_trajectory_mode = tracjectory_mode_t.MODE_IDLE;
 
         int value = 0;
         int vel_1_test;
@@ -1947,199 +1950,75 @@ namespace RobotArmHelix
                         {
                             if (byteArray[0] == 0xAA)
                             {
+                                // Always check cmd
+                                cur_cmd = byteArray[1];
 
-                                pre_byte_arr1 = byteArray[1];
-                                
-
-                                //onsole.WriteLine(byteArray[0].ToString("X"));
-                                switch (byteArray[1])
+                                switch (g_trajectory_mode)
                                 {
-                                    case 0x00:
-                                        // Position variables (integer)
-                                        int x_pos = 0, y_pos = 0, z_pos = 0;
+                                case tracjectory_mode_t.MODE_IDLE:
+                                Console.WriteLine("MODE_IDLE");
 
-                                        // Position variables (double)
-                                        double x = 0, y = 0, z = 0;
-
-                                        // Velocity variables (double)
-                                        double x_vel = 0, y_vel = 0, z_vel = 0;
-
-                                        // Jacobian matrices
-                                        double[,] Jacobi_plus = new double[5, 3];
-                                        double[,] Jacobi_vel = new double[3, 1];
-
-                                        // Omega array
-                                        double[] omega = new double[5];
-
-                                        // Omega placeholders
-                                        double omega1_plc = 0.0, omega2_plc = 0.0, omega3_plc = 0.0, omega4_plc = 0.0, omega5_plc = 0.0;
-
-                                        x_pos = CombineBytesToInt32(byteArray[2], byteArray[3], byteArray[4]);
-                                        y_pos = CombineBytesToInt32(byteArray[5], byteArray[6], byteArray[7]);
-                                        z_pos = CombineBytesToInt32(byteArray[8], byteArray[9], byteArray[10]);
-
-                                        x_vel = CombineBytesToInt16Vel(byteArray[12], byteArray[13]) / 10.0; // cm/s
-                                        y_vel = CombineBytesToInt16Vel(byteArray[14], byteArray[15]) / 10.0;
-                                        z_vel = CombineBytesToInt16Vel(byteArray[16], byteArray[17]) / 10.0;
-
-                                        //plot(x_vel, y_vel, z_vel);
-
-                                        if (x_pos >= 0x800000)
-                                        {
-                                            x_pos = (x_pos - 0x800000);
-                                            x_pos = (-1) * x_pos;
-                                        }
-                                        x = x_pos / 10000.0;
-
-                                        if (y_pos >= 0x800000)
-                                        {
-                                            y_pos = (y_pos - 0x800000);
-                                            y_pos = (-1) * y_pos;
-                                        }
-                                        y = y_pos / 10000.0;
-
-                                        if (z_pos >= 0x800000)
-                                        {
-                                            z_pos = (z_pos - 0x800000);
-                                            z_pos = (-1) * z_pos;
-                                        }
-                                        z = z_pos / 10000.0;
-
-                                        x = x * 20;
-                                        y = y * 20;
-                                        z = z * 15 + 700;
-
-                                        // Position variables through low pass filter
-                                        if(low_pass_init == false)
-                                        {
-                                            x_lpf = x;
-                                            y_lpf = y; 
-                                            z_lpf = z;
-                                            low_pass_init = true;
-                                        }
-
-                                        /* Low pass filter */
-                                        x_lpf = x_lpf * (1 - alpha) + x * alpha;
-                                        y_lpf = y_lpf * (1 - alpha) + y * alpha;
-                                        z_lpf = z_lpf * (1 - alpha) + z * alpha;
-                                        int ret;
-                                        double t1, t2, t3, t4, t5;
-
-                                        (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
-                                        Jacobi_plus = CreateJacobianMatrix(t1 * Math.PI / 180.0, t2 * Math.PI / 180.0, t3 * Math.PI / 180.0, t4 * Math.PI / 180.0, t5 * Math.PI / 180.0);
-                                        Jacobi_vel = CreateVelocityMatrix(x_vel, y_vel, z_vel);
-                                        omega = MultiplyMatrices(Jacobi_plus, Jacobi_vel);
-                                        omega1_plc = omega[0] * 1800 * 35 / Math.PI + 100.0;
-                                        omega2_plc = omega[1] * 1800 * 15 / Math.PI + 150.0;
-                                        omega3_plc = omega[2] * 1800 * 15 / Math.PI + 150.0;
-                                        omega4_plc = -(omega[1] + omega[2]) * 1800 * 20 / Math.PI + 100.0;
-                                        omega5_plc = 0.0; 
-
-
-                                        ret = Check_angle(t1, t2, t3, t4, t5);
-
-                                        if (ret == 0)
-                                        {
-                                            Dispatcher.Invoke(() =>
-                                            {
-                                                Saving_stt_name.Content = "Writing...";
-                                                Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 0, 0));
-                                                Status_mode_name.Content = "DATA OK";
-                                                Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 255, 0));
-                                            });
-                                            /* Anti wind-up */
-                                            if (Math.Abs(omega1_plc) >= 1000)
-                                            {
-                                                omega1_plc = 1000;
-                                            }
-                                            if (Math.Abs(omega2_plc) >= 600)
-                                            {
-                                                omega2_plc = 600;
-                                            }
-                                            if (Math.Abs(omega3_plc) >= 600)
-                                            {
-                                                omega3_plc = 600;
-                                            }
-
-                                            if (write_csv == true)
-                                            {
-                                                if(plc_en == true)
-                                                {
-
-                                                    Dispatcher.Invoke(() =>
-                                                    { 
-                                                        /**/
-                                                        string duongDanCoSo = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + "plc\\";
-                                                        string tenTrajectory = plc_program_arr[plc_stt];
-                                                        string duongDanDayDu = Path.Combine(duongDanCoSo, tenTrajectory);
-                                                        string tenFileKhongDuoi = Path.GetFileNameWithoutExtension(duongDanDayDu);
-
-                                                        if (File.Exists(duongDanDayDu))
-                                                        {
-                                                            var lines = File.ReadAllLines(duongDanDayDu); // n numbers
-                                                            int num = lines.Length;
-                                                            Saving_point_name.Content = num.ToString();
-                                                        }
-
-                                                        using (StreamWriter writer = new StreamWriter(duongDanDayDu, true))
-                                                        {
-                                                            string csvLine = $"{x_lpf},{y_lpf},{z_lpf}";
-                                                            writer.WriteLine(csvLine);
-                                                        }
-                                                    });
-                                                }
-                                            }
-
-                                            adaptive_runtime(x, y, z, Math.Abs(omega1_plc), Math.Abs(omega2_plc), Math.Abs(omega3_plc), Math.Abs(omega4_plc), Math.Abs(omega5_plc), glove_enable);
-                                        }
-                                        else
-                                        {
-
-                                            Dispatcher.Invoke(() =>
-                                            {
-                                                Saving_stt_name.Content = "";
-                                                Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 0, 0));
-                                                Status_mode_name.Content = "DATA FAIL";
-                                                Status_mode_name.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 0, 0));
-                                            });
-
-                                        }
-                                    // plot(x, y, z);
-                                    break;
-
-                                    case 0x01:
-
-                                        if (write_csv == true)
-                                        {
-
-                                            write_csv = false;
-                                            low_pass_init = false;
-                                            plc_en = false;
-                                            plc_stt++;
-
-                                            Dispatcher.Invoke(() =>
-                                            {
-                                            Name_csv.Content = plc_program_arr[plc_stt].ToString();
-                                            Name_csv.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 255, 0));
-                                            });
-
-
-                                        }
-                                        else
-                                        {
-
-                                            write_csv = true;
-                                            plc_en = true;
-
-                                        }
-                                        Console.WriteLine(write_csv.ToString());
-                                        Console.WriteLine("Hehe");
-                                        Console.WriteLine(plc_stt.ToString());
-                                    break;
-                                    default:
-                                    Console.WriteLine("Hex value is not 0x1, 0x2, 0xA, or 0xB");
-                                    break;
+                                if (glove_enable == 1)
+                                {
+                                    g_trajectory_mode = tracjectory_mode_t.MODE_ONLY_CONTROL;
                                 }
+
+                                break;
+
+                                case tracjectory_mode_t.MODE_ONLY_CONTROL:
+                                Console.WriteLine("MODE_ONLY_CONTROL");
+
+                                // Handle only control here
+
+                                if (csv_write_enable == true)
+                                {
+                                    g_trajectory_mode= tracjectory_mode_t.MODE_WAITING_START_RECORD;
+                                }
+                                else if (glove_enable == 0)
+                                {
+                                    g_trajectory_mode= tracjectory_mode_t.MODE_IDLE;
+                                }
+
+                                break;
+
+                                case tracjectory_mode_t.MODE_WAITING_START_RECORD:
+                                Console.WriteLine("MODE_WAITING_START_RECORD");
+
+                                // Handle Waiting start record here
+
+                                if (plc_stt <= 8 && pre_cmd == 0 && cur_cmd == 1)
+                                {
+                                    g_trajectory_mode= tracjectory_mode_t.MODE_START_RECORD_DATA;
+                                    plc_stt++;
+                                    if (plc_stt > 8)
+                                    {
+                                        plc_stt = 8;
+                                    }
+                                }
+                                else if (csv_write_enable == false)
+                                {
+                                    g_trajectory_mode = tracjectory_mode_t.MODE_ONLY_CONTROL;
+                                }
+
+                                break;
+
+                                case tracjectory_mode_t.MODE_START_RECORD_DATA:
+                                Console.WriteLine("MODE_START_RECORD_DATA");
+                                Console.WriteLine("Trajectory"+ plc_stt.ToString());
+
+                                // Handle start record here
+
+                                if (pre_cmd == 0x01 && cur_cmd == 0x00)
+                                {
+                                    g_trajectory_mode = tracjectory_mode_t.MODE_WAITING_START_RECORD;
+                                }
+                                break;
+
+                                default:
+                                break;
+                                }
+
+                                pre_cmd = cur_cmd;
                             }
                        }
                     }
@@ -2366,7 +2245,7 @@ namespace RobotArmHelix
 
             //if (write_csv == false)
             //{
-            //    if (plc_en == false)
+            //    if (csv_write_enable == false)
             //    {
 
             //        Dispatcher.Invoke(() =>
@@ -2587,7 +2466,7 @@ namespace RobotArmHelix
             File.Delete(delete_path); // Xóa file nếu nó tồn tại
             if(plc_stt > 0)
             {
-                plc_stt = plc_stt - 1;
+                plc_stt--;
             }
         }
 
@@ -2656,12 +2535,12 @@ namespace RobotArmHelix
 
         private void Enable_plc_button_Click(object sender, RoutedEventArgs e)
         {
-            plc_en = true;
+            csv_write_enable = true;
         }
 
         private void Disable_plc_button_Click(object sender, RoutedEventArgs e)
         {
-            plc_en = false;
+            csv_write_enable = false;
         }
 
         private void New_Trajectory_Click(object sender, RoutedEventArgs e)
