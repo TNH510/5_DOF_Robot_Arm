@@ -140,6 +140,7 @@ namespace RobotArmHelix
 
         //provides functionality to 3d models
         Model3DGroup RA = new Model3DGroup(); //RoboticArm 3d group
+        Model3DGroup GLOVE = new Model3DGroup(); //Glove 3d group
         Model3D geom = null; //Debug sphere to check in which point the joint is rotatin
         Model3D geomtest = null; //Debug sphere to check in which point the joint is rotatin
         public ActUtlType plc = new();
@@ -176,6 +177,10 @@ namespace RobotArmHelix
         Transform3DGroup F5;
         Transform3DGroup F6;
         RotateTransform3D R;
+
+        RotateTransform3D GLOVE_R;
+        Transform3DGroup GLOVE_F;
+
         TranslateTransform3D T;
         Vector3D reachingPoint;
         int movements = 10;
@@ -190,6 +195,9 @@ namespace RobotArmHelix
         private const string MODEL_PATH3 = "K3.stl";
         private const string MODEL_PATH4 = "K4.stl";
         private const string MODEL_PATH5 = "K5.stl";
+
+        private const string MODEL_GLOVE_PATH1 = "GLOVE_1.stl";
+        private const string MODEL_GLOVE_PATH2 = "GLOVE_2.stl";
 
         private readonly PlotModel _plotModel_position;
         private readonly PlotModel _plotModel_theta;
@@ -229,6 +237,9 @@ namespace RobotArmHelix
             modelsNames.Add(MODEL_PATH4);
             modelsNames.Add(MODEL_PATH5);
 
+            modelsNames.Add(MODEL_GLOVE_PATH1);
+            modelsNames.Add(MODEL_GLOVE_PATH2);
+
             RoboticArm.Content = Initialize_Environment(modelsNames);
 
             /** Debug sphere to check in which point the joint is rotating**/
@@ -249,7 +260,8 @@ namespace RobotArmHelix
             viewPort3d.Camera.Position = new Point3D(-567, 4895, 4620);
 
             double[] angles = { joints[1].angle, joints[2].angle, joints[3].angle, joints[4].angle, joints[5].angle };
-            ForwardKinematics(angles);
+            double[] glv_quaternion = {0, 0, 0, 1};
+            ForwardKinematics(angles, glv_quaternion);
 
             // Set the source of the Image control to display an image file
             displayedImage.Source = new BitmapImage(new Uri("C:\\Users\\daveb\\Desktop\\5_DOF_Robot_Arm\\gui\\robot-tool-c#\\RobotArmHelix\\image\\113.bmp"));
@@ -469,12 +481,15 @@ namespace RobotArmHelix
                 RA.Children.Add(joints[4].model);
                 RA.Children.Add(joints[5].model);
 
+                RA.Children.Add(joints[6].model);
+
                 changeModelColor(joints[0], Colors.Black);
                 changeModelColor(joints[1], Colors.OrangeRed);
                 changeModelColor(joints[2], Colors.OrangeRed);
                 changeModelColor(joints[3], Colors.OrangeRed);
                 changeModelColor(joints[4], Colors.OrangeRed);
                 changeModelColor(joints[5], Colors.Tomato);
+                changeModelColor(joints[6], Colors.Tomato);
 
                 joints[1].angleMin = -180;
                 joints[1].angleMax = 180;
@@ -521,6 +536,14 @@ namespace RobotArmHelix
                 joints[5].rotPointY = 350;
                 joints[5].rotPointZ = 1062;
 
+                joints[6].angleMin = -115;
+                joints[6].angleMax = 115;
+                joints[6].rotAxisX = 1;
+                joints[6].rotAxisY = 0;
+                joints[6].rotAxisZ = 0;
+                joints[6].rotPointX = 0;
+                joints[6].rotPointY = 350;
+                joints[6].rotPointZ = 1062;
             }
             catch (Exception e)
             {
@@ -749,7 +772,7 @@ namespace RobotArmHelix
             }
         }
 
-        public Vector3D ForwardKinematics(double[] angles)
+        public Vector3D ForwardKinematics(double[] angles, double[] glv_quaternion)
         {
 
             /* Variables */
@@ -811,6 +834,8 @@ namespace RobotArmHelix
             F6.Children.Add(R);
             F6.Children.Add(F5);
 
+            GLOVE_R = new RotateTransform3D();
+            GLOVE_R.Rotation = new QuaternionRotation3D(new Quaternion(glv_quaternion[0], glv_quaternion[1], glv_quaternion[2], glv_quaternion[3])); // Xoay quanh trục x
 
             joints[0].model.Transform = F1; //First joint
             joints[1].model.Transform = F2; //Second joint (the "biceps")
@@ -818,6 +843,8 @@ namespace RobotArmHelix
             joints[3].model.Transform = F4; //the "forearm"
             joints[4].model.Transform = F5; //the tool plate
             joints[5].model.Transform = F6; //the tool
+
+            joints[6].model.Transform = GLOVE_R; //the tool
 
             // Convert the angle from degree to radian and define actual initial position
             t1_dh = angles[0] / 180 * Math.PI;
@@ -1680,6 +1707,8 @@ namespace RobotArmHelix
             int[] value_positon = new int[16];
             uint t1 = 0, t2 = 0, t3 = 0, t4 = 0, t5 = 0;
             double t1_out, t2_out, t3_out, t4_out, t5_out;
+            double[] glv_quaternion = { 0, 0, 0, 1 };
+
             if (cn_bttn == true)
             {
                 double[] angles = { joints[1].angle, joints[2].angle, joints[3].angle, joints[4].angle, joints[5].angle };
@@ -1687,7 +1716,7 @@ namespace RobotArmHelix
                 Dispatcher.Invoke(() =>
                 {
                     /* Update position for robot on GUI */
-                    ForwardKinematics(angles);
+                    ForwardKinematics(angles, glv_quaternion);
                     /* Update data for slider on GUI */
                     joint1.Value = angles[0];
                     joint2.Value = angles[1];
@@ -1742,7 +1771,7 @@ namespace RobotArmHelix
                     Dispatcher.Invoke(() =>
                     {
                         /* Update position for robot on GUI */
-                        ForwardKinematics(angles_global);
+                        ForwardKinematics(angles_global, glv_quaternion);
                     });
                 }
                 catch (TaskCanceledException)
@@ -1934,6 +1963,8 @@ namespace RobotArmHelix
                                         x_vel = CombineBytesToInt16Vel(byteArray[12], byteArray[13]) / 10.0; // cm/s
                                         y_vel = CombineBytesToInt16Vel(byteArray[14], byteArray[15]) / 10.0;
                                         z_vel = CombineBytesToInt16Vel(byteArray[16], byteArray[17]) / 10.0;
+
+                                        plot(x_vel, y_vel, z_vel);
 
                                         if (x_pos >= 0x800000)
                                         {

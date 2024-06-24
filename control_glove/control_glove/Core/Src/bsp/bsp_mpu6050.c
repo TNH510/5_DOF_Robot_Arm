@@ -443,7 +443,7 @@ static int16_t AcX, AcY, AcZ, Tmp, GyX, GyY, GyZ;
 static float   axg, ayg, azg, gxrs, gyrs, gzrs;
 
 static void    writeByte(uint8_t address, uint8_t subAddress, uint8_t data);
-static void    readBytes(uint8_t address, uint8_t subAddress, uint16_t count, uint8_t *dest);
+static bool    readBytes(uint8_t address, uint8_t subAddress, uint16_t count, uint8_t *dest);
 static uint8_t readByte(uint8_t address, uint8_t subAddress);
 /*-----------------------------------------------------------------------------------------------*/
 base_status_t bsp_mpu6050_init(void)
@@ -489,7 +489,7 @@ base_status_t bsp_mpu6050_init(void)
 base_status_t bsp_mpu6050_get_data(float *gxrs, float *gyrs, float *gzrs, float *axg, float *ayg, float *azg)
 {
     uint8_t data_org[14];    // original data of accelerometer and gyro
-    readBytes(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_ACCEL_XOUT_H, 14, &data_org[0]);
+    bool status = readBytes(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_ACCEL_XOUT_H, 14, &data_org[0]);
 
     AcX = data_org[0] << 8 | data_org[1];      // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)
     AcY = data_org[2] << 8 | data_org[3];      // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
@@ -506,6 +506,15 @@ base_status_t bsp_mpu6050_get_data(float *gxrs, float *gyrs, float *gzrs, float 
     *gyrs = (float) (GyY - MPU6050_GYOFFSET) / MPU6050_GYGAIN * 0.01745329;    // degree to radians
     *gzrs = (float) (GyZ - MPU6050_GZOFFSET) / MPU6050_GZGAIN * 0.01745329;    // degree to radians
     // Degree to Radians Pi / 180 = 0.01745329 0.01745329251994329576923690768489
+
+    if (status)
+    {
+        return BS_OK;
+    }
+    else 
+    {
+        return BS_ERROR;
+    }
 }
 
 base_status_t bsp_mpu6050_calib(void)
@@ -579,9 +588,9 @@ static void writeByte(uint8_t address, uint8_t subAddress, uint8_t data)
     bsp_i2c1_write_mem(address, subAddress, &data, 1);
 }
 
-static void readBytes(uint8_t address, uint8_t subAddress, uint16_t count, uint8_t *dest)
+static bool readBytes(uint8_t address, uint8_t subAddress, uint16_t count, uint8_t *dest)
 {
-    bsp_i2c1_read_mem(address, subAddress, dest, count);
+    return bsp_i2c1_read_mem(address, subAddress, dest, count);
 }
 
 static uint8_t readByte(uint8_t address, uint8_t subAddress)

@@ -18,6 +18,7 @@ extern "C" {
 /* Includes ----------------------------------------------------------------- */
 #include <stdint.h>
 #include "bsp_common.h"
+#include "math.h"
 
 /* Public defines ----------------------------------------------------------- */
 /* Public enumerate/structure ----------------------------------------------- */

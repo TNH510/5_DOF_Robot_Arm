@@ -1,7 +1,7 @@
 /**
  * @file       bsp_button.h
- * @copyright  Copyright (C) 2019 Fiot Co., Ltd. All rights reserved.
- * @license    This project is released under the Fiot License.
+ * @copyright  Copyright (C) HieuTranNgoc
+ * @license    This project is released under HieuTranNgoc License.
  * @version    1.0.2
  * @date       2023-08-25
  * @author     Hieu Tran
@@ -14,27 +14,27 @@
 #define __BSP_BUTTON_H
 
 /* Includes ----------------------------------------------------------- */
+#include "bsp_common.h"
 #include "stm32f4xx_hal.h"
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "bsp_common.h"
 /* Public defines ----------------------------------------------------- */
-#define USER_BUTTON_Pin GPIO_PIN_14
+#define USER_BUTTON_Pin       GPIO_PIN_14
 #define USER_BUTTON_GPIO_Port GPIOC
 #define USER_BUTTON_EXTI_IRQn EXTI15_10_IRQn
-#define SW3_Pin GPIO_PIN_3
-#define SW3_GPIO_Port GPIOA
-#define SW3_EXTI_IRQn EXTI3_IRQn
-#define SW1_Pin GPIO_PIN_1
-#define SW1_GPIO_Port GPIOA
-#define SW1_EXTI_IRQn EXTI1_IRQn
-#define SW2_Pin GPIO_PIN_2
-#define SW2_GPIO_Port GPIOA
-#define SW2_EXTI_IRQn EXTI2_IRQn
+#define SW3_Pin               GPIO_PIN_3
+#define SW3_GPIO_Port         GPIOA
+#define SW3_EXTI_IRQn         EXTI3_IRQn
+#define SW1_Pin               GPIO_PIN_1
+#define SW1_GPIO_Port         GPIOA
+#define SW1_EXTI_IRQn         EXTI1_IRQn
+#define SW2_Pin               GPIO_PIN_2
+#define SW2_GPIO_Port         GPIOA
+#define SW2_EXTI_IRQn         EXTI2_IRQn
 
 /* Number of button */
-#define BUTTON_MAX         (3)
+#define BUTTON_MAX            (3)
 /* Public enumerate/structure ----------------------------------------- */
 /**
  * @brief Enum for button events
@@ -108,6 +108,6 @@ bool bsp_button_init(button_t *button);
  */
 button_event_t bsp_button_check_state_one_button(button_id_t button_id, bool *interrupt_trigger, button_t *button);
 
-#endif  // __BSP_BUTTON_H
+#endif    // __BSP_BUTTON_H
 
 /* End of file -------------------------------------------------------- */
