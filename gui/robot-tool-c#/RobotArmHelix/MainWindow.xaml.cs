@@ -1967,8 +1967,16 @@ namespace RobotArmHelix
 
                                 case tracjectory_mode_t.MODE_ONLY_CONTROL:
                                 Console.WriteLine("MODE_ONLY_CONTROL");
+                                // Position variables (double)
+                                double x = 0, y = 0, z = 0;
+                                // Omega placeholders
+                                double omega1_plc = 0.0, omega2_plc = 0.0, omega3_plc = 0.0, omega4_plc = 0.0, omega5_plc = 0.0;
 
                                 // Handle only control here
+                                if(update_pos_vel_data(byteArray, out x, out y, out z, out omega1_plc, out omega2_plc,  out omega3_plc, out omega4_plc, out omega5_plc))
+                                {
+                                    adaptive_runtime(x, y, z, omega1_plc, omega2_plc, omega3_plc, omega4_plc, omega5_plc);
+                                }
 
                                 if (csv_write_enable == true)
                                 {
@@ -2027,7 +2035,114 @@ namespace RobotArmHelix
         }
         #endregion
 
-        private void adaptive_runtime(double x, double y, double z, double v1, double v2, double v3, double v4, double v5, int enable_stt)
+
+        private bool update_pos_vel_data(byte[] byteArray,
+                                         out double x, out double y, out double z,
+                                         out double omega1_plc, out double omega2_plc,
+                                         out double omega3_plc, out double omega4_plc,
+                                         out double omega5_plc)
+        {
+            // Position variables (integer)
+            int x_pos = 0, y_pos = 0, z_pos = 0;
+
+            // Position variables (double)
+            x = 0;
+            y = 0;
+            z = 0;
+
+            // Velocity variables (double)
+            double x_vel = 0, y_vel = 0, z_vel = 0;
+
+            // Jacobian matrices
+            double[,] Jacobi_plus = new double[5, 3];
+            double[,] Jacobi_vel = new double[3, 1];
+
+            // Omega array
+            double[] omega = new double[5];
+
+            // Omega placeholders
+            omega1_plc = 0.0;
+            omega2_plc = 0.0;
+            omega3_plc = 0.0;
+            omega4_plc = 0.0;
+            omega5_plc = 0.0;
+
+            x_pos = CombineBytesToInt32(byteArray[2], byteArray[3], byteArray[4]);
+            y_pos = CombineBytesToInt32(byteArray[5], byteArray[6], byteArray[7]);
+            z_pos = CombineBytesToInt32(byteArray[8], byteArray[9], byteArray[10]);
+
+            x_vel = CombineBytesToInt16Vel(byteArray[12], byteArray[13]) / 10.0; // cm/s
+            y_vel = CombineBytesToInt16Vel(byteArray[14], byteArray[15]) / 10.0;
+            z_vel = CombineBytesToInt16Vel(byteArray[16], byteArray[17]) / 10.0;
+
+            //plot(x_vel, y_vel, z_vel);
+
+            if (x_pos >= 0x800000)
+            {
+                x_pos = (x_pos - 0x800000);
+                x_pos = (-1) * x_pos;
+            }
+            x = x_pos / 10000.0;
+
+            if (y_pos >= 0x800000)
+            {
+                y_pos = (y_pos - 0x800000);
+                y_pos = (-1) * y_pos;
+            }
+            y = y_pos / 10000.0;
+
+            if (z_pos >= 0x800000)
+            {
+                z_pos = (z_pos - 0x800000);
+                z_pos = (-1) * z_pos;
+            }
+            z = z_pos / 10000.0;
+
+            x = x * 20;
+            y = y * 20;
+            z = z * 15 + 700;
+
+            // Position variables through low pass filter
+            if(low_pass_init == false)
+            {
+                x_lpf = x;
+                y_lpf = y; 
+                z_lpf = z;
+                low_pass_init = true;
+            }
+
+            /* Low pass filter */
+            x_lpf = x_lpf * (1 - alpha) + x * alpha;
+            y_lpf = y_lpf * (1 - alpha) + y * alpha;
+            z_lpf = z_lpf * (1 - alpha) + z * alpha;
+            int ret;
+            double t1, t2, t3, t4, t5;
+
+            (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
+            Jacobi_plus = CreateJacobianMatrix(t1 * Math.PI / 180.0, t2 * Math.PI / 180.0, t3 * Math.PI / 180.0, t4 * Math.PI / 180.0, t5 * Math.PI / 180.0);
+            Jacobi_vel = CreateVelocityMatrix(x_vel, y_vel, z_vel);
+            omega = MultiplyMatrices(Jacobi_plus, Jacobi_vel);
+            omega1_plc = omega[0] * 1800 * 35 / Math.PI + 100.0;
+            omega2_plc = omega[1] * 1800 * 15 / Math.PI + 150.0;
+            omega3_plc = omega[2] * 1800 * 15 / Math.PI + 150.0;
+            omega4_plc = -(omega[1] + omega[2]) * 1800 * 20 / Math.PI + 100.0;
+            omega5_plc = 0.0; 
+
+
+            ret = Check_angle(t1, t2, t3, t4, t5);
+
+            if(ret == 0)
+            {
+                return true;
+            }
+            else 
+            {
+                return false;
+            }
+        }
+
+
+        private void adaptive_runtime(double x, double y, double z, double v1, double v2, double v3, double v4, double v5)
         {
             int[] temp_vel = new int[5];
             double t1_adapt, t2_adapt, t3_adapt, t4_adapt, t5_adapt;
@@ -2042,31 +2157,28 @@ namespace RobotArmHelix
             ////---------------------------------
             (t1_adapt, t2_adapt, t3_adapt, t4_adapt, t5_adapt) = convert_position_angle(x, y, z);
             int[] temp_value = new int[5];
-            if (enable_stt == 1)
-            {
-                int[] value_angle = new int[10];
-                /* Run */
-                temp_value[0] = (int)(Convert.ToDouble(t1_adapt) * 100000 + 18000000);
-                temp_value[1] = (int)(Convert.ToDouble(t2_adapt - 90) * 100000 + 18000000);
-                temp_value[2] = (int)(Convert.ToDouble(t3_adapt + 90) * 100000 + 18000000);
-                temp_value[3] = (int)(Convert.ToDouble(t4_adapt + 90) * 100000 + 18000000);
-                temp_value[4] = (int)(Convert.ToDouble(t5_adapt) * 100000 + 18000000);
+            int[] value_angle = new int[10];
+            /* Run */
+            temp_value[0] = (int)(Convert.ToDouble(t1_adapt) * 100000 + 18000000);
+            temp_value[1] = (int)(Convert.ToDouble(t2_adapt - 90) * 100000 + 18000000);
+            temp_value[2] = (int)(Convert.ToDouble(t3_adapt + 90) * 100000 + 18000000);
+            temp_value[3] = (int)(Convert.ToDouble(t4_adapt + 90) * 100000 + 18000000);
+            temp_value[4] = (int)(Convert.ToDouble(t5_adapt) * 100000 + 18000000);
 
-                temp_vel[0] = (int)(Convert.ToDouble(v1) * 1000);
-                temp_vel[1] = (int)(Convert.ToDouble(v2) * 1000);
-                temp_vel[2] = (int)(Convert.ToDouble(v3) * 1000);
-                temp_vel[3] = (int)(Convert.ToDouble(v4) * 1000);
-                temp_vel[4] = (int)(Convert.ToDouble(v5) * 1000);
-                /* Write the angle and velocity */
-                for (int ind = 0; ind < 5; ind++)
-                {
-                    write_d_mem_32_bit(2100 + 2 * ind, temp_vel[ind]);
-                }
-                turn_on_1_pulse_relay(650);
-                for (int ind = 0; ind < 5; ind++)
-                {
-                    write_d_mem_32_bit(1400 + 2 * ind, temp_value[ind]);
-                }
+            temp_vel[0] = (int)(Convert.ToDouble(v1) * 1000);
+            temp_vel[1] = (int)(Convert.ToDouble(v2) * 1000);
+            temp_vel[2] = (int)(Convert.ToDouble(v3) * 1000);
+            temp_vel[3] = (int)(Convert.ToDouble(v4) * 1000);
+            temp_vel[4] = (int)(Convert.ToDouble(v5) * 1000);
+            /* Write the angle and velocity */
+            for (int ind = 0; ind < 5; ind++)
+            {
+                write_d_mem_32_bit(2100 + 2 * ind, temp_vel[ind]);
+            }
+            turn_on_1_pulse_relay(650);
+            for (int ind = 0; ind < 5; ind++)
+            {
+                write_d_mem_32_bit(1400 + 2 * ind, temp_value[ind]);
             }
         }
 
@@ -2203,6 +2315,18 @@ namespace RobotArmHelix
         }
         private void Glove_disable_button_Click(object sender, RoutedEventArgs e)
         {
+            /* Stop command axis 1 */
+            turn_on_1_pulse_relay(3200);
+            /* Stop command axis 2 */
+            turn_on_1_pulse_relay(3220);
+            /* Stop command axis 3 */
+            turn_on_1_pulse_relay(3240);
+            /* Stop command axis 4 */
+            turn_on_1_pulse_relay(3260);
+            /* Stop command axis 5 */
+            turn_on_1_pulse_relay(3280);
+
+            turn_on_1_pulse_relay(515);
             glove_enable = 0;
         }
         private void Glove_refresh_button_Click(object sender, RoutedEventArgs e)
