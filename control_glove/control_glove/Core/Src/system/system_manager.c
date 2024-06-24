@@ -71,11 +71,13 @@ void system_manager_task(void)
         }
         break;
     case SYS_MODE_CALIB:
+
+        sensor_manager_update_data();
+
         // Set Mode Calib LED state
         if (sensor_manager_is_yaw_angle_calib() == true)
         {
             drv_led_turn_on_red_led();
-            sensor_manager_update_data();
             drv_led_turn_on_green_led();
         }
         else

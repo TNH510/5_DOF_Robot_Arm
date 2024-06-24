@@ -393,22 +393,22 @@ static void sensor_manager_test_button_change(button_name_t event)
 static float sensor_manager_caculate_current_yaw(void)
 {
     // First Quadrant
-    if (x_pos > 0 && y_pos > 0)
+    if (x_pos >= 0.0f && y_pos >= 0.0f)
     {
         g_yaw_angle_calib_result = asin(y_pos/sqrt(x_pos * x_pos + y_pos * y_pos));
     }
     // II
-    else if (x_pos < 0 && y_pos > 0)
+    else if (x_pos < 0.0f && y_pos >= 0.0f)
     {
         g_yaw_angle_calib_result = M_PI - asin(y_pos/sqrt(x_pos * x_pos + y_pos * y_pos));
     }
     // III
-    else if (x_pos < 0 && y_pos < 0)
+    else if (x_pos < 0.0f && y_pos < 0.0f)
     {
         g_yaw_angle_calib_result = M_PI + asin(-y_pos/sqrt(x_pos * x_pos + y_pos * y_pos));
     }
     // IV
-    else if (x_pos > 0 && y_pos < 0)
+    else if (x_pos >= 0.0f && y_pos < 0.0f)
     {
         g_yaw_angle_calib_result = 2 * M_PI - asin(-y_pos/sqrt(x_pos * x_pos + y_pos * y_pos));
     }
