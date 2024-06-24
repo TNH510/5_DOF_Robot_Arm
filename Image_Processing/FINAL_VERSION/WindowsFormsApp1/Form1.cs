@@ -20,6 +20,7 @@ namespace WindowsFormsApp1
         static byte[,] byteArray2D;
         public static int[] angle = new int[4];
         string imagePath;
+        static int[] Point_conner = new int[4];
         public Form1()
         {
             InitializeComponent();
@@ -473,7 +474,7 @@ namespace WindowsFormsApp1
                 { Result = "KHÔNG NHẬN DIỆN "; }
                 return Result;
             }
-            public static int[,] PerformHoughTransform(int[,] image)
+            public static int[,] PerformHoughTransform(byte[,] image)
             {
                 int width = image.GetLength(0);
                 int height = image.GetLength(1);
@@ -511,11 +512,11 @@ namespace WindowsFormsApp1
                 return houghMatrix;
             }
             //dev ở hàm này về việc nhận ra kích thước(px), xác định cạnh đáy và (góc) của hình chữ nhật, hình vuông
-            public static int[,] Lines(int[,] houghMatrix, int threshold, int width, int height, int edges)
+            public static byte[,] Lines(int[,] houghMatrix, int threshold, int width, int height)
             {
                 int diagonal = (int)Math.Sqrt(width * width + height * height); // Đường chéo của ảnh
 
-                int[,] resultImage = new int[width, height];
+                byte[,] resultImage = new byte[width, height];
                 int count = 0;
                 int[,] theta_rho = new int[5000, 4];
                 // lấy toàn bộ số điểm vượt ngưỡng 
@@ -581,13 +582,15 @@ namespace WindowsFormsApp1
                             }
                         }
                     }
-                    if (soluong_nhom >= edges)// điều kiện thoát vòng lặp
+                    if (soluong_nhom >= 4)// điều kiện thoát vòng lặp
                     {
                         i = nhom;
                     }
-
                 }
-                for (int i = 0; i < edges; i++)
+
+                int[,] number_corner= new int[20,3];
+                int count_number_corner = 0;
+                for (int i = 0; i < 4; i++)
                 {
                     int avr_theta = ketqua[0, 0, i];
                     angle[i] = ketqua[0, 0, i];
@@ -605,6 +608,7 @@ namespace WindowsFormsApp1
                                 if (resultImage[x, y] == 0)
                                 {
                                     resultImage[x, y] = 255;
+                                    
                                     if (y + 1 < resultImage.GetLength(1))
                                     {
                                         resultImage[x, y + 1] = 255;
@@ -613,11 +617,17 @@ namespace WindowsFormsApp1
                                 else if (resultImage[x, y] == 255)
                                 {
                                     resultImage[x, y] = 10;
-
+                                    number_corner[count_number_corner, 0] = x;
+                                    number_corner[count_number_corner, 1] = y;
+                                    number_corner[count_number_corner, 2] = avr_theta;
                                     if (y + 1 < resultImage.GetLength(1))
                                     {
                                         resultImage[x, y + 1] = 10;
+                                        number_corner[count_number_corner, 0] = x;
+                                        number_corner[count_number_corner, 1] = y+1;
+                                        number_corner[count_number_corner, 2] = avr_theta;
                                     }
+                                    count_number_corner++;
                                 }
                                 else if (resultImage[x, y] == 10)
                                 {
@@ -646,11 +656,18 @@ namespace WindowsFormsApp1
                                 else if (resultImage[x, y] == 255)
                                 {
                                     resultImage[x, y] = 10;//giao điểm
-
+                                    number_corner[count_number_corner, 0] = x;
+                                    number_corner[count_number_corner, 1] = y;
+                                    number_corner[count_number_corner, 2] = avr_theta;
                                     if (x + 1 < resultImage.GetLength(0))
                                     {
                                         resultImage[x + 1, y] = 10;
+                                        number_corner[count_number_corner, 0] = x;
+                                        number_corner[count_number_corner, 1] = y+1;
+                                        number_corner[count_number_corner, 2] = avr_theta;
                                     }
+                                    count_number_corner++;
+                                        
                                 }
                                 else if (resultImage[x, y] == 10)
                                 {
@@ -662,7 +679,10 @@ namespace WindowsFormsApp1
                     }
                     //
                 }
-
+                //chọn ra 4 điểm góc và đưa ra kích thước của 2 cạnh và góc của 2 cạnh đó 
+                //cạnh AB
+                //A
+                
                 return resultImage;
             }
             //dev hàm tìm tâm, bán kính của hình tròn
@@ -686,7 +706,7 @@ namespace WindowsFormsApp1
                 Radius /= count;
                 return Radius;
             }
-            public static void Active(out byte[,]Final_image, out string shape, out double avr_X, out double avr_Y, out int Radiuss)
+            public static void Active(out byte[,]Final_image, out string shape, out double avr_X, out double avr_Y, out int Radiuss,out byte[,])
             {
                 int[] threshold = new int[2];
                 //tinh nguong bang phuong phap Otsu cho ra 2 nguong phan doan anh
@@ -702,11 +722,12 @@ namespace WindowsFormsApp1
                 shape = Detect_Shape(Final_image);
                 //cho ra anh canh bang phuong phap canny.
                 Final_image = Canny_Detect(Final_image, 50, 200);
-
+                int[,] Hough=  PerformHoughTransform(Final_image);
+                byte[,] line = Lines(Hough, 50, 640, 480);
                 Radiuss = 0;
                 if (shape == "HÌNH CHỮ NHẬT" || shape == "HÌNH VUÔNG")
                 {
-                    // hàm Lines
+                    // 
                 }
                 else if (shape == "HÌNH TRÒN" )
                 {

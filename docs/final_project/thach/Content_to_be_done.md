@@ -1,8 +1,3 @@
-<!-- # CÁC TÍNH NĂNG
-1. Điều khiển chạy JOG từ máy tính
-2. Điều khiển chạy MoveJ từ máy tính
-3. Điều khiển chạy theo quỹ đạo cho trước (MoveL, MoveC) từ máy tính cá nhân
-4. Tính năng an toàn cho cánh tay robot (App, Driver) -->
 # Những nội dung chính
 ## Kiến thức cơ bản
 ### Giới thiệu về C#
