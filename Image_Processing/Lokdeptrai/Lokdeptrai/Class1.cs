@@ -407,12 +407,12 @@ namespace Lokdeptrai
             //tạo ra 1 biến 3D để thêm thông tin là điểm ảnh đã được duyệt qua chưa
             //đếm xem có bao nhiêu điểm >=60
             int count_hough_point = 0;
-
+            int threshold = 80;
             for (int i = 0; i < hough.GetLength(0); i++)
             {
                 for (int j = 0; j < hough.GetLength(1); j++)
                 {
-                    if (hough[i, j] >= 60)
+                    if (hough[i, j] >= threshold)
                     {
                         count_hough_point++;
                     }
@@ -425,7 +425,7 @@ namespace Lokdeptrai
             {
                 for (int j = 0; j < hough.GetLength(1); j++)
                 {
-                    if (hough[i, j] >= 60)
+                    if (hough[i, j] >= threshold)
                     {
                         Temp_info[count1, 0] = i;//x
                         Temp_info[count1, 1] = j;//y
@@ -590,6 +590,208 @@ namespace Lokdeptrai
             }
             return corner;
         }
+        public static (double length, double width, double angle) GetRectangleDimensions(double[,] points)
+        {
+            // Calculate distances between all pairs of points
+            double[,] distances = new double[4, 4];
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = i + 1; j < 4; j++)
+                {
+                    distances[i, j] = Math.Sqrt(Math.Pow(points[i, 0] - points[j, 0], 2) + Math.Pow(points[i, 1] - points[j, 1], 2));
+                    distances[j, i] = distances[i, j];
+                }
+            }
+
+            // Find the maximum distance which is the diagonal of the rectangle
+            double maxDistance = 0;
+            int p1 = 0, p2 = 0;
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = i + 1; j < 4; j++)
+                {
+                    if (distances[i, j] > maxDistance)
+                    {
+                        maxDistance = distances[i, j];
+                        p1 = i;
+                        p2 = j;
+                    }
+                }
+            }
+
+            // The points opposite to p1 and p2
+            int p3 = -1, p4 = -1;
+            for (int i = 0; i < 4; i++)
+            {
+                if (i != p1 && i != p2)
+                {
+                    if (p3 == -1)
+                        p3 = i;
+                    else
+                        p4 = i;
+                }
+            }
+
+            // Determine the shorter sides
+            double side1 = distances[p1, p3];
+            double side2 = distances[p1, p4];
+
+            double length, width, dx, dy;
+
+            if (side1 > side2)
+            {
+                length = side1;
+                width = side2;
+                dx = points[p1, 0] - points[p3, 0];
+                dy = points[p1, 1] - points[p3, 1];
+            }
+            else
+            {
+                length = side2;
+                width = side1;
+                dx = points[p1, 0] - points[p4, 0];
+                dy = points[p1, 1] - points[p4, 1];
+            }
+
+            // Ensure we are calculating the angle for the longer side
+            if (length < width)
+            {
+                double temp = length;
+                length = width;
+                width = temp;
+                dx = points[p1, 0] - points[p4, 0];
+                dy = points[p1, 1] - points[p4, 1];
+            }
+
+            // Calculate angle with Ox
+            double angle = Math.Atan2(dy, dx) * (180.0 / Math.PI);
+
+            return (length, width, angle);
+        }
+        static double CalculateDistance(double x1, double y1, double x2, double y2)
+        {
+            double deltaX = x2 - x1;
+            double deltaY = y2 - y1;
+            return Math.Sqrt(deltaX * deltaX + deltaY * deltaY);
+        }
+        public static (double[] length, double[] angle) GetTriangleDimensions(double[,] points)
+        {
+            double[] length = new double[3];
+            double[] angle = new double[3];
+            double[,] Temp_point = new double[3, 2];
+            for (int i = 0; i < 3; i++)
+            {
+                Temp_point[i, 0] = points[i, 0];
+                Temp_point[i, 1] = points[i, 1];
+            }
+            //tính khoảng cách
+            for (int i = 0; i < 3; i++)
+            {
+                if (i == 2)
+                {
+                    length[i] = CalculateDistance(Temp_point[2, 0], Temp_point[2, 1], Temp_point[0, 0], Temp_point[0, 1]);
+                    angle[i] = Math.Atan2(Temp_point[0, 1] - Temp_point[2, 1], Temp_point[0, 0] - Temp_point[2, 0]) * (180.0 / Math.PI);
+                }
+                else
+                {
+                    length[i] = CalculateDistance(Temp_point[i, 0], Temp_point[i, 1], Temp_point[i + 1, 0], Temp_point[i + 1, 1]);
+                    angle[i] = Math.Atan2(Temp_point[i + 1, 1] - Temp_point[i, 1], Temp_point[i + 1, 0] - Temp_point[i, 0]) * (180.0 / Math.PI);
+                }
+
+            }
+            return (length, angle);
+        }
+        public static void Detect_Shape_dimention( int[,] line_info, int[,] point_info, out string shape, out int[,] dimention, out int[,] Center_Point)
+        {
+            //từ line_info và point_info 
+            int number_edges = line_info.GetLength(0);
+            int number_point = point_info.GetLength(0);
+            Center_Point = new int[1, 2];
+            Center_Point[0, 0] = point_info[number_point - 1, 0];
+            Center_Point[0, 1] = point_info[number_point - 1, 1];
+            shape = "Unknown";
+            dimention = new int[3, 2];
+
+            if (number_edges == 4 && number_point == 5)
+            {
+
+                //tính toán kích thước các cạnh
+                //tìm điểm gần gốc tọa độ nhất
+                double[,] Temp_point = new double[4, 2];
+                for (int i = 0; i < number_point - 1; i++)
+                {
+                    Temp_point[i, 0] = point_info[i, 0];
+                    Temp_point[i, 1] = point_info[i, 1];
+                }
+                (double length, double width, double angle) = GetRectangleDimensions(Temp_point);
+                if (angle < 0)
+                {
+                    angle = angle + 180;
+                }
+                if (length - width > 10)
+                {
+                    shape = "Rectangle";
+                    dimention[0, 0] = (int)length;
+                    dimention[0, 1] = (int)angle;
+                    dimention[1, 0] = (int)width;
+                    //dimention[1, 1] = D2_angle;
+                }
+                //else if (D1 - D2 < -20)
+                //{
+                //    shape = "Rectangle";
+                //    dimention[0, 0] = D2;
+                //    dimention[0, 1] = D2_angle;
+                //    dimention[1, 0] = D1;
+                //    dimention[1, 1] = D1_angle;
+                //}
+                else if (length - width > -10 && length - width < 10)
+                {
+
+                    shape = "Square";
+                    dimention[0, 0] = (int)length;
+                    dimention[0, 1] = (int)angle;
+
+
+                }
+
+            }
+            else if (number_edges == 3 && number_point == 4)
+            {
+                double[,] Temp_point = new double[3, 2];
+                for (int i = 0; i < number_point - 1; i++)
+                {
+                    Temp_point[i, 0] = point_info[i, 0];
+                    Temp_point[i, 1] = point_info[i, 1];
+                }
+                shape = "Triangle";
+                (double[] length, double[] angle) = GetTriangleDimensions(Temp_point);
+                double max_value = length[0];
+                int index = 0;
+                for (int i = 1; i < 3; i++)
+                {
+                    if (length[i] > max_value)
+                    {
+                        max_value = length[i];
+                        index = i;
+                    }
+                }
+                dimention[0, 0] = (int)max_value;
+                if (angle[index] < 0)
+                {
+                    angle[index] = angle[index] + 180;
+                }
+                dimention[0, 1] = (int)angle[index];
+
+            }
+            else if (number_edges == 0 && number_point == 1)
+            {
+                shape = "Circle";
+
+            }
+
+
+
+        }
         public static int[,] Point_corner(int[,]image)
         {
             // tạo ảnh chứa kết quả
@@ -605,5 +807,7 @@ namespace Lokdeptrai
 
             return corner;
         }
+
+
     }
 }

@@ -415,7 +415,8 @@ namespace Image_proccessing
                 //int[,] blur = gray;
                 //Bitmap img_blur = IntToBitmap(blur);
                 int[] threhold = new int[2];
-                threhold= CalculateTwoThresholds(gray);               
+                threhold= CalculateTwoThresholds(gray);
+                
                 //int threhold1 = 63;
                 //int threhold2 = 65;
                 for (int i = 0; i < gray.GetLength(0); i++)
@@ -436,8 +437,11 @@ namespace Image_proccessing
                         }
                     }
                 }
+                //loại bỏ n
+                
                 //gray = MedianBlur(gray);
                 gray = Erosion_Dilation(gray, 3, 3);
+                gray = RemoveSmallRegions.RemoveSmallWhiteRegions(gray);
                 //string a =  imagePath + "_1.jpg";
                 //Bitmap SaveImage = IntToBitmap(gray);
                 //SaveImage.Save(a);
@@ -521,34 +525,47 @@ namespace Image_proccessing
 
                 return houghMatrix;
             }
-            public static int[,]  FindCircle(int[,] image, int radius)
+            public static int[,] HoughTransformForCircle(int[,] edgeImage, int radius)
             {
-                int width = image.GetLength(0);
-                int height = image.GetLength(1);
-                int[,] accumulator = new int[width, height];
+                int width = edgeImage.GetLength(0);
+                int height = edgeImage.GetLength(1);
 
-                // Tính toán ma trận tích lũy
+                // Tạo ma trận Hough với kích thước width x height
+                int[,] houghMatrix = new int[width, height];
+
+                // Độ chính xác của các góc
+                double angleStep = Math.PI / 180.0;
+
+                // Duyệt qua tất cả các điểm ảnh trong ảnh cạnh
                 for (int x = 0; x < width; x++)
                 {
                     for (int y = 0; y < height; y++)
                     {
-                        if (image[x, y] == 255)
+                        // Nếu điểm ảnh là cạnh (giá trị khác 0)
+                        if (edgeImage[x, y] != 0)
                         {
-                            for (int theta = 0; theta < 360; theta++)
+                            // Duyệt qua tất cả các góc từ 0 đến 360 độ
+                            for (double theta = 0; theta < 2 * Math.PI; theta += angleStep)
                             {
-                                double a = x - radius * Math.Cos(theta * Math.PI / 180);
-                                double b = y - radius * Math.Sin(theta * Math.PI / 180);
+                                // Tính tọa độ trung tâm (a, b) dựa trên bán kính và góc
+                                int a = (int)(x - radius * Math.Cos(theta));
+                                int b = (int)(y - radius * Math.Sin(theta));
 
+                                // Kiểm tra xem (a, b) có nằm trong phạm vi của ảnh không
                                 if (a >= 0 && a < width && b >= 0 && b < height)
                                 {
-                                    accumulator[(int)a, (int)b]++;
+                                    // Tăng giá trị tại (a, b) trong ma trận Hough
+                                    houghMatrix[a, b]++;
                                 }
                             }
                         }
                     }
                 }
-                return accumulator;
-            }
+
+                return houghMatrix;
+            }//find center point
+
+
             public static int[,] DrawLines(int[,] houghMatrix, int threshold, int width, int height)
             {
                 int diagonal = (int)Math.Sqrt(width * width + height * height); // Đường chéo của ảnh
@@ -993,7 +1010,6 @@ namespace Image_proccessing
                 }
                 return Image_Result;
             }
-
             public static int[,] Find_line_info(int[,] hough,out int count_hough_point)
             {
                 //tạo ra 1 biến 3D để thêm thông tin là điểm ảnh đã được duyệt qua chưa
@@ -1292,59 +1308,7 @@ namespace Image_proccessing
 
                 return (length, width, angle);
             }
-            public static (int, int, double) FindCircleCenterRadius(int[,] edgeImage, int numIterations, double threshold)
-            {
-                int width = edgeImage.GetLength(0);
-                int height = edgeImage.GetLength(1);
 
-                int bestInliers = 0;
-                int centerX = 0;
-                int centerY = 0;
-                double radius = 0;
-
-                Random random = new Random();
-
-                for (int i = 0; i < numIterations; i++)
-                {
-                    // Chọn ngẫu nhiên một điểm trong ảnh cạnh
-                    int randomX = random.Next(0, width);
-                    int randomY = random.Next(0, height);
-
-                    // Nếu điểm này không phải là cạnh, bỏ qua
-                    if (edgeImage[randomX, randomY] != 255)
-                        continue;
-
-                    int inliers = 0;
-
-                    for (int x = 0; x < width; x++)
-                    {
-                        for (int y = 0; y < height; y++)
-                        {
-                            // Tính khoảng cách từ điểm đang xét đến điểm ngẫu nhiên
-                            double distance = Math.Sqrt(Math.Pow(x - randomX, 2) + Math.Pow(y - randomY, 2));
-
-                            // Kiểm tra xem điểm có nằm trong vùng lân cận của đường tròn hay không
-                            if (Math.Abs(distance - radius) <= threshold)
-                            {
-                                // Đếm số lượng điểm nằm trong vùng lân cận
-                                if (edgeImage[x, y] == 255)
-                                    inliers++;
-                            }
-                        }
-                    }
-
-                    // Cập nhật mô hình tốt nhất nếu số lượng inliers vượt qua ngưỡng
-                    if (inliers > bestInliers)
-                    {
-                        bestInliers = inliers;
-                        centerX = randomX;
-                        centerY = randomY;
-                        radius = threshold;
-                    }
-                }
-
-                return (centerX, centerY, radius);
-            }
             // Tính khoảng cách giữa hai điểm có tọa độ (x1, y1) và (x2, y2)
             static double CalculateDistance(double x1, double y1, double x2, double y2)
             {
@@ -1470,7 +1434,117 @@ namespace Image_proccessing
 
 
             }
+            
+        }
+        class RemoveSmallRegions
+        {
+            private static int width;
+            private static int height;
 
+            // Hàm để kiểm tra xem tọa độ có nằm trong ảnh không
+            private static bool IsValid(int x, int y)
+            {
+                return x >= 0 && x < width && y >= 0 && y < height;
+            }
+
+            // Hàm để gán nhãn các vùng liên thông bằng thuật toán BFS
+            private static void LabelComponent(int[,] image, int[,] labels, int startX, int startY, int label)
+            {
+                int[] dx = { -1, 1, 0, 0 };
+                int[] dy = { 0, 0, -1, 1 };
+                Queue<(int, int)> queue = new Queue<(int, int)>();
+                queue.Enqueue((startX, startY));
+                labels[startX, startY] = label;
+
+                while (queue.Count > 0)
+                {
+                    var (x, y) = queue.Dequeue();
+
+                    for (int d = 0; d < 4; d++)
+                    {
+                        int newX = x + dx[d];
+                        int newY = y + dy[d];
+
+                        if (IsValid(newX, newY) && image[newX, newY] == 255 && labels[newX, newY] == 0)
+                        {
+                            labels[newX, newY] = label;
+                            queue.Enqueue((newX, newY));
+                        }
+                    }
+                }
+            }
+
+            public static int[,] RemoveSmallWhiteRegions(int[,] image)
+            {
+                width = image.GetLength(0);
+                height = image.GetLength(1);
+
+                int[,] labels = new int[width, height];
+                int label = 1;
+                Dictionary<int, int> labelSizes = new Dictionary<int, int>();
+
+                // Gán nhãn cho các vùng liên thông
+                for (int x = 0; x < width; x++)
+                {
+                    for (int y = 0; y < height; y++)
+                    {
+                        if (image[x, y] == 255 && labels[x, y] == 0)
+                        {
+                            LabelComponent(image, labels, x, y, label);
+                            label++;
+                        }
+                    }
+                }
+
+                // Tính diện tích của mỗi vùng
+                for (int x = 0; x < width; x++)
+                {
+                    for (int y = 0; y < height; y++)
+                    {
+                        if (labels[x, y] != 0)
+                        {
+                            if (!labelSizes.ContainsKey(labels[x, y]))
+                            {
+                                labelSizes[labels[x, y]] = 0;
+                            }
+                            labelSizes[labels[x, y]]++;
+                        }
+                    }
+                }
+
+                // Tìm nhãn của vùng lớn nhất
+                int maxLabel = -1;
+                int maxSize = -1;
+
+                foreach (var kvp in labelSizes)
+                {
+                    if (kvp.Value > maxSize)
+                    {
+                        maxSize = kvp.Value;
+                        maxLabel = kvp.Key;
+                    }
+                }
+
+                // Tạo ảnh kết quả chỉ giữ lại vùng lớn nhất
+                int[,] result = new int[width, height];
+
+                for (int x = 0; x < width; x++)
+                {
+                    for (int y = 0; y < height; y++)
+                    {
+                        if (labels[x, y] == maxLabel)
+                        {
+                            result[x, y] = 255;
+                        }
+                        else
+                        {
+                            result[x, y] = 0;
+                        }
+                    }
+                }
+
+                return result;
+            }
         }
         private void button1_Click(object sender, EventArgs e)
         {
@@ -1491,62 +1565,7 @@ namespace Image_proccessing
                 picture1.Image = image;
             }
         }
-        static int FindLargestRegion(int[,] image)
-        {
-            int rows = image.GetLength(0);
-            int cols = image.GetLength(1);
-            int maxArea = 0;
-            int[,] visited = new int[rows, cols];
 
-            for (int i = 0; i < rows; i++)
-            {
-                for (int j = 0; j < cols; j++)
-                {
-                    if (image[i, j] == 255 && visited[i, j] == 0)
-                    {
-                        int area = DFS(image, i, j, rows, cols, visited);
-                        if (area > maxArea)
-                            maxArea = area;
-                    }
-                }
-            }
-
-            return maxArea;
-        }
-
-        static int DFS(int[,] image, int i, int j, int rows, int cols, int[,] visited)
-        {
-            if (i < 0 || i >= rows || j < 0 || j >= cols || image[i, j] == 0 || visited[i, j] == 1)
-                return 0;
-
-            visited[i, j] = 1;
-            return 1 + DFS(image, i + 1, j, rows, cols, visited)
-                 + DFS(image, i - 1, j, rows, cols, visited)
-                 + DFS(image, i, j + 1, rows, cols, visited)
-                 + DFS(image, i, j - 1, rows, cols, visited);
-        }
-
-        static int[,] CreateOutputImage(int[,] image, int maxArea)
-        {
-            int rows = image.GetLength(0);
-            int cols = image.GetLength(1);
-            int[,] outputImage = new int[rows, cols];
-
-            for (int i = 0; i < rows; i++)
-            {
-                for (int j = 0; j < cols; j++)
-                {
-                    if (image[i, j] == 255)
-                    {
-                        int area = DFS(image, i, j, rows, cols, new int[rows, cols]);
-                        if (area == maxArea)
-                            outputImage[i, j] = 255;
-                    }
-                }
-            }
-
-            return outputImage;
-        }
         private void button2_Click(object sender, EventArgs e)
         {
             int high_threshold = 200;//ngưỡng trên cho canny detect
@@ -1618,30 +1637,51 @@ namespace Image_proccessing
                             }
                         }
                     }
-
                 }
             }
+            //int[,] thres_image = EdgeDetection.BitmapToInt(Import_picture);
+            //for (int i = 0; i < thres_image.GetLength(0); i++)
+            //{
+            //    for (int j = 0; j < thres_image.GetLength(1); j++)
+            //    {
+            //        if (thres_image[i, j] >= 55)
+            //        {
+            //            thres_image[i, j] = 255;
+            //        }
+            //        else
+            //        {
+            //            thres_image[i, j] = 0;
+            //        }
+            //    }
+            //}
+            //thres_image= RemoveSmallRegions.RemoveSmallWhiteRegions(thres_image);   
+            //int[,] houghcircle = EdgeDetection.HoughTransformForCircle(edges,50);
+            //int max_value = 0;
+            //for (int i = 0; i < houghcircle.GetLength(0); i++)
+            //{
+            //    for (int j=0; j < houghcircle.GetLength(1); j++)
+            //    {
+            //        if (houghcircle[i, j] > max_value)
+            //        {
+            //            max_value = houghcircle[i,j];
+            //        }    
 
-            int[,] houghcircle = EdgeDetection.BitmapToInt(Import_picture);
-            for (int i = 0; i < houghcircle.GetLength(0); i++)
-            {
-                for (int j=0; j < houghcircle.GetLength(1); j++)
-                {
-                    if (houghcircle[i, j] > 50)
-                    {
-                        houghcircle[i,j] = 255;
-                    }    
-                    else houghcircle[i,j] = 0;
-                }
-            }
-            // Tìm vùng lớn nhất
-            int maxArea =FindLargestRegion(houghcircle);
+            //    }
+            //}
+            //for (int i = 0; i < houghcircle.GetLength(0); i++)
+            //{
+            //    for (int j = 0; j < houghcircle.GetLength(1); j++)
+            //    {
+            //        if (houghcircle[i, j] >= max_value-5)
+            //        {
+            //            houghcircle[i, j]= 255;
+            //        }
+            //    }
+            //}
 
-            // Tạo ảnh output
-            int[,] outputImage = CreateOutputImage(houghcircle, maxArea);
 
             picture1.Image = Import_picture;
-            picture2.Image = EdgeDetection.IntToBitmap(outputImage);
+            //picture2.Image = EdgeDetection.IntToBitmap(thres_image);
             picture3.Image = EdgeDetection.IntToBitmap(hough);
             picture4.Image = EdgeDetection.IntToBitmap(edges);
    
