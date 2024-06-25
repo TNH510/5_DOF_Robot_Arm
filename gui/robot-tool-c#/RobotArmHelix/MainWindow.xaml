@@ -65,7 +65,7 @@
                     </Grid.ColumnDefinitions>
                     <Grid HorizontalAlignment="Left" Height="150" Margin="10,16,0,0" VerticalAlignment="Top" Width="288" Background="#FF1F21AF" Grid.ColumnSpan="9" Grid.Column="1">
                         <Label x:Name="jogging_lbl" Content="JOGGING" HorizontalAlignment="Center" VerticalAlignment="Top" Width="84" Foreground="#FF9EA1B0" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif" RenderTransformOrigin="-0.364,0.248"/>
-                        <Button x:Name="Forward_button" Content="Forward" HorizontalAlignment="Left" Margin="19,91,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" MouseDown="Forward_button_MouseDown" MouseUp="Forward_button_MouseUp"/>
+                        <Button x:Name="Forward_button" Content="Forward" HorizontalAlignment="Left" Margin="19,91,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" MouseDown="Forward_button_MouseDown" MouseUp="Forward_button_MouseUp" Click="Forward_button_Click"/>
                         <Button x:Name="Jog_set_speed" Content="Set speed" HorizontalAlignment="Left" Margin="22,56,0,0" VerticalAlignment="Top" Width="90" Height="24" FontSize="11" Click="Jog_set_speed_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36"/>
                         <Button x:Name="Backward_button" Content="Backward" HorizontalAlignment="Left" Margin="152,92,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" MouseDown="Backward_button_MouseDown" MouseUp="Backward_button_MouseUp"/>
                         <TextBox x:Name="joint_tb" Text="1" HorizontalAlignment="Left" Height="24" Margin="66,31,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="32" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Background="{x:Null}" Foreground="#FF007EF9" BorderBrush="{x:Null}" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
@@ -168,7 +168,7 @@
                             </Button.RenderTransform>
                         </Button>
                         <Button x:Name="Take_pic_btn" Content="TAKE PICTURE" HorizontalAlignment="Left" Margin="156,369,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" Click="Take_img_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36"/>
-                        <Image x:Name="displayedImageCamera" HorizontalAlignment="Left" Height="259" Margin="25,38,0,0" VerticalAlignment="Top" Width="621"/>
+                        <Image x:Name="displayedImageCamera" HorizontalAlignment="Left" Height="259" Margin="193,38,0,0" VerticalAlignment="Top" Width="453"/>
                     </Grid>
                 </Grid>
             </TabItem>

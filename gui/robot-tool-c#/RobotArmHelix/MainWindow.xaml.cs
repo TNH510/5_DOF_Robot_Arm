@@ -12,7 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-
+using Emgu.CV;
 using HelixToolkit.Wpf;
 using System.IO;
 using System.Reflection;
@@ -42,6 +42,8 @@ using System.Data.Common;
 using MathNet.Numerics.LinearAlgebra;
 using System.Windows.Shell;
 using Lokdeptrai;
+using Emgu.CV.Structure;
+using System.Runtime.InteropServices;
 /**
 * Author: Gabriele Marini (Gabryxx7)
 * This class load the 3d models of all the parts of the robotic arms and add them to the viewport
@@ -84,7 +86,7 @@ namespace RobotArmHelix
         public bool low_pass_init = false;
         public int plc_csv = 0;
         public double x_lpf = 0.0, y_lpf = 0.0, z_lpf = 0.0;
-        public double alpha = 0.5;
+        public double alpha = 0.2;
 
         public string[] plc_program_arr = { "home.csv", "conveyor1_in.csv", "conveyor1_out.csv", "conveyor2_in.csv", "conveyor2_out.csv", "conveyor3_in.csv", "conveyor3_out.csv", "conveyor4_in.csv", "conveyor4_out.csv" };
         public int plc_stt = 0;
@@ -1088,7 +1090,7 @@ namespace RobotArmHelix
             }
             /* Start timer1 and timer2 */
             // timer1.Start();
-            // Thread1Start();
+            Thread1Start();
             // Thread1Start();
             //Thread2Start();
             //timer1.Start();
@@ -1967,7 +1969,8 @@ namespace RobotArmHelix
                                 // Handle only control here
                                 if(update_pos_vel_data(byteArray, out x, out y, out z, out omega1_plc, out omega2_plc,  out omega3_plc, out omega4_plc, out omega5_plc))
                                 {
-                                    adaptive_runtime(x, y, z, omega1_plc, omega2_plc, omega3_plc, omega4_plc, omega5_plc);
+                                    adaptive_runtime(x, y, z, Math.Abs(omega1_plc), Math.Abs(omega2_plc), Math.Abs(omega3_plc), Math.Abs(omega4_plc), Math.Abs(omega5_plc));
+                                    Console.WriteLine(omega1_plc.ToString() + " " + omega2_plc.ToString() + " " + omega3_plc.ToString() + " " + omega4_plc.ToString());
                                 }
 
                                 if (csv_write_enable == true)
@@ -1988,17 +1991,14 @@ namespace RobotArmHelix
                                 // Handle Waiting start record here
                                 if(update_pos_vel_data(byteArray, out x, out y, out z, out omega1_plc, out omega2_plc,  out omega3_plc, out omega4_plc, out omega5_plc))
                                 {
-                                    adaptive_runtime(x, y, z, omega1_plc, omega2_plc, omega3_plc, omega4_plc, omega5_plc);
+                                    
+                                    adaptive_runtime(x, y, z, Math.Abs(omega1_plc), Math.Abs(omega2_plc), Math.Abs(omega3_plc), Math.Abs(omega4_plc), Math.Abs(omega5_plc));
                                 }
 
                                 if (plc_stt <= 8 && pre_cmd == 0 && cur_cmd == 1)
                                 {
                                     g_trajectory_mode= tracjectory_mode_t.MODE_START_RECORD_DATA;
-                                    plc_stt++;
-                                    if (plc_stt > 8)
-                                    {
-                                        plc_stt = 8;
-                                    }
+
                                     
                                 }
                                 else if (csv_write_enable == false)
@@ -2011,16 +2011,17 @@ namespace RobotArmHelix
                                 case tracjectory_mode_t.MODE_START_RECORD_DATA:
                                 Console.WriteLine("MODE_START_RECORD_DATA");
                                 Console.WriteLine("Trajectory"+ plc_stt.ToString());
-
                                 // Handle only control here
-                                if(update_pos_vel_data(byteArray, out x, out y, out z, out omega1_plc, out omega2_plc,  out omega3_plc, out omega4_plc, out omega5_plc))
+                                if (update_pos_vel_data(byteArray, out x, out y, out z, out omega1_plc, out omega2_plc,  out omega3_plc, out omega4_plc, out omega5_plc))
                                 {
-                                    adaptive_runtime(x, y, z, omega1_plc, omega2_plc, omega3_plc, omega4_plc, omega5_plc);
+                                    
+                                    adaptive_runtime(x, y, z, Math.Abs(omega1_plc), Math.Abs(omega2_plc), Math.Abs(omega3_plc), Math.Abs(omega4_plc), Math.Abs(omega5_plc));
                                 }
                                 Dispatcher.Invoke(() =>
-                                { 
+                                {
+                                   Name_csv.Content = plc_program_arr[plc_stt];
                                    /**/
-                                   string duongDanCoSo = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + "plc\\";
+                                    string duongDanCoSo = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + "plc\\";
                                    string tenTrajectory = plc_program_arr[plc_stt];
                                    string duongDanDayDu = Path.Combine(duongDanCoSo, tenTrajectory);
                                    string tenFileKhongDuoi = Path.GetFileNameWithoutExtension(duongDanDayDu);
@@ -2040,7 +2041,12 @@ namespace RobotArmHelix
                                 if (pre_cmd == 0x01 && cur_cmd == 0x00)
                                 {
                                     g_trajectory_mode = tracjectory_mode_t.MODE_WAITING_START_RECORD;
-                                }
+                                    plc_stt++;
+                                    if (plc_stt > 8)
+                                    {
+                                        plc_stt = 8;
+                                    }
+                                        }
                                 break;
 
                                 default:
@@ -2119,9 +2125,9 @@ namespace RobotArmHelix
             }
             z = z_pos / 10000.0;
 
-            x = x * 20;
-            y = y * 20;
-            z = z * 15 + 700;
+            x = x * 22;
+            y = y * 22;
+            z = z * 15 + 600;
 
             // Position variables through low pass filter
             if(low_pass_init == false)
@@ -2147,10 +2153,28 @@ namespace RobotArmHelix
             omega2_plc = omega[1] * 1800 * 15 / Math.PI + 150.0;
             omega3_plc = omega[2] * 1800 * 15 / Math.PI + 150.0;
             omega4_plc = -(omega[1] + omega[2]) * 1800 * 20 / Math.PI + 100.0;
-            omega5_plc = 0.0; 
+            omega5_plc = 0.0;
 
+            /* Anti wind-up */
+            if (Math.Abs(omega1_plc) >= 600)
+            {
+                omega1_plc = 600;
+            }
+            if (Math.Abs(omega2_plc) >= 400)
+            {
+                omega2_plc = 400;
+            }
+            if (Math.Abs(omega3_plc) >= 400)
+            {
+                omega3_plc = 400;
+            }
 
             ret = Check_angle(t1, t2, t3, t4, t5);
+
+            if(z < 500)
+            {
+                return false;
+            }
 
             if(ret == 0)
             {
@@ -2384,13 +2408,14 @@ namespace RobotArmHelix
             // Initialize a 2D array to hold the CSV data
             // Assuming you know the size of the array (10 rows and number of columns as per your data)
             double[,] data = new double[100, 3];
-            double[] vel = new double[100];
+            int[] value_vel = new int[200];
+            int[] temp_vel = new int[100];
             for (int t = 0; t < point_csv; t++)
             {
                 data[t, 0] = selectmemberX[t];
                 data[t, 1] = selectmemberY[t];
                 data[t, 2] = selectmemberZ[t];
-                vel[t] = velmember[t];
+                temp_vel[t] = (int)velmember[t] * 1000;
                 plot(velmember[t], 0, 0);
 
 
@@ -2399,9 +2424,8 @@ namespace RobotArmHelix
                 //Console.WriteLine(selectmemberY[t].ToString());
                 //Console.WriteLine(selectmemberZ[t].ToString());
             }
-            Console.WriteLine(velmember[42].ToString());
             Move_mod_Function(data, "D1010");
-
+            Memory_velocity_write(temp_vel, value_vel, "D1810", 100);
 
             //if (write_csv == false)
             //{
@@ -2634,6 +2658,7 @@ namespace RobotArmHelix
             if(plc_stt > 0)
             {
                 plc_stt--;
+                Console.WriteLine(plc_stt.ToString());
             }
         }
 
@@ -2801,7 +2826,7 @@ namespace RobotArmHelix
             // Bitmap Header(14 bytes) + Bitmap Information (40 bytes) + Color Palette (4 * 256) = 1078 bytes to delete
 
             // The kinds of image format (RAW or bitmap) is based on the configuration on E2D200.exe
-            int bytesToDelete = 1078; // Adjust this number according to your requirement
+            int bytesToDelete = 1125; // Adjust this number according to your requirement
 
             // Delete the specified number of bytes from the beginning
             byteData.RemoveRange(0, bytesToDelete);
@@ -2821,6 +2846,29 @@ namespace RobotArmHelix
             byte[,] byteArray2D = new byte[newHeight, newWidth];
             int[,] intArray2D = new int[newHeight, newWidth];
 
+
+
+            byteArray2D = ConvertTo2DArray(byteArrayModified, newHeight, newWidth);
+
+            Image<Bgr, byte> Hinhmucxam = new Image<Bgr, byte>(newWidth, newHeight);
+
+            for (int x = 0; x < newWidth; x++)
+            {
+                for (int y = 0; y < newHeight; y++)
+                {
+
+                    //Gan gia tri muc xam vua tinh duoc vao hinh muc xam
+                    Hinhmucxam.Data[y, x, 2] = byteArray2D[y, x];
+                    Hinhmucxam.Data[y, x, 1] = byteArray2D[y, x];
+                    Hinhmucxam.Data[y, x, 0] = byteArray2D[y, x];
+
+                }
+            }
+
+            //Hien thi hinh goc trong picBox_Hinhgoc da tao
+
+            //displayedImageCamera.Source = Hinhmucxam;
+
             // Chuyển đổi từng phần tử từ byte sang int
             for (int i = 0; i < newHeight; i++)
             {
@@ -2829,38 +2877,55 @@ namespace RobotArmHelix
                     intArray2D[i, j] = byteArray2D[i, j];
                 }
             }
-
-            byteArray2D = ConvertTo2DArray(byteArrayModified, newHeight, newWidth);
-
-            // Convert byte array to BitmapImage
-            var bitmapImage = ByteArrayToBitmapSource(byteArrayModified, newWidth, newHeight);
-
-            displayedImageCamera.Source = bitmapImage;
+            
 
             int high_threshold = 200;//ngưỡng trên cho canny detect
             int low_threshold = 50;//ngưỡng dưới cho canny detect 
+            
             int[,] edges = Image_Processing.DeTectEdgeByCannyMethod(intArray2D, high_threshold, low_threshold);
-            //edges = EdgeDetection.Erosion_Dilation(edges, 5, 5);
+            byte[,] edges_byte = new byte[edges.GetLength(0), edges.GetLength(1)];
+
+            Console.WriteLine(intArray2D[1, 1].ToString());
 
             // Lấy số hàng và số cột của mảng
-            // Khởi tạo một mảng 2 chiều
-            int widthCanny = edges.GetLength(0);
-            int heightCanny = edges.GetLength(1);
-
+            
             //biểu đồ hough
-            int[,] hough = Image_Processing.PerformHoughTransform(intArray2D);
+            int[,] hough = Image_Processing.PerformHoughTransform(edges);
             int[,] lines = Image_Processing.Find_line_info1(hough);
             //int[,] result = EdgeDetection.Drawline2(lines);
             int[,] corner = Image_Processing.Find_corner_info(lines);
 
-            Image_Processing.Detect_Shape_dimention(intArray2D, corner, out string shape, out int[,] dimention, out int[,] center_point);
+            Image_Processing.Detect_Shape_dimention(lines, corner, out string shape, out int[,] dimention, out int[,] center_point);
 
-            Console.WriteLine(dimention[0, 1].ToString());
-            Console.WriteLine(dimention[0, 0].ToString());
-            Console.WriteLine(dimention[1, 0].ToString());
-            Console.WriteLine(dimention[1, 1].ToString());
+            Console.WriteLine(shape);
+            Console.WriteLine(dimention[0,0]);
+            Console.WriteLine(dimention[0, 1]);
+            Console.WriteLine(dimention[1, 0]);
+            Console.WriteLine("x :"+center_point[0, 0]);
+            Console.WriteLine("y :" + center_point[0, 1]);
+        }
 
+        public static class BitmapSourceConvert
+        {
+            [DllImport("gdi32")]
+            private static extern int DeleteObject(IntPtr o);
 
+            //public static BitmapSource ToBitmapSource(IImage image)
+            //{
+            //    using (System.Drawing.Bitmap source = image.Bitmap)
+            //    {
+            //        IntPtr ptr = source.GetHbitmap();
+
+            //        BitmapSource bs = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
+            //            ptr,
+            //            IntPtr.Zero,
+            //            Int32Rect.Empty,
+            //            System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
+
+            //        DeleteObject(ptr);
+            //        return bs;
+            //    }
+            //}
         }
 
         public static byte[,] ConvertTo2DArray(byte[] array1D, int rows, int columns)
@@ -2917,6 +2982,11 @@ namespace RobotArmHelix
 
 
         private void Detect_shape_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Forward_button_Click(object sender, RoutedEventArgs e)
         {
 
         }
@@ -3118,7 +3188,7 @@ namespace RobotArmHelix
                 }
 
                 // Xây dựng ma trận Vandermonde
-                var A = Matrix<double>.Build.Dense(x.Length, degree + 1);
+                var A = MathNet.Numerics.LinearAlgebra.Matrix<double>.Build.Dense(x.Length, degree + 1);
                 for (int i = 0; i <= degree; i++)
                 {
                     for (int j = 0; j < x.Length; j++)
@@ -3217,7 +3287,7 @@ namespace RobotArmHelix
 
             /* Data to load to the PLC */
             int points_lpf = 100;
-            int vel_max = 500;
+            int vel_max = 1000;
             /* Take points for saving in PLC */
             double step = (double) numSamples / points_lpf;
 
