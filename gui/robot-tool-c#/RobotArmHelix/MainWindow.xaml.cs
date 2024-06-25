@@ -40,8 +40,8 @@ using System.Globalization;
 using MathNet.Numerics;
 using System.Data.Common;
 using MathNet.Numerics.LinearAlgebra;
-using Lokdeptrai;
 using System.Windows.Shell;
+using Lokdeptrai;
 /**
 * Author: Gabriele Marini (Gabryxx7)
 * This class load the 3d models of all the parts of the robotic arms and add them to the viewport
@@ -73,6 +73,8 @@ namespace RobotArmHelix
     /// </summary>
     public partial class MainWindow : System.Windows.Window
    {
+        // Create a socket object
+        Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
         public double[] selectmemberX = new double[500];
         public double[] selectmemberY = new double[500];
@@ -2706,6 +2708,217 @@ namespace RobotArmHelix
         private void Disable_plc_button_Click(object sender, RoutedEventArgs e)
         {
             csv_write_enable = false;
+        }
+
+        private void Connect_camera_click(object sender, RoutedEventArgs e)
+        {
+            // Connect to the server
+            string host = "192.168.000.49";
+            int port = Convert.ToInt32("50010");//50010
+
+            try
+            {
+                clientSocket.Connect(host, port);
+                Console.WriteLine("Connected");
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Unable to connect");
+            }
+        }
+
+        private void Take_img_Click(object sender, RoutedEventArgs e)
+        {
+            // Perform your desired action here
+            string CaptureImageMessage = "1003t\r\n";
+            byte[] CaptureImageBytes = Encoding.ASCII.GetBytes(CaptureImageMessage);
+            clientSocket.Send(CaptureImageBytes);
+            // Receive the response from the server
+            var buffer = new byte[308295];
+            int bytesRead = clientSocket.Receive(buffer);
+
+            System.Threading.Thread.Sleep(100); // Simulating 100ms delay
+
+            string RequestImageMessage = "1003I?\r\n";
+            // Send the command to the server
+            byte[] RequestImageBytes = Encoding.ASCII.GetBytes(RequestImageMessage);
+            clientSocket.Send(RequestImageBytes);
+
+            string sentencetosend = "1003I?\r\n";
+
+            // Receive the response from the server
+            buffer = new byte[308295];
+            bytesRead = clientSocket.Receive(buffer);
+
+            if (RequestImageMessage == sentencetosend)
+            {
+                response_client = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                //PrintLog("", "", response_client);
+                //Console.WriteLine(response_client);
+                while (bytesRead < 308291)
+                {
+                    bytesRead += clientSocket.Receive(buffer, bytesRead, 308291 - bytesRead, SocketFlags.None);
+                }
+            }
+
+            response_client = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+            //PrintLog("Data received", "", response_client);
+
+            // Sentences to remove
+            string[] sentencesToRemove = { "1003000308278", "1003*", "1003?", "1003000307200" };
+            //Console.WriteLine("hello");
+            // Loop through each sentence and replace it with an empty string
+            foreach (string sentence in sentencesToRemove)
+            {
+                response_client = response_client.Replace(sentence, "");
+            }
+
+            // Convert the modified response string back to bytes
+            byte[] modifiedBuffer = Encoding.ASCII.GetBytes(response_client);
+            // Convert each byte to its string representation
+            string[] byteStrings = new string[modifiedBuffer.Length];
+            for (int i = 0; i < modifiedBuffer.Length; i++)
+            {
+                byteStrings[i] = modifiedBuffer[i].ToString();
+            }
+            // Join the string representations of bytes
+            string bmpString = string.Join(" ", byteStrings);
+            // Split the byte string into individual byte values
+            string[] byteValues = bmpString.Split();
+
+            // Convert each byte value from string to integer
+            List<byte> byteData = new List<byte>();
+
+
+            foreach (string byteString in byteValues)
+            {
+                byteData.Add(Convert.ToByte(byteString));
+            }
+
+            // Define the number of bytes to delete from the beginning
+
+            // Bitmap Header(14 bytes) + Bitmap Information (40 bytes) + Color Palette (4 * 256) = 1078 bytes to delete
+
+            // The kinds of image format (RAW or bitmap) is based on the configuration on E2D200.exe
+            int bytesToDelete = 1078; // Adjust this number according to your requirement
+
+            // Delete the specified number of bytes from the beginning
+            byteData.RemoveRange(0, bytesToDelete);
+
+            // Convert the list of bytes back to byte array
+            byte[] byteArrayModified = byteData.ToArray();
+
+            // Determine the dimensions of the original image
+            int width = 640;  // Adjust according to your image width
+            int height = 480;  // Adjust according to your image height
+
+            // Calculate the new dimensions of the image after removing bytes
+            int newWidth = width;  // Since bytes removed from the beginning don't affect width
+            int newHeight = height;  // Adjust height accordingly
+
+            // convert from 1-D array to 2-D array
+            byte[,] byteArray2D = new byte[newHeight, newWidth];
+            int[,] intArray2D = new int[newHeight, newWidth];
+
+            // Chuyển đổi từng phần tử từ byte sang int
+            for (int i = 0; i < newHeight; i++)
+            {
+                for (int j = 0; j < newWidth; j++)
+                {
+                    intArray2D[i, j] = byteArray2D[i, j];
+                }
+            }
+
+            byteArray2D = ConvertTo2DArray(byteArrayModified, newHeight, newWidth);
+
+            // Convert byte array to BitmapImage
+            var bitmapImage = ByteArrayToBitmapSource(byteArrayModified, newWidth, newHeight);
+
+            displayedImageCamera.Source = bitmapImage;
+
+            int high_threshold = 200;//ngưỡng trên cho canny detect
+            int low_threshold = 50;//ngưỡng dưới cho canny detect 
+            int[,] edges = Image_Processing.DeTectEdgeByCannyMethod(intArray2D, high_threshold, low_threshold);
+            //edges = EdgeDetection.Erosion_Dilation(edges, 5, 5);
+
+            // Lấy số hàng và số cột của mảng
+            // Khởi tạo một mảng 2 chiều
+            int widthCanny = edges.GetLength(0);
+            int heightCanny = edges.GetLength(1);
+
+            //biểu đồ hough
+            int[,] hough = Image_Processing.PerformHoughTransform(intArray2D);
+            int[,] lines = Image_Processing.Find_line_info1(hough);
+            //int[,] result = EdgeDetection.Drawline2(lines);
+            int[,] corner = Image_Processing.Find_corner_info(lines);
+
+            Image_Processing.Detect_Shape_dimention(intArray2D, corner, out string shape, out int[,] dimention, out int[,] center_point);
+
+            Console.WriteLine(dimention[0, 1].ToString());
+            Console.WriteLine(dimention[0, 0].ToString());
+            Console.WriteLine(dimention[1, 0].ToString());
+            Console.WriteLine(dimention[1, 1].ToString());
+
+
+        }
+
+        public static byte[,] ConvertTo2DArray(byte[] array1D, int rows, int columns)
+        {
+            byte[,] array2D = new byte[rows, columns];
+            int index = 0;
+
+            // Iterate over the elements of the 1D array and assign them to the 2D array
+            for (int i = rows - 1; i >= 0; i--)
+            {
+                for (int j = 0; j < columns; j++)
+                {
+                    // Check if there are enough elements in the 1D array
+                    if (index < array1D.Length)
+                    {
+                        array2D[i, j] = array1D[index];
+                        index++;
+                    }
+                    else
+                    {
+                        array2D[i, j] = 0;
+                    }
+                }
+            }
+            return array2D;
+        }
+
+        // Method to convert byte array to BitmapImage
+        public static BitmapSource ByteArrayToBitmapSource(byte[] byteData, int newWidth, int newHeight)
+        {
+            if (byteData == null || byteData.Length == 0)
+                return null;
+
+            try
+            {
+                // Create BitmapSource
+                return BitmapSource.Create(
+                    newWidth,
+                    newHeight,
+                    96, // dpi x
+                    96, // dpi y
+                    PixelFormats.Gray8, // pixel format (8-bit grayscale)
+                    null, // palette
+                    byteData, // pixel data
+                    newWidth); // stride (width * bytes per pixel)
+            }
+            catch (Exception ex)
+            {
+                // Handle any exceptions
+                Console.WriteLine("Error converting byte array to BitmapSource: " + ex.Message);
+                return null;
+            }
+        }
+
+
+        private void Detect_shape_Click(object sender, RoutedEventArgs e)
+        {
+
         }
 
         private void New_Trajectory_Click(object sender, RoutedEventArgs e)
