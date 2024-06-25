@@ -1,4 +1,4 @@
-syms w x y z n l1 l2 ce se
+syms w x y z n l1 l2 ce se cy sy
 % syms l1 l2 
 
 % w = 0.5
@@ -7,6 +7,8 @@ syms w x y z n l1 l2 ce se
 % z = 0.5
 % ce = 1
 % se = 0
+% cy = 1
+% sy = 0
 
 % Compute quaternion norm
 n = w^2 + x^2 + y^2 + z^2;
@@ -25,11 +27,12 @@ a32 = 2 * (y*z + w*x) / n;
 a33 = (w^2 - x^2 - y^2 + z^2) / n;
 
 % Create the rotation matrix
+R0 = [cy -sy 0 0; sy cy 0 0; 0 0 1 0; 0 0 0 1]
 rotm = [a11 a12 a13 0; a21 a22 a23 0; a31 a32 a33 0; 0 0 0 1];
 T1 = [1 0 0 l1; 0 1 0 0; 0 0 1 0; 0 0 0 1]
-% R2 = [ce -se 0 0; se ce 0 0; 0 0 1 0; 0 0 0 1]
-% T2 = [1 0 0 l2; 0 1 0 0; 0 0 1 0; 0 0 0 1]
+R2 = [ce -se 0 0; se ce 0 0; 0 0 1 0; 0 0 0 1]
+T2 = [1 0 0 l2; 0 1 0 0; 0 0 1 0; 0 0 0 1]
 P  = [0; 0; 0; 1]
 
-% result = rotm * T1 * R2 * T2 * P
-result = rotm * T1 * P
+result = R0 * rotm * T1 * R2 * T2 * P
+% result = rotm * T1 * P

@@ -1,7 +1,7 @@
 /**
  * @file       drv_button.h
- * @copyright  Copyright (C) 2019 Fiot Co., Ltd. All rights reserved.
- * @license    This project is released under the Fiot License.
+ * @copyright  Copyright (C) HieuTranNgoc
+ * @license    This project is released under HieuTranNgoc License.
  * @version    1.1.2
  * @date       2023-08-30
  * @author     Hieu Tran
@@ -44,9 +44,15 @@ typedef enum
 typedef struct
 {
     button_event_t button_event_button_1;
+    button_event_t button_event_button_2;
+    button_event_t button_event_button_3;
 
-    volatile bool button_1_interrupt;
-    bool         *button_1_interrupt_p;
+    bool  button_1_interrupt;
+    bool *button_1_interrupt_p;
+    bool  button_2_interrupt;
+    bool *button_2_interrupt_p;
+    bool  button_3_interrupt;
+    bool *button_3_interrupt_p;
 } drv_button_t;
 /* Public macros ------------------------------------------------------ */
 
@@ -68,6 +74,6 @@ bool drv_button_init(void);
  */
 void drv_button_check_event(button_name_t *button_state);
 
-#endif  // __DRIVER_BUTTON_H
+#endif    // __DRIVER_BUTTON_H
 
 /* End of file -------------------------------------------------------- */

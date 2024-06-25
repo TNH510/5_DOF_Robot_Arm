@@ -23,7 +23,8 @@ Control Memory
 | M558   | JOG5_F             |
 | M559   | JOG5_R             |
 | M600   | Adapt Control (K6) |
-|        |                    |
+| M650   | Change vel (K7)    |
+| M700   | Program status     |
 
 Data memory
 
@@ -40,6 +41,8 @@ Data memory
 | D1404 --> D1405     | Data for axis 3 adapt_control     |
 | D1406 --> D1407     | Data for axis 4 adapt_control     |
 | D1408 --> D1409     | Data for axis 5 adapt_control     |
+| D2100 --> D2109     | Data for velocity control         |
+| D3000 --> D3009     | Test receive 5 axis position      |
 
 Temp memory
 
@@ -49,10 +52,11 @@ Temp memory
 | M542   |       |
 | M500   |       |
 | M502   |       |
+| D502   |       |
 | M602   |       |
 | M604   |       |
-|        |       |
-|        |       |
+| M503   |       |
+| D503   |       |
 |        |       |
 
 System Memory

@@ -1,10 +1,10 @@
 /**
  * @file       bsp_uart.c
- * @copyright  Copyright (C) 2019 Fiot Co., Ltd. All rights reserved.
+ * @copyright  Copyright (C) HieuTranNgoc
  * @license    This project is released under the QuyLe License.
  * @version    1.0.1
  * @date       2023-08-14
- * @author     Quy Le 
+ * @author     Quy Le
  * @author     Hieu Tran
  *
  * @brief      bsp uart
@@ -26,12 +26,12 @@ cbuffer_t                 cb;
 
 /* Private variables -------------------------------------------------- */
 /* Use for cbuffer */
-uint8_t  rx_buffer[RX_BUFFER_SIZE];
+uint8_t rx_buffer[RX_BUFFER_SIZE];
 
 /* User for handle data receive in dma mode */
-uint8_t        rx_buffer_user[RX_BUFFER_SIZE];
-static uint8_t rx_buffer_one[RX_BUFFER_SIZE];
-static uint8_t rx_buffer_two[RX_BUFFER_SIZE];
+uint8_t         rx_buffer_user[RX_BUFFER_SIZE];
+static uint8_t  rx_buffer_one[RX_BUFFER_SIZE];
+static uint8_t  rx_buffer_two[RX_BUFFER_SIZE];
 static uint8_t *p_buffer_for_reception;
 static uint8_t *p_buffer_for_user;
 
@@ -88,7 +88,7 @@ void bsp_uart_deinit_peripheral(void)
 void bsp_uart_handle_data(UART_HandleTypeDef *huart, uint16_t size)
 {
     static uint16_t old_pos = 0;
-    uint8_t       *p_temp;
+    uint8_t        *p_temp;
     uint16_t        i;
 
     /*Check if number of received data in reception buffer has changed*/

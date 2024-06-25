@@ -1,0 +1,24 @@
+@startuml formdata
+
+concise "FRAME" as PROTOCOL
+scale 100 as 50 pixels
+hide time-axis
+
+PROTOCOL is idle
+
+@PROTOCOL
+100 is 0xAA
++100 is CMD
++100 is X_POS
++300 is Y_POS
++300 is Z_POS
++300 is CRC
++100 is idle
+@100 <-> @200 : 1 Byte
+@200 <-> @300 : 1 Byte
+@300 <-> @600 : 3 Byte
+@600 <-> @900 : 3 Byte
+@900 <-> @1200 : 3 Byte
+@1200 <-> @1300 : 1 Byte
+@enduml
+

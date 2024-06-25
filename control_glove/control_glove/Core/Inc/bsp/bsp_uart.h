@@ -1,10 +1,10 @@
 /**
  * @file       bsp_uart.h
- * @copyright  Copyright (C) 2019 Fiot Co., Ltd. All rights reserved.
+ * @copyright  Copyright (C) HieuTranNgoc
  * @license    This project is released under the QuyLe License.
  * @version    1.0.1
  * @date       2023-08-14
- * @author     Quy Le 
+ * @author     Quy Le
  * @author     Hieu Tran
  *
  * @brief      bsp uart
@@ -17,9 +17,9 @@
 #define BSP_USART_H
 
 /* Includes ----------------------------------------------------------- */
+#include "bsp_common.h"
 #include "cbuffer.h"
 #include "main.h"
-#include "bsp_common.h"
 
 #include <string.h>
 /* Public defines ---------------------------------------------------- */
@@ -80,7 +80,7 @@ void bsp_uart_deinit_peripheral(void);
 
 /**
  * @brief Print length of string
- * 
+ *
  * @param huart   UART want to transmit
  * @param string  String want to transmit
  * @param len     Length string want to transmit

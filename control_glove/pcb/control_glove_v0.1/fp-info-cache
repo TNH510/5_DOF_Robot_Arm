@@ -1,4 +1,4 @@
-20588520252661694
+20590288055677110
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -86442,6 +86442,13 @@ varistor
 0
 2
 2
+hieu
+resistor
+
+
+0
+0
+0
 hieu
 stm32f4_board
 

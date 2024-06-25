@@ -13,12 +13,36 @@
 
 /* Private includes --------------------------------------------------------- */
 /* Private defines ---------------------------------------------------------- */
+typedef struct 
+{
+	uint8_t start_frame;
+	uint8_t cmd;
+	uint8_t x_pos[3];
+	uint8_t y_pos[3];
+	uint8_t z_pos[3];
+	uint8_t x_vel[2];
+	uint8_t y_vel[2];
+	uint8_t z_vel[2];
+	uint8_t crc;
+} glv_protocol_t;
+
+typedef struct
+{
+    uint8_t value  		: 7;
+    uint8_t sign_bit    : 1;
+} glv_pos_byte_high_t;
+
 /* Private enumerate/structure ---------------------------------------------- */
 /* Private macros ----------------------------------------------------------- */
 /* Public variables --------------------------------------------------------- */
 /* Private variables -------------------------------------------------------- */
+static float sy = 0.0f, cy = 1.0f; // Yaw init is 0
+
 /* Private prototypes ------------------------------------------------------- */
 static float square(float num);
+static bool encode_pos(float value, uint8_t *result);
+static bool encode_vel(float value, uint8_t *result);
+static uint8_t crc_8_atm(uint8_t *data, uint16_t length);
 
 /* Public implementations --------------------------------------------------- */
 void glv_convert_euler_angle(float q0, float q1, float q2, float q3, 
@@ -29,27 +53,33 @@ void glv_convert_euler_angle(float q0, float q1, float q2, float q3,
   *roll  = atan2(2.0f * (q0 * q1 + q2 * q3), q0 * q0 - q1 * q1 - q2 * q2 + q3 * q3) * 57.29577951;
 }
 
+void glv_set_init_yaw(float yaw_value_rad)
+{
+	sy = sin(-yaw_value_rad);
+	cy = cos(-yaw_value_rad);
+}
+
 void glv_pos_convert(float q0, float q1, float q2, float q3, float elbow_angle, 
-                              float *q1_pos, float *q2_pos, float *q3_pos)
+                              float *x, float *y, float *z)
 {
 	const float l1 = 12.0;
 	const float l2 = 20.0;
 	float ce = cos(elbow_angle);
 	float se = sin(elbow_angle);
 
-	*q1_pos = l2*((ce*(square(q0) + square(q1) - square(q2) - square(q3))) - (se*(2*q0*q3 - 2*q1*q2))) + (l1*(square(q0) + square(q1) - square(q2) - square(q3)));
-	*q2_pos = l2*((se*(square(q0) - square(q1) + square(q2) - square(q3))) + (ce*(2*q0*q3 + 2*q1*q2))) + (l1*(2*q0*q3 + 2*q1*q2));
-	*q3_pos = - l2*((ce*(2*q0*q2 - 2*q1*q3)) - (se*(2*q0*q1 + 2*q2*q3))) - (l1*(2*q0*q2 - 2*q1*q3));
+	*x = l2*(ce*((cy*(square(q0) + square(q1) - square(q2) - square(q3))) - (sy*(2*q0*q3 + 2*q1*q2))) - se*((sy*(square(q0) - square(q1) + square(q2) - square(q3))) + (cy*(2*q0*q3 - 2*q1*q2)))) + l1*((cy*(square(q0) + square(q1) - square(q2) - square(q3))) - (sy*(2*q0*q3 + 2*q1*q2)));
+	*y = l2*(ce*((sy*(square(q0) + square(q1) - square(q2) - square(q3))) + (cy*(2*q0*q3 + 2*q1*q2))) + se*((cy*(square(q0) - square(q1) + square(q2) - square(q3))) - (sy*(2*q0*q3 - 2*q1*q2)))) + l1*((sy*(square(q0) + square(q1) - square(q2) - square(q3))) + (cy*(2*q0*q3 + 2*q1*q2)));
+	*z = - l2*((ce*(2*q0*q2 - 2*q1*q3)) - (se*(2*q0*q1 + 2*q2*q3))) - (l1*(2*q0*q2 - 2*q1*q3));
 }
 
 void glv_pos_shoulder_convert(float q0, float q1, float q2, float q3, 
-                              float *q1_pos, float *q2_pos, float *q3_pos)
+                              float *x, float *y, float *z)
 {
 	const float l1 = 12.0;
 
-	*q1_pos = (l1*(square(q0) + square(q1) - square(q2) - square(q3)));
-    *q2_pos = (l1*(2*q0*q3 + 2*q1*q2));
-    *q3_pos = -(l1*(2*q0*q2 - 2*q1*q3));
+	*x = (l1*(square(q0) + square(q1) - square(q2) - square(q3)));
+    *y = (l1*(2*q0*q3 + 2*q1*q2));
+    *z = -(l1*(2*q0*q2 - 2*q1*q3));
 }
 
 void glv_robot_pos_convert(float x_pos, float y_pos, float z_pos, 
@@ -173,9 +203,136 @@ void glv_encrypt_sensor_data(float q0, float q1, float q2, float q3,
 	data[9] = (uint8_t)(elbow_temp & 0xFF);
 }
 
+bool glv_encode_uart_command(float x_pos, float y_pos, float z_pos, 
+                             float x_vel, float y_vel, float z_vel,
+                                glv_cmd_t cmd, uint8_t *encode_frame)
+{
+	glv_protocol_t frame;
+
+	// Set start frame and cmd
+	frame.start_frame = 0xAA;
+	frame.cmd = (uint8_t) cmd;
+
+	bool status = encode_pos(x_pos, &frame.x_pos[0]);
+	status &= encode_pos(y_pos, &frame.y_pos[0]);
+	status &= encode_pos(z_pos, &frame.z_pos[0]);
+
+	status &= encode_vel(x_vel, &frame.x_vel[0]);
+	status &= encode_vel(y_vel, &frame.y_vel[0]);
+	status &= encode_vel(z_vel, &frame.z_vel[0]);
+
+	if (status == true)
+	{
+		// Return result
+		encode_frame[0] = frame.start_frame;
+		encode_frame[1] = frame.cmd;
+		encode_frame[2] = frame.x_pos[0];
+		encode_frame[3] = frame.x_pos[1];
+		encode_frame[4] = frame.x_pos[2];
+		encode_frame[5] = frame.y_pos[0];
+		encode_frame[6] = frame.y_pos[1];
+		encode_frame[7] = frame.y_pos[2];
+		encode_frame[8] = frame.z_pos[0];
+		encode_frame[9] = frame.z_pos[1];
+		encode_frame[10] = frame.z_pos[2];
+
+		encode_frame[12] = frame.x_vel[0];
+		encode_frame[13] = frame.x_vel[1];
+		encode_frame[14] = frame.y_vel[0];
+		encode_frame[15] = frame.y_vel[1];
+		encode_frame[16] = frame.z_vel[0];
+		encode_frame[17] = frame.z_vel[1];
+
+		encode_frame[18] = 0xFF;
+
+		/* Caculate CRC */
+		frame.crc = crc_8_atm(encode_frame, 11);
+		encode_frame[11] = frame.crc;
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+
+}
+
 /* Private implementations -------------------------------------------------- */
 static float square(float num)
 {
 	return (float)(num * num);
+}
+
+static bool encode_vel(float value, uint8_t *result)
+{
+	// Check value
+	if (value <= 100.0 && value >= -100.0)
+	{
+		result[0] = (uint8_t)((((int32_t)(value * 100.0)) & 0xFF00) >> 8);
+		result[1] = (uint8_t)(((int32_t)(value * 100.0)) & 0x00FF);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+static bool encode_pos(float value, uint8_t *result)
+{
+	// Check value
+	if (value < 100.0f && value > -99.9999f)
+	{
+		glv_pos_byte_high_t pos_h;
+		uint32_t mul_1000_value = 0;
+
+		// Check value is positive or negative
+		if (value >= 0)
+		{
+			pos_h.sign_bit = 0;
+			mul_1000_value = (uint32_t)(value * 10000.0f);
+		}
+		else
+		{
+			pos_h.sign_bit = 1;
+			mul_1000_value = (uint32_t)(value * (-10000.0f));
+		}		
+
+		// Pos value handle
+		pos_h.value = ((uint8_t)((mul_1000_value & 0xFF0000) >> 16)) & 0b01111111;
+		result[0] = pos_h.value | (pos_h.sign_bit << 7);
+		result[1] = (uint8_t)((mul_1000_value & 0x00FF00) >> 8);
+		result[2] = (uint8_t)(mul_1000_value & 0x0000FF);
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+static uint8_t crc_8_atm(uint8_t *data, uint16_t length)
+{
+  uint8_t crc = 0;
+  for (uint16_t i = 0; i < length; i++)
+  {
+    crc ^= data[i];
+
+    for (uint8_t bit = 0; bit < 8; bit++)
+    {
+      if (crc & 0x80)
+      {
+        crc = (crc << 1) ^ 0x07;
+      }
+      else
+      {
+        crc <<= 1;
+      }
+    }
+  }
+
+  return crc;
 }
 /* End of file -------------------------------------------------------------- */
