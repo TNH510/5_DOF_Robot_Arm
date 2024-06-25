@@ -1090,7 +1090,7 @@ namespace RobotArmHelix
             }
             /* Start timer1 and timer2 */
             // timer1.Start();
-            //Thread1Start();
+            Thread1Start();
             // Thread1Start();
             //Thread2Start();
             //timer1.Start();
@@ -2041,6 +2041,35 @@ namespace RobotArmHelix
                                 if (pre_cmd == 0x01 && cur_cmd == 0x00)
                                 {
                                     g_trajectory_mode = tracjectory_mode_t.MODE_WAITING_START_RECORD;
+                                    double last_pointX = 0.0, last_pointY = 0.0, lastpointZ = 0.0; 
+                                    Dispatcher.Invoke(() =>
+                                    {
+                                        Name_csv.Content = plc_program_arr[plc_stt];
+                                        /**/
+                                        string duongDanCoSo = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + "plc\\";
+                                        string tenTrajectory = plc_program_arr[plc_stt];
+                                        string duongDanDayDu = Path.Combine(duongDanCoSo, tenTrajectory);
+                                        string tenFileKhongDuoi = Path.GetFileNameWithoutExtension(duongDanDayDu);
+
+                                        if (File.Exists(duongDanDayDu))
+                                        {
+                                            var lines = File.ReadAllLines(duongDanDayDu); // n numbers
+                                            int num = lines.Length;
+                                            Saving_point_name.Content = num.ToString();
+                                        }
+                                        using (StreamWriter writer = new StreamWriter(duongDanDayDu, true))
+                                        {
+                                            if(plc_stt == 0)
+                                            {
+                                                last_pointX = 596;
+                                                last_pointY = -406;
+                                                lastpointZ = 519;
+                                            }
+                                            string csvLine = $"{last_pointX},{last_pointY},{lastpointZ}";
+                                            writer.WriteLine(csvLine);
+                                        }
+                                    });
+
                                     plc_stt++;
                                     if (plc_stt > 8)
                                     {
@@ -2125,9 +2154,9 @@ namespace RobotArmHelix
             }
             z = z_pos / 10000.0;
 
-            x = x * 22;
-            y = y * 22;
-            z = z * 15 + 600;
+            x = x * 21;
+            y = y * 21;
+            z = z * 15 + 650;
 
             // Position variables through low pass filter
             if(low_pass_init == false)
