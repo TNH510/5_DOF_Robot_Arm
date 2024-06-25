@@ -27,6 +27,13 @@
 /* Private includes --------------------------------------------------------- */
 /* Private defines ---------------------------------------------------------- */
 /* Private enumerate/structure ---------------------------------------------- */
+typedef enum
+{
+    MODE_ONLY_SEND,
+    MODE_RECORD
+} cmd_mode_t;
+
+static cmd_mode_t g_mode = MODE_ONLY_SEND;
 static drv_imu_t g_imu_data = {.axg = 0, .ayg = 0, .azg = 0, .gxrs = 0, .gzrs = 0};
 static drv_magnetic_data_t g_magnetic_data = {.XAxis = 0, .YAxis = 0, .ZAxis = 0};
 
@@ -53,8 +60,6 @@ static float x_vel, y_vel, z_vel;
 static float x_vel_pre = 0, y_vel_pre = 0, z_vel_pre = 0;
 static float x_vel_pass, y_vel_pass, z_vel_pass;
 
-glv_cmd_t g_cmd = GLV_CMD_ONLY_POS_TRANSMIT;
-bool is_cmd_send = false;
 static uint8_t data_index_send = 0;
 static uint8_t encode_frame[19];
 
@@ -213,14 +218,13 @@ base_status_t sensor_manager_run(button_name_t event)
             y_vel_pre = y_vel_pass;
             z_vel_pre = z_vel_pass;
 
-            if (g_cmd != GLV_CMD_ONLY_POS_TRANSMIT)
+            if (g_mode == MODE_RECORD)
             {
-                glv_encode_uart_command(x_pos, y_pos, z_pos, x_vel_pass, y_vel_pass, z_vel_pass, g_cmd, encode_frame);
-                g_cmd = GLV_CMD_ONLY_POS_TRANSMIT;
+                glv_encode_uart_command(x_pos, y_pos, z_pos, x_vel_pass, y_vel_pass, z_vel_pass, GLV_CMD_POS_TRANSMIT_AND_START_RECORD, encode_frame);
             }
-            else
+            else if (g_mode == MODE_ONLY_SEND)
             {
-                glv_encode_uart_command(x_pos, y_pos, z_pos, x_vel_pass, y_vel_pass, z_vel_pass, g_cmd, encode_frame);
+                glv_encode_uart_command(x_pos, y_pos, z_pos, x_vel_pass, y_vel_pass, z_vel_pass, GLV_CMD_ONLY_POS_TRANSMIT, encode_frame);
             }
             
             HAL_Delay(5);
@@ -362,18 +366,15 @@ static void sensor_manager_run_button_change(button_name_t event)
     }
     else if (event == CLICK_LEFT_BUTTON)
     {
-        g_cmd = GLV_CMD_POS_TRANSMIT_AND_START_RECORD;
-        is_cmd_send = true;
-
+        g_mode = MODE_RECORD;
     }
     else if (event == HOLD_LEFT_BUTTON)
     {
-        g_cmd = GLV_CMD_POS_TRANSMIT_AND_STOP_RECORD;
+        /**/
     }
     else if (event == CLICK_RIGHT_BUTTON)
     {
-        g_cmd = GLV_CMD_POS_TRANSMIT_AND_STOP_RECORD;
-        is_cmd_send = true;
+        g_mode = MODE_ONLY_SEND;
     }
     else if (event == HOLD_RIGHT_BUTTON)
     {
