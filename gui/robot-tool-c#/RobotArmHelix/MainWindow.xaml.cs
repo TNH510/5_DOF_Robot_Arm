@@ -1090,7 +1090,7 @@ namespace RobotArmHelix
             }
             /* Start timer1 and timer2 */
             // timer1.Start();
-            Thread1Start();
+            //Thread1Start();
             // Thread1Start();
             //Thread2Start();
             //timer1.Start();
@@ -2150,8 +2150,8 @@ namespace RobotArmHelix
             Jacobi_vel = CreateVelocityMatrix(x_vel, y_vel, z_vel);
             omega = MultiplyMatrices(Jacobi_plus, Jacobi_vel);
             omega1_plc = omega[0] * 1800 * 35 / Math.PI + 100.0;
-            omega2_plc = omega[1] * 1800 * 15 / Math.PI + 150.0;
-            omega3_plc = omega[2] * 1800 * 15 / Math.PI + 150.0;
+            omega2_plc = omega[1] * 1800 * 20 / Math.PI + 80.0;
+            omega3_plc = omega[2] * 1800 * 20 / Math.PI + 80.0;
             omega4_plc = -(omega[1] + omega[2]) * 1800 * 20 / Math.PI + 100.0;
             omega5_plc = 0.0;
 
