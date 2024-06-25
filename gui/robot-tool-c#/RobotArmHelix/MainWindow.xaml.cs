@@ -88,7 +88,7 @@ namespace RobotArmHelix
         public double x_lpf = 0.0, y_lpf = 0.0, z_lpf = 0.0;
         public double alpha = 0.2;
 
-        public string[] plc_program_arr = { "home.csv", "conveyor1_in.csv", "conveyor1_out.csv", "conveyor2_in.csv", "conveyor2_out.csv", "conveyor3_in.csv", "conveyor3_out.csv", "conveyor4_in.csv", "conveyor4_out.csv" };
+        public string[] plc_program_arr = { "home.csv", "conveyor1_in.csv", "conveyor1_out.csv", "conveyor2_in.csv", "conveyor2_out.csv", "conveyor3_in.csv", "conveyor3_out.csv", "conveyor4_in.csv", "conveyor4_out.csv"};
         public int plc_stt = 0;
         public bool csv_write_enable = false;
 
@@ -349,6 +349,14 @@ namespace RobotArmHelix
             /* Check csv files */
             string[] csvfiles = LayTenTatCaFileCSV(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" +"plc\\");
             plc_stt = csvfiles.Length;
+            if(plc_stt < 1)
+            {
+                /* Do nothing */
+            }
+            else if(plc_stt >= 1)
+            {
+                plc_stt = plc_stt - 1;
+            }
         }
 
         #region Thread_Timer
@@ -1090,7 +1098,7 @@ namespace RobotArmHelix
             }
             /* Start timer1 and timer2 */
             // timer1.Start();
-            Thread1Start();
+            //Thread1Start();
             // Thread1Start();
             //Thread2Start();
             //timer1.Start();
@@ -2041,7 +2049,7 @@ namespace RobotArmHelix
                                 if (pre_cmd == 0x01 && cur_cmd == 0x00)
                                 {
                                     g_trajectory_mode = tracjectory_mode_t.MODE_WAITING_START_RECORD;
-                                    double last_pointX = 0.0, last_pointY = 0.0, lastpointZ = 0.0; 
+                                    double last_pointX = 0.0, last_pointY = 0.0, last_pointZ = 0.0; 
                                     Dispatcher.Invoke(() =>
                                     {
                                         Name_csv.Content = plc_program_arr[plc_stt];
@@ -2059,14 +2067,47 @@ namespace RobotArmHelix
                                         }
                                         using (StreamWriter writer = new StreamWriter(duongDanDayDu, true))
                                         {
-                                            if(plc_stt == 0)
+                                            if(plc_stt == 0) // Home
                                             {
-                                                last_pointX = 596;
-                                                last_pointY = -406;
-                                                lastpointZ = 519;
+                                                last_pointX = Convert.ToDouble(TbX_home.Text);
+                                                last_pointY = Convert.ToDouble(TbY_home.Text);
+                                                last_pointZ = Convert.ToDouble(TbZ_home.Text);
+                                                string csvLine = $"{last_pointX},{last_pointY},{last_pointZ}";
+                                                writer.WriteLine(csvLine);
                                             }
-                                            string csvLine = $"{last_pointX},{last_pointY},{lastpointZ}";
-                                            writer.WriteLine(csvLine);
+                                            else if(plc_stt == 1) //CV in 1
+                                            {
+                                                last_pointX = Convert.ToDouble(TbCVX1.Text);
+                                                last_pointY = Convert.ToDouble(TbCVY1.Text);
+                                                last_pointZ = Convert.ToDouble(TbCVZ1.Text);
+                                                string csvLine = $"{last_pointX},{last_pointY},{last_pointZ}";
+                                                writer.WriteLine(csvLine);
+                                            }
+                                            else if (plc_stt == 3)
+                                            {
+                                                last_pointX = Convert.ToDouble(TbCVX2.Text);
+                                                last_pointY = Convert.ToDouble(TbCVY2.Text);
+                                                last_pointZ = Convert.ToDouble(TbCVZ2.Text);
+                                                string csvLine = $"{last_pointX},{last_pointY},{last_pointZ}";
+                                                writer.WriteLine(csvLine);
+                                            }
+                                            else if (plc_stt == 5)
+                                            {
+                                                last_pointX = Convert.ToDouble(TbCVX3.Text);
+                                                last_pointY = Convert.ToDouble(TbCVY3.Text);
+                                                last_pointZ = Convert.ToDouble(TbCVZ3.Text);
+                                                string csvLine = $"{last_pointX},{last_pointY},{last_pointZ}";
+                                                writer.WriteLine(csvLine);
+                                            }
+                                            else if (plc_stt == 7)
+                                            {
+                                                last_pointX = Convert.ToDouble(TbCVX4.Text);
+                                                last_pointY = Convert.ToDouble(TbCVY4.Text);
+                                                last_pointZ = Convert.ToDouble(TbCVZ4.Text);
+                                                string csvLine = $"{last_pointX},{last_pointY},{last_pointZ}";
+                                                writer.WriteLine(csvLine);
+                                            }
+
                                         }
                                     });
 
@@ -3316,7 +3357,7 @@ namespace RobotArmHelix
 
             /* Data to load to the PLC */
             int points_lpf = 100;
-            int vel_max = 1000;
+            int vel_max = 1500;
             /* Take points for saving in PLC */
             double step = (double) numSamples / points_lpf;
 
