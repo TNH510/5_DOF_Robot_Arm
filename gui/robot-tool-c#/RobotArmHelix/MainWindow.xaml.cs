@@ -1514,7 +1514,7 @@ namespace RobotArmHelix
             int ret;
             int[] value_angle = new int[800];
             int[] value_angle_t5 = new int[200];
-
+            
             /* Linear Equation */
             for (int t = 0; t < 100; t++)
             {
@@ -1548,11 +1548,6 @@ namespace RobotArmHelix
 
             Memory_angle_write(angle_array, value_angle, device, 100);
 
-            //for (int j = 0; j < 100; j++)
-            //{
-            //    value_angle_t5[2 * j] = Write_Theta(angle_array[j, 4])[0];
-            //    value_angle_t5[2 * j + 1] = Write_Theta(angle_array[j, 4])[1];
-            //}
         }
         private void MoveL_Function(double[] curr_pos, double[] targ_pos, string device)
         {
@@ -1856,6 +1851,16 @@ namespace RobotArmHelix
 
             }
             plc.WriteDeviceBlock(device, 8 * point, ref value_angle[0]);
+        }
+
+        private void Memory_velocity_write(int[] array, int[] value_vel, string device, int point)
+        {
+            for (int j = 0; j < point; j++)
+            {
+                value_vel[2 * j] = Write_Theta(array[j])[0];
+                value_vel[2 * j + 1] = Write_Theta(array[j])[1];
+            }
+            plc.WriteDeviceBlock(device, 2 * point, ref value_vel[0]);
         }
         public void write_d_mem_32_bit(int device, int data)
         {
@@ -2433,17 +2438,24 @@ namespace RobotArmHelix
             // Initialize a 2D array to hold the CSV data
             // Assuming you know the size of the array (10 rows and number of columns as per your data)
             double[,] data = new double[100, 3];
+            int[] value_vel = new int[200];
+            int[] temp_vel = new int[100];
             for (int t = 0; t < point_csv; t++)
             {
                 data[t, 0] = selectmemberX[t];
                 data[t, 1] = selectmemberY[t];
                 data[t, 2] = selectmemberZ[t];
 
+                temp_vel[t] = (int)velmember[t] * 1000;
+
+                plot(velmember[t], 0, 0);
+
                 Console.WriteLine(selectmemberX[t].ToString());
                 Console.WriteLine(selectmemberY[t].ToString());
                 Console.WriteLine(selectmemberZ[t].ToString());
             }
 
+            Memory_velocity_write(temp_vel, value_vel, "D1810", 100);
             Move_mod_Function(data, "D1010");
         }
 
