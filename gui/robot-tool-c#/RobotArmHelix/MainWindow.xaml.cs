@@ -87,6 +87,10 @@ namespace RobotArmHelix
         public double x_lpf = 0.0, y_lpf = 0.0, z_lpf = 0.0;
         public double alpha = 0.2;
 
+
+        public byte plc_receive_data = 0x00;
+        public byte plc_receive_height = 0x00;
+        public byte plc_receive_length = 0x00;
         public bool plc_receive_object = false;
         public bool plc_accept = false;
         public bool plc_come_object = false;
@@ -691,11 +695,11 @@ namespace RobotArmHelix
 
             //biểu đồ hough
             int[,] hough = Image_Processing.PerformHoughTransform(edges);
-            int[,] lines = Image_Processing.Find_line_info1(hough);
+            int[,] lines = Image_Processing.Find_line_info1(hough, out int count_hough_point);
             //int[,] result = EdgeDetection.Drawline2(lines);
             int[,] corner = Image_Processing.Find_corner_info(lines);
 
-            Image_Processing.Detect_Shape_dimention(lines, corner, out shape, out int[,] dimention, out int[,] center_point);
+            Image_Processing.Detect_Shape_dimention(edges, lines, corner, out shape, out int[,] dimention, out int[,] center_point);
 
             Console.WriteLine(shape);
         }
@@ -708,7 +712,7 @@ namespace RobotArmHelix
             Console.WriteLine("MODE_IDLE");
                 // Handle 
                  
-                if(plc_receive_object == true)
+                if(plc_receive_data == 0x01)
                 {
                     g_plc_run_mode = plc_run_mode_t.MODE_TAKE_PICTURE;
 
@@ -747,15 +751,23 @@ namespace RobotArmHelix
                         shape_name.Text = shape;
                     });
                     g_plc_run_mode = plc_run_mode_t.MODE_RETURN;
+                    byte[] sendata = new byte[4];
+                    sendata[0] = 0xBB;
+                    sendata[1] = 0x02;
+                    sendata[2] = 0x00;
+                    sendata[3] = 0x00;
+                    uart.Write(sendata, 0, sendata.Length);
+                        
+                    //Sendrequest("run");                 
+                    
                 }
                 
             break;
 
             case plc_run_mode_t.MODE_RETURN:
             Console.WriteLine("MODE_RETURN");
-                //Sendrequest("run");                 
-                //plc_accept = plc.Read();
-                if(plc_accept == true)
+                //plc_receive_data = plc.Read();
+                if(plc_receive_data == 0x03)
                 {
                     g_plc_run_mode = plc_run_mode_t.MODE_WAITING_POSITION;
                 }
@@ -765,8 +777,8 @@ namespace RobotArmHelix
             case plc_run_mode_t.MODE_WAITING_POSITION:
 
             Console.WriteLine("MODE_WAITING_POSITION");
-                //plc_come_object = plc.Read();
-                if(plc_come_object == true)
+                //plc_receive_data = plc.Read();
+                if(plc_receive_data == 0x04)
                 {
                     g_plc_run_mode = plc_run_mode_t.MODE_RUN_TRAJECTORY;
                 }
@@ -827,11 +839,17 @@ namespace RobotArmHelix
                         ret = PLCReadbit("M700", out map_complete);
                         if (map_complete == 1)
                         {
-                            plc_receive_object = false;
+                            plc_receive_data = 0x00;
                             plc_accept = false;
                             plc_come_object = false;
                             g_plc_run_mode = plc_run_mode_t.MODE_IDLE;
                             g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_1;
+                            byte[] sendata = new byte[4];
+                            sendata[0] = 0xBB;
+                            sendata[1] = 0x05;
+                            sendata[2] = 0x00;
+                            sendata[3] = 0x00;
+                            uart.Write(sendata, 0, sendata.Length);
                         }
                     break;
 
@@ -887,11 +905,17 @@ namespace RobotArmHelix
                         ret = PLCReadbit("M700", out map_complete);
                         if (map_complete == 1)
                         {
-                            plc_receive_object = false;
+                            plc_receive_data = 0x00;
                             plc_accept = false;
                             plc_come_object = false;
                             g_plc_run_mode = plc_run_mode_t.MODE_IDLE;
                             g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_1;
+                            byte[] sendata = new byte[4];
+                            sendata[0] = 0xBB;
+                            sendata[1] = 0x05;
+                            sendata[2] = 0x00;
+                            sendata[3] = 0x00;
+                            uart.Write(sendata, 0, sendata.Length);
                         }
                     break;
                     default:
@@ -900,7 +924,7 @@ namespace RobotArmHelix
                 
                 break;
                 case "Unknown":
-                        plc_receive_object = false;
+                        plc_receive_data = 0x00;
                         plc_accept = false;
                         plc_come_object = false;
                         g_plc_run_mode = plc_run_mode_t.MODE_IDLE;
@@ -912,7 +936,7 @@ namespace RobotArmHelix
                 if(Done_stt == true)
                 {
                     turn = 0;
-                    plc_receive_object = false;
+                    plc_receive_data = 0x00;
                     plc_accept = false;
                     plc_come_object = false;
                     g_plc_run_mode = plc_run_mode_t.MODE_IDLE;
@@ -2394,6 +2418,17 @@ namespace RobotArmHelix
                     byte[] byteArray = new byte[uart.BytesToRead];
                     uart.Read(byteArray, 0, byteArray.Length);
                     // Convert the byte array to a hexadecimal string
+                    if (byteArray[0] == 0xBB)
+                    {
+                        Console.WriteLine("Hello hehe");
+                        plc_receive_data = byteArray[1];
+                        plc_receive_height = byteArray[2];
+                        plc_receive_length = byteArray[3];
+
+                        Console.WriteLine(plc_receive_data.ToString());
+                        Console.WriteLine(plc_receive_height.ToString());
+                        Console.WriteLine(plc_receive_length.ToString());
+                    }
                     if (byteArray.Length >= 19)
                     {
                         byte crc_byte = 0x00;
@@ -3474,11 +3509,11 @@ namespace RobotArmHelix
 
             //biểu đồ hough
             int[,] hough = Image_Processing.PerformHoughTransform(edges);
-            int[,] lines = Image_Processing.Find_line_info1(hough);
+            int[,] lines = Image_Processing.Find_line_info1(hough, out int count_hough_point);
             //int[,] result = EdgeDetection.Drawline2(lines);
             int[,] corner = Image_Processing.Find_corner_info(lines);
 
-            Image_Processing.Detect_Shape_dimention(lines, corner, out shape, out int[,] dimention, out int[,] center_point);
+            Image_Processing.Detect_Shape_dimention(edges, lines, corner, out shape, out int[,] dimention, out int[,] center_point);
 
             Console.WriteLine(shape);
             Console.WriteLine(dimention[0, 0]);
@@ -3495,7 +3530,7 @@ namespace RobotArmHelix
 
         private void Receive_btn_Click(object sender, RoutedEventArgs e)
         {
-            plc_receive_object = true;
+            plc_receive_data = 0x00;
         }
 
         private void Shape_btn_Click(object sender, RoutedEventArgs e)
@@ -3835,7 +3870,7 @@ namespace RobotArmHelix
                 }
                 else
                 {
-                    int numSamples30 = (int)(numSamples * 0.3);
+                    int numSamples30 = (int)(numSamples * 0.2);
                     int numSamples70 = numSamples - numSamples30;
                     if (j < numSamples30)
                     {
