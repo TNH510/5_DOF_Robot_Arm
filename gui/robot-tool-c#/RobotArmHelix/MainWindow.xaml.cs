@@ -88,6 +88,13 @@ namespace RobotArmHelix
         public double x_lpf = 0.0, y_lpf = 0.0, z_lpf = 0.0;
         public double alpha = 0.2;
 
+        public bool plc_receive_object = false;
+        public bool plc_accept = false;
+        public bool plc_come_object = false;
+        public bool Done_stt = false;
+        public string shape = "";
+        public int turn = 0;
+
         public string[] plc_program_arr = { "home.csv", "conveyor1_in.csv", "conveyor1_out.csv", "conveyor2_in.csv", "conveyor2_out.csv", "conveyor3_in.csv", "conveyor3_out.csv", "conveyor4_in.csv", "conveyor4_out.csv"};
         public int plc_stt = 0;
         public bool csv_write_enable = false;
@@ -113,8 +120,29 @@ namespace RobotArmHelix
             MODE_START_RECORD_DATA,
             MODE_DELETE_LAST_DATA,
         }
+        public enum plc_run_mode_t
+        {
+            MODE_IDLE,
+            MODE_TAKE_PICTURE,
+            MODE_RETURN, 
+            MODE_WAITING_POSITION,
+            MODE_RUN_TRAJECTORY,
+        }
+
+        public enum run_trajectory_mode_t
+        {
+            MODE_MAP_1,
+            MODE_WAITING_MAP1,
+            MODE_MAP_2,
+            MODE_WAITING_MAP2,
+            MODE_MAP_3,
+            MODE_WAITING_MAP3,
+            MODE_WAITING_DONE,
+        }
 
         tracjectory_mode_t g_trajectory_mode = tracjectory_mode_t.MODE_IDLE;
+        plc_run_mode_t g_plc_run_mode = plc_run_mode_t.MODE_IDLE;
+        run_trajectory_mode_t g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_1;
 
         int value = 0;
         int vel_1_test;
@@ -229,7 +257,6 @@ namespace RobotArmHelix
 
         private readonly DispatcherTimer _timer;
         private readonly BackgroundWorker _uartWorker;
-
         public MainWindow()
         {
             InitializeComponent();
@@ -292,6 +319,10 @@ namespace RobotArmHelix
             timer1 = new System.Windows.Forms.Timer();
             timer1.Interval = 100;
             timer1.Tick += new System.EventHandler(timer1_Tick);
+
+            timer2 = new System.Windows.Forms.Timer();
+            timer2.Interval = 100;
+            timer2.Tick += new System.EventHandler(timer2_Tick);
 
             #endregion
 
@@ -473,6 +504,171 @@ namespace RobotArmHelix
             catch (Exception er)
             {
                 PrintLog("Bug", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", er));
+            }
+        }
+
+        public void move_trajectory_plc(string path1)
+        {
+            string duongDanCoSo = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + "plc\\";
+            string tenTrajectory = path1;
+            string duongDanDayDu = Path.Combine(duongDanCoSo, tenTrajectory);
+
+            Modify_low_pass_filter(duongDanDayDu);
+
+            int point_csv = 100;
+            //Initialize a 2D array to hold the CSV data
+            //Assuming you know the size of the array (10 rows and number of columns as per your data)
+            double[,] data = new double[100, 3];
+            int[] value_vel = new int[200];
+            int[] temp_vel = new int[100];
+            for (int t = 0; t < point_csv; t++)
+            {
+                data[t, 0] = selectmemberX[t];
+                data[t, 1] = selectmemberY[t];
+                data[t, 2] = selectmemberZ[t];
+                temp_vel[t] = (int)velmember[t] * 1000;
+                plot(velmember[t], 0, 0);
+
+
+                Console.WriteLine(velmember[t].ToString());
+                Console.WriteLine(selectmemberX[t].ToString());
+                Console.WriteLine(selectmemberY[t].ToString());
+                Console.WriteLine(selectmemberZ[t].ToString());
+            }
+            Move_mod_Function(data, "D1010");
+            Memory_velocity_write(temp_vel, value_vel, "D1810", 100);
+
+            turn_on_1_pulse_relay(530);
+            Press_button(MethodBase.GetCurrentMethod().Name, "M530");
+        }
+
+        public void timer2_Tick(object sender, EventArgs e)
+        {
+            switch (g_plc_run_mode)
+            {
+            case plc_run_mode_t.MODE_IDLE:
+            Console.WriteLine("MODE_IDLE");
+                // Handle 
+                 
+                if(plc_receive_object == true)
+                {
+                    g_plc_run_mode = plc_run_mode_t.MODE_TAKE_PICTURE;
+                } 
+                
+                break;
+
+            case plc_run_mode_t.MODE_TAKE_PICTURE:
+            Console.WriteLine("MODE_TAKE_PICTURE");
+                shape = "square";
+                bool taken_pic = true;
+                if(taken_pic == true)
+                {
+                    g_plc_run_mode = plc_run_mode_t.MODE_RETURN;
+                }
+                
+            break;
+
+            case plc_run_mode_t.MODE_RETURN:
+            Console.WriteLine("MODE_RETURN");
+                //Sendrequest("run");                 
+                //plc_accept = plc.Read();
+                if(plc_accept == true)
+                {
+                    g_plc_run_mode = plc_run_mode_t.MODE_WAITING_POSITION;
+                }
+                
+            break;
+
+            case plc_run_mode_t.MODE_WAITING_POSITION:
+
+            Console.WriteLine("MODE_WAITING_POSITION");
+                //plc_come_object = plc.Read();
+                if(plc_come_object == true)
+                {
+                    g_plc_run_mode = plc_run_mode_t.MODE_RUN_TRAJECTORY;
+                }
+                
+            break;
+
+            case plc_run_mode_t.MODE_RUN_TRAJECTORY:
+            Console.WriteLine("MODE_RUN_TRAJECTORY");
+                switch (shape)
+                {
+                case "square":
+                    int ret, map_complete;
+                    string[] map = { "home.csv", "conveyor1_in.csv", "conveyor1_out.csv" };
+                    string duongDanCoSo = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + "plc\\";
+                    switch (g_run_trajectory_plc)
+                    {
+                    case run_trajectory_mode_t.MODE_MAP_1:
+                    Console.WriteLine("MODE_MAP_1");
+
+                        move_trajectory_plc(map[0]);
+                        g_run_trajectory_plc = run_trajectory_mode_t.MODE_WAITING_MAP1;
+
+                    break;
+                    case run_trajectory_mode_t.MODE_WAITING_MAP1:
+                    Console.WriteLine("MODE_WAITING_MAP1");
+                        /* Read status of Brake and AC Servo */
+                        ret = PLCReadbit("M700", out map_complete);
+                        if (map_complete == 1)
+                        {
+                            g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_2;
+                        }         
+                    break;
+                    case run_trajectory_mode_t.MODE_MAP_2:
+                    Console.WriteLine("MODE_MAP_2");
+
+                        move_trajectory_plc(map[1]);
+                        g_run_trajectory_plc = run_trajectory_mode_t.MODE_WAITING_MAP2;
+                    break;
+                    case run_trajectory_mode_t.MODE_WAITING_MAP2:
+                    Console.WriteLine("MODE_WAITING_MAP2");
+                        /* Read status of Brake and AC Servo */
+                        ret = PLCReadbit("M700", out map_complete);
+                        if (map_complete == 1)
+                        {
+                            g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_3;
+                        }
+
+                    break;
+                    case run_trajectory_mode_t.MODE_MAP_3:
+                    Console.WriteLine("MODE_MAP_3");
+
+                        move_trajectory_plc(map[2]);
+                        g_run_trajectory_plc = run_trajectory_mode_t.MODE_WAITING_DONE;
+                    break;
+                    case run_trajectory_mode_t.MODE_WAITING_DONE:
+                    Console.WriteLine("MODE_WAITING_DONE");
+                        /* Read status of Brake and AC Servo */
+                        ret = PLCReadbit("M700", out map_complete);
+                        if (map_complete == 1)
+                        {
+                            g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_1;
+                        }
+                    break;
+
+                    default:
+                    break;
+                    }
+                break;
+                default:
+                break;
+                }
+
+                if(Done_stt == true)
+                {
+                    turn = 0;
+                    plc_receive_object = false;
+                    plc_accept = false;
+                    plc_come_object = false;
+                    g_plc_run_mode = plc_run_mode_t.MODE_IDLE;
+                }
+
+            break;
+
+            default:
+            break;
             }
         }
 
@@ -1964,7 +2160,7 @@ namespace RobotArmHelix
                                 {
                                 case tracjectory_mode_t.MODE_IDLE:
                                 Console.WriteLine("MODE_IDLE");
-
+                                
                                 if (glove_enable == 1)
                                 {
                                     g_trajectory_mode = tracjectory_mode_t.MODE_ONLY_CONTROL;
@@ -2029,7 +2225,7 @@ namespace RobotArmHelix
                                 {
                                    Name_csv.Content = plc_program_arr[plc_stt];
                                    /**/
-                                    string duongDanCoSo = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + "plc\\";
+                                   string duongDanCoSo = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + "plc\\";
                                    string tenTrajectory = plc_program_arr[plc_stt];
                                    string duongDanDayDu = Path.Combine(duongDanCoSo, tenTrajectory);
                                    string tenFileKhongDuoi = Path.GetFileNameWithoutExtension(duongDanDayDu);
@@ -3144,6 +3340,36 @@ namespace RobotArmHelix
 
         }
 
+        private void Receive_btn_Click(object sender, RoutedEventArgs e)
+        {
+            plc_receive_object = true;
+        }
+
+        private void Shape_btn_Click(object sender, RoutedEventArgs e)
+        {
+            shape = "square";
+        }
+
+        private void PLC_accept_button_Click(object sender, RoutedEventArgs e)
+        {
+            plc_accept = true;
+        }
+
+        private void PLC_come_button_Click(object sender, RoutedEventArgs e)
+        {
+            plc_come_object = true;
+        }
+
+        private void Run_PLC_Click(object sender, RoutedEventArgs e)
+        {
+            timer2.Start();
+        }
+
+        private void Stop_PLC_Click(object sender, RoutedEventArgs e)
+        {
+            timer2.Stop();
+        }
+
         private void New_Trajectory_Click(object sender, RoutedEventArgs e)
         {
             string duongDanCoSo = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + program_list_name.Text + "\\";
@@ -3163,7 +3389,7 @@ namespace RobotArmHelix
             // Tạo mới file CSV
             using (StreamWriter writer = new StreamWriter(duongDanDayDu, false))
             {
-
+                
             }
         }
 
