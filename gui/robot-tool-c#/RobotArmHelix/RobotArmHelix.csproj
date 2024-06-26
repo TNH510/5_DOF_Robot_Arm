@@ -100,7 +100,7 @@
       <HintPath>..\packages\HelixToolkit.Wpf.2.24.0\lib\net462\HelixToolkit.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="Lokdeptrai">
-      <HintPath>..\..\..\..\camera_test\Lokdeptrai.dll</HintPath>
+      <HintPath>C:\Users\Hieu\Documents\Zalo Received Files\Lokdeptrai.dll</HintPath>
     </Reference>
     <Reference Include="MathNet.Numerics, Version=5.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MathNet.Numerics.5.0.0\lib\net48\MathNet.Numerics.dll</HintPath>
