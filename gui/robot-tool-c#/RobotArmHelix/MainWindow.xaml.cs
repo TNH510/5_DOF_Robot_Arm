@@ -710,12 +710,12 @@ namespace RobotArmHelix
             {
             case plc_run_mode_t.MODE_IDLE:
             Console.WriteLine("MODE_IDLE");
-                // Handle 
+                // Handle
                  
                 if(plc_receive_data == 0x01)
                 {
                     g_plc_run_mode = plc_run_mode_t.MODE_TAKE_PICTURE;
-
+                    
                     // Connect to the server
                     string host = "192.168.000.49";
                     int port = Convert.ToInt32("50010");//50010
@@ -923,11 +923,84 @@ namespace RobotArmHelix
                     }
                 
                 break;
+
+                case "Triangle":
+                    string[] map3 = { "home.csv", "conveyor3_in.csv", "conveyor3_out.csv" };
+                    switch (g_run_trajectory_plc)
+                    {
+                    case run_trajectory_mode_t.MODE_MAP_1:
+                    Console.WriteLine("MODE_MAP_1");
+
+                        move_trajectory_plc(map3[0]);
+                        g_run_trajectory_plc = run_trajectory_mode_t.MODE_WAITING_MAP1;
+
+                    break;
+                    case run_trajectory_mode_t.MODE_WAITING_MAP1:
+                    Console.WriteLine("MODE_WAITING_MAP1");
+                        /* Read status of Brake and AC Servo */
+                        ret = PLCReadbit("M700", out map_complete);
+                        if (map_complete == 1)
+                        {
+                            g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_2;
+                        }         
+                    break;
+                    case run_trajectory_mode_t.MODE_MAP_2:
+                    Console.WriteLine("MODE_MAP_2");
+
+                        move_trajectory_plc(map3[1]);
+                        g_run_trajectory_plc = run_trajectory_mode_t.MODE_WAITING_MAP2;
+                    break;
+                    case run_trajectory_mode_t.MODE_WAITING_MAP2:
+                    Console.WriteLine("MODE_WAITING_MAP2");
+                        /* Read status of Brake and AC Servo */
+                        ret = PLCReadbit("M700", out map_complete);
+                        if (map_complete == 1)
+                        {
+                            g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_3;
+                        }
+
+                    break;
+                    case run_trajectory_mode_t.MODE_MAP_3:
+                    Console.WriteLine("MODE_MAP_3");
+
+                        move_trajectory_plc(map3[2]);
+                        g_run_trajectory_plc = run_trajectory_mode_t.MODE_WAITING_DONE;
+                    break;
+                    case run_trajectory_mode_t.MODE_WAITING_DONE:
+                    Console.WriteLine("MODE_WAITING_DONE");
+                        /* Read status of Brake and AC Servo */
+                        ret = PLCReadbit("M700", out map_complete);
+                        if (map_complete == 1)
+                        {
+                            plc_receive_data = 0x00;
+                            plc_accept = false;
+                            plc_come_object = false;
+                            g_plc_run_mode = plc_run_mode_t.MODE_IDLE;
+                            g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_1;
+                            byte[] sendata = new byte[4];
+                            sendata[0] = 0xBB;
+                            sendata[1] = 0x05;
+                            sendata[2] = 0x00;
+                            sendata[3] = 0x00;
+                            uart.Write(sendata, 0, sendata.Length);
+                        }
+                    break;
+                    default:
+                    break;
+                    }
+                
+                break;
                 case "Unknown":
                         plc_receive_data = 0x00;
                         plc_accept = false;
                         plc_come_object = false;
                         g_plc_run_mode = plc_run_mode_t.MODE_IDLE;
+                        byte[] sendata2 = new byte[4];
+                        sendata2[0] = 0xBB;
+                        sendata2[1] = 0x05;
+                        sendata2[2] = 0x00;
+                        sendata2[3] = 0x00;
+                        uart.Write(sendata2, 0, sendata2.Length);
                 break;
                 default:
                 break;
@@ -1491,6 +1564,19 @@ namespace RobotArmHelix
 
         private void GoHome_button_Click(object sender, RoutedEventArgs e)
         {
+            /* Stop command axis 1 */
+            turn_on_1_pulse_relay(3200);
+            /* Stop command axis 2 */
+            turn_on_1_pulse_relay(3220);
+            /* Stop command axis 3 */
+            turn_on_1_pulse_relay(3240);
+            /* Stop command axis 4 */
+            turn_on_1_pulse_relay(3260);
+            /* Stop command axis 5 */
+            turn_on_1_pulse_relay(3280);
+
+            turn_on_1_pulse_relay(515);
+
             Press_button(MethodBase.GetCurrentMethod().Name, Constants.R_GOHOME);
         }
         #endregion
@@ -3216,22 +3302,6 @@ namespace RobotArmHelix
             }
         }
 
-        private void Process_image_button_Click(object sender, RoutedEventArgs e)
-        {
-            string filePath = "C:\\Users\\daveb\\Desktop\\5_DOF_Robot_Arm\\gui\\robot-tool-c#\\RobotArmHelix\\image\\113.bmp";
-            int[,] pixelArray = ConvertBmpTo2DArray(filePath);
-            int[,] hello = Lokdeptrai.Image_Processing.Point_corner(pixelArray);
-            // In ra mảng 2 chiều để kiểm tra kết quả
-            for (int i = 0; i < hello.GetLength(0); i++)
-            {
-                for (int j = 0; j < hello.GetLength(1); j++)
-                {
-                    Console.Write(hello[i, j] + " ");
-                }
-                Console.WriteLine();
-            }
-        }
-
         public static int[,] ConvertBmpTo2DArray(string filePath)
         {
             // Tạo BitmapImage từ đường dẫn file
@@ -3263,20 +3333,6 @@ namespace RobotArmHelix
             }
 
             return pixelArray;
-        }
-
-        private void Plot_dat_csv_Click(object sender, RoutedEventArgs e)
-        {
-            string save_path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + program_list_name.Text + "\\" + trajectory_list_name.Text + ".csv";
-            /* Check file existing having data or not to warn the user */
-            // Read all lines from the CSV file
-            var lines = File.ReadAllLines(save_path); // n numbers
-            int num = lines.Length;
-            for(int i = 0; i < num; i++)
-            {
-                var values = lines[i].Split(',').Select(double.Parse).ToArray();
-                plot_lpf(values[0], values[1], values[2]);
-            }
         }
 
         private void Enable_plc_button_Click(object sender, RoutedEventArgs e)
@@ -3487,10 +3543,6 @@ namespace RobotArmHelix
             byteArray2D = ConvertTo2DArray(byteArrayModified, newHeight, newWidth);
 
 
-            //Hien thi hinh goc trong picBox_Hinhgoc da tao
-
-            displayedImageCamera.Source = bitmapImage;
-
             // Chuyển đổi từng phần tử từ byte sang int
             for (int i = 0; i < newHeight; i++)
             {
@@ -3551,6 +3603,13 @@ namespace RobotArmHelix
         private void Run_PLC_Click(object sender, RoutedEventArgs e)
         {
             timer2.Start();
+            /* Send command for PLC to run */
+            byte[] sendata = new byte[4];
+            sendata[0] = 0xBB;
+            sendata[1] = 0x05;
+            sendata[2] = 0x00;
+            sendata[3] = 0x00;
+            uart.Write(sendata, 0, sendata.Length);
         }
 
         private void Stop_PLC_Click(object sender, RoutedEventArgs e)

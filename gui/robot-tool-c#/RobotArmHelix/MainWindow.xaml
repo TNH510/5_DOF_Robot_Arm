@@ -18,27 +18,12 @@
         <!--<Label x:Name="coordinatesLabel" Content="Coordinates: (0, 0, 0)" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,63,0" Foreground="White"/>-->
         <Menu Grid.ColumnSpan="2">
             <MenuItem Header="Project">
-                <MenuItem Header="New" HorizontalAlignment="Left" Height="20" Width="150">
-                    <MenuItem.Icon>
-                        <Image Source="Icons/NewFile.png" />
-                    </MenuItem.Icon>
-                </MenuItem>
-                <MenuItem Command="Open" HorizontalAlignment="Left" Height="20" Width="150" >
-                    <MenuItem.Icon>
-                        <Image Source="Icons/open.png" />
-                    </MenuItem.Icon>
-                </MenuItem>
                 <Separator HorizontalAlignment="Left" Height="1" Width="140"/>
                 <MenuItem x:Name="MenuItemExit" InputGestureText="Ctrl+X" Header="Exit" HorizontalAlignment="Left" Height="20" Width="150" Click="MenuItemExit_Click" >
                     <MenuItem.Icon>
                         <Image Source="Icons/Exit.png" Margin="0,0,0,-3" />
                     </MenuItem.Icon>
                 </MenuItem>
-            </MenuItem>
-            <MenuItem Header="_Edit" Height="20" Width="40">
-                <MenuItem Command="Cut" HorizontalAlignment="Left" Height="20" Width="150"/>
-                <MenuItem Command="Copy" HorizontalAlignment="Left" Height="20" Width="150"/>
-                <MenuItem Command="Paste" HorizontalAlignment="Left" Height="20" Width="150"/>
             </MenuItem>
             <MenuItem Header="_Online" Height="20" Width="50">
                 <MenuItem Header="PLC" Height="20" Width="150">
@@ -63,7 +48,7 @@
                         <ColumnDefinition Width="95*"/>
                         <ColumnDefinition Width="1618*"/>
                     </Grid.ColumnDefinitions>
-                    <Grid HorizontalAlignment="Left" Height="150" Margin="10,16,0,0" VerticalAlignment="Top" Width="288" Background="#FF1F21AF" Grid.ColumnSpan="9" Grid.Column="1">
+                    <Grid HorizontalAlignment="Left" Height="160" Margin="18,237,0,0" VerticalAlignment="Top" Width="288" Background="Black" Grid.Column="1" Grid.ColumnSpan="9">
                         <Label x:Name="jogging_lbl" Content="JOGGING" HorizontalAlignment="Center" VerticalAlignment="Top" Width="84" Foreground="#FF9EA1B0" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif" RenderTransformOrigin="-0.364,0.248"/>
                         <Button x:Name="Forward_button" Content="Forward" HorizontalAlignment="Left" Margin="19,91,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" MouseDown="Forward_button_MouseDown" MouseUp="Forward_button_MouseUp" Click="Forward_button_Click"/>
                         <Button x:Name="Jog_set_speed" Content="Set speed" HorizontalAlignment="Left" Margin="22,56,0,0" VerticalAlignment="Top" Width="90" Height="24" FontSize="11" Click="Jog_set_speed_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36"/>
@@ -72,10 +57,7 @@
                         <Label x:Name="Joint_lbl" Content="Joint" HorizontalAlignment="Left" Margin="27,31,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="23" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
                         <TextBox x:Name="jog_speed_tb" Text="500" HorizontalAlignment="Left" Height="24" Margin="184,57,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Background="{x:Null}" Foreground="#FF007EF9" BorderBrush="{x:Null}" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
                     </Grid>
-                    <Grid HorizontalAlignment="Left" Height="318" Margin="12,192,0,0" VerticalAlignment="Top" Width="288" Opacity="0.9" Grid.ColumnSpan="9" Grid.Column="1">
-                        <Grid.Background>
-                            <ImageBrush ImageSource="/hinh-nen-win-10-co-logo-4-mau.jpg"/>
-                        </Grid.Background>
+                    <Grid HorizontalAlignment="Left" Height="318" Margin="17,427,0,0" VerticalAlignment="Top" Width="288" Opacity="0.9" Grid.ColumnSpan="9" Grid.Column="1" Background="Black">
                         <TextBox x:Name="TbX" Text="500" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="50" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" TextChanged="ReachingPoint_TextChanged" Background="{x:Null}" Foreground="#FF007EF9" BorderBrush="{x:Null}" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="66,79,0,0"/>
                         <TextBox x:Name="TbY" Text="0" HorizontalAlignment="Left" Height="24" TextWrapping="Wrap" VerticalAlignment="Top" Width="51" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" TextChanged="ReachingPoint_TextChanged" Background="{x:Null}" Foreground="#FF007EF9" BorderBrush="{x:Null}" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="139,80,0,0"/>
                         <TextBox x:Name="TbZ" Text="900" HorizontalAlignment="Left" Height="24" TextWrapping="Wrap" VerticalAlignment="Top"  Width="50" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" TextChanged="ReachingPoint_TextChanged" Background="{x:Null}" Foreground="#FF007EF9" BorderBrush="{x:Null}" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="195,80,0,0"/>
@@ -92,7 +74,7 @@
                         <Button x:Name="EStop_btn" Content="E-Stop" HorizontalAlignment="Left" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" Click="EStop_bttn_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF181E36" FontWeight="Bold" BorderBrush="#FF181E36" Background="#FF007EF9" Margin="148,235,0,0"/>
                         <Button x:Name="Clear_Trajectory_btn" Content="Clear_Trajectory" HorizontalAlignment="Left" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" Click="Clr_Traj_btn_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Margin="12,176,0,0"/>
                     </Grid>
-                    <Grid HorizontalAlignment="Left" Height="142" Margin="54,20,0,0" VerticalAlignment="Top" Width="365" Background="#FFA23414" Grid.Column="9">
+                    <Grid HorizontalAlignment="Left" Height="160" Margin="59,237,0,0" VerticalAlignment="Top" Width="365" Background="Black" Grid.Column="9">
                         <Label x:Name="control_lbl" Content="CONTROL" HorizontalAlignment="Center" VerticalAlignment="Top" Width="84" Foreground="#FF9EA1B0" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif"/>
                         <Button x:Name="Servo_button" Content="Servo" HorizontalAlignment="Left" Margin="44,40,0,0" VerticalAlignment="Top" Width="119" Height="38" FontSize="11" Click="Servo_button_click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36"/>
                         <Button x:Name="ResetError_button" Content="Reset error" HorizontalAlignment="Left" Margin="44,91,0,0" VerticalAlignment="Top" Width="117" Height="40" FontSize="11" Click="ResetError_button_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36"/>
@@ -108,12 +90,9 @@
                         </Button>
                         <Button x:Name="GoHome_button" Content="Go home" HorizontalAlignment="Left" Margin="214,91,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" Click="GoHome_button_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36"/>
                     </Grid>
-                    <oxy:PlotView x:Name="plotView_position" Grid.Column="9" Background="White" Cursor="Hand" Margin="445,10,18,490" />
-                    <oxy:PlotView x:Name="plotView_robot_pos" Margin="445,516,18,46" Background="White" Grid.Column="9" />
-                    <Grid HorizontalAlignment="Left" Height="316" Margin="55,193,0,0" VerticalAlignment="Top" Width="364" Grid.Column="9">
-                        <Grid.Background>
-                            <ImageBrush ImageSource="/hinh-nen-windows-10-dep-32.jpg"/>
-                        </Grid.Background>
+                    <oxy:PlotView x:Name="plotView_position" Grid.Column="9" Background="White" Cursor="Hand" Margin="445,10,18,484" />
+                    <oxy:PlotView x:Name="plotView_robot_pos" Margin="445,516,18,23" Background="White" Grid.Column="9" />
+                    <Grid HorizontalAlignment="Left" Height="316" Margin="60,428,0,0" VerticalAlignment="Top" Width="364" Grid.Column="9" Background="Black">
                         <Label x:Name="Glove_name" Content="GLOVE" HorizontalAlignment="Left" Margin="135,2,0,0" VerticalAlignment="Top" Width="84" Foreground="#FF9EA1B0" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif"/>
                         <Label x:Name="Glove_com" Content="COM PORT" HorizontalAlignment="Left" Margin="17,50,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
                         <Label x:Name="Glove_baud" Content="BAUD RATE" HorizontalAlignment="Left" Margin="17,82,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
@@ -149,22 +128,6 @@
                             </ComboBox.Background>
                         </ComboBox>
                         <Button x:Name="Refresh_glove_btn" Content="Refresh" HorizontalAlignment="Left" Margin="198,50,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_refresh_button_Click" RenderTransformOrigin="0.48,1.838"/>
-                    </Grid>
-                    <Grid HorizontalAlignment="Left" Height="442" Margin="13,524,0,0" VerticalAlignment="Top" Width="668" Background="#FFA23414" Grid.Column="1" Grid.ColumnSpan="9">
-                        <Label x:Name="control_lbl1" Content="CONTROL" HorizontalAlignment="Center" VerticalAlignment="Top" Width="84" Foreground="#FF9EA1B0" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif"/>
-                        <Button x:Name="Connect_camera_btn" Content="CONNECT" HorizontalAlignment="Left" Margin="50,334,0,0" VerticalAlignment="Top" Width="165" Height="65" FontSize="11" Click="Connect_camera_click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36"/>
-                        <Button x:Name="Detect_shape" Content="DETECT" HorizontalAlignment="Left" Margin="434,335,0,0" VerticalAlignment="Top" Width="165" Height="65" FontSize="11" Click="Detect_shape_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" RenderTransformOrigin="0.5,0.5">
-                            <Button.RenderTransform>
-                                <TransformGroup>
-                                    <ScaleTransform/>
-                                    <SkewTransform AngleY="0.653"/>
-                                    <RotateTransform/>
-                                    <TranslateTransform Y="-0.655"/>
-                                </TransformGroup>
-                            </Button.RenderTransform>
-                        </Button>
-                        <Button x:Name="Take_pic_btn" Content="TAKE PICTURE" HorizontalAlignment="Left" Margin="241,334,0,0" VerticalAlignment="Top" Width="165" Height="65" FontSize="11" Click="Take_img_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" RenderTransformOrigin="1.279,-0.349"/>
-                        <Image x:Name="displayedImageCamera" HorizontalAlignment="Left" Height="283" Margin="109,31,0,0" VerticalAlignment="Top" Width="537"/>
                     </Grid>
                 </Grid>
             </TabItem>
@@ -218,23 +181,21 @@
                         <Label x:Name="Tz" HorizontalAlignment="Left" Margin="276,25,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="25" Width="62" ContentStringFormat="{}{0:0.##}" FontFamily="Microsoft Sans Serif" FontWeight="Bold"/>
                         <Label x:Name="display_lbl" Content="DISPLAY" HorizontalAlignment="Left" Margin="150,1,0,0" VerticalAlignment="Top" Width="84" Foreground="#FF9EA1B0" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif"/>
                     </Grid>
-                    <TextBox x:Name="ErrorLog" HorizontalAlignment="Left" Height="432" TextWrapping="Wrap" VerticalAlignment="Top"  Width="408" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" Background="#FF007EF9" Foreground="Black" BorderBrush="#FF007EF9" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="12,447,0,0" Grid.ColumnSpan="5"/>
+                    <TextBox x:Name="ErrorLog" HorizontalAlignment="Left" Height="510" TextWrapping="Wrap" VerticalAlignment="Top"  Width="408" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" Background="#FF007EF9" Foreground="Black" BorderBrush="#FF007EF9" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="12,447,0,0" Grid.ColumnSpan="5"/>
                 </Grid>
             </TabItem>
             <TabItem Height="25" Header="Program" VerticalAlignment="Center" Margin="10,0,-10,0">
                 <Grid Background="#FFE5E5E5">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="4*"/>
-                        <ColumnDefinition Width="115*"/>
+                        <ColumnDefinition Width="64*"/>
+                        <ColumnDefinition Width="28*"/>
+                        <ColumnDefinition Width="1813*"/>
                     </Grid.ColumnDefinitions>
-                    <Grid HorizontalAlignment="Left" Height="365" Margin="8,18,0,0" VerticalAlignment="Top" Width="570" Grid.Column="1">
-                        <Grid.Background>
-                            <ImageBrush ImageSource="/hinh-nen-windows-10-dep-32.jpg"/>
-                        </Grid.Background>
+                    <Grid HorizontalAlignment="Left" Height="365" Margin="8,18,0,0" VerticalAlignment="Top" Width="570" Grid.Column="1" Grid.ColumnSpan="2" Background="Black">
                         <Label x:Name="Auto_name" Content="AUTO GENERATE" HorizontalAlignment="Center" VerticalAlignment="Top" Width="162" Foreground="#FF9EA1B0" FontSize="14" FontWeight="Bold" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Microsoft Sans Serif"/>
-                        <Button x:Name="Enable_glove_btn" Content="ENABLE RUNTIME" HorizontalAlignment="Left" Margin="36,262,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_enable_button_Click"/>
-                        <Button x:Name="Disble_glove_btn" Content="DISABLE RUNTIME" HorizontalAlignment="Left" Margin="36,314,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_disable_button_Click" RenderTransformOrigin="0.48,1.838"/>
-                        <Button x:Name="Modify_csv_btn" Content="Modify data" HorizontalAlignment="Left" Margin="196,314,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Modify_dat_csv_Click"/>
+                        <Button x:Name="Enable_glove_btn" Content="ENABLE RUNTIME" HorizontalAlignment="Left" Margin="61,262,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_enable_button_Click"/>
+                        <Button x:Name="Disble_glove_btn" Content="DISABLE RUNTIME" HorizontalAlignment="Left" Margin="61,314,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Glove_disable_button_Click" RenderTransformOrigin="0.48,1.838"/>
+                        <Button x:Name="Modify_csv_btn" Content="Modify data" HorizontalAlignment="Left" Margin="382,315,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Modify_dat_csv_Click"/>
                         <ComboBox x:Name="program_list_name" SelectedIndex="0" HorizontalAlignment="Left" Margin="156,49,0,0" VerticalAlignment="Top" Width="85"/>
                         <Label x:Name="Exist_program_name" Content="EXIST PROGRAM" HorizontalAlignment="Left" Margin="38,47,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
                         <Label x:Name="Point_save_name" Content="SAVED POINTS:" HorizontalAlignment="Left" Margin="37,158,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
@@ -264,25 +225,30 @@
                         <ComboBox x:Name="trajectory_list_name" SelectedIndex="0" HorizontalAlignment="Left" Margin="380,50,0,0" VerticalAlignment="Top" Width="129"/>
                         <Label x:Name="Exist_trajectory_name" Content="EXIST TRAJECTORY" HorizontalAlignment="Left" Margin="248,48,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
                         <Button x:Name="Create_new_trajectory_btn_Copy" Content="New trajectory" HorizontalAlignment="Left" Margin="170,92,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="New_Trajectory_Click"/>
-                        <Button x:Name="Test_move_mod" Content="Move trajectory" HorizontalAlignment="Left" Margin="196,261,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" Click="Test_move_mod_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36"/>
+                        <Button x:Name="Test_move_mod" Content="Move trajectory" HorizontalAlignment="Left" Margin="382,262,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" Click="Test_move_mod_Click" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36"/>
                         <Label x:Name="Status_name" Content="STATUS:" HorizontalAlignment="Left" Margin="36,204,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
                         <Label x:Name="Status_mode_name" Content="OK" HorizontalAlignment="Left" Margin="97,204,0,0" VerticalAlignment="Top" Foreground="#FF00F90F" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
                         <Label x:Name="CSV_name" Content="CSV STATUS:" HorizontalAlignment="Left" Margin="36,227,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
                         <Label x:Name="Saving_stt_name" Content="Waiting..." HorizontalAlignment="Left" Margin="126,228,0,0" VerticalAlignment="Top" Foreground="#FFF7F900" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
                         <Label x:Name="Saving_point_name" Content="0" HorizontalAlignment="Left" Margin="142,158,0,0" VerticalAlignment="Top" Foreground="#FF00F90F" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
-                        <Button x:Name="Plot_lpf_btn" Content="Show data" HorizontalAlignment="Left" Margin="405,172,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Plot_dat_csv_Click"/>
                         <Label x:Name="Csv_file_name" Content="FILE WRITING:" HorizontalAlignment="Left" Margin="37,178,0,0" VerticalAlignment="Top" Foreground="#FF007EF9" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif"/>
                         <Label x:Name="Name_csv" Content="" HorizontalAlignment="Left" Margin="137,178,0,0" VerticalAlignment="Top" Foreground="#FF00F90F" Height="24" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Width="90"/>
+                        <Button x:Name="Enbale_PLC_btn" Content="ENABLE PLC" HorizontalAlignment="Left" Margin="232,264,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Enable_plc_button_Click" RenderTransformOrigin="0.48,1.838"/>
+                        <Button x:Name="Disable_PLC_btn" Content="DISABLE PLC" HorizontalAlignment="Left" Margin="231,315,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Disable_plc_button_Click" RenderTransformOrigin="0.48,1.838"/>
                     </Grid>
-                    <Grid HorizontalAlignment="Left" Height="397" Margin="8,394,0,0" VerticalAlignment="Top" Width="566" Background="#FFA23414" Grid.Column="1">
-                        <Image x:Name="displayedImage" HorizontalAlignment="Left" Height="293" Margin="11,11,0,0" VerticalAlignment="Top" Width="542"/>
-                        <Button x:Name="Process_image_btn" Content="Process" HorizontalAlignment="Left" Margin="31,316,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Process_image_button_Click" RenderTransformOrigin="0.48,1.838"/>
-                        <Button x:Name="Enbale_PLC_btn" Content="ENABLE PLC" HorizontalAlignment="Left" Margin="200,316,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Enable_plc_button_Click" RenderTransformOrigin="0.48,1.838"/>
-                        <Button x:Name="Disable_PLC_btn" Content="DISABLE PLC" HorizontalAlignment="Left" Margin="396,316,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Disable_plc_button_Click" RenderTransformOrigin="0.48,1.838"/>
-                        <TextBox x:Name="shape_name" Text="Undetect" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="86" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" TextChanged="ReachingPoint_TextChanged" Background="{x:Null}" Foreground="#FF007EF9" BorderBrush="{x:Null}" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="84,364,0,0"/>
-                        <Label x:Name="tbShape" Content="Shape:" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="#FF007EF9" Height="23" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="31,364,0,0"/>
+                    <Grid HorizontalAlignment="Left" Height="514" Margin="8,394,0,0" VerticalAlignment="Top" Width="569" Background="Black" Grid.Column="1" Grid.ColumnSpan="2">
+                        <Image x:Name="displayedImage" HorizontalAlignment="Left" Height="394" Margin="11,11,0,0" VerticalAlignment="Top" Width="542"/>
+                        <TextBox x:Name="shape_name" Text="Undetect" HorizontalAlignment="Left" Height="37" TextWrapping="Wrap" VerticalAlignment="Top" Width="106" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" TextChanged="ReachingPoint_TextChanged" Background="{x:Null}" Foreground="#FF007EF9" BorderBrush="{x:Null}" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="433,69,0,0" FontSize="20"/>
+                        <Label x:Name="tbShape" Content="Shape:" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="#FF007EF9" Height="32" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="440,39,0,0" FontSize="20"/>
+                        <TextBox x:Name="CoordX" Text="X:" HorizontalAlignment="Left" Height="37" TextWrapping="Wrap" VerticalAlignment="Top" Width="106" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" TextChanged="ReachingPoint_TextChanged" Background="{x:Null}" Foreground="#FF007EF9" BorderBrush="{x:Null}" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="420,166,0,0" FontSize="20"/>
+                        <Label x:Name="tbCoord" Content="Coordination:" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="#FF007EF9" Height="32" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="410,132,0,0" FontSize="20"/>
+                        <TextBox x:Name="CoordY" Text="Y:" HorizontalAlignment="Left" Height="37" TextWrapping="Wrap" VerticalAlignment="Top" Width="106" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" TextChanged="ReachingPoint_TextChanged" Background="{x:Null}" Foreground="#FF007EF9" BorderBrush="{x:Null}" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="420,196,0,0" FontSize="20"/>
+                        <TextBox x:Name="CoordX_name" Text="0" HorizontalAlignment="Left" Height="37" TextWrapping="Wrap" VerticalAlignment="Top" Width="106" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" TextChanged="ReachingPoint_TextChanged" Background="{x:Null}" Foreground="#FF007EF9" BorderBrush="{x:Null}" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="450,166,0,0" FontSize="20"/>
+                        <TextBox x:Name="CoordY_name" Text="0" HorizontalAlignment="Left" Height="37" TextWrapping="Wrap" VerticalAlignment="Top" Width="106" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" TextChanged="ReachingPoint_TextChanged" Background="{x:Null}" Foreground="#FF007EF9" BorderBrush="{x:Null}" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="450,196,0,0" FontSize="20"/>
+                        <Button x:Name="Stop_btn" Content="Stop" HorizontalAlignment="Left" Margin="316,438,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Stop_PLC_Click" RenderTransformOrigin="0.48,1.838"/>
+                        <Button x:Name="Run_btn" Content="Run" HorizontalAlignment="Left" Margin="130,438,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Run_PLC_Click" RenderTransformOrigin="0.48,1.838"/>
                     </Grid>
-                    <Grid HorizontalAlignment="Left" Height="888" Margin="606,21,0,0" VerticalAlignment="Top" Width="1216" Background="#FFA23414" Grid.Column="1">
+                    <Grid HorizontalAlignment="Left" Height="891" Margin="578,18,0,0" VerticalAlignment="Top" Width="1216" Background="White" Grid.Column="2">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="646*"/>
                             <ColumnDefinition Width="151*"/>
@@ -329,12 +295,6 @@
                         <TextBox x:Name="TbCVZ4" Text="521" HorizontalAlignment="Left" Height="24" TextWrapping="Wrap" VerticalAlignment="Top"  Width="50" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" TextChanged="ReachingPoint_TextChanged" Background="{x:Null}" Foreground="#FF007EF9" BorderBrush="{x:Null}" FontWeight="Bold" FontFamily="Microsoft Sans Serif" Margin="962,601,0,0" Grid.ColumnSpan="2"/>
                         <Label x:Name="tbCVZ_lbl4" Content="Z" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="#FF007EF9" Height="23" FontFamily="Microsoft Sans Serif" FontWeight="Bold" Margin="941,601,0,0"/>
                     </Grid>
-                    <Button x:Name="Receive_object_btn" Content="Receive" HorizontalAlignment="Left" Margin="41,837,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Receive_btn_Click" RenderTransformOrigin="0.48,1.838" Grid.Column="1"/>
-                    <Button x:Name="Shape_btn" Content="Shape" HorizontalAlignment="Left" Margin="210,837,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Shape_btn_Click" RenderTransformOrigin="0.48,1.838" Grid.Column="1"/>
-                    <Button x:Name="PLC_accept_btn" Content="Accept" HorizontalAlignment="Left" Margin="40,907,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="PLC_accept_button_Click" RenderTransformOrigin="0.48,1.838" Grid.Column="1"/>
-                    <Button x:Name="PLC_come_btn" Content="Come" HorizontalAlignment="Left" Margin="209,907,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="PLC_come_button_Click" RenderTransformOrigin="0.48,1.838" Grid.Column="1"/>
-                    <Button x:Name="Run_btn" Content="Run" HorizontalAlignment="Left" Margin="361,836,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Run_PLC_Click" RenderTransformOrigin="0.48,1.838" Grid.Column="1"/>
-                    <Button x:Name="Stop_btn" Content="Stop" HorizontalAlignment="Left" Margin="363,906,0,0" VerticalAlignment="Top" Width="120" Height="40" FontSize="11" FontFamily="Microsoft Sans Serif" Foreground="#FF007EF9" FontWeight="Bold" BorderBrush="#FF007EF9" Background="#FF181E36" Click="Stop_PLC_Click" RenderTransformOrigin="0.48,1.838" Grid.Column="1"/>
                 </Grid>
             </TabItem>
         </TabControl>
