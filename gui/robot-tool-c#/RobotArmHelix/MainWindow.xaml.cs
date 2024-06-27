@@ -607,6 +607,17 @@ namespace RobotArmHelix
 
         public void Detect_shape_function(string bmp_string)
         {
+            //// ảnh cạnh được phân bởi phương pháp canny
+            //int[,] edges = DeTectEdgeByCannyMethod(image, 50, 200);
+            ////biểu đồ hough để tìm ra đường thẳng
+            //int[,] hough = PerformHoughTransform(edges);
+            ////tìm ra các phương trình đường thẳng từ biểu đồ hough
+            //int[,] lines = Find_line_info(hough, out int count_hough_point);
+            //// tìm điểm giao của các phương trình.
+            //int[,] corner = Find_corner_info(lines);
+            //Detect_Shape_dimention(int[,] edges, int[,] lines, int[,] corner, out string shape, out int[,] dimention, out int[,] Center_Point)
+
+
             bmp_string = bmpString;
             // Split the byte string into individual byte values
             string[] byteValues = bmp_string.Split();
@@ -689,13 +700,14 @@ namespace RobotArmHelix
 
             int high_threshold = 200;//ngưỡng trên cho canny detect
             int low_threshold = 50;//ngưỡng dưới cho canny detect 
+            
 
-            int[,] edges = Image_Processing.DeTectEdgeByCannyMethod(intArray2D, high_threshold, low_threshold);
+            int[,] edges = Image_Processing.DeTectEdgeByCannyMethod(intArray2D,200,50,"as");
             byte[,] edges_byte = new byte[edges.GetLength(0), edges.GetLength(1)];
 
             //biểu đồ hough
-            int[,] hough = Image_Processing.PerformHoughTransform(edges);
-            int[,] lines = Image_Processing.Find_line_info1(hough, out int count_hough_point);
+            int[,] hough = Image_Processing.PerformHoughTransform_Rectangle(edges);
+            int[,] lines = Image_Processing.Find_line_info(hough, out int count_hough_point);
             //int[,] result = EdgeDetection.Drawline2(lines);
             int[,] corner = Image_Processing.Find_corner_info(lines);
 
@@ -990,7 +1002,7 @@ namespace RobotArmHelix
                     }
                 
                 break;
-                case "Unknown":
+                case "unknown":
                         plc_receive_data = 0x00;
                         plc_accept = false;
                         plc_come_object = false;
@@ -3556,12 +3568,12 @@ namespace RobotArmHelix
             int high_threshold = 200;//ngưỡng trên cho canny detect
             int low_threshold = 50;//ngưỡng dưới cho canny detect 
 
-            int[,] edges = Image_Processing.DeTectEdgeByCannyMethod(intArray2D, high_threshold, low_threshold);
+            int[,] edges = Image_Processing.DeTectEdgeByCannyMethod(intArray2D,200,50,"ab");
             byte[,] edges_byte = new byte[edges.GetLength(0), edges.GetLength(1)];
 
             //biểu đồ hough
-            int[,] hough = Image_Processing.PerformHoughTransform(edges);
-            int[,] lines = Image_Processing.Find_line_info1(hough, out int count_hough_point);
+            int[,] hough = Image_Processing.PerformHoughTransform_Rectangle(edges);
+            int[,] lines = Image_Processing.Find_line_info(hough, out int count_hough_point);
             //int[,] result = EdgeDetection.Drawline2(lines);
             int[,] corner = Image_Processing.Find_corner_info(lines);
 
@@ -3603,6 +3615,10 @@ namespace RobotArmHelix
         private void Run_PLC_Click(object sender, RoutedEventArgs e)
         {
             timer2.Start();
+            plc_receive_data = 0x00;
+            plc_accept = false;
+            plc_come_object = false;
+            g_plc_run_mode = plc_run_mode_t.MODE_IDLE;
             /* Send command for PLC to run */
             byte[] sendata = new byte[4];
             sendata[0] = 0xBB;
