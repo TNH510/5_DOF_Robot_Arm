@@ -24,10 +24,14 @@ for t1 = t1_values * pi / 180
                     y_value = sin(t1)*(l3*cos(t2 + t3) + l2*cos(t2) + l5*cos(t2 + t3 + t4));
                     z_value = l1 + l3*sin(t2 + t3) + l2*sin(t2) + l5*sin(t2 + t3 + t4);
 
-                    if (z_value >= 500 && z_value <= 1000)
-                        x = [x, x_value];
-                        y = [y, y_value];
-                        z = [z, z_value];
+%                     x_value = (x_value + 48) / 24;
+%                     y_value = (y_value + 48) / 24;
+%                     z_value = (z_value - 500) * 11 / 250;
+
+                    if (z_value >= 300 && z_value <= 1000)
+                    x = [x, x_value];
+                    y = [y, y_value];
+                    z = [z, z_value];
                     end
                 end
 

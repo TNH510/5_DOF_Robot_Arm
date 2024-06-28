@@ -36,6 +36,8 @@ typedef struct
 /* Private macros ----------------------------------------------------------- */
 /* Public variables --------------------------------------------------------- */
 /* Private variables -------------------------------------------------------- */
+static float sy = 0.0f, cy = 1.0f; // Yaw init is 0
+
 /* Private prototypes ------------------------------------------------------- */
 static float square(float num);
 static bool encode_pos(float value, uint8_t *result);
@@ -51,27 +53,33 @@ void glv_convert_euler_angle(float q0, float q1, float q2, float q3,
   *roll  = atan2(2.0f * (q0 * q1 + q2 * q3), q0 * q0 - q1 * q1 - q2 * q2 + q3 * q3) * 57.29577951;
 }
 
+void glv_set_init_yaw(float yaw_value_rad)
+{
+	sy = sin(-yaw_value_rad);
+	cy = cos(-yaw_value_rad);
+}
+
 void glv_pos_convert(float q0, float q1, float q2, float q3, float elbow_angle, 
-                              float *q1_pos, float *q2_pos, float *q3_pos)
+                              float *x, float *y, float *z)
 {
 	const float l1 = 12.0;
 	const float l2 = 20.0;
 	float ce = cos(elbow_angle);
 	float se = sin(elbow_angle);
 
-	*q1_pos = l2*((ce*(square(q0) + square(q1) - square(q2) - square(q3))) - (se*(2*q0*q3 - 2*q1*q2))) + (l1*(square(q0) + square(q1) - square(q2) - square(q3)));
-	*q2_pos = l2*((se*(square(q0) - square(q1) + square(q2) - square(q3))) + (ce*(2*q0*q3 + 2*q1*q2))) + (l1*(2*q0*q3 + 2*q1*q2));
-	*q3_pos = - l2*((ce*(2*q0*q2 - 2*q1*q3)) - (se*(2*q0*q1 + 2*q2*q3))) - (l1*(2*q0*q2 - 2*q1*q3));
+	*x = l2*(ce*((cy*(square(q0) + square(q1) - square(q2) - square(q3))) - (sy*(2*q0*q3 + 2*q1*q2))) - se*((sy*(square(q0) - square(q1) + square(q2) - square(q3))) + (cy*(2*q0*q3 - 2*q1*q2)))) + l1*((cy*(square(q0) + square(q1) - square(q2) - square(q3))) - (sy*(2*q0*q3 + 2*q1*q2)));
+	*y = l2*(ce*((sy*(square(q0) + square(q1) - square(q2) - square(q3))) + (cy*(2*q0*q3 + 2*q1*q2))) + se*((cy*(square(q0) - square(q1) + square(q2) - square(q3))) - (sy*(2*q0*q3 - 2*q1*q2)))) + l1*((sy*(square(q0) + square(q1) - square(q2) - square(q3))) + (cy*(2*q0*q3 + 2*q1*q2)));
+	*z = - l2*((ce*(2*q0*q2 - 2*q1*q3)) - (se*(2*q0*q1 + 2*q2*q3))) - (l1*(2*q0*q2 - 2*q1*q3));
 }
 
 void glv_pos_shoulder_convert(float q0, float q1, float q2, float q3, 
-                              float *q1_pos, float *q2_pos, float *q3_pos)
+                              float *x, float *y, float *z)
 {
 	const float l1 = 12.0;
 
-	*q1_pos = (l1*(square(q0) + square(q1) - square(q2) - square(q3)));
-    *q2_pos = (l1*(2*q0*q3 + 2*q1*q2));
-    *q3_pos = -(l1*(2*q0*q2 - 2*q1*q3));
+	*x = (l1*(square(q0) + square(q1) - square(q2) - square(q3)));
+    *y = (l1*(2*q0*q3 + 2*q1*q2));
+    *z = -(l1*(2*q0*q2 - 2*q1*q3));
 }
 
 void glv_robot_pos_convert(float x_pos, float y_pos, float z_pos, 
