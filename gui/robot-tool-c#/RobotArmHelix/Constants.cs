@@ -17,8 +17,8 @@ namespace RobotArmHelix
         public const double l4 = 0.0;
         public const double l5 = 230.0;
 
-        public const double T1_LU = 90.0;
-        public const double T1_LD = -35.0;
+        public const double T1_LU = 110.0;
+        public const double T1_LD = -55.0;
 
         public const double T2_LU = 110.0;
         public const double T2_LD = 45.0;
