@@ -96,6 +96,7 @@ namespace RobotArmHelix
         public bool plc_come_object = false;
         public bool Done_stt = false;
         public string shape = "";
+        public int[,] Centerpoint = new int[1,2];
         public int turn = 0;
 
         public string[] plc_program_arr = { "home.csv", "conveyor1_in.csv", "conveyor1_out.csv", "conveyor2_in.csv", "conveyor2_out.csv", "conveyor3_in.csv", "conveyor3_out.csv", "conveyor4_in.csv", "conveyor4_out.csv"};
@@ -761,6 +762,8 @@ namespace RobotArmHelix
                     Dispatcher.Invoke(() =>
                     {
                         shape_name.Text = shape;
+                        CoordX_name.Text = Centerpoint[0, 0].ToString(); 
+                        CoordY_name.Text = Centerpoint[0, 1].ToString(); 
                     });
                     g_plc_run_mode = plc_run_mode_t.MODE_RETURN;
                     byte[] sendata = new byte[4];
@@ -3577,14 +3580,14 @@ namespace RobotArmHelix
             //int[,] result = EdgeDetection.Drawline2(lines);
             int[,] corner = Image_Processing.Find_corner_info(lines);
 
-            Image_Processing.Detect_Shape_dimention(edges, lines, corner, out shape, out int[,] dimention, out int[,] center_point);
+            Image_Processing.Detect_Shape_dimention(edges, lines, corner, out shape, out int[,] dimention, out Centerpoint);
 
             Console.WriteLine(shape);
             Console.WriteLine(dimention[0, 0]);
             Console.WriteLine(dimention[0, 1]);
-            Console.WriteLine(dimention[1, 0]);
-            Console.WriteLine("x :" + center_point[0, 0]);
-            Console.WriteLine("y :" + center_point[0, 1]);
+            Console.WriteLine(dimention[0, 1]);
+            Console.WriteLine(Centerpoint[0, 1]);
+            Console.WriteLine(Centerpoint[1, 0]);
         }
 
         private void Forward_button_Click(object sender, RoutedEventArgs e)
