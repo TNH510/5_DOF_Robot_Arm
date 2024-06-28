@@ -11,6 +11,7 @@ using Lokdeptrai;
 using System.Security.Cryptography;
 using System.Reflection;
 using System.Globalization;
+using System.Runtime.Remoting.Messaging;
 
 namespace Image_proccessing
 {
@@ -28,8 +29,6 @@ namespace Image_proccessing
         public static int[] angle= new int [4];
         class EdgeDetection
         {
-            
-
             public static int[,] Thresh_image(string imagePath)
             {
                 Bitmap bitmap = new Bitmap(imagePath);
@@ -416,9 +415,13 @@ namespace Image_proccessing
                 //Bitmap img_blur = IntToBitmap(blur);
                 int[] threhold = new int[2];
                 threhold= CalculateTwoThresholds(gray);
-                
+
                 //int threhold1 = 63;
                 //int threhold2 = 65;
+                //if (threhold[0]<35)
+                //{
+                //    threhold[0] = 35;
+                //}    
                 for (int i = 0; i < gray.GetLength(0); i++)
                 {
                     for (int j = 0; j < gray.GetLength(1); j++)
@@ -427,10 +430,7 @@ namespace Image_proccessing
                         {
                             gray[i, j] = 255;
                         }
-                        //else if ((gray[i, j] >= threhold[1] && gray[i, j] <= 255))
-                        //{
-                        //    gray[i, j] = 255;
-                        //}                        
+                      
                         else
                         {
                             gray[i, j] = 0;
@@ -438,13 +438,17 @@ namespace Image_proccessing
                     }
                 }
                 //loại bỏ n
-                
-                //gray = MedianBlur(gray);
-                gray = Erosion_Dilation(gray, 3, 3);
+                for (int i=0; i<3;i++)
+                {
+                    gray = Erosion(gray);
+                }    
                 gray = RemoveSmallRegions.RemoveSmallWhiteRegions(gray);
-                //string a =  imagePath + "_1.jpg";
-                //Bitmap SaveImage = IntToBitmap(gray);
-                //SaveImage.Save(a);
+                for (int i = 0; i < 3; i++)
+                {
+                    gray = Dilation(gray);
+                }
+                gray = Erosion_Dilation(gray, 5,5);//close
+
                 int[,] edges = EdgeDetection.Canny_Detect(gray, high_threshold, low_threshold);
 
                 return edges;
@@ -512,7 +516,7 @@ namespace Image_proccessing
                                 double radian = (theta * Math.PI) / 180.0;
                                 int rho = (int)(x * Math.Cos(radian) + y * Math.Sin(radian));
                                 rho += diagonalLength; // Dịch chuyển rho để không có giá trị âm
-                                houghMatrix[theta, rho] = houghMatrix[theta, rho] + 1;
+                                houghMatrix[theta, rho] = houghMatrix[theta, rho] + 2;
                                 if (houghMatrix[theta, rho] > 255)
                                 {
                                     houghMatrix[theta, rho] = 255;
@@ -564,8 +568,6 @@ namespace Image_proccessing
 
                 return houghMatrix;
             }//find center point
-
-
             public static int[,] DrawLines(int[,] houghMatrix, int threshold, int width, int height)
             {
                 int diagonal = (int)Math.Sqrt(width * width + height * height); // Đường chéo của ảnh
@@ -1308,8 +1310,6 @@ namespace Image_proccessing
 
                 return (length, width, angle);
             }
-
-            // Tính khoảng cách giữa hai điểm có tọa độ (x1, y1) và (x2, y2)
             static double CalculateDistance(double x1, double y1, double x2, double y2)
             {
                 double deltaX = x2 - x1;
@@ -1343,24 +1343,89 @@ namespace Image_proccessing
                 }
                 return (length, angle);
             }
-            public static void Detect_Shape_dimention(int[,]edges, int[,] line_info, int[,] point_info, out string shape, out int[,] dimention, out int[,] Center_Point)
+
+            public static (string shape, int[,] Center, int Radius) Circle(int[,]edges)
+            {
+                int width= edges.GetLength(0);
+                int height= edges.GetLength(1);
+                int[,] center = { { 0,0 } };
+                int count = 0;
+                int Radius = 0;
+                string shape = "Unknown";
+                for(int i=0; i<width; i++)
+                {
+                    for(int j=0; j<height; j++)
+                    {
+                        if (edges[i,j]==255)
+                        {
+                            center[0,0] += i;
+                            center[0,1] += j;
+                            count++;
+                        }    
+                        
+                    }    
+                }
+                center[0,0] /= count;//x
+                center[0,1] /= count;//y
+                //min radius
+                int min_radius = 1000;
+                double[] radius = new double[count+1];
+                int count1 = 0;
+                for (int i = 0; i < width; i++)
+                {
+                    for (int j = 0; j < height; j++)
+                    {
+                        if (edges[i, j] == 255)
+                        {
+                            radius [count1] = CalculateDistance(center[0,0], center[0, 1],i, j);
+                            
+                            if (radius[count1] < min_radius )
+                            {
+                                min_radius = (int)radius[count1];
+                            }
+                            count1++;
+                        }
+                    }
+                }
+                //
+                int count2 = 0;
+                for(int i=0; i<count1;i++)
+                {
+                    if (radius[i]-min_radius < 10)/////////////////
+                    {
+                        count2++;
+                    }    
+                }    
+                if(count2>0.8*count)
+                {
+                    Radius = min_radius + 3;
+                    shape = "Circle";
+                }
+                else
+                {
+                    Radius = 0;
+                    shape = "Unknown";
+                }    
+                return (shape, center, Radius);
+            }
+            public static void Detect_Shape_dimention(int[,] edges, int[,] line_info, int[,] point_info, out string shape, out int[,] dimention, out int[,] Center_Point)
             {
                 //từ line_info và point_info 
                 int number_edges = line_info.GetLength(0);
                 int number_point = point_info.GetLength(0);
                 Center_Point = new int[1, 2];
-                Center_Point[0,0]= point_info[number_point-1,0];
-                Center_Point[0, 1] = point_info[number_point-1, 1];
+                Center_Point[0, 0] = point_info[number_point - 1, 0];
+                Center_Point[0, 1] = point_info[number_point - 1, 1];
                 shape = "Unknown";
                 dimention = new int[3, 2];
 
-                if (number_edges==4 && number_point==5 )
+                if (number_edges == 4 && number_point == 5)
                 {
 
                     //tính toán kích thước các cạnh
                     //tìm điểm gần gốc tọa độ nhất
-                    double [,]Temp_point=new double[4,2];
-                    for (int i=0;i<number_point-1;i++)
+                    double[,] Temp_point = new double[4, 2];
+                    for (int i = 0; i < number_point - 1; i++)
                     {
                         Temp_point[i, 0] = point_info[i, 0];
                         Temp_point[i, 1] = point_info[i, 1];
@@ -1368,15 +1433,16 @@ namespace Image_proccessing
                     (double length, double width, double angle) = GetRectangleDimensions(Temp_point);
                     if (angle < 0)
                     {
-                        angle = angle+180;
+                        angle = angle + 180;
                     }
                     if (length - width > 10)
                     {
+                        //dimention = canh
                         shape = "Rectangle";
-                        dimention[0,0] = (int)length;
-                        dimention[0, 1] = (int)angle;
-                        dimention[1, 0] = (int)width;
-                        //dimention[1, 1] = D2_angle;
+                        dimention[0, 0] = (int)length;//canh dai
+                        dimention[0, 1] = (int)angle;//canh goc canh dai - ox
+                        dimention[1, 0] = (int)width;//canh ngan
+                                                     //dimention[1, 1] = D2_angle;
                     }
                     //else if (D1 - D2 < -20)
                     //{
@@ -1386,17 +1452,17 @@ namespace Image_proccessing
                     //    dimention[1, 0] = D1;
                     //    dimention[1, 1] = D1_angle;
                     //}
-                    else if (length - width > -10 && length - width < 10)
+                    else if (length - width > -20 && length - width < 20)
                     {
 
                         shape = "Square";
-                        dimention[0, 0] = (int)length;
-                        dimention[0, 1] = (int)angle;
+                        dimention[0, 0] = (int)length;//canh 
+                        dimention[0, 1] = (int)angle;// goc canh với Ox
 
 
                     }
-           
-                } 
+
+                }
                 else if (number_edges == 3 && number_point == 4)
                 {
                     double[,] Temp_point = new double[3, 2];
@@ -1407,34 +1473,35 @@ namespace Image_proccessing
                     }
                     shape = "Triangle";
                     (double[] length, double[] angle) = GetTriangleDimensions(Temp_point);
-                    double max_value = length[0]; 
+                    double max_value = length[0];
                     int index = 0;
-                    for (int i=1; i<3;i++)
+                    for (int i = 1; i < 3; i++)
                     {
-                        if (length[i]>max_value)
+                        if (length[i] > max_value)
                         {
                             max_value = length[i];
                             index = i;
-                        }    
+                        }
                     }
-                    dimention[0, 0] = (int)max_value;
+                    dimention[0, 0] = (int)max_value;//canh day
                     if (angle[index] < 0)
                     {
                         angle[index] = angle[index] + 180;
                     }
-                    dimention[0, 1] = (int)angle[index];
+                    dimention[0, 1] = (int)angle[index]; //goc cua Ox voi canh day
 
                 }
                 else if (number_edges == 0 && number_point == 1)
                 {
-                    shape = "Circle";
-                    
-                }    
+                    (shape, Center_Point, dimention[0, 0]) = Circle(edges);//canh day
+
+                }
+                else shape = "unknown";
 
 
 
             }
-            
+
         }
         class RemoveSmallRegions
         {
@@ -1579,13 +1646,13 @@ namespace Image_proccessing
             int width = edges.GetLength(0);
             int height = edges.GetLength(1);
 
-            //biểu đồ hough
-            int[,] hough = EdgeDetection.PerformHoughTransform_Rectangle(edges);            
-            int[,] lines = EdgeDetection.Find_line_info(hough,out int count_hough_point);
-            //int[,] result = EdgeDetection.Drawline2(lines);
+            ////biểu đồ hough
+            int[,] hough = EdgeDetection.PerformHoughTransform_Rectangle(edges);
+            int[,] lines = EdgeDetection.Find_line_info(hough, out int count_hough_point);
+            int[,] result = EdgeDetection.Drawline2(lines);
             int[,] corner = EdgeDetection.Find_corner_info(lines);
 
-            EdgeDetection.Detect_Shape_dimention(edges,lines, corner, out string shape,out int[,] dimention, out int[,]center_point);
+            EdgeDetection.Detect_Shape_dimention(edges, lines, corner, out string shape, out int[,] dimention, out int[,] center_point);
             textBox8.Text = shape;
             int x = center_point[0, 0];
             Mid_Point_X.Text = Convert.ToString(x);
@@ -1620,16 +1687,32 @@ namespace Image_proccessing
 
             // thể hiện lên GUI
             Bitmap Import_picture = new Bitmap(imagePath);
-            // chấm đỏ
+            //chấm đỏ
             for (int i = 0; i < corner.GetLength(0); i++)
             {
-                int X1 = corner[i,0] ;
-                int Y1 = corner[i,1] ;
+                int X1 = corner[i, 0];
+                int Y1 = corner[i, 1];
                 for (int x1 = X1 - 2; x1 < X1 + 2; x1++)
                 {
                     if (x1 > 0 && x1 < Import_picture.Width)
                     {
                         for (int y1 = Y1 - 2; y1 < Y1 + 2; y1++)
+                        {
+                            if (y1 > 0 && y1 < Import_picture.Height)
+                            {
+                                Import_picture.SetPixel(x1, y1, Color.Red);
+                            }
+                        }
+                    }
+                }
+            }
+            if (shape == "Circle")
+            {
+                for (int x1 = x - 2; x1 < x + 2; x1++)
+                {
+                    if (x1 > 0 && x1 < Import_picture.Width)
+                    {
+                        for (int y1 = y - 2; y1 < y + 2; y1++)
                         {
                             if (y1 > 0 && y1 < Import_picture.Height)
                             {
@@ -1681,7 +1764,7 @@ namespace Image_proccessing
 
 
             picture1.Image = Import_picture;
-            //picture2.Image = EdgeDetection.IntToBitmap(thres_image);
+            //picture2.Image = EdgeDetection.IntToBitmap(result);
             picture3.Image = EdgeDetection.IntToBitmap(hough);
             picture4.Image = EdgeDetection.IntToBitmap(edges);
    
