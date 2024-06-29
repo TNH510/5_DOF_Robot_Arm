@@ -824,8 +824,8 @@ namespace RobotArmHelix
                         ret = PLCReadbit("M700", out map_complete);
                         if (map_complete == 1)
                         {
-                            take_object = PLCWritebit("M111", 1);
                             g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_2;
+                            //take_object = PLCWritebit("M111", 1);
                         }         
                     break;
                     case run_trajectory_mode_t.MODE_MAP_2:
@@ -841,7 +841,7 @@ namespace RobotArmHelix
                         if (map_complete == 1)
                         {
                             g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_3;
-                            take_object = PLCWritebit("M111", 0);
+                            //take_object = PLCWritebit("M111", 0);
                         }
 
                     break;
@@ -875,7 +875,7 @@ namespace RobotArmHelix
                     }
                 break;
                 case "Square":
-                    string[] map2 = { "home.csv", "conveyor2_in.csv", "conveyor2_out.csv" };
+                    string[] map2 = { "home.csv", "conveyor1_in.csv", "conveyor1_out.csv" };
                     switch (g_run_trajectory_plc)
                     {
                     case run_trajectory_mode_t.MODE_MAP_1:
@@ -944,7 +944,7 @@ namespace RobotArmHelix
                 break;
 
                 case "Triangle":
-                    string[] map3 = { "home.csv", "conveyor3_in.csv", "conveyor3_out.csv" };
+                    string[] map3 = { "home.csv", "conveyor1_in.csv", "conveyor1_out.csv" };
                     switch (g_run_trajectory_plc)
                     {
                     case run_trajectory_mode_t.MODE_MAP_1:
@@ -1013,7 +1013,7 @@ namespace RobotArmHelix
                 break;
 
                 case "Circle":
-                    string[] map4 = { "home.csv", "conveyor4_in.csv", "conveyor4_out.csv" };
+                    string[] map4 = { "home.csv", "conveyor1_in.csv", "conveyor1_out.csv" };
                     switch (g_run_trajectory_plc)
                     {
                     case run_trajectory_mode_t.MODE_MAP_1:
@@ -1526,21 +1526,21 @@ namespace RobotArmHelix
             Ty.Content = y;
             Tz.Content = z;
 
-            Dispatcher.Invoke(() =>
-            {
-                Name_csv.Content = plc_program_arr[plc_stt];
-                /**/
-                string duongDanCoSo = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + "plc\\";
-                string tenTrajectory = plc_program_arr[plc_stt];
-                string duongDanDayDu = Path.Combine(duongDanCoSo, tenTrajectory);
-                string tenFileKhongDuoi = Path.GetFileNameWithoutExtension(duongDanDayDu);
+            //Dispatcher.Invoke(() =>
+            //{
+            //    Name_csv.Content = plc_program_arr[plc_stt];
+            //    /**/
+            //    string duongDanCoSo = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + "plc\\";
+            //    string tenTrajectory = plc_program_arr[plc_stt];
+            //    string duongDanDayDu = Path.Combine(duongDanCoSo, tenTrajectory);
+            //    string tenFileKhongDuoi = Path.GetFileNameWithoutExtension(duongDanDayDu);
 
-                using (StreamWriter writer = new StreamWriter(duongDanDayDu, true))
-                {
-                    string csvLine = $"{x_lpf},{y_lpf},{z_lpf}";
-                    writer.WriteLine(csvLine);
-                }
-            });
+            //    using (StreamWriter writer = new StreamWriter(duongDanDayDu, true))
+            //    {
+            //        string csvLine = $"{x_lpf},{y_lpf},{z_lpf}";
+            //        writer.WriteLine(csvLine);
+            //    }
+            //});
 
             /* Draw trajectory */
             List<Point3D> trajectoryPoints = new List<Point3D>();
