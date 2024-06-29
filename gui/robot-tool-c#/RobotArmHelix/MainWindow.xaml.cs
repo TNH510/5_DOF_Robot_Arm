@@ -1005,6 +1005,73 @@ namespace RobotArmHelix
                     }
                 
                 break;
+
+                case "Circle":
+                    string[] map4 = { "home.csv", "conveyor4_in.csv", "conveyor4_out.csv" };
+                    switch (g_run_trajectory_plc)
+                    {
+                    case run_trajectory_mode_t.MODE_MAP_1:
+                    Console.WriteLine("MODE_MAP_1");
+
+                        move_trajectory_plc(map4[0]);
+                        g_run_trajectory_plc = run_trajectory_mode_t.MODE_WAITING_MAP1;
+
+                    break;
+                    case run_trajectory_mode_t.MODE_WAITING_MAP1:
+                    Console.WriteLine("MODE_WAITING_MAP1");
+                        /* Read status of Brake and AC Servo */
+                        ret = PLCReadbit("M700", out map_complete);
+                        if (map_complete == 1)
+                        {
+                            g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_2;
+                        }         
+                    break;
+                    case run_trajectory_mode_t.MODE_MAP_2:
+                    Console.WriteLine("MODE_MAP_2");
+
+                        move_trajectory_plc(map4[1]);
+                        g_run_trajectory_plc = run_trajectory_mode_t.MODE_WAITING_MAP2;
+                    break;
+                    case run_trajectory_mode_t.MODE_WAITING_MAP2:
+                    Console.WriteLine("MODE_WAITING_MAP2");
+                        /* Read status of Brake and AC Servo */
+                        ret = PLCReadbit("M700", out map_complete);
+                        if (map_complete == 1)
+                        {
+                            g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_3;
+                        }
+
+                    break;
+                    case run_trajectory_mode_t.MODE_MAP_3:
+                    Console.WriteLine("MODE_MAP_3");
+
+                        move_trajectory_plc(map4[2]);
+                        g_run_trajectory_plc = run_trajectory_mode_t.MODE_WAITING_DONE;
+                    break;
+                    case run_trajectory_mode_t.MODE_WAITING_DONE:
+                    Console.WriteLine("MODE_WAITING_DONE");
+                        /* Read status of Brake and AC Servo */
+                        ret = PLCReadbit("M700", out map_complete);
+                        if (map_complete == 1)
+                        {
+                            plc_receive_data = 0x00;
+                            plc_accept = false;
+                            plc_come_object = false;
+                            g_plc_run_mode = plc_run_mode_t.MODE_IDLE;
+                            g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_1;
+                            byte[] sendata = new byte[4];
+                            sendata[0] = 0xBB;
+                            sendata[1] = 0x05;
+                            sendata[2] = 0x00;
+                            sendata[3] = 0x00;
+                            uart.Write(sendata, 0, sendata.Length);
+                        }
+                    break;
+                    default:
+                    break;
+                    }
+                
+                break;
                 case "unknown":
                         plc_receive_data = 0x00;
                         plc_accept = false;
@@ -2139,11 +2206,11 @@ namespace RobotArmHelix
         {
             double[] vect_u = new double[3];
             double t1, t2, t3, t4, t5;
-            int[,] angle_array = new int[10, 5];
+            int[,] angle_array = new int[100, 5];
             double x, y, z;
             int ret;
-            int[] value_angle = new int[80];
-            int[] value_angle_t5 = new int[20];
+            int[] value_angle = new int[800];
+            int[] value_angle_t5 = new int[200];
             /* Referred vector */
             for (int i = 0; i < 3; i++)
             {
@@ -2152,11 +2219,11 @@ namespace RobotArmHelix
             }
 
             /* Linear Equation */
-            for (int t = 0; t < 10; t++)
+            for (int t = 0; t < 100; t++)
             {
-                x = curr_pos[0] + (vect_u[0] / 10) * (t + 1); /* 500 is the actual position of robot following the x axis */
-                y = curr_pos[1] + (vect_u[1] / 10) * (t + 1); /* 0 is the actual position of robot following the y axis */
-                z = curr_pos[2] + (vect_u[2] / 10) * (t + 1); /* 900 is the actual position of robot following the y axis */
+                x = curr_pos[0] + (vect_u[0] / 100) * (t + 1); /* 500 is the actual position of robot following the x axis */
+                y = curr_pos[1] + (vect_u[1] / 100) * (t + 1); /* 0 is the actual position of robot following the y axis */
+                z = curr_pos[2] + (vect_u[2] / 100) * (t + 1); /* 900 is the actual position of robot following the y axis */
                 if (z >= 500 && z <= 1000)
                 {
                     (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
@@ -2188,13 +2255,13 @@ namespace RobotArmHelix
                 }
 
             }
-            Memory_angle_write(angle_array, value_angle, device, 10);
+            Memory_angle_write(angle_array, value_angle, device, 100);
 
-            for (int j = 0; j < 10; j++)
-            {
-                value_angle_t5[2 * j] = Write_Theta(angle_array[j, 4])[0];
-                value_angle_t5[2 * j + 1] = Write_Theta(angle_array[j, 4])[1];
-            }
+            //for (int j = 0; j < 100; j++)
+            //{
+            //    value_angle_t5[2 * j] = Write_Theta(angle_array[j, 4])[0];
+            //    value_angle_t5[2 * j + 1] = Write_Theta(angle_array[j, 4])[1];
+            //}
         }
         private void Tsm_moveL_btn_Click(object sender, RoutedEventArgs e)
         {
