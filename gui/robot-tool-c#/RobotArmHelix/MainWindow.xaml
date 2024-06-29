@@ -140,15 +140,12 @@
                         <ColumnDefinition Width="41*"/>
                         <ColumnDefinition Width="1709*"/>
                     </Grid.ColumnDefinitions>
-                    <h:HelixViewport3D x:Name="viewPort3d" ViewCubeHeight="150" ViewCubeWidth="150" ViewCubeVerticalPosition="Bottom" CoordinateSystemLabelForeground="White" CoordinateSystemVerticalPosition="Center" CoordinateSystemHorizontalPosition="Right" CoordinateSystemHeight="150" CoordinateSystemWidth="150" RenderOptions.BitmapScalingMode="HighQuality" RenderOptions.EdgeMode="Unspecified" BorderBrush="Black" BorderThickness="5" ShowCoordinateSystem="False" ShowFrameRate="False" ShowCameraInfo="False" MouseLeftButtonUp="ViewPort3D_OnMouseLeftButtonUp" MouseLeftButtonDown="ViewPort3D_OnMouseLeftButtonDown" IsManipulationEnabled="True" IsViewCubeEdgeClicksEnabled="True" OpacityMask="#FFC82626" Margin="7,38,15,0" Grid.ColumnSpan="5" Height="922" VerticalAlignment="Top">
-                        <h:HelixViewport3D.Background>
-                            <ImageBrush TileMode="None" ImageSource="/4485761_codang.jpg"/>
-                        </h:HelixViewport3D.Background>
+                    <h:HelixViewport3D x:Name="viewPort3d" ViewCubeHeight="150" ViewCubeWidth="150" ViewCubeVerticalPosition="Bottom" CoordinateSystemLabelForeground="White" CoordinateSystemVerticalPosition="Center" CoordinateSystemHorizontalPosition="Right" CoordinateSystemHeight="150" CoordinateSystemWidth="150" RenderOptions.BitmapScalingMode="HighQuality" RenderOptions.EdgeMode="Unspecified" BorderBrush="Black" BorderThickness="5" ShowCoordinateSystem="False" ShowFrameRate="False" ShowCameraInfo="False" MouseLeftButtonUp="ViewPort3D_OnMouseLeftButtonUp" MouseLeftButtonDown="ViewPort3D_OnMouseLeftButtonDown" IsManipulationEnabled="True" IsViewCubeEdgeClicksEnabled="True" OpacityMask="#FFC82626" Margin="7,38,15,0" Grid.ColumnSpan="5" Height="922" VerticalAlignment="Top" Background="Black">
                         <!-- Remember to add light to the scene -->
                         <h:GridLinesVisual3D Width="16000" Length="16000" Thickness="1.5" MinorDistance="100" MajorDistance="400" Fill="#E5CFCECE" />
                         <h:DefaultLights/>
                     </h:HelixViewport3D>
-                    <Grid HorizontalAlignment="Left" Height="389" Margin="14,59,0,0" VerticalAlignment="Top" Width="406" Background="#FF310C27" Grid.ColumnSpan="5">
+                    <Grid HorizontalAlignment="Left" Height="389" Margin="14,59,0,0" VerticalAlignment="Top" Width="406" Background="#FF171617" Grid.ColumnSpan="5">
                         <Slider x:Name="joint1" HorizontalAlignment="Left" Margin="39,55,0,0" VerticalAlignment="Top" Width="303"  Maximum="180" Minimum="-180" ValueChanged="joint_ValueChanged" LargeChange="0.1" TickFrequency="0.1" Height="22"/>
                         <Slider x:Name="joint2" Margin="42,121,64,0" VerticalAlignment="Top" Maximum="180" Minimum="-180" ValueChanged="joint_ValueChanged" LargeChange="0.1" TickFrequency="0.1" Height="22"/>
                         <Slider x:Name="joint3" HorizontalAlignment="Left" Margin="41,189,0,0" VerticalAlignment="Top" Width="301" Maximum="180" Minimum="-180" ValueChanged="joint_ValueChanged" LargeChange="0.1" TickFrequency="0.1" Height="22"/>
