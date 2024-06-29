@@ -1518,6 +1518,22 @@ namespace RobotArmHelix
             Ty.Content = y;
             Tz.Content = z;
 
+            Dispatcher.Invoke(() =>
+            {
+                Name_csv.Content = plc_program_arr[plc_stt];
+                /**/
+                string duongDanCoSo = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + "plc\\";
+                string tenTrajectory = plc_program_arr[plc_stt];
+                string duongDanDayDu = Path.Combine(duongDanCoSo, tenTrajectory);
+                string tenFileKhongDuoi = Path.GetFileNameWithoutExtension(duongDanDayDu);
+
+                using (StreamWriter writer = new StreamWriter(duongDanDayDu, true))
+                {
+                    string csvLine = $"{x_lpf},{y_lpf},{z_lpf}";
+                    writer.WriteLine(csvLine);
+                }
+            });
+
             /* Draw trajectory */
             List<Point3D> trajectoryPoints = new List<Point3D>();
             // Create a debug sphere at the trajectory point

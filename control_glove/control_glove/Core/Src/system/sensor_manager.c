@@ -106,7 +106,7 @@ base_status_t sensor_manager_update_data(void)
 
 base_status_t sensor_manager_calib(button_name_t event)
 {
-    if (event == CLICK_LEFT_BUTTON)
+    if (event == CLICK_LEFT_BUTTON || event == CLICK_SELECT_BUTTON)
     {
         g_yaw_angle_calib_result = sensor_manager_caculate_current_yaw();
         printf("Yaw Calib: %0.2f\r\n", g_yaw_angle_calib_result * 180.0 / M_PI);
@@ -358,7 +358,16 @@ static void sensor_manager_run_button_change(button_name_t event)
 {
     if (event == CLICK_SELECT_BUTTON)
     {
-        /**/
+        if (g_mode == MODE_ONLY_SEND)
+        {
+            g_mode = MODE_RECORD;
+            drv_led_turn_on_blue_led();
+        }
+        else if (g_mode == MODE_RECORD)
+        {
+            g_mode = MODE_ONLY_SEND;
+            drv_led_turn_off_blue_led();
+        }
     }
     else if (event == HOLD_SELECT_BUTTON)
     {
