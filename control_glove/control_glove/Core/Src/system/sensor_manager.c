@@ -27,6 +27,13 @@
 /* Private includes --------------------------------------------------------- */
 /* Private defines ---------------------------------------------------------- */
 /* Private enumerate/structure ---------------------------------------------- */
+typedef enum
+{
+    MODE_ONLY_SEND,
+    MODE_RECORD
+} cmd_mode_t;
+
+static cmd_mode_t g_mode = MODE_ONLY_SEND;
 static drv_imu_t g_imu_data = {.axg = 0, .ayg = 0, .azg = 0, .gxrs = 0, .gzrs = 0};
 static drv_magnetic_data_t g_magnetic_data = {.XAxis = 0, .YAxis = 0, .ZAxis = 0};
 
@@ -40,7 +47,8 @@ static uint16_t adc_value[10] = {0};
 float adc_avr_value;
 static float adc_low_pass = 0.0f;
 static uint8_t adc_sample_count = 0;
-float elbow_angle = 66.0;
+float elbow_angle_deg = 0.0;
+float elbow_angle_rad = 0.0;
 
 float robot_x_pos, robot_y_pos, robot_z_pos;
 float x_pos, y_pos, z_pos;
@@ -52,8 +60,6 @@ static float x_vel, y_vel, z_vel;
 static float x_vel_pre = 0, y_vel_pre = 0, z_vel_pre = 0;
 static float x_vel_pass, y_vel_pass, z_vel_pass;
 
-glv_cmd_t g_cmd = GLV_CMD_ONLY_POS_TRANSMIT;
-bool is_cmd_send = false;
 static uint8_t data_index_send = 0;
 static uint8_t encode_frame[19];
 
@@ -100,20 +106,14 @@ base_status_t sensor_manager_update_data(void)
 
 base_status_t sensor_manager_calib(button_name_t event)
 {
-    // if (event == CLICK_LEFT_BUTTON)
-    // {
+    if (event == CLICK_LEFT_BUTTON)
+    {
         g_yaw_angle_calib_result = sensor_manager_caculate_current_yaw();
-        printf("Yaw Calib: %0.2f\r\n", g_yaw_angle_calib_result);
+        printf("Yaw Calib: %0.2f\r\n", g_yaw_angle_calib_result * 180.0 / M_PI);
+        glv_set_init_yaw(g_yaw_angle_calib_result);
 
-        // if (g_is_yaw_angle_calib == false)
-        // {
-        //     g_is_yaw_angle_calib = true;
-        // }
-        // else
-        // {
-        //     g_is_yaw_angle_calib = false;
-        // }
-    // }
+        g_is_yaw_angle_calib = true;
+    }
 
     return BS_OK;
 }
@@ -150,7 +150,7 @@ base_status_t sensor_manager_test(button_name_t event)
             printf("%0.2f,%0.2f,%0.2f\r\n", x_pos, y_pos, z_pos);
             break;
         case 5:
-            printf("%0.2f,%0.2f,%0.2f\r\n", adc_low_pass, (float)adc_value[adc_sample_count], elbow_angle*57.296f);
+            printf("%0.2f,%0.2f,%0.2f\r\n", adc_low_pass, (float)adc_value[adc_sample_count], elbow_angle_deg);
             break;
         default:
             break;
@@ -218,14 +218,13 @@ base_status_t sensor_manager_run(button_name_t event)
             y_vel_pre = y_vel_pass;
             z_vel_pre = z_vel_pass;
 
-            if (g_cmd != GLV_CMD_ONLY_POS_TRANSMIT)
+            if (g_mode == MODE_RECORD)
             {
-                glv_encode_uart_command(x_pos, y_pos, z_pos, x_vel_pass, y_vel_pass, z_vel_pass, g_cmd, encode_frame);
-                g_cmd = GLV_CMD_ONLY_POS_TRANSMIT;
+                glv_encode_uart_command(x_pos, y_pos, z_pos, x_vel_pass, y_vel_pass, z_vel_pass, GLV_CMD_POS_TRANSMIT_AND_START_RECORD, encode_frame);
             }
-            else
+            else if (g_mode == MODE_ONLY_SEND)
             {
-                glv_encode_uart_command(x_pos, y_pos, z_pos, x_vel_pass, y_vel_pass, z_vel_pass, g_cmd, encode_frame);
+                glv_encode_uart_command(x_pos, y_pos, z_pos, x_vel_pass, y_vel_pass, z_vel_pass, GLV_CMD_ONLY_POS_TRANSMIT, encode_frame);
             }
             
             HAL_Delay(5);
@@ -283,7 +282,8 @@ static void sensor_manager_run_handle_data(void)
     }
 
     // Caculate elbow angle
-    elbow_angle = adc_avr_value * 0.0013189f - 1.1519173f; 
+    elbow_angle_deg = (adc_avr_value - 3093) / (-14.2f); 
+    elbow_angle_rad =  elbow_angle_deg * 0.0174533f;
 
     // Get sample freq 
     bsp_timer_tick_stop(&g_freq);
@@ -296,7 +296,7 @@ static void sensor_manager_run_handle_data(void)
                         g_magnetic_data.XAxis, g_magnetic_data.YAxis, g_magnetic_data.ZAxis);
 
     // Caculate kinematic
-    glv_pos_convert(q0, q1, q2, q3, elbow_angle, &x_pos, &y_pos, &z_pos);
+    glv_pos_convert(q0, q1, q2, q3, elbow_angle_rad, &x_pos, &y_pos, &z_pos);
 }
 
 static void sensor_manager_test_handle_data(void)
@@ -334,7 +334,8 @@ static void sensor_manager_test_handle_data(void)
     }
 
     // Caculate elbow angle
-    elbow_angle = adc_avr_value * 0.0013189f - 1.1519173f; 
+    elbow_angle_deg = (adc_avr_value - 3093) / (-14.2f);  
+    elbow_angle_rad =  elbow_angle_deg * 0.0174533f;
 
     // Get sample freq 
     bsp_timer_tick_stop(&g_freq);
@@ -350,7 +351,7 @@ static void sensor_manager_test_handle_data(void)
     glv_convert_euler_angle(q0, q1, q2, q3, &pitch, &roll, &yaw);
 
     // Caculate kinematic
-    glv_pos_convert(q0, q1, q2, q3, elbow_angle, &x_pos, &y_pos, &z_pos);
+    glv_pos_convert(q0, q1, q2, q3, elbow_angle_rad, &x_pos, &y_pos, &z_pos);
 }
 
 static void sensor_manager_run_button_change(button_name_t event)
@@ -365,18 +366,15 @@ static void sensor_manager_run_button_change(button_name_t event)
     }
     else if (event == CLICK_LEFT_BUTTON)
     {
-        g_cmd = GLV_CMD_POS_TRANSMIT_AND_START_RECORD;
-        is_cmd_send = true;
-
+        g_mode = MODE_RECORD;
     }
     else if (event == HOLD_LEFT_BUTTON)
     {
-        g_cmd = GLV_CMD_POS_TRANSMIT_AND_STOP_RECORD;
+        /**/
     }
     else if (event == CLICK_RIGHT_BUTTON)
     {
-        g_cmd = GLV_CMD_POS_TRANSMIT_AND_STOP_RECORD;
-        is_cmd_send = true;
+        g_mode = MODE_ONLY_SEND;
     }
     else if (event == HOLD_RIGHT_BUTTON)
     {
@@ -399,27 +397,27 @@ static void sensor_manager_test_button_change(button_name_t event)
 static float sensor_manager_caculate_current_yaw(void)
 {
     // First Quadrant
-    if (x_pos > 0 && y_pos > 0)
+    if (x_pos >= 0.0f && y_pos >= 0.0f)
     {
         g_yaw_angle_calib_result = asin(y_pos/sqrt(x_pos * x_pos + y_pos * y_pos));
     }
     // II
-    else if (x_pos < 0 && y_pos > 0)
+    else if (x_pos < 0.0f && y_pos >= 0.0f)
     {
         g_yaw_angle_calib_result = M_PI - asin(y_pos/sqrt(x_pos * x_pos + y_pos * y_pos));
     }
     // III
-    else if (x_pos < 0 && y_pos < 0)
+    else if (x_pos < 0.0f && y_pos < 0.0f)
     {
         g_yaw_angle_calib_result = M_PI + asin(-y_pos/sqrt(x_pos * x_pos + y_pos * y_pos));
     }
     // IV
-    else if (x_pos > 0 && y_pos < 0)
+    else if (x_pos >= 0.0f && y_pos < 0.0f)
     {
         g_yaw_angle_calib_result = 2 * M_PI - asin(-y_pos/sqrt(x_pos * x_pos + y_pos * y_pos));
     }
 
-    return g_yaw_angle_calib_result * 180.0 / M_PI; 
+    return g_yaw_angle_calib_result; 
 }
 
 #ifdef I2C_RECOVERY

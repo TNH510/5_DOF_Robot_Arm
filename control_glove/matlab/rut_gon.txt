@@ -1,0 +1,9 @@
+// Result if add R0
+l2 *(ce *((cy * (square(q0) + square(q1) - square(q2) - square(q3))) - (sy * (2 * q0 * q3 + 2 * q1 * q2)))
+     - se * ((sy * (square(q0) - square(q1) + square(q2) - square(q3))) + (cy * (2 * q0 * q3 - 2 * q1 * q2))))
+    + l1 *((cy * (square(q0) + square(q1) - square(q2) - square(q3))) - (sy * (2 * q0 * q3 + 2 * q1 * q2))) l2 *(
+        ce *((sy * (square(q0) + square(q1) - square(q2) - square(q3))) + (cy * (2 * q0 * q3 + 2 * q1 * q2)))
+        + se * ((cy * (square(q0) - square(q1) + square(q2) - square(q3))) - (sy * (2 * q0 * q3 - 2 * q1 * q2))))
+    + l1 *((sy * (square(q0) + square(q1) - square(q2) - square(q3))) + (cy * (2 * q0 * q3 + 2 * q1 * q2)))
+    - l2 *((ce * (2 * q0 * q2 - 2 * q1 * q3)) - (se * (2 * q0 * q1 + 2 * q2 * q3)))
+    - (l1 * (2 * q0 * q2 - 2 * q1 * q3)) 1

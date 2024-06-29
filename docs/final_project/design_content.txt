@@ -1,0 +1,20 @@
+- Chương 1: Giới thiệu
+- Chương 2: Cơ sở lí thuyết
+- Chương 3: Tổng quan hệ thống
+- Chương 4: Điều khiển cánh tay robot 5 bậc tự do sử dụng PLC Mishubishi
+- Chương 5: Thiết kế, chế tạo và lập trình thiết bị theo dõi chuyển động cánh tay
+- Chương 6: Thiết kế và lập trình thuật toán nhận dạng vật thể từ Camera công nghiệp
+- Chương 7: Điều khiển băng tải và lấy dữ liệu từ cảm biến dùng PLC Siemens
+- Chương 8: Thiết kế, lập trình giao diện hệ thống với WPF
+- Chương 9: Kết quả, kết luận và hướng phát triển
+----------------------------------------------------------------------------------------
+Chương 5: Thiết kế, chế tạo và lập trình thiết bị theo dõi chuyển động cánh tay
+5.1 Mục tiêu và định hướng thiết kế
+5.2 Thiết kế nguyên lí và tính toán động học cho hệ thống
+5.3 Thiết kế hệ thống điều khiển
+5.4 Tính toán, chọn lựa linh kiện và thiết kế schematic
+5.5 Thiết kế và gia công mạch in
+5.6 Kết nối và xử lí dữ liệu thu được từ các cảm biến
+5.7 Thiết kế và gia công hệ thống cơ khí
+5.8 Thử nghiệm và đánh giá độ chính xác dữ liệu tính được
+5.9 Thiết kế giao thức và giải thuật điều khiển cho cánh tay robot

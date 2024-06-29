@@ -15,11 +15,15 @@ with open(csv_file, 'r') as csvfile:
     for row in reader:
         if len(row) == 3:
             try:
+                # num1 = float(row[0]) * 21
+                # num2 = float(row[1]) * 21
+                # num3 = float(row[2]) * 15 + 650
                 num1 = float(row[0])
-                num2 = float(row[1])
+                num2 = float(row[1]) * 21
                 num3 = float(row[2])
                 data1.append(num1)
                 data2.append(num2)
+
                 data3.append(num3)
             except ValueError:
                 pass

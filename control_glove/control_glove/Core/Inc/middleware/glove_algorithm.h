@@ -38,6 +38,8 @@ typedef enum
 void glv_convert_euler_angle(float q0, float q1, float q2, float q3, 
                                       float *pitch, float *roll, float *yaw);
 
+void glv_set_init_yaw(float yaw_value_rad);
+
 void glv_pos_convert(float q0, float q1, float q2, float q3, float elbow_angle, 
                               float *x_pos, float *y_pos, float *z_pos);
 
