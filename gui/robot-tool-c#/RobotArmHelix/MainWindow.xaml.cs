@@ -803,6 +803,7 @@ namespace RobotArmHelix
             case plc_run_mode_t.MODE_RUN_TRAJECTORY:
             Console.WriteLine("MODE_RUN_TRAJECTORY");
                 int ret, map_complete;
+                int take_object;
                 switch (shape)
                 {
                 case "Rectangle":
@@ -823,6 +824,7 @@ namespace RobotArmHelix
                         ret = PLCReadbit("M700", out map_complete);
                         if (map_complete == 1)
                         {
+                            take_object = PLCWritebit("M111", 1);
                             g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_2;
                         }         
                     break;
@@ -839,12 +841,12 @@ namespace RobotArmHelix
                         if (map_complete == 1)
                         {
                             g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_3;
+                            take_object = PLCWritebit("M111", 0);
                         }
 
                     break;
                     case run_trajectory_mode_t.MODE_MAP_3:
                     Console.WriteLine("MODE_MAP_3");
-
                         move_trajectory_plc(map[2]);
                         g_run_trajectory_plc = run_trajectory_mode_t.MODE_WAITING_DONE;
                     break;
@@ -889,6 +891,7 @@ namespace RobotArmHelix
                         ret = PLCReadbit("M700", out map_complete);
                         if (map_complete == 1)
                         {
+                            take_object = PLCWritebit("M111", 1);
                             g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_2;
                         }         
                     break;
@@ -904,6 +907,7 @@ namespace RobotArmHelix
                         ret = PLCReadbit("M700", out map_complete);
                         if (map_complete == 1)
                         {
+                            take_object = PLCWritebit("M111", 0);
                             g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_3;
                         }
 
@@ -956,6 +960,7 @@ namespace RobotArmHelix
                         ret = PLCReadbit("M700", out map_complete);
                         if (map_complete == 1)
                         {
+                            take_object = PLCWritebit("M111", 1);
                             g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_2;
                         }         
                     break;
@@ -971,6 +976,7 @@ namespace RobotArmHelix
                         ret = PLCReadbit("M700", out map_complete);
                         if (map_complete == 1)
                         {
+                            take_object = PLCWritebit("M111", 0);
                             g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_3;
                         }
 
@@ -1023,6 +1029,7 @@ namespace RobotArmHelix
                         ret = PLCReadbit("M700", out map_complete);
                         if (map_complete == 1)
                         {
+                            take_object = PLCWritebit("M111", 1);
                             g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_2;
                         }         
                     break;
@@ -1038,6 +1045,7 @@ namespace RobotArmHelix
                         ret = PLCReadbit("M700", out map_complete);
                         if (map_complete == 1)
                         {
+                            take_object = PLCWritebit("M111", 0);
                             g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_3;
                         }
 
@@ -1755,7 +1763,7 @@ namespace RobotArmHelix
             }
             /* Start timer1 and timer2 */
             // timer1.Start();
-            //Thread1Start();
+            // Thread1Start();
             // Thread1Start();
             //Thread2Start();
             //timer1.Start();
@@ -2637,9 +2645,7 @@ namespace RobotArmHelix
                                 {
                                     g_trajectory_mode = tracjectory_mode_t.MODE_ONLY_CONTROL;
                                 }
-
                                 break;
-
                                 case tracjectory_mode_t.MODE_ONLY_CONTROL:
                                 Console.WriteLine("MODE_ONLY_CONTROL");
                                 // Handle only control here
@@ -2881,9 +2887,11 @@ namespace RobotArmHelix
             y_lpf = y_lpf * (1 - alpha) + y * alpha;
             z_lpf = z_lpf * (1 - alpha) + z * alpha;
             int ret;
+            int ret2 = 0;
             double t1, t2, t3, t4, t5;
 
             (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
+            ret2 = Check_angle(t1, t2, t3, t4, t5);
             Jacobi_plus = CreateJacobianMatrix(t1 * Math.PI / 180.0, t2 * Math.PI / 180.0, t3 * Math.PI / 180.0, t4 * Math.PI / 180.0, t5 * Math.PI / 180.0);
             Jacobi_vel = CreateVelocityMatrix(x_vel, y_vel, z_vel);
             omega = MultiplyMatrices(Jacobi_plus, Jacobi_vel);
@@ -2930,6 +2938,7 @@ namespace RobotArmHelix
             int[] temp_vel = new int[5];
             double t1_adapt, t2_adapt, t3_adapt, t4_adapt, t5_adapt;
             int ret = 0;
+            int ret2 = 0;
             int movepath_status;
 
             /* Read status of Brake and AC Servo */
@@ -2938,6 +2947,20 @@ namespace RobotArmHelix
             ///* đang bỏ qua điều kiện Z --> Phải nhớ để add vô sau */
             ////---------------------------------
             (t1_adapt, t2_adapt, t3_adapt, t4_adapt, t5_adapt) = convert_position_angle(x, y, z);
+
+            ret2 = Check_angle(t1_adapt, t2_adapt, t3_adapt, t4_adapt, t5_adapt);
+            if (ret2 != 0)
+            {
+                double theta = 0.0;
+                if (ret2 == 1) theta = t1_adapt;
+                else if (ret2 == 2) theta = t2_adapt;
+                else if (ret2 == 3) theta = t3_adapt;
+                else if (ret2 == 4) theta = t4_adapt;
+                else if (ret2 == 5) theta = t5_adapt;
+                // PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
+                return;
+            }
+
 
             double[] angles_csv = { t1_adapt, t2_adapt - 90, t3_adapt + 90, t4_adapt + 90, t5_adapt };
             double[] glv_quaternion = { 0, 0, 0, 1 };
