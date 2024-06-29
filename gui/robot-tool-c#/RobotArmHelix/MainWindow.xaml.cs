@@ -2618,7 +2618,9 @@ namespace RobotArmHelix
                         plc_receive_length = byteArray[3];
 
                         Console.WriteLine(plc_receive_data.ToString());
+                        Console.WriteLine("-----------");
                         Console.WriteLine(plc_receive_height.ToString());
+                        Console.WriteLine("-----------");
                         Console.WriteLine(plc_receive_length.ToString());
                     }
                     if (byteArray.Length >= 19)
