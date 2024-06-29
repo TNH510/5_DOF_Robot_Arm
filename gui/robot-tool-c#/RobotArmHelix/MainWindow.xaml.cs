@@ -803,6 +803,7 @@ namespace RobotArmHelix
             case plc_run_mode_t.MODE_RUN_TRAJECTORY:
             Console.WriteLine("MODE_RUN_TRAJECTORY");
                 int ret, map_complete;
+                int take_object;
                 switch (shape)
                 {
                 case "Rectangle":
@@ -823,6 +824,7 @@ namespace RobotArmHelix
                         ret = PLCReadbit("M700", out map_complete);
                         if (map_complete == 1)
                         {
+                            take_object = PLCWritebit("M111", 1);
                             g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_2;
                         }         
                     break;
@@ -839,12 +841,12 @@ namespace RobotArmHelix
                         if (map_complete == 1)
                         {
                             g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_3;
+                            take_object = PLCWritebit("M111", 0);
                         }
 
                     break;
                     case run_trajectory_mode_t.MODE_MAP_3:
                     Console.WriteLine("MODE_MAP_3");
-
                         move_trajectory_plc(map[2]);
                         g_run_trajectory_plc = run_trajectory_mode_t.MODE_WAITING_DONE;
                     break;
@@ -889,6 +891,7 @@ namespace RobotArmHelix
                         ret = PLCReadbit("M700", out map_complete);
                         if (map_complete == 1)
                         {
+                            take_object = PLCWritebit("M111", 1);
                             g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_2;
                         }         
                     break;
@@ -904,6 +907,7 @@ namespace RobotArmHelix
                         ret = PLCReadbit("M700", out map_complete);
                         if (map_complete == 1)
                         {
+                            take_object = PLCWritebit("M111", 0);
                             g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_3;
                         }
 
@@ -956,6 +960,7 @@ namespace RobotArmHelix
                         ret = PLCReadbit("M700", out map_complete);
                         if (map_complete == 1)
                         {
+                            take_object = PLCWritebit("M111", 1);
                             g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_2;
                         }         
                     break;
@@ -971,6 +976,7 @@ namespace RobotArmHelix
                         ret = PLCReadbit("M700", out map_complete);
                         if (map_complete == 1)
                         {
+                            take_object = PLCWritebit("M111", 0);
                             g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_3;
                         }
 
@@ -979,6 +985,75 @@ namespace RobotArmHelix
                     Console.WriteLine("MODE_MAP_3");
 
                         move_trajectory_plc(map3[2]);
+                        g_run_trajectory_plc = run_trajectory_mode_t.MODE_WAITING_DONE;
+                    break;
+                    case run_trajectory_mode_t.MODE_WAITING_DONE:
+                    Console.WriteLine("MODE_WAITING_DONE");
+                        /* Read status of Brake and AC Servo */
+                        ret = PLCReadbit("M700", out map_complete);
+                        if (map_complete == 1)
+                        {
+                            plc_receive_data = 0x00;
+                            plc_accept = false;
+                            plc_come_object = false;
+                            g_plc_run_mode = plc_run_mode_t.MODE_IDLE;
+                            g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_1;
+                            byte[] sendata = new byte[4];
+                            sendata[0] = 0xBB;
+                            sendata[1] = 0x05;
+                            sendata[2] = 0x00;
+                            sendata[3] = 0x00;
+                            uart.Write(sendata, 0, sendata.Length);
+                        }
+                    break;
+                    default:
+                    break;
+                    }
+                
+                break;
+
+                case "Circle":
+                    string[] map4 = { "home.csv", "conveyor4_in.csv", "conveyor4_out.csv" };
+                    switch (g_run_trajectory_plc)
+                    {
+                    case run_trajectory_mode_t.MODE_MAP_1:
+                    Console.WriteLine("MODE_MAP_1");
+
+                        move_trajectory_plc(map4[0]);
+                        g_run_trajectory_plc = run_trajectory_mode_t.MODE_WAITING_MAP1;
+
+                    break;
+                    case run_trajectory_mode_t.MODE_WAITING_MAP1:
+                    Console.WriteLine("MODE_WAITING_MAP1");
+                        /* Read status of Brake and AC Servo */
+                        ret = PLCReadbit("M700", out map_complete);
+                        if (map_complete == 1)
+                        {
+                            take_object = PLCWritebit("M111", 1);
+                            g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_2;
+                        }         
+                    break;
+                    case run_trajectory_mode_t.MODE_MAP_2:
+                    Console.WriteLine("MODE_MAP_2");
+
+                        move_trajectory_plc(map4[1]);
+                        g_run_trajectory_plc = run_trajectory_mode_t.MODE_WAITING_MAP2;
+                    break;
+                    case run_trajectory_mode_t.MODE_WAITING_MAP2:
+                    Console.WriteLine("MODE_WAITING_MAP2");
+                        /* Read status of Brake and AC Servo */
+                        ret = PLCReadbit("M700", out map_complete);
+                        if (map_complete == 1)
+                        {
+                            take_object = PLCWritebit("M111", 0);
+                            g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_3;
+                        }
+
+                    break;
+                    case run_trajectory_mode_t.MODE_MAP_3:
+                    Console.WriteLine("MODE_MAP_3");
+
+                        move_trajectory_plc(map4[2]);
                         g_run_trajectory_plc = run_trajectory_mode_t.MODE_WAITING_DONE;
                     break;
                     case run_trajectory_mode_t.MODE_WAITING_DONE:
