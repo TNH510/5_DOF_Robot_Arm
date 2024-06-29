@@ -1,10 +1,10 @@
 /**
  * @file       bsp_gpio.c
- * @copyright  Copyright (C) 2023 QuyLe Co., Ltd. All rights reserved.
- * @license    This project is released under the QuyLe License.
+ * @copyright  Copyright (C) HieuTranNgoc
+ * @license    This project is released under HieuTranNgoc License.
  * @version    v1.0.0
  * @date       2023-08-20
- * @author     quyle-itr-intern
+ * @author     HieuTranNgoc
  *
  * @brief      handle gpio
  *

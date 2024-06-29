@@ -1,10 +1,8 @@
 /**
  * @file       bsp_uart.c
  * @copyright  Copyright (C) HieuTranNgoc
- * @license    This project is released under the QuyLe License.
  * @version    1.0.1
  * @date       2023-08-14
- * @author     Quy Le
  * @author     Hieu Tran
  *
  * @brief      bsp uart
