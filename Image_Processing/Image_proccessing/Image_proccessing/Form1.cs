@@ -438,16 +438,16 @@ namespace Image_proccessing
                     }
                 }
                 //loại bỏ n
-                for (int i=0; i<3;i++)
+                for (int i = 0; i < 3; i++)
                 {
                     gray = Erosion(gray);
-                }    
+                }
                 gray = RemoveSmallRegions.RemoveSmallWhiteRegions(gray);
                 for (int i = 0; i < 3; i++)
                 {
                     gray = Dilation(gray);
                 }
-                gray = Erosion_Dilation(gray, 5,5);//close
+                gray = Erosion_Dilation(gray, 5, 5);//close
 
                 int[,] edges = EdgeDetection.Canny_Detect(gray, high_threshold, low_threshold);
 
@@ -516,7 +516,7 @@ namespace Image_proccessing
                                 double radian = (theta * Math.PI) / 180.0;
                                 int rho = (int)(x * Math.Cos(radian) + y * Math.Sin(radian));
                                 rho += diagonalLength; // Dịch chuyển rho để không có giá trị âm
-                                houghMatrix[theta, rho] = houghMatrix[theta, rho] + 2;
+                                houghMatrix[theta, rho] = houghMatrix[theta, rho] + 1;
                                 if (houghMatrix[theta, rho] > 255)
                                 {
                                     houghMatrix[theta, rho] = 255;

@@ -57,9 +57,9 @@
             // picture1
             // 
             this.picture1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.picture1.Location = new System.Drawing.Point(38, 24);
+            this.picture1.Location = new System.Drawing.Point(1200, 359);
             this.picture1.Name = "picture1";
-            this.picture1.Size = new System.Drawing.Size(561, 559);
+            this.picture1.Size = new System.Drawing.Size(182, 172);
             this.picture1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.picture1.TabIndex = 0;
             this.picture1.TabStop = false;
@@ -88,9 +88,9 @@
             // 
             this.picture4.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.picture4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.picture4.Location = new System.Drawing.Point(1205, 24);
+            this.picture4.Location = new System.Drawing.Point(26, 24);
             this.picture4.Name = "picture4";
-            this.picture4.Size = new System.Drawing.Size(177, 156);
+            this.picture4.Size = new System.Drawing.Size(561, 559);
             this.picture4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.picture4.TabIndex = 0;
             this.picture4.TabStop = false;

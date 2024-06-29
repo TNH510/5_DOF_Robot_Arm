@@ -308,12 +308,7 @@ namespace Lokdeptrai
             int[] threhold = new int[2];
             threhold = CalculateTwoThresholds(gray);
 
-            //int threhold1 = 63;
-            //int threhold2 = 65;
-            if (threhold[0] < 35)
-            {
-                threhold[0] = 35;
-            }
+            
             for (int i = 0; i < gray.GetLength(0); i++)
             {
                 for (int j = 0; j < gray.GetLength(1); j++)
