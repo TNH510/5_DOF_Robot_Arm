@@ -62,7 +62,7 @@ with open('data.csv', 'w', newline='') as csvfile:
                     plt.pause(0.07)  # Tạm dừng một chút để đồ thị được cập nhật
 
                     # Kiểm tra nếu đạt 200 mẫu dữ liệu, thoát khỏi vòng lặp
-                    if len(data1) == 3000:
+                    if len(data1) == 100:
                         break
                 except ValueError:
                     pass
