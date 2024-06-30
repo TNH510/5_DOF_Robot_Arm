@@ -771,9 +771,7 @@ namespace RobotArmHelix
                     sendata[1] = 0x02;
                     sendata[2] = 0x00;
                     sendata[3] = 0x00;
-                    uart.Write(sendata, 0, sendata.Length);
-                        
-                    //Sendrequest("run");                 
+                    uart.Write(sendata, 0, sendata.Length);               
                     
                 }
                 
@@ -781,7 +779,7 @@ namespace RobotArmHelix
 
             case plc_run_mode_t.MODE_RETURN:
             Console.WriteLine("MODE_RETURN");
-                //plc_receive_data = plc.Read();
+                
                 if(plc_receive_data == 0x03)
                 {
                     g_plc_run_mode = plc_run_mode_t.MODE_WAITING_POSITION;
@@ -824,8 +822,8 @@ namespace RobotArmHelix
                         ret = PLCReadbit("M700", out map_complete);
                         if (map_complete == 1)
                         {
+                            take_object = PLCWritebit("M111", 1);
                             g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_2;
-                            //take_object = PLCWritebit("M111", 1);
                         }         
                     break;
                     case run_trajectory_mode_t.MODE_MAP_2:
@@ -840,8 +838,9 @@ namespace RobotArmHelix
                         ret = PLCReadbit("M700", out map_complete);
                         if (map_complete == 1)
                         {
+                            take_object = PLCWritebit("M111", 0);
                             g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_3;
-                            //take_object = PLCWritebit("M111", 0);
+                            
                         }
 
                     break;
@@ -875,7 +874,7 @@ namespace RobotArmHelix
                     }
                 break;
                 case "Square":
-                    string[] map2 = { "home.csv", "conveyor1_in.csv", "conveyor1_out.csv" };
+                    string[] map2 = { "home.csv", "conveyor2_in.csv", "conveyor2_out.csv" };
                     switch (g_run_trajectory_plc)
                     {
                     case run_trajectory_mode_t.MODE_MAP_1:
@@ -943,8 +942,8 @@ namespace RobotArmHelix
                 
                 break;
 
-                case "Triangle":
-                    string[] map3 = { "home.csv", "conveyor1_in.csv", "conveyor1_out.csv" };
+                case "Circle":
+                    string[] map3 = { "home.csv", "conveyor3_in.csv", "conveyor3_out.csv" };
                     switch (g_run_trajectory_plc)
                     {
                     case run_trajectory_mode_t.MODE_MAP_1:
@@ -1012,8 +1011,8 @@ namespace RobotArmHelix
                 
                 break;
 
-                case "Circle":
-                    string[] map4 = { "home.csv", "conveyor1_in.csv", "conveyor1_out.csv" };
+                case "Triangle":
+                    string[] map4 = { "home.csv", "conveyor4_in.csv", "conveyor4_out.csv" };
                     switch (g_run_trajectory_plc)
                     {
                     case run_trajectory_mode_t.MODE_MAP_1:
@@ -1081,16 +1080,16 @@ namespace RobotArmHelix
                 
                 break;
                 case "unknown":
-                        plc_receive_data = 0x00;
-                        plc_accept = false;
-                        plc_come_object = false;
-                        g_plc_run_mode = plc_run_mode_t.MODE_IDLE;
-                        byte[] sendata2 = new byte[4];
-                        sendata2[0] = 0xBB;
-                        sendata2[1] = 0x05;
-                        sendata2[2] = 0x00;
-                        sendata2[3] = 0x00;
-                        uart.Write(sendata2, 0, sendata2.Length);
+                    plc_receive_data = 0x00;
+                    plc_accept = false;
+                    plc_come_object = false;
+                    g_plc_run_mode = plc_run_mode_t.MODE_IDLE;
+                    byte[] sendata2 = new byte[4];
+                    sendata2[0] = 0xBB;
+                    sendata2[1] = 0x05;
+                    sendata2[2] = 0x00;
+                    sendata2[3] = 0x00;
+                    uart.Write(sendata2, 0, sendata2.Length);
                 break;
                 default:
                 break;
@@ -1747,7 +1746,7 @@ namespace RobotArmHelix
             }
             /* Start timer1 and timer2 */
             // timer1.Start();
-            // Thread1Start();
+            Thread1Start();
             // Thread1Start();
             //Thread2Start();
             //timer1.Start();
@@ -2025,7 +2024,7 @@ namespace RobotArmHelix
                 y = double.Parse(TbY.Text);
                 z = double.Parse(TbZ.Text);
 
-                if (z >= 500 && z <= 1000)
+                if (z >= 480 && z <= 1000)
                 {
                     (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
                     ret = Check_angle(t1, t2, t3, t4, t5);
@@ -2743,7 +2742,15 @@ namespace RobotArmHelix
                                                 string csvLine = $"{last_pointX},{last_pointY},{last_pointZ}";
                                                 writer.WriteLine(csvLine);
                                             }
-                                            else if (plc_stt == 3)
+                                            else if (plc_stt == 2) //CV out 1
+                                            {
+                                                last_pointX = 500;
+                                                last_pointY = 0;
+                                                last_pointZ = 830;
+                                                string csvLine = $"{last_pointX},{last_pointY},{last_pointZ}";
+                                                writer.WriteLine(csvLine);
+                                            }
+                                            else if (plc_stt == 3) //CV in 2
                                             {
                                                 last_pointX = Convert.ToDouble(TbCVX2.Text);
                                                 last_pointY = Convert.ToDouble(TbCVY2.Text);
@@ -2751,7 +2758,15 @@ namespace RobotArmHelix
                                                 string csvLine = $"{last_pointX},{last_pointY},{last_pointZ}";
                                                 writer.WriteLine(csvLine);
                                             }
-                                            else if (plc_stt == 5)
+                                            else if (plc_stt == 4) //CV out 2
+                                            {
+                                                last_pointX = 500;
+                                                last_pointY = 0;
+                                                last_pointZ = 830;
+                                                string csvLine = $"{last_pointX},{last_pointY},{last_pointZ}";
+                                                writer.WriteLine(csvLine);
+                                            }
+                                            else if (plc_stt == 5) //CV in 3
                                             {
                                                 last_pointX = Convert.ToDouble(TbCVX3.Text);
                                                 last_pointY = Convert.ToDouble(TbCVY3.Text);
@@ -2759,11 +2774,27 @@ namespace RobotArmHelix
                                                 string csvLine = $"{last_pointX},{last_pointY},{last_pointZ}";
                                                 writer.WriteLine(csvLine);
                                             }
-                                            else if (plc_stt == 7)
+                                            else if (plc_stt == 6) //CV out 3
+                                            {
+                                                last_pointX = 500;
+                                                last_pointY = 0;
+                                                last_pointZ = 830;
+                                                string csvLine = $"{last_pointX},{last_pointY},{last_pointZ}";
+                                                writer.WriteLine(csvLine);
+                                            }
+                                            else if (plc_stt == 7) //CV in 4
                                             {
                                                 last_pointX = Convert.ToDouble(TbCVX4.Text);
                                                 last_pointY = Convert.ToDouble(TbCVY4.Text);
                                                 last_pointZ = Convert.ToDouble(TbCVZ4.Text);
+                                                string csvLine = $"{last_pointX},{last_pointY},{last_pointZ}";
+                                                writer.WriteLine(csvLine);
+                                            }
+                                            else if (plc_stt == 8) //CV out 4
+                                            {
+                                                last_pointX = 500;
+                                                last_pointY = 0;
+                                                last_pointZ = 830;
                                                 string csvLine = $"{last_pointX},{last_pointY},{last_pointZ}";
                                                 writer.WriteLine(csvLine);
                                             }
@@ -2880,16 +2911,16 @@ namespace RobotArmHelix
             Jacobi_plus = CreateJacobianMatrix(t1 * Math.PI / 180.0, t2 * Math.PI / 180.0, t3 * Math.PI / 180.0, t4 * Math.PI / 180.0, t5 * Math.PI / 180.0);
             Jacobi_vel = CreateVelocityMatrix(x_vel, y_vel, z_vel);
             omega = MultiplyMatrices(Jacobi_plus, Jacobi_vel);
-            omega1_plc = omega[0] * 1800 * 35 / Math.PI + 100.0;
-            omega2_plc = omega[1] * 1800 * 20 / Math.PI + 80.0;
-            omega3_plc = omega[2] * 1800 * 20 / Math.PI + 80.0;
-            omega4_plc = -(omega[1] + omega[2]) * 1800 * 20 / Math.PI + 100.0;
+            omega1_plc = omega[0] * 1800 * 35 / Math.PI + 80.0;
+            omega2_plc = omega[1] * 1800 * 20 / Math.PI + 60.0;
+            omega3_plc = omega[2] * 1800 * 20 / Math.PI + 60.0;
+            omega4_plc = -(omega[1] + omega[2]) * 1800 * 20 / Math.PI + 200.0;
             omega5_plc = 0.0;
 
             /* Anti wind-up */
-            if (Math.Abs(omega1_plc) >= 600)
+            if (Math.Abs(omega1_plc) >= 500)
             {
-                omega1_plc = 600;
+                omega1_plc = 500;
             }
             if (Math.Abs(omega2_plc) >= 400)
             {
@@ -3708,7 +3739,6 @@ namespace RobotArmHelix
 
         private void Run_PLC_Click(object sender, RoutedEventArgs e)
         {
-            timer2.Start();
             plc_receive_data = 0x00;
             plc_accept = false;
             plc_come_object = false;
@@ -3720,6 +3750,7 @@ namespace RobotArmHelix
             sendata[2] = 0x00;
             sendata[3] = 0x00;
             uart.Write(sendata, 0, sendata.Length);
+            timer2.Start();
         }
 
         private void Stop_PLC_Click(object sender, RoutedEventArgs e)
