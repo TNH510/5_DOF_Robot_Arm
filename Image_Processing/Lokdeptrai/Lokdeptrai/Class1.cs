@@ -307,8 +307,6 @@ namespace Lokdeptrai
             //Bitmap img_blur = IntToBitmap(blur);
             int[] threhold = new int[2];
             threhold = CalculateTwoThresholds(gray);
-
-            
             for (int i = 0; i < gray.GetLength(0); i++)
             {
                 for (int j = 0; j < gray.GetLength(1); j++)
@@ -953,7 +951,7 @@ namespace Lokdeptrai
                 //    dimention[1, 0] = D1;
                 //    dimention[1, 1] = D1_angle;
                 //}
-                else if (length - width > -20 && length - width < 20)
+                else if (length - width > -15 && length - width < 15)
                 {
 
                     shape = "Square";
@@ -992,7 +990,7 @@ namespace Lokdeptrai
                 dimention[0, 1] = (int)angle[index]; //goc cua Ox voi canh day
 
             }
-            else if (number_edges == 0 && number_point == 1)
+            else if (number_edges <= 2 && number_point <= 2)
             {
                 (shape, Center_Point, dimention[0, 0]) = Circle(edges);//canh day
 
@@ -1019,13 +1017,11 @@ namespace Lokdeptrai
 
         private static int width;
         private static int height;
-
         // Hàm để kiểm tra xem tọa độ có nằm trong ảnh không
         private static bool IsValid(int x, int y)
         {
             return x >= 0 && x < width && y >= 0 && y < height;
         }
-
         // Hàm để gán nhãn các vùng liên thông bằng thuật toán BFS
         private static void LabelComponent(int[,] image, int[,] labels, int startX, int startY, int label)
         {
@@ -1052,7 +1048,6 @@ namespace Lokdeptrai
                 }
             }
         }
-
         public static int[,] RemoveSmallWhiteRegions(int[,] image)
         {
             width = image.GetLength(0);
@@ -1126,4 +1121,4 @@ namespace Lokdeptrai
         }
 
     }
-    }
+}

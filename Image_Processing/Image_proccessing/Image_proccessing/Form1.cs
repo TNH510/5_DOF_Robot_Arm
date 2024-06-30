@@ -414,7 +414,9 @@ namespace Image_proccessing
                 //int[,] blur = gray;
                 //Bitmap img_blur = IntToBitmap(blur);
                 int[] threhold = new int[2];
-                threhold= CalculateTwoThresholds(gray);
+                threhold = CalculateTwoThresholds(gray);
+
+                int threhold1 = CalculateThreshold(gray);
 
                 //int threhold1 = 63;
                 //int threhold2 = 65;
@@ -429,24 +431,16 @@ namespace Image_proccessing
                         if ((gray[i, j] >= threhold[0]))
                         {
                             gray[i, j] = 255;
-                        }
-                      
+                        }                 
                         else
                         {
                             gray[i, j] = 0;
                         }
                     }
                 }
-                //loại bỏ n
-                for (int i = 0; i < 3; i++)
-                {
-                    gray = Erosion(gray);
-                }
+
+
                 gray = RemoveSmallRegions.RemoveSmallWhiteRegions(gray);
-                for (int i = 0; i < 3; i++)
-                {
-                    gray = Dilation(gray);
-                }
                 gray = Erosion_Dilation(gray, 5, 5);//close
 
                 int[,] edges = EdgeDetection.Canny_Detect(gray, high_threshold, low_threshold);
@@ -1047,85 +1041,86 @@ namespace Image_proccessing
 
                     }
                 }
-                //phân nhóm
-                //bốc tk đầu tiên
-                int x = 0;
-                int y = 0;
-                int nhom = 0;
-                int count = 0;
-                while (count < count_hough_point)
-                {
-                    int distance = 0;
-                    for (int i = 0; i < count_hough_point; i++)
+
+                    //phân nhóm
+                    //bốc tk đầu tiên
+                    int x = 0;
+                    int y = 0;
+                    int nhom = 0;
+                    int count = 0;
+                    while (count < count_hough_point)
                     {
-                        if (Temp_info[i, 3] == 0)//check xem da phan loai hay chua
+                        int distance = 0;
+                        for (int i = 0; i < count_hough_point; i++)
                         {
-                            x = Temp_info[i, 0];
-                            y = Temp_info[i, 1];
-                            distance= Math.Abs( y - 800);
-                            break;
-                        }
-                    }
-                    //tính toán khoản cách để phâm nhóm 
-                    for (int i = 0; i < count_hough_point; i++)
-                    {
-                        if (Temp_info[i, 3] == 0)//check xem da phan loai hay chua
-                        {
-                            if ((((Math.Abs(x - Temp_info[i, 0]) < 25) && (Math.Abs(y - Temp_info[i, 1]) < 120))) || ((Math.Abs(x - Temp_info[i, 0]) > 170) && (Math.Abs(Math.Abs(Temp_info[i, 1] - 800)-distance)<120)))
+                            if (Temp_info[i, 3] == 0)//check xem da phan loai hay chua
                             {
-                                Temp_info[i, 2] = nhom;//nhom
-                                Temp_info[i, 3] = 1;//da check
-                                count++;
+                                x = Temp_info[i, 0];
+                                y = Temp_info[i, 1];
+                                distance = Math.Abs(y - 800);
+                                break;
                             }
                         }
-                    }
-                    nhom++;
-                }
-                // tìm ra giá trị vote cao nhất ở mỗi nhóm
-                int max_value;
-                int[,] Temp_Result = new int[nhom, 2];//x,y
-                for (int i = 0; i < nhom; i++)
-                {
-                    //tìm ra giá trị lớn nhất
-                    max_value = 0;
-                    int theta = 0;
-                    for (int j = 0; j < count_hough_point; j++)
-                    {
-                        if (Temp_info[j, 4] > max_value && Temp_info[j, 2] == i)
+                        //tính toán khoản cách để phâm nhóm 
+                        for (int i = 0; i < count_hough_point; i++)
                         {
-                            max_value = Temp_info[j, 4];
-                            theta= Temp_info[j, 0];
+                            if (Temp_info[i, 3] == 0)//check xem da phan loai hay chua
+                            {
+                                if ((((Math.Abs(x - Temp_info[i, 0]) < 25) && (Math.Abs(y - Temp_info[i, 1]) < 120))) || ((Math.Abs(x - Temp_info[i, 0]) > 170) && (Math.Abs(Math.Abs(Temp_info[i, 1] - 800) - distance) < 120)))
+                                {
+                                    Temp_info[i, 2] = nhom;//nhom
+                                    Temp_info[i, 3] = 1;//da check
+                                    count++;
+                                }
+                            }
                         }
+                        nhom++;
                     }
-                    //tìm những đường thẳng có giá trị bằng với max_value
-                    int avr_x = 0;
-                    int avr_y = 0;
-                    int count2 = 0;
-                    for (int j = 0; j < count_hough_point; j++)
+                    // tìm ra giá trị vote cao nhất ở mỗi nhóm
+                    int max_value;
+                    int[,] Temp_Result = new int[nhom, 2];//x,y
+                    for (int i = 0; i < nhom; i++)
                     {
-                        if (Temp_info[j, 4] == max_value && Temp_info[j, 2] == i && Math.Abs(theta- Temp_info[j, 0])<10)
+                        //tìm ra giá trị lớn nhất
+                        max_value = 0;
+                        int theta = 0;
+                        for (int j = 0; j < count_hough_point; j++)
                         {
-                            avr_x += Temp_info[j, 0];
-                            avr_y += Temp_info[j, 1];
-                            count2++;
+                            if (Temp_info[j, 4] > max_value && Temp_info[j, 2] == i)
+                            {
+                                max_value = Temp_info[j, 4];
+                                theta = Temp_info[j, 0];
+                            }
                         }
+                        //tìm những đường thẳng có giá trị bằng với max_value
+                        int avr_x = 0;
+                        int avr_y = 0;
+                        int count2 = 0;
+                        for (int j = 0; j < count_hough_point; j++)
+                        {
+                            if (Temp_info[j, 4] == max_value && Temp_info[j, 2] == i && Math.Abs(theta - Temp_info[j, 0]) < 10)
+                            {
+                                avr_x += Temp_info[j, 0];
+                                avr_y += Temp_info[j, 1];
+                                count2++;
+                            }
+                        }
+                        Temp_Result[i, 0] = avr_x / count2;
+                        Temp_Result[i, 1] = avr_y / count2;
                     }
-                    Temp_Result[i, 0] = avr_x / count2;
-                    Temp_Result[i, 1] = avr_y / count2;
-                }
-                //Lọc ra các đường dùng được
-                int number_lines = Temp_Result.GetLength(0);
-                
-                //int count3 = 0;//đếm số lượng đường có alpha < 5 độ
-                //for (int i =0; i<number_lines;i++)
-                //{
-                //    if(Temp_Result[i, 0]<3)
-                //    {
-                //        count3++;
-                //    }    
-                //}
+                    //Lọc ra các đường dùng được
+                    int number_lines = Temp_Result.GetLength(0);
 
-                int[,] Final_Result=new int [number_lines,2];
+                    //int count3 = 0;//đếm số lượng đường có alpha < 5 độ
+                    //for (int i =0; i<number_lines;i++)
+                    //{
+                    //    if(Temp_Result[i, 0]<3)
+                    //    {
+                    //        count3++;
+                    //    }    
+                    //}
+
+                    int[,] Final_Result = new int[number_lines, 2];
                 //int count4 = 0;
                 for (int i = 0; i < number_lines; i++)
                 {
@@ -1135,11 +1130,12 @@ namespace Image_proccessing
                     //}
                     //else
                     //{
-                        Final_Result[i, 0] = Temp_Result[i, 0];
-                        Final_Result[i, 1] = Temp_Result[i, 1];
-                        //count4++;
+                    Final_Result[i, 0] = Temp_Result[i, 0];
+                    Final_Result[i, 1] = Temp_Result[i, 1];
+                    //count4++;
                     //}
                 }
+    
                 return Final_Result;
             }
             public static int[,] Find_corner_info(int[,] Lines)
@@ -1396,7 +1392,7 @@ namespace Image_proccessing
                         count2++;
                     }    
                 }    
-                if(count2>0.8*count)
+                if(count2>0.7*count)
                 {
                     Radius = min_radius + 3;
                     shape = "Circle";
@@ -1452,7 +1448,7 @@ namespace Image_proccessing
                     //    dimention[1, 0] = D1;
                     //    dimention[1, 1] = D1_angle;
                     //}
-                    else if (length - width > -20 && length - width < 20)
+                    else if (length - width > -15 && length - width < 15)
                     {
 
                         shape = "Square";
@@ -1491,7 +1487,7 @@ namespace Image_proccessing
                     dimention[0, 1] = (int)angle[index]; //goc cua Ox voi canh day
 
                 }
-                else if (number_edges == 0 && number_point == 1)
+                else if (number_edges <= 1 && number_point <= 2)
                 {
                     (shape, Center_Point, dimention[0, 0]) = Circle(edges);//canh day
 
@@ -1649,7 +1645,7 @@ namespace Image_proccessing
             ////biểu đồ hough
             int[,] hough = EdgeDetection.PerformHoughTransform_Rectangle(edges);
             int[,] lines = EdgeDetection.Find_line_info(hough, out int count_hough_point);
-            int[,] result = EdgeDetection.Drawline2(lines);
+            //int[,] result = EdgeDetection.Drawline2(lines);
             int[,] corner = EdgeDetection.Find_corner_info(lines);
 
             EdgeDetection.Detect_Shape_dimention(edges, lines, corner, out string shape, out int[,] dimention, out int[,] center_point);
