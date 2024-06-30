@@ -771,9 +771,7 @@ namespace RobotArmHelix
                     sendata[1] = 0x02;
                     sendata[2] = 0x00;
                     sendata[3] = 0x00;
-                    uart.Write(sendata, 0, sendata.Length);
-                        
-                    //Sendrequest("run");                 
+                    uart.Write(sendata, 0, sendata.Length);               
                     
                 }
                 
@@ -781,7 +779,7 @@ namespace RobotArmHelix
 
             case plc_run_mode_t.MODE_RETURN:
             Console.WriteLine("MODE_RETURN");
-                //plc_receive_data = plc.Read();
+                
                 if(plc_receive_data == 0x03)
                 {
                     g_plc_run_mode = plc_run_mode_t.MODE_WAITING_POSITION;
@@ -1082,16 +1080,16 @@ namespace RobotArmHelix
                 
                 break;
                 case "unknown":
-                        plc_receive_data = 0x00;
-                        plc_accept = false;
-                        plc_come_object = false;
-                        g_plc_run_mode = plc_run_mode_t.MODE_IDLE;
-                        byte[] sendata2 = new byte[4];
-                        sendata2[0] = 0xBB;
-                        sendata2[1] = 0x05;
-                        sendata2[2] = 0x00;
-                        sendata2[3] = 0x00;
-                        uart.Write(sendata2, 0, sendata2.Length);
+                    plc_receive_data = 0x00;
+                    plc_accept = false;
+                    plc_come_object = false;
+                    g_plc_run_mode = plc_run_mode_t.MODE_IDLE;
+                    byte[] sendata2 = new byte[4];
+                    sendata2[0] = 0xBB;
+                    sendata2[1] = 0x05;
+                    sendata2[2] = 0x00;
+                    sendata2[3] = 0x00;
+                    uart.Write(sendata2, 0, sendata2.Length);
                 break;
                 default:
                 break;
@@ -1748,7 +1746,7 @@ namespace RobotArmHelix
             }
             /* Start timer1 and timer2 */
             // timer1.Start();
-            // Thread1Start();
+            Thread1Start();
             // Thread1Start();
             //Thread2Start();
             //timer1.Start();
@@ -2746,9 +2744,9 @@ namespace RobotArmHelix
                                             }
                                             else if (plc_stt == 2) //CV out 1
                                             {
-                                                last_pointX = Convert.ToDouble(TbX_home.Text);
-                                                last_pointY = Convert.ToDouble(TbY_home.Text);
-                                                last_pointZ = Convert.ToDouble(TbZ_home.Text);
+                                                last_pointX = 500;
+                                                last_pointY = 0;
+                                                last_pointZ = 830;
                                                 string csvLine = $"{last_pointX},{last_pointY},{last_pointZ}";
                                                 writer.WriteLine(csvLine);
                                             }
@@ -2762,9 +2760,9 @@ namespace RobotArmHelix
                                             }
                                             else if (plc_stt == 4) //CV out 2
                                             {
-                                                last_pointX = Convert.ToDouble(TbX_home.Text);
-                                                last_pointY = Convert.ToDouble(TbY_home.Text);
-                                                last_pointZ = Convert.ToDouble(TbZ_home.Text);
+                                                last_pointX = 500;
+                                                last_pointY = 0;
+                                                last_pointZ = 830;
                                                 string csvLine = $"{last_pointX},{last_pointY},{last_pointZ}";
                                                 writer.WriteLine(csvLine);
                                             }
@@ -2778,9 +2776,9 @@ namespace RobotArmHelix
                                             }
                                             else if (plc_stt == 6) //CV out 3
                                             {
-                                                last_pointX = Convert.ToDouble(TbX_home.Text);
-                                                last_pointY = Convert.ToDouble(TbY_home.Text);
-                                                last_pointZ = Convert.ToDouble(TbZ_home.Text);
+                                                last_pointX = 500;
+                                                last_pointY = 0;
+                                                last_pointZ = 830;
                                                 string csvLine = $"{last_pointX},{last_pointY},{last_pointZ}";
                                                 writer.WriteLine(csvLine);
                                             }
@@ -2794,9 +2792,9 @@ namespace RobotArmHelix
                                             }
                                             else if (plc_stt == 8) //CV out 4
                                             {
-                                                last_pointX = Convert.ToDouble(TbX_home.Text);
-                                                last_pointY = Convert.ToDouble(TbY_home.Text);
-                                                last_pointZ = Convert.ToDouble(TbZ_home.Text);
+                                                last_pointX = 500;
+                                                last_pointY = 0;
+                                                last_pointZ = 830;
                                                 string csvLine = $"{last_pointX},{last_pointY},{last_pointZ}";
                                                 writer.WriteLine(csvLine);
                                             }
@@ -3741,7 +3739,6 @@ namespace RobotArmHelix
 
         private void Run_PLC_Click(object sender, RoutedEventArgs e)
         {
-            timer2.Start();
             plc_receive_data = 0x00;
             plc_accept = false;
             plc_come_object = false;
@@ -3753,6 +3750,7 @@ namespace RobotArmHelix
             sendata[2] = 0x00;
             sendata[3] = 0x00;
             uart.Write(sendata, 0, sendata.Length);
+            timer2.Start();
         }
 
         private void Stop_PLC_Click(object sender, RoutedEventArgs e)
