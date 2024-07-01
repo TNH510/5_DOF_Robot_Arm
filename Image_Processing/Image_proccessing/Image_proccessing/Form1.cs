@@ -1688,11 +1688,11 @@ namespace Image_proccessing
             {
                 int X1 = corner[i, 0];
                 int Y1 = corner[i, 1];
-                for (int x1 = X1 - 2; x1 < X1 + 2; x1++)
+                for (int x1 = X1 - 5; x1 < X1 + 5; x1++)
                 {
                     if (x1 > 0 && x1 < Import_picture.Width)
                     {
-                        for (int y1 = Y1 - 2; y1 < Y1 + 2; y1++)
+                        for (int y1 = Y1 - 5; y1 < Y1 + 5; y1++)
                         {
                             if (y1 > 0 && y1 < Import_picture.Height)
                             {
@@ -1704,11 +1704,11 @@ namespace Image_proccessing
             }
             if (shape == "Circle")
             {
-                for (int x1 = x - 2; x1 < x + 2; x1++)
+                for (int x1 = x - 5; x1 < x + 5; x1++)
                 {
                     if (x1 > 0 && x1 < Import_picture.Width)
                     {
-                        for (int y1 = y - 2; y1 < y + 2; y1++)
+                        for (int y1 = y - 5; y1 < y + 5; y1++)
                         {
                             if (y1 > 0 && y1 < Import_picture.Height)
                             {
