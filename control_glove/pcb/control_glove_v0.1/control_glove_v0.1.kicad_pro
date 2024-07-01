@@ -389,7 +389,7 @@
       "idf": "",
       "netlist": "control_glove_v0.1.net",
       "specctra_dsn": "",
-      "step": "",
+      "step": "../../3d_new_version/all.step",
       "vrml": ""
     },
     "page_layout_descr_file": ""

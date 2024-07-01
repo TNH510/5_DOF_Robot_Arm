@@ -1,10 +1,10 @@
 /**
  * @file       bsp_i2c.c
  * @copyright  Copyright (C) HieuTranNgoc
- * @license    This project is released under the QuyLe License.
+ * @license    This project is released under HieuTranNgoc License.
  * @version    1.0.0
  * @date       2023-08-19
- * @author     quyle-itr-intern
+ * @author     Hieu Tran Ngoc
  *
  * @brief      handle i2c
  *

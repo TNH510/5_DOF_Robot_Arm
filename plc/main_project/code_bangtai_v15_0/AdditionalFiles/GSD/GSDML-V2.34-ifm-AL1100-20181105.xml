@@ -1,0 +1,1817 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<ISO15745Profile xmlns="http://www.profibus.com/GSDML/2003/11/DeviceProfile" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.profibus.com/GSDML/2003/11/DeviceProfile ..\xsd\GSDML-DeviceProfile-V2.34.xsd">
+    <ProfileHeader>
+        <ProfileIdentification>PROFINET Device Profile</ProfileIdentification>
+        <ProfileRevision>1.00</ProfileRevision>
+        <ProfileName>Device Profile for PROFINET Devices</ProfileName>
+        <ProfileSource>PROFIBUS Nutzerorganisation e. V. (PNO)</ProfileSource>
+        <ProfileClassID>Device</ProfileClassID>
+        <ISO15745Reference>
+            <ISO15745Part>4</ISO15745Part>
+            <ISO15745Edition>1</ISO15745Edition>
+            <ProfileTechnology>GSDML</ProfileTechnology>
+        </ISO15745Reference>
+    </ProfileHeader>
+    <ProfileBody>
+        <DeviceIdentity VendorID="0x0136" DeviceID="0xAC52">
+            <InfoText TextId="device_info"/>
+            <VendorName Value="ifm electronic"/>
+        </DeviceIdentity>
+        <DeviceFunction>
+            <Family MainFamily="I/O" ProductFamily="ifm electronic"/>
+        </DeviceFunction>
+        <ApplicationProcess>
+            <DeviceAccessPointList>
+                <!-- IO-Link Master-->
+                <DeviceAccessPointItem ID="DIM 1" PhysicalSlots="0..1" ModuleIdentNumber="0x10100000" MinDeviceInterval="8" ImplementationType="netX" DNS_CompatibleName="AL1100" FixedInSlots="0" ObjectUUID_LocalIndex="1" MultipleWriteSupported="true" IO_SupervisorSupported="false" DeviceAccessSupported="true" NumberOfDeviceAccessAR="1" CheckDeviceID_Allowed="true" PNIO_Version="V2.33" NameOfStationNotTransferable="true" ResetToFactoryModes="2" LLDP_NoD_Supported="true">
+                    <ModuleInfo>
+                        <Name TextId="DAP"/>
+                        <InfoText TextId="DAP Desc"/>
+                        <VendorName Value="ifm electronic"/>
+                        <OrderNumber Value="AL1100"/>
+                    </ModuleInfo>
+                    <CertificationInfo ApplicationClass="" ConformanceClass="C" NetloadClass="III"/>
+                    <SubslotList>
+                        <SubslotItem SubslotNumber="32768" TextId="PDEV_X1"/>
+                        <SubslotItem SubslotNumber="32769" TextId="PDEV_X1_P1"/>
+                        <SubslotItem SubslotNumber="32770" TextId="PDEV_X1_P2"/>
+                    </SubslotList>
+                    <IOConfigData MaxInputLength="160" MaxOutputLength="160"/>
+                    <UseableModules>
+                        <ModuleItemRef ModuleItemTarget="IN_OUT_MODULE_IO-Link 16I/16O" FixedInSlots="1"/>
+                    </UseableModules>
+                    <VirtualSubmoduleList>
+                        <VirtualSubmoduleItem ID="VSMI 1" SubmoduleIdentNumber="0x10110000" Writeable_IM_Records="1 2 3" MayIssueProcessAlarm="true">
+                            <IOData/>
+                            <ModuleInfo>
+                                <Name TextId="SUB_MOD_DAP"/>
+                                <InfoText TextId="SUB_MOD_DAP_Desc"/>
+                            </ModuleInfo>
+                        </VirtualSubmoduleItem>
+                    </VirtualSubmoduleList>
+                    <SystemDefinedSubmoduleList>
+                        <InterfaceSubmoduleItem ID="ISMI00000001" SubslotNumber="32768" SubmoduleIdentNumber="0x10110001" SupportedRT_Classes="RT_CLASS_1;RT_CLASS_3" TextId="InterfaceName" SupportedProtocols="LLDP;SNMP" NetworkComponentDiagnosisSupported="false" DCP_BoundarySupported="true" PTP_BoundarySupported="true" DCP_HelloSupported="false" DelayMeasurementSupported="true">
+                            <RT_Class3Properties StartupMode="Legacy;Advanced" MaxBridgeDelay="5500" MaxNumberIR_FrameData="256" ForwardingMode="Relative" MaxRetentionTime="20000"/>
+                            <SynchronisationMode SupportedRole="SyncSlave" MaxLocalJitter="50" T_PLL_MAX="1000" SupportedSyncProtocols="PTCP"/>
+                            <ApplicationRelations StartupMode="Legacy;Advanced" NumberOfAdditionalInputCR="0" NumberOfAdditionalMulticastProviderCR="0" NumberOfAdditionalOutputCR="0" NumberOfMulticastConsumerCR="0" NumberOfAR="1">
+                                <TimingProperties SendClock="32" ReductionRatio="1 2 4 8 16 32 64 128 256 512"/>
+                                <RT_Class3TimingProperties SendClock="8 16 32 64 128" ReductionRatio="1 2 4 8 16"/>
+                            </ApplicationRelations>
+                            <MediaRedundancy SupportedRole="Client"/>
+                        </InterfaceSubmoduleItem>
+                        <PortSubmoduleItem ID="IDS_1P1" SubslotNumber="32769" SubmoduleIdentNumber="0x10110002" MAUTypes="16" TextId="IDT_Port1" MaxPortRxDelay="340" MaxPortTxDelay="92" PortDeactivationSupported="false" LinkStateDiagnosisCapability="Up+Down" IsDefaultRingport="true" CheckMAUTypeSupported="true" CheckMAUTypeDifferenceSupported="true">
+                            <MAUTypeList>
+                                <MAUTypeItem Value="16" AdjustSupported="true"/>
+                            </MAUTypeList>
+                        </PortSubmoduleItem>
+                        <PortSubmoduleItem ID="IDS_1P2" SubslotNumber="32770" SubmoduleIdentNumber="0x10110003" MAUTypes="16" TextId="IDT_Port2" MaxPortRxDelay="340" MaxPortTxDelay="92" PortDeactivationSupported="false" LinkStateDiagnosisCapability="Up+Down" IsDefaultRingport="true" CheckMAUTypeSupported="true" CheckMAUTypeDifferenceSupported="true">
+                            <MAUTypeList>
+                                <MAUTypeItem Value="16" AdjustSupported="true"/>
+                            </MAUTypeList>
+                        </PortSubmoduleItem>
+                    </SystemDefinedSubmoduleList>
+                    <Graphics>
+                        <GraphicItemRef Type="DeviceSymbol" GraphicItemTarget="1"/>
+                        <GraphicItemRef Type="DeviceIcon" GraphicItemTarget="1"/>
+                    </Graphics>
+                </DeviceAccessPointItem>
+            </DeviceAccessPointList>
+            <ModuleList>
+                <ModuleItem ID="IN_OUT_MODULE_IO-Link 16I/16O" ModuleIdentNumber="0x10400000" PhysicalSubslots="2..5">
+                    <ModuleInfo CategoryRef="Modular slot">
+                        <Name TextId="Modular module text"/>
+                        <InfoText TextId="Modular module help"/>
+                        <OrderNumber Value="AL1100"/>
+                    </ModuleInfo>
+                    <SubslotList>
+                        <SubslotItem SubslotNumber="2" TextId="IDT_NAME_PORT1"/>
+                        <SubslotItem SubslotNumber="3" TextId="IDT_NAME_PORT2"/>
+                        <SubslotItem SubslotNumber="4" TextId="IDT_NAME_PORT3"/>
+                        <SubslotItem SubslotNumber="5" TextId="IDT_NAME_PORT4"/>
+                    </SubslotList>
+                    <VirtualSubmoduleList>
+                        <VirtualSubmoduleItem ID="IDS_1.0 Linking Modul" SubmoduleIdentNumber="0x00010000" FixedInSubslots="1" MayIssueProcessAlarm="true" API="19969">
+                            <IOData/>
+                            <RecordDataList>
+                                <ParameterRecordDataItem Index="301" Length="1" TransferSequence="0">
+                                    <Name TextId="Usecase parameter"/>
+                                    <Const ByteOffset="0" Data="0x00"/>
+                                    <Ref ValueItemTarget="VAL_Usecase" DataType="BitArea" BitLength="8" ByteOffset="0" BitOffset="0" DefaultValue="255" Changeable="true" AllowedValues="0 1 2 255" TextId="RecUC_UseCaseMode"/>
+                                </ParameterRecordDataItem>
+                            </RecordDataList>
+                            <ModuleInfo>
+                                <Name TextId="IO-Link Master"/>
+                                <InfoText TextId="empty"/>
+                            </ModuleInfo>
+                        </VirtualSubmoduleItem>
+                    </VirtualSubmoduleList>
+                    <UseableSubmodules>
+                        <SubmoduleItemRef SubmoduleItemTarget="IDS_1 Port x IO-Link 32I/32O" AllowedInSubslots="2..5"/>
+                        <SubmoduleItemRef SubmoduleItemTarget="IDS_1 Port x IO-Link 16I/16O" AllowedInSubslots="2..5"/>
+                        <SubmoduleItemRef SubmoduleItemTarget="IDS_1 Port x IO-Link 8I/8O" AllowedInSubslots="2..5"/>
+                        <SubmoduleItemRef SubmoduleItemTarget="IDS_1 Port x IO-Link 4I/4O" AllowedInSubslots="2..5"/>
+                        <SubmoduleItemRef SubmoduleItemTarget="IDS_1 Port x IO-Link 2I/2O" AllowedInSubslots="2..5"/>
+                        <SubmoduleItemRef SubmoduleItemTarget="IDS_1 Port x IO-Link 1I/1O" AllowedInSubslots="2..5"/>
+                        <SubmoduleItemRef SubmoduleItemTarget="IDS_1 Port x IO-Link 1I/15O" AllowedInSubslots="2..5"/>
+                        <SubmoduleItemRef SubmoduleItemTarget="IDS_1 Port x IO-Link 32I" AllowedInSubslots="2..5"/>
+                        <SubmoduleItemRef SubmoduleItemTarget="IDS_1 Port x IO-Link 16I" AllowedInSubslots="2..5"/>
+                        <SubmoduleItemRef SubmoduleItemTarget="IDS_1 Port x IO-Link 8I" AllowedInSubslots="2..5"/>
+                        <SubmoduleItemRef SubmoduleItemTarget="IDS_1 Port x IO-Link 4I" AllowedInSubslots="2..5"/>
+                        <SubmoduleItemRef SubmoduleItemTarget="IDS_1 Port x IO-Link 2I" AllowedInSubslots="2..5"/>
+                        <SubmoduleItemRef SubmoduleItemTarget="IDS_1 Port x IO-Link 1I" AllowedInSubslots="2..5"/>
+                        <SubmoduleItemRef SubmoduleItemTarget="IDS_1 Port x IO-Link 32O" AllowedInSubslots="2..5"/>
+                        <SubmoduleItemRef SubmoduleItemTarget="IDS_1 Port x IO-Link 16O" AllowedInSubslots="2..5"/>
+                        <SubmoduleItemRef SubmoduleItemTarget="IDS_1 Port x IO-Link 8O" AllowedInSubslots="2..5"/>
+                        <SubmoduleItemRef SubmoduleItemTarget="IDS_1 Port x IO-Link 4O" AllowedInSubslots="2..5"/>
+                        <SubmoduleItemRef SubmoduleItemTarget="IDS_1 Port x IO-Link 2O" AllowedInSubslots="2..5"/>
+                        <SubmoduleItemRef SubmoduleItemTarget="IDS_1 Port x IO-Link 1O" AllowedInSubslots="2..5"/>
+                        <SubmoduleItemRef SubmoduleItemTarget="IDS_1 Port x DI" AllowedInSubslots="2..5"/>
+                        <SubmoduleItemRef SubmoduleItemTarget="IDS_1 Port x DO" AllowedInSubslots="2..5"/>
+                        <SubmoduleItemRef SubmoduleItemTarget="IDS_1 Port x INACTIVATE" AllowedInSubslots="2..5"/>
+                    </UseableSubmodules>
+                </ModuleItem>
+            </ModuleList>
+            <SubmoduleList>
+                <!-- IO-Link device proxy 32I/ 32O -->
+                <SubmoduleItem API="19969" ID="IDS_1 Port x IO-Link 32I/32O" SubmoduleIdentNumber="0x00002021" RequiredSchemaVersion="V2.31" MayIssueProcessAlarm="true">
+                    <IOData>
+                        <Input Consistency="All items consistency">
+                            <DataItem DataType="OctetString" TextId="Input_Data_32" Length="32" UseAsBits="false"/>
+                            <DataItem DataType="Unsigned8" UseAsBits="true" TextId="PQI">
+                                <BitDataItem BitOffset="0" TextId="DI4"/>
+                                <BitDataItem BitOffset="1" TextId="DI2"/>
+                                <BitDataItem BitOffset="2" TextId="NP"/>
+                                <BitDataItem BitOffset="3" TextId="SV"/>
+                                <BitDataItem BitOffset="4" TextId="DA"/>
+                                <BitDataItem BitOffset="5" TextId="DC"/>
+                                <BitDataItem BitOffset="6" TextId="DE"/>
+                                <BitDataItem BitOffset="7" TextId="PQ"/>
+                            </DataItem>
+                        </Input>
+                        <Output Consistency="All items consistency">
+                            <DataItem DataType="OctetString" TextId="Output_Data_32" Length="32" UseAsBits="false"/>
+                        </Output>
+                    </IOData>
+                    <RecordDataList>
+                        <!-- Profile Index=0xB100 (45312)-->
+                        <ParameterRecordDataItem Index="45312" Length="12" TransferSequence="0">
+                            <Name TextId="Port parameters"/>
+                            <Const ByteOffset="0" Data="0x00,0x01,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_PortMode" DataType="BitArea" BitLength="4" ByteOffset="2" BitOffset="0" DefaultValue="11" Changeable="true" AllowedValues="11" TextId="RecIOL_PortMode"/>
+                            <Ref ValueItemTarget="M_Cycle" DataType="BitArea" ByteOffset="4" BitOffset="0" BitLength="8" DefaultValue="0" AllowedValues="0 20 40 68 88 128 148 188" TextId="CycleTime" Visible="true" Changeable="true"/>
+                            <Ref ValueItemTarget="I_Level" DataType="BitArea" ByteOffset="3" BitOffset="1" BitLength="3" DefaultValue="0" AllowedValues="0..4" TextId="IntegrationLevel" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned16" ByteOffset="5" DefaultValue="0" AllowedValues="0..65535" TextId="VendorID" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned32" ByteOffset="7" DefaultValue="0" AllowedValues="0..16777215" TextId="DeviceID"/>
+                            <Ref ValueItemTarget="VAL_DisableEvents" DataType="BitArea" BitLength="1" ByteOffset="11" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1" TextId="RecIOL_DisableEvents"/>
+                        </ParameterRecordDataItem>
+                        <ParameterRecordDataItem Index="300" Length="33" TransferSequence="0">
+                            <Name TextId="Fail Safe parameter"/>
+                            <Const ByteOffset="0" Data="0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_FailSafeMode" DataType="BitArea" BitLength="8" ByteOffset="0" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1 2 3" TextId="RecFSM_FailSafeMode"/>
+                            <Ref DataType="OctetString" Length="32" ByteOffset="1" DefaultValue="0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00" TextId="PatternValue" Changeable="true" Visible="true"/>
+                        </ParameterRecordDataItem>
+                    </RecordDataList>
+                    <ModuleInfo CategoryRef="IOLink Input + Output + PQI">
+                        <Name TextId="CM IO-Link 32 I/ 32 O"/>
+                        <InfoText TextId="CM IO-Link 32 I/ 32 O"/>
+                        <OrderNumber Value=""/>
+                    </ModuleInfo>
+                </SubmoduleItem>
+                <!-- IO-Link device proxy 16I/ 16O -->
+                <SubmoduleItem API="19969" ID="IDS_1 Port x IO-Link 16I/16O" SubmoduleIdentNumber="0x00001011" RequiredSchemaVersion="V2.31" MayIssueProcessAlarm="true">
+                    <IOData>
+                        <Input Consistency="All items consistency">
+                            <DataItem DataType="OctetString" TextId="Input_Data_16" Length="16" UseAsBits="false"/>
+                            <DataItem DataType="Unsigned8" UseAsBits="true" TextId="PQI">
+                                <BitDataItem BitOffset="0" TextId="DI4"/>
+                                <BitDataItem BitOffset="1" TextId="DI2"/>
+                                <BitDataItem BitOffset="2" TextId="NP"/>
+                                <BitDataItem BitOffset="3" TextId="SV"/>
+                                <BitDataItem BitOffset="4" TextId="DA"/>
+                                <BitDataItem BitOffset="5" TextId="DC"/>
+                                <BitDataItem BitOffset="6" TextId="DE"/>
+                                <BitDataItem BitOffset="7" TextId="PQ"/>
+                            </DataItem>
+                        </Input>
+                        <Output Consistency="All items consistency">
+                            <DataItem DataType="OctetString" TextId="Output_Data_16" Length="16" UseAsBits="false"/>
+                        </Output>
+                    </IOData>
+                    <RecordDataList>
+                        <!-- Profile Index=0xB100 (45312) -->
+                        <ParameterRecordDataItem Index="45312" Length="12" TransferSequence="0">
+                            <Name TextId="Port parameters"/>
+                            <Const ByteOffset="0" Data="0x00,0x01,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_PortMode" DataType="BitArea" BitLength="4" ByteOffset="2" BitOffset="0" DefaultValue="11" Changeable="true" AllowedValues="11" TextId="RecIOL_PortMode"/>
+                            <Ref ValueItemTarget="M_Cycle" DataType="BitArea" ByteOffset="4" BitOffset="0" BitLength="8" DefaultValue="0" AllowedValues="0 20 40 68 88 128 148 188" TextId="CycleTime" Visible="true" Changeable="true"/>
+                            <Ref ValueItemTarget="I_Level" DataType="BitArea" ByteOffset="3" BitOffset="1" BitLength="3" DefaultValue="0" AllowedValues="0..4" TextId="IntegrationLevel" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned16" ByteOffset="5" DefaultValue="0" AllowedValues="0..65535" TextId="VendorID" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned32" ByteOffset="7" DefaultValue="0" AllowedValues="0..16777215" TextId="DeviceID"/>
+                            <Ref ValueItemTarget="VAL_DisableEvents" DataType="BitArea" BitLength="1" ByteOffset="11" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1" TextId="RecIOL_DisableEvents"/>
+                        </ParameterRecordDataItem>
+                        <ParameterRecordDataItem Index="300" Length="33" TransferSequence="0">
+                            <Name TextId="Fail Safe parameter"/>
+                            <Const ByteOffset="0" Data="0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_FailSafeMode" DataType="BitArea" BitLength="8" ByteOffset="0" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1 2 3" TextId="RecFSM_FailSafeMode"/>
+                            <Ref DataType="OctetString" Length="16" ByteOffset="1" DefaultValue="0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00" TextId="PatternValue" Changeable="true" Visible="true"/>
+                        </ParameterRecordDataItem>
+                    </RecordDataList>
+                    <ModuleInfo CategoryRef="IOLink Input + Output + PQI">
+                        <Name TextId="CM IO-Link 17 I/ 16 O"/>
+                        <InfoText TextId="CM IO-Link 17 I/ 16 O"/>
+                        <OrderNumber Value=""/>
+                    </ModuleInfo>
+                </SubmoduleItem>
+                <!-- IO-Link device proxy 8I/ 8O -->
+                <SubmoduleItem API="19969" ID="IDS_1 Port x IO-Link 8I/8O" SubmoduleIdentNumber="0x00000809" RequiredSchemaVersion="V2.31" MayIssueProcessAlarm="true">
+                    <IOData>
+                        <Input Consistency="All items consistency">
+                            <DataItem DataType="OctetString" TextId="Input_Data_8" Length="8" UseAsBits="false"/>
+                            <DataItem DataType="Unsigned8" UseAsBits="true" TextId="PQI">
+                                <BitDataItem BitOffset="0" TextId="DI4"/>
+                                <BitDataItem BitOffset="1" TextId="DI2"/>
+                                <BitDataItem BitOffset="2" TextId="NP"/>
+                                <BitDataItem BitOffset="3" TextId="SV"/>
+                                <BitDataItem BitOffset="4" TextId="DA"/>
+                                <BitDataItem BitOffset="5" TextId="DC"/>
+                                <BitDataItem BitOffset="6" TextId="DE"/>
+                                <BitDataItem BitOffset="7" TextId="PQ"/>
+                            </DataItem>
+                        </Input>
+                        <Output Consistency="All items consistency">
+                            <DataItem DataType="OctetString" TextId="Output_Data_8" Length="8" UseAsBits="false"/>
+                        </Output>
+                    </IOData>
+                    <RecordDataList>
+                        <!-- Profile Index=0xB100 (45312)-->
+                        <ParameterRecordDataItem Index="45312" Length="12" TransferSequence="0">
+                            <Name TextId="Port parameters"/>
+                            <Const ByteOffset="0" Data="0x00,0x01,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_PortMode" DataType="BitArea" BitLength="4" ByteOffset="2" BitOffset="0" DefaultValue="11" Changeable="true" AllowedValues="11" TextId="RecIOL_PortMode"/>
+                            <Ref ValueItemTarget="M_Cycle" DataType="BitArea" ByteOffset="4" BitOffset="0" BitLength="8" DefaultValue="0" AllowedValues="0 20 40 68 88 128 148 188" TextId="CycleTime" Visible="true" Changeable="true"/>
+                            <Ref ValueItemTarget="I_Level" DataType="BitArea" ByteOffset="3" BitOffset="1" BitLength="3" DefaultValue="0" AllowedValues="0..4" TextId="IntegrationLevel" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned16" ByteOffset="5" DefaultValue="0" AllowedValues="0..65535" TextId="VendorID" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned32" ByteOffset="7" DefaultValue="0" AllowedValues="0..16777215" TextId="DeviceID"/>
+                            <Ref ValueItemTarget="VAL_DisableEvents" DataType="BitArea" BitLength="1" ByteOffset="11" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1" TextId="RecIOL_DisableEvents"/>
+                        </ParameterRecordDataItem>
+                        <ParameterRecordDataItem Index="300" Length="33" TransferSequence="0">
+                            <Name TextId="Fail Safe parameter"/>
+                            <Const ByteOffset="0" Data="0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_FailSafeMode" DataType="BitArea" BitLength="8" ByteOffset="0" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1 2 3" TextId="RecFSM_FailSafeMode"/>
+                            <Ref DataType="OctetString" Length="8" ByteOffset="1" DefaultValue="0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00" TextId="PatternValue" Changeable="true" Visible="true"/>
+                        </ParameterRecordDataItem>
+                    </RecordDataList>
+                    <ModuleInfo CategoryRef="IOLink Input + Output + PQI">
+                        <Name TextId="CM IO-Link 9 I/ 8 O"/>
+                        <InfoText TextId="CM IO-Link 9 I/ 8 O"/>
+                        <OrderNumber Value=""/>
+                    </ModuleInfo>
+                </SubmoduleItem>
+                <!-- IO-Link device proxy 4I/ 4O -->
+                <SubmoduleItem API="19969" ID="IDS_1 Port x IO-Link 4I/4O" SubmoduleIdentNumber="0x00000405" RequiredSchemaVersion="V2.31" MayIssueProcessAlarm="true">
+                    <IOData>
+                        <Input Consistency="All items consistency">
+                            <DataItem DataType="OctetString" TextId="Input_Data_4" Length="4" UseAsBits="false"/>
+                            <DataItem DataType="Unsigned8" UseAsBits="true" TextId="PQI">
+                                <BitDataItem BitOffset="0" TextId="DI4"/>
+                                <BitDataItem BitOffset="1" TextId="DI2"/>
+                                <BitDataItem BitOffset="2" TextId="NP"/>
+                                <BitDataItem BitOffset="3" TextId="SV"/>
+                                <BitDataItem BitOffset="4" TextId="DA"/>
+                                <BitDataItem BitOffset="5" TextId="DC"/>
+                                <BitDataItem BitOffset="6" TextId="DE"/>
+                                <BitDataItem BitOffset="7" TextId="PQ"/>
+                            </DataItem>
+                        </Input>
+                        <Output Consistency="All items consistency">
+                            <DataItem DataType="OctetString" TextId="Output_Data_4" Length="4" UseAsBits="false"/>
+                        </Output>
+                    </IOData>
+                    <RecordDataList>
+                        <!-- Profile Index=0xB100 (45312)-->
+                        <ParameterRecordDataItem Index="45312" Length="12" TransferSequence="0">
+                            <Name TextId="Port parameters"/>
+                            <Const ByteOffset="0" Data="0x00,0x01,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_PortMode" DataType="BitArea" BitLength="4" ByteOffset="2" BitOffset="0" DefaultValue="11" Changeable="true" AllowedValues="11" TextId="RecIOL_PortMode"/>
+                            <Ref ValueItemTarget="M_Cycle" DataType="BitArea" ByteOffset="4" BitOffset="0" BitLength="8" DefaultValue="0" AllowedValues="0 20 40 68 88 128 148 188" TextId="CycleTime" Visible="true" Changeable="true"/>
+                            <Ref ValueItemTarget="I_Level" DataType="BitArea" ByteOffset="3" BitOffset="1" BitLength="3" DefaultValue="0" AllowedValues="0..4" TextId="IntegrationLevel" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned16" ByteOffset="5" DefaultValue="0" AllowedValues="0..65535" TextId="VendorID" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned32" ByteOffset="7" DefaultValue="0" AllowedValues="0..16777215" TextId="DeviceID"/>
+                            <Ref ValueItemTarget="VAL_DisableEvents" DataType="BitArea" BitLength="1" ByteOffset="11" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1" TextId="RecIOL_DisableEvents"/>
+                        </ParameterRecordDataItem>
+                        <ParameterRecordDataItem Index="300" Length="33" TransferSequence="0">
+                            <Name TextId="Fail Safe parameter"/>
+                            <Const ByteOffset="0" Data="0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_FailSafeMode" DataType="BitArea" BitLength="8" ByteOffset="0" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1 2 3" TextId="RecFSM_FailSafeMode"/>
+                            <Ref DataType="OctetString" Length="4" ByteOffset="1" DefaultValue="0x00,0x00,0x00,0x00" TextId="PatternValue" Changeable="true" Visible="true"/>
+                        </ParameterRecordDataItem>
+                    </RecordDataList>
+                    <ModuleInfo CategoryRef="IOLink Input + Output + PQI">
+                        <Name TextId="CM IO-Link 5 I/ 4 O"/>
+                        <InfoText TextId="CM IO-Link 5 I/ 4 O"/>
+                        <OrderNumber Value=""/>
+                    </ModuleInfo>
+                </SubmoduleItem>
+                <!-- IO-Link device proxy 2I/ 2O -->
+                <SubmoduleItem API="19969" ID="IDS_1 Port x IO-Link 2I/2O" SubmoduleIdentNumber="0x00000203" RequiredSchemaVersion="V2.31" MayIssueProcessAlarm="true">
+                    <IOData>
+                        <Input Consistency="All items consistency">
+                            <DataItem DataType="OctetString" TextId="Input_Data_2" Length="2" UseAsBits="false"/>
+                            <DataItem DataType="Unsigned8" UseAsBits="true" TextId="PQI">
+                                <BitDataItem BitOffset="0" TextId="DI4"/>
+                                <BitDataItem BitOffset="1" TextId="DI2"/>
+                                <BitDataItem BitOffset="2" TextId="NP"/>
+                                <BitDataItem BitOffset="3" TextId="SV"/>
+                                <BitDataItem BitOffset="4" TextId="DA"/>
+                                <BitDataItem BitOffset="5" TextId="DC"/>
+                                <BitDataItem BitOffset="6" TextId="DE"/>
+                                <BitDataItem BitOffset="7" TextId="PQ"/>
+                            </DataItem>
+                        </Input>
+                        <Output Consistency="All items consistency">
+                            <DataItem DataType="OctetString" TextId="Output_Data_2" Length="2" UseAsBits="false"/>
+                        </Output>
+                    </IOData>
+                    <RecordDataList>
+                        <!-- Profile Index=0xB100 (45312)-->
+                        <ParameterRecordDataItem Index="45312" Length="12" TransferSequence="0">
+                            <Name TextId="Port parameters"/>
+                            <Const ByteOffset="0" Data="0x00,0x01,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_PortMode" DataType="BitArea" BitLength="4" ByteOffset="2" BitOffset="0" DefaultValue="11" Changeable="true" AllowedValues="11" TextId="RecIOL_PortMode"/>
+                            <Ref ValueItemTarget="M_Cycle" DataType="BitArea" ByteOffset="4" BitOffset="0" BitLength="8" DefaultValue="0" AllowedValues="0 20 40 68 88 128 148 188" TextId="CycleTime" Visible="true" Changeable="true"/>
+                            <Ref ValueItemTarget="I_Level" DataType="BitArea" ByteOffset="3" BitOffset="1" BitLength="3" DefaultValue="0" AllowedValues="0..4" TextId="IntegrationLevel" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned16" ByteOffset="5" DefaultValue="0" AllowedValues="0..65535" TextId="VendorID" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned32" ByteOffset="7" DefaultValue="0" AllowedValues="0..16777215" TextId="DeviceID"/>
+                            <Ref ValueItemTarget="VAL_DisableEvents" DataType="BitArea" BitLength="1" ByteOffset="11" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1" TextId="RecIOL_DisableEvents"/>
+                        </ParameterRecordDataItem>
+                        <ParameterRecordDataItem Index="300" Length="33" TransferSequence="0">
+                            <Name TextId="Fail Safe parameter"/>
+                            <Const ByteOffset="0" Data="0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_FailSafeMode" DataType="BitArea" BitLength="8" ByteOffset="0" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1 2 3" TextId="RecFSM_FailSafeMode"/>
+                            <Ref DataType="OctetString" Length="2" ByteOffset="1" DefaultValue="0x00,0x00" TextId="PatternValue" Changeable="true" Visible="true"/>
+                        </ParameterRecordDataItem>
+                    </RecordDataList>
+                    <ModuleInfo CategoryRef="IOLink Input + Output + PQI">
+                        <Name TextId="CM IO-Link 3 I/ 2 O"/>
+                        <InfoText TextId="CM IO-Link 3 I/ 2 O"/>
+                        <OrderNumber Value=""/>
+                    </ModuleInfo>
+                </SubmoduleItem>
+                <!-- IO-Link device proxy 1I/ 15O -->
+                <SubmoduleItem API="19969" ID="IDS_1 Port x IO-Link 1I/15O" SubmoduleIdentNumber="0x00000F02" RequiredSchemaVersion="V2.31" MayIssueProcessAlarm="true">
+                    <IOData>
+                        <Input Consistency="All items consistency">
+                            <DataItem DataType="OctetString" TextId="Input_Data_1" Length="1" UseAsBits="false"/>
+                            <DataItem DataType="Unsigned8" UseAsBits="true" TextId="PQI">
+                                <BitDataItem BitOffset="0" TextId="DI4"/>
+                                <BitDataItem BitOffset="1" TextId="DI2"/>
+                                <BitDataItem BitOffset="2" TextId="NP"/>
+                                <BitDataItem BitOffset="3" TextId="SV"/>
+                                <BitDataItem BitOffset="4" TextId="DA"/>
+                                <BitDataItem BitOffset="5" TextId="DC"/>
+                                <BitDataItem BitOffset="6" TextId="DE"/>
+                                <BitDataItem BitOffset="7" TextId="PQ"/>
+                            </DataItem>
+                        </Input>
+                        <Output Consistency="All items consistency">
+                            <DataItem DataType="OctetString" TextId="Output_Data_15" Length="15" UseAsBits="false"/>
+                        </Output>
+                    </IOData>
+                    <RecordDataList>
+                        <!-- Profile Index=0xB100 (45312)-->
+                        <ParameterRecordDataItem Index="45312" Length="12" TransferSequence="0">
+                            <Name TextId="Port parameters"/>
+                            <Const ByteOffset="0" Data="0x00,0x01,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_PortMode" DataType="BitArea" BitLength="4" ByteOffset="2" BitOffset="0" DefaultValue="11" Changeable="true" AllowedValues="11" TextId="RecIOL_PortMode"/>
+                            <Ref ValueItemTarget="M_Cycle" DataType="BitArea" ByteOffset="4" BitOffset="0" BitLength="8" DefaultValue="0" AllowedValues="0 20 40 68 88 128 148 188" TextId="CycleTime" Visible="true" Changeable="true"/>
+                            <Ref ValueItemTarget="I_Level" DataType="BitArea" ByteOffset="3" BitOffset="1" BitLength="3" DefaultValue="0" AllowedValues="0..4" TextId="IntegrationLevel" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned16" ByteOffset="5" DefaultValue="0" AllowedValues="0..65535" TextId="VendorID" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned32" ByteOffset="7" DefaultValue="0" AllowedValues="0..16777215" TextId="DeviceID"/>
+                            <Ref ValueItemTarget="VAL_DisableEvents" DataType="BitArea" BitLength="1" ByteOffset="11" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1" TextId="RecIOL_DisableEvents"/>
+                        </ParameterRecordDataItem>
+                        <ParameterRecordDataItem Index="300" Length="33" TransferSequence="0">
+                            <Name TextId="Fail Safe parameter"/>
+                            <Const ByteOffset="0" Data="0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_FailSafeMode" DataType="BitArea" BitLength="8" ByteOffset="0" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1 2 3" TextId="RecFSM_FailSafeMode"/>
+                            <Ref DataType="OctetString" Length="15" ByteOffset="1" DefaultValue="0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00" TextId="PatternValue" Changeable="true" Visible="true"/>
+                        </ParameterRecordDataItem>
+                    </RecordDataList>
+                    <ModuleInfo CategoryRef="IOLink Input + Output + PQI">
+                        <Name TextId="CM IO-Link 2 I/ 15 O"/>
+                        <InfoText TextId="CM IO-Link 2 I/ 15 O"/>
+                        <OrderNumber Value=""/>
+                    </ModuleInfo>
+                </SubmoduleItem>
+                <!-- IO-Link device proxy 1I/ 1O -->
+                <SubmoduleItem API="19969" ID="IDS_1 Port x IO-Link 1I/1O" SubmoduleIdentNumber="0x00000102" RequiredSchemaVersion="V2.31" MayIssueProcessAlarm="true">
+                    <IOData>
+                        <Input Consistency="All items consistency">
+                            <DataItem DataType="OctetString" TextId="Input_Data_1" Length="1" UseAsBits="false"/>
+                            <DataItem DataType="Unsigned8" UseAsBits="true" TextId="PQI">
+                                <BitDataItem BitOffset="0" TextId="DI4"/>
+                                <BitDataItem BitOffset="1" TextId="DI2"/>
+                                <BitDataItem BitOffset="2" TextId="NP"/>
+                                <BitDataItem BitOffset="3" TextId="SV"/>
+                                <BitDataItem BitOffset="4" TextId="DA"/>
+                                <BitDataItem BitOffset="5" TextId="DC"/>
+                                <BitDataItem BitOffset="6" TextId="DE"/>
+                                <BitDataItem BitOffset="7" TextId="PQ"/>
+                            </DataItem>
+                        </Input>
+                        <Output Consistency="All items consistency">
+                            <DataItem DataType="OctetString" TextId="Output_Data_1" Length="1" UseAsBits="false"/>
+                        </Output>
+                    </IOData>
+                    <RecordDataList>
+                        <!-- Profile Index=0xB100 (45312)-->
+                        <ParameterRecordDataItem Index="45312" Length="12" TransferSequence="0">
+                            <Name TextId="Port parameters"/>
+                            <Const ByteOffset="0" Data="0x00,0x01,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_PortMode" DataType="BitArea" BitLength="4" ByteOffset="2" BitOffset="0" DefaultValue="11" Changeable="true" AllowedValues="11" TextId="RecIOL_PortMode"/>
+                            <Ref ValueItemTarget="M_Cycle" DataType="BitArea" ByteOffset="4" BitOffset="0" BitLength="8" DefaultValue="0" AllowedValues="0 20 40 68 88 128 148 188" TextId="CycleTime" Visible="true" Changeable="true"/>
+                            <Ref ValueItemTarget="I_Level" DataType="BitArea" ByteOffset="3" BitOffset="1" BitLength="3" DefaultValue="0" AllowedValues="0..4" TextId="IntegrationLevel" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned16" ByteOffset="5" DefaultValue="0" AllowedValues="0..65535" TextId="VendorID" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned32" ByteOffset="7" DefaultValue="0" AllowedValues="0..16777215" TextId="DeviceID"/>
+                            <Ref ValueItemTarget="VAL_DisableEvents" DataType="BitArea" BitLength="1" ByteOffset="11" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1" TextId="RecIOL_DisableEvents"/>
+                        </ParameterRecordDataItem>
+                        <ParameterRecordDataItem Index="300" Length="33" TransferSequence="0">
+                            <Name TextId="Fail Safe parameter"/>
+                            <Const ByteOffset="0" Data="0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_FailSafeMode" DataType="BitArea" BitLength="8" ByteOffset="0" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1 2 3" TextId="RecFSM_FailSafeMode"/>
+                            <Ref DataType="OctetString" Length="1" ByteOffset="1" DefaultValue="0x00" TextId="PatternValue" Changeable="true" Visible="true"/>
+                        </ParameterRecordDataItem>
+                    </RecordDataList>
+                    <ModuleInfo CategoryRef="IOLink Input + Output + PQI">
+                        <Name TextId="CM IO-Link 2 I/ 1 O"/>
+                        <InfoText TextId="CM IO-Link 2 I/ 1 O"/>
+                        <OrderNumber Value=""/>
+                    </ModuleInfo>
+                </SubmoduleItem>
+                <!-- IO-Link device proxy 32O -->
+                <SubmoduleItem API="19969" ID="IDS_1 Port x IO-Link 32O" SubmoduleIdentNumber="0x00002001" RequiredSchemaVersion="V2.31" MayIssueProcessAlarm="true">
+                    <IOData>
+                        <Input Consistency="All items consistency">
+                            <DataItem DataType="Unsigned8" UseAsBits="true" TextId="PQI">
+                                <BitDataItem BitOffset="0" TextId="DI4"/>
+                                <BitDataItem BitOffset="1" TextId="DI2"/>
+                                <BitDataItem BitOffset="2" TextId="NP"/>
+                                <BitDataItem BitOffset="3" TextId="SV"/>
+                                <BitDataItem BitOffset="4" TextId="DA"/>
+                                <BitDataItem BitOffset="5" TextId="DC"/>
+                                <BitDataItem BitOffset="6" TextId="DE"/>
+                                <BitDataItem BitOffset="7" TextId="PQ"/>
+                            </DataItem>
+                        </Input>
+                        <Output Consistency="All items consistency">
+                            <DataItem DataType="OctetString" TextId="Output_Data_32" Length="32" UseAsBits="false"/>
+                        </Output>
+                    </IOData>
+                    <RecordDataList>
+                        <!-- Profile Index=0xB100 (45312)-->
+                        <ParameterRecordDataItem Index="45312" Length="12" TransferSequence="0">
+                            <Name TextId="Port parameters"/>
+                            <Const ByteOffset="0" Data="0x00,0x01,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_PortMode" DataType="BitArea" BitLength="4" ByteOffset="2" BitOffset="0" DefaultValue="11" Changeable="true" AllowedValues="11" TextId="RecIOL_PortMode"/>
+                            <Ref ValueItemTarget="M_Cycle" DataType="BitArea" ByteOffset="4" BitOffset="0" BitLength="8" DefaultValue="0" AllowedValues="0 20 40 68 88 128 148 188" TextId="CycleTime" Visible="true" Changeable="true"/>
+                            <Ref ValueItemTarget="I_Level" DataType="BitArea" ByteOffset="3" BitOffset="1" BitLength="3" DefaultValue="0" AllowedValues="0..4" TextId="IntegrationLevel" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned16" ByteOffset="5" DefaultValue="0" AllowedValues="0..65535" TextId="VendorID" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned32" ByteOffset="7" DefaultValue="0" AllowedValues="0..16777215" TextId="DeviceID"/>
+                            <Ref ValueItemTarget="VAL_DisableEvents" DataType="BitArea" BitLength="1" ByteOffset="11" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1" TextId="RecIOL_DisableEvents"/>
+                        </ParameterRecordDataItem>
+                        <ParameterRecordDataItem Index="300" Length="33" TransferSequence="0">
+                            <Name TextId="Fail Safe parameter"/>
+                            <Const ByteOffset="0" Data="0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_FailSafeMode" DataType="BitArea" BitLength="8" ByteOffset="0" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1 2 3" TextId="RecFSM_FailSafeMode"/>
+                            <Ref DataType="OctetString" Length="32" ByteOffset="1" DefaultValue="0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00" TextId="PatternValue" Changeable="true" Visible="true"/>
+                        </ParameterRecordDataItem>
+                    </RecordDataList>
+                    <ModuleInfo CategoryRef="IOLink Output + PQI">
+                        <Name TextId="CM IO-Link 32 O"/>
+                        <InfoText TextId="CM IO-Link 32 O"/>
+                        <OrderNumber Value=""/>
+                    </ModuleInfo>
+                </SubmoduleItem>
+                <!-- IO-Link device proxy 16O -->
+                <SubmoduleItem API="19969" ID="IDS_1 Port x IO-Link 16O" SubmoduleIdentNumber="0x00001001" RequiredSchemaVersion="V2.31" MayIssueProcessAlarm="true">
+                    <IOData>
+                        <Input Consistency="All items consistency">
+                            <DataItem DataType="Unsigned8" UseAsBits="true" TextId="PQI">
+                                <BitDataItem BitOffset="0" TextId="DI4"/>
+                                <BitDataItem BitOffset="1" TextId="DI2"/>
+                                <BitDataItem BitOffset="2" TextId="NP"/>
+                                <BitDataItem BitOffset="3" TextId="SV"/>
+                                <BitDataItem BitOffset="4" TextId="DA"/>
+                                <BitDataItem BitOffset="5" TextId="DC"/>
+                                <BitDataItem BitOffset="6" TextId="DE"/>
+                                <BitDataItem BitOffset="7" TextId="PQ"/>
+                            </DataItem>
+                        </Input>
+                        <Output Consistency="All items consistency">
+                            <DataItem DataType="OctetString" TextId="Output_Data_16" Length="16" UseAsBits="false"/>
+                        </Output>
+                    </IOData>
+                    <RecordDataList>
+                        <!-- Profile Index=0xB100 (45312) -->
+                        <ParameterRecordDataItem Index="45312" Length="12" TransferSequence="0">
+                            <Name TextId="Port parameters"/>
+                            <Const ByteOffset="0" Data="0x00,0x01,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_PortMode" DataType="BitArea" BitLength="4" ByteOffset="2" BitOffset="0" DefaultValue="11" Changeable="true" AllowedValues="11" TextId="RecIOL_PortMode"/>
+                            <Ref ValueItemTarget="M_Cycle" DataType="BitArea" ByteOffset="4" BitOffset="0" BitLength="8" DefaultValue="0" AllowedValues="0 20 40 68 88 128 148 188" TextId="CycleTime" Visible="true" Changeable="true"/>
+                            <Ref ValueItemTarget="I_Level" DataType="BitArea" ByteOffset="3" BitOffset="1" BitLength="3" DefaultValue="0" AllowedValues="0..4" TextId="IntegrationLevel" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned16" ByteOffset="5" DefaultValue="0" AllowedValues="0..65535" TextId="VendorID" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned32" ByteOffset="7" DefaultValue="0" AllowedValues="0..16777215" TextId="DeviceID"/>
+                            <Ref ValueItemTarget="VAL_DisableEvents" DataType="BitArea" BitLength="1" ByteOffset="11" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1" TextId="RecIOL_DisableEvents"/>
+                        </ParameterRecordDataItem>
+                        <ParameterRecordDataItem Index="300" Length="33" TransferSequence="0">
+                            <Name TextId="Fail Safe parameter"/>
+                            <Const ByteOffset="0" Data="0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_FailSafeMode" DataType="BitArea" BitLength="8" ByteOffset="0" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1 2 3" TextId="RecFSM_FailSafeMode"/>
+                            <Ref DataType="OctetString" Length="16" ByteOffset="1" DefaultValue="0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00" TextId="PatternValue" Changeable="true" Visible="true"/>
+                        </ParameterRecordDataItem>
+                    </RecordDataList>
+                    <ModuleInfo CategoryRef="IOLink Output + PQI">
+                        <Name TextId="CM IO-Link 16 O"/>
+                        <InfoText TextId="CM IO-Link 16 O"/>
+                        <OrderNumber Value=""/>
+                    </ModuleInfo>
+                </SubmoduleItem>
+                <!-- IO-Link device proxy 8O -->
+                <SubmoduleItem API="19969" ID="IDS_1 Port x IO-Link 8O" SubmoduleIdentNumber="0x00000801" RequiredSchemaVersion="V2.31" MayIssueProcessAlarm="true">
+                    <IOData>
+                        <Input Consistency="All items consistency">
+                            <DataItem DataType="Unsigned8" UseAsBits="true" TextId="PQI">
+                                <BitDataItem BitOffset="0" TextId="DI4"/>
+                                <BitDataItem BitOffset="1" TextId="DI2"/>
+                                <BitDataItem BitOffset="2" TextId="NP"/>
+                                <BitDataItem BitOffset="3" TextId="SV"/>
+                                <BitDataItem BitOffset="4" TextId="DA"/>
+                                <BitDataItem BitOffset="5" TextId="DC"/>
+                                <BitDataItem BitOffset="6" TextId="DE"/>
+                                <BitDataItem BitOffset="7" TextId="PQ"/>
+                            </DataItem>
+                        </Input>
+                        <Output Consistency="All items consistency">
+                            <DataItem DataType="OctetString" TextId="Output_Data_8" Length="8" UseAsBits="false"/>
+                        </Output>
+                    </IOData>
+                    <RecordDataList>
+                        <!-- Profile Index=0xB100 (45312)-->
+                        <ParameterRecordDataItem Index="45312" Length="12" TransferSequence="0">
+                            <Name TextId="Port parameters"/>
+                            <Const ByteOffset="0" Data="0x00,0x01,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_PortMode" DataType="BitArea" BitLength="4" ByteOffset="2" BitOffset="0" DefaultValue="11" Changeable="true" AllowedValues="11" TextId="RecIOL_PortMode"/>
+                            <Ref ValueItemTarget="M_Cycle" DataType="BitArea" ByteOffset="4" BitOffset="0" BitLength="8" DefaultValue="0" AllowedValues="0 20 40 68 88 128 148 188" TextId="CycleTime" Visible="true" Changeable="true"/>
+                            <Ref ValueItemTarget="I_Level" DataType="BitArea" ByteOffset="3" BitOffset="1" BitLength="3" DefaultValue="0" AllowedValues="0..4" TextId="IntegrationLevel" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned16" ByteOffset="5" DefaultValue="0" AllowedValues="0..65535" TextId="VendorID" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned32" ByteOffset="7" DefaultValue="0" AllowedValues="0..16777215" TextId="DeviceID"/>
+                            <Ref ValueItemTarget="VAL_DisableEvents" DataType="BitArea" BitLength="1" ByteOffset="11" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1" TextId="RecIOL_DisableEvents"/>
+                        </ParameterRecordDataItem>
+                        <ParameterRecordDataItem Index="300" Length="33" TransferSequence="0">
+                            <Name TextId="Fail Safe parameter"/>
+                            <Const ByteOffset="0" Data="0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_FailSafeMode" DataType="BitArea" BitLength="8" ByteOffset="0" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1 2 3" TextId="RecFSM_FailSafeMode"/>
+                            <Ref DataType="OctetString" Length="8" ByteOffset="1" DefaultValue="0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00" TextId="PatternValue" Changeable="true" Visible="true"/>
+                        </ParameterRecordDataItem>
+                    </RecordDataList>
+                    <ModuleInfo CategoryRef="IOLink Output + PQI">
+                        <Name TextId="CM IO-Link 8 O"/>
+                        <InfoText TextId="CM IO-Link 8 O"/>
+                        <OrderNumber Value=""/>
+                    </ModuleInfo>
+                </SubmoduleItem>
+                <!-- IO-Link device proxy 4O -->
+                <SubmoduleItem API="19969" ID="IDS_1 Port x IO-Link 4O" SubmoduleIdentNumber="0x00000401" RequiredSchemaVersion="V2.31" MayIssueProcessAlarm="true">
+                    <IOData>
+                        <Input Consistency="All items consistency">
+                            <DataItem DataType="Unsigned8" UseAsBits="true" TextId="PQI">
+                                <BitDataItem BitOffset="0" TextId="DI4"/>
+                                <BitDataItem BitOffset="1" TextId="DI2"/>
+                                <BitDataItem BitOffset="2" TextId="NP"/>
+                                <BitDataItem BitOffset="3" TextId="SV"/>
+                                <BitDataItem BitOffset="4" TextId="DA"/>
+                                <BitDataItem BitOffset="5" TextId="DC"/>
+                                <BitDataItem BitOffset="6" TextId="DE"/>
+                                <BitDataItem BitOffset="7" TextId="PQ"/>
+                            </DataItem>
+                        </Input>
+                        <Output Consistency="All items consistency">
+                            <DataItem DataType="OctetString" TextId="Output_Data_4" Length="4" UseAsBits="false"/>
+                        </Output>
+                    </IOData>
+                    <RecordDataList>
+                        <!-- Profile Index=0xB100 (45312)-->
+                        <ParameterRecordDataItem Index="45312" Length="12" TransferSequence="0">
+                            <Name TextId="Port parameters"/>
+                            <Const ByteOffset="0" Data="0x00,0x01,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_PortMode" DataType="BitArea" BitLength="4" ByteOffset="2" BitOffset="0" DefaultValue="11" Changeable="true" AllowedValues="11" TextId="RecIOL_PortMode"/>
+                            <Ref ValueItemTarget="M_Cycle" DataType="BitArea" ByteOffset="4" BitOffset="0" BitLength="8" DefaultValue="0" AllowedValues="0 20 40 68 88 128 148 188" TextId="CycleTime" Visible="true" Changeable="true"/>
+                            <Ref ValueItemTarget="I_Level" DataType="BitArea" ByteOffset="3" BitOffset="1" BitLength="3" DefaultValue="0" AllowedValues="0..4" TextId="IntegrationLevel" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned16" ByteOffset="5" DefaultValue="0" AllowedValues="0..65535" TextId="VendorID" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned32" ByteOffset="7" DefaultValue="0" AllowedValues="0..16777215" TextId="DeviceID"/>
+                            <Ref ValueItemTarget="VAL_DisableEvents" DataType="BitArea" BitLength="1" ByteOffset="11" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1" TextId="RecIOL_DisableEvents"/>
+                        </ParameterRecordDataItem>
+                        <ParameterRecordDataItem Index="300" Length="33" TransferSequence="0">
+                            <Name TextId="Fail Safe parameter"/>
+                            <Const ByteOffset="0" Data="0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_FailSafeMode" DataType="BitArea" BitLength="8" ByteOffset="0" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1 2 3" TextId="RecFSM_FailSafeMode"/>
+                            <Ref DataType="OctetString" Length="4" ByteOffset="1" DefaultValue="0x00,0x00,0x00,0x00" TextId="PatternValue" Changeable="true" Visible="true"/>
+                        </ParameterRecordDataItem>
+                    </RecordDataList>
+                    <ModuleInfo CategoryRef="IOLink Output + PQI">
+                        <Name TextId="CM IO-Link 4 O"/>
+                        <InfoText TextId="CM IO-Link 4 O"/>
+                        <OrderNumber Value=""/>
+                    </ModuleInfo>
+                </SubmoduleItem>
+                <!-- IO-Link device proxy 2O -->
+                <SubmoduleItem API="19969" ID="IDS_1 Port x IO-Link 2O" SubmoduleIdentNumber="0x00000201" RequiredSchemaVersion="V2.31" MayIssueProcessAlarm="true">
+                    <IOData>
+                        <Input Consistency="All items consistency">
+                            <DataItem DataType="Unsigned8" UseAsBits="true" TextId="PQI">
+                                <BitDataItem BitOffset="0" TextId="DI4"/>
+                                <BitDataItem BitOffset="1" TextId="DI2"/>
+                                <BitDataItem BitOffset="2" TextId="NP"/>
+                                <BitDataItem BitOffset="3" TextId="SV"/>
+                                <BitDataItem BitOffset="4" TextId="DA"/>
+                                <BitDataItem BitOffset="5" TextId="DC"/>
+                                <BitDataItem BitOffset="6" TextId="DE"/>
+                                <BitDataItem BitOffset="7" TextId="PQ"/>
+                            </DataItem>
+                        </Input>
+                        <Output Consistency="All items consistency">
+                            <DataItem DataType="OctetString" TextId="Output_Data_2" Length="2" UseAsBits="false"/>
+                        </Output>
+                    </IOData>
+                    <RecordDataList>
+                        <!-- Profile Index=0xB100 (45312)-->
+                        <ParameterRecordDataItem Index="45312" Length="12" TransferSequence="0">
+                            <Name TextId="Port parameters"/>
+                            <Const ByteOffset="0" Data="0x00,0x01,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_PortMode" DataType="BitArea" BitLength="4" ByteOffset="2" BitOffset="0" DefaultValue="11" Changeable="true" AllowedValues="11" TextId="RecIOL_PortMode"/>
+                            <Ref ValueItemTarget="M_Cycle" DataType="BitArea" ByteOffset="4" BitOffset="0" BitLength="8" DefaultValue="0" AllowedValues="0 20 40 68 88 128 148 188" TextId="CycleTime" Visible="true" Changeable="true"/>
+                            <Ref ValueItemTarget="I_Level" DataType="BitArea" ByteOffset="3" BitOffset="1" BitLength="3" DefaultValue="0" AllowedValues="0..4" TextId="IntegrationLevel" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned16" ByteOffset="5" DefaultValue="0" AllowedValues="0..65535" TextId="VendorID" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned32" ByteOffset="7" DefaultValue="0" AllowedValues="0..16777215" TextId="DeviceID"/>
+                            <Ref ValueItemTarget="VAL_DisableEvents" DataType="BitArea" BitLength="1" ByteOffset="11" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1" TextId="RecIOL_DisableEvents"/>
+                        </ParameterRecordDataItem>
+                        <ParameterRecordDataItem Index="300" Length="33" TransferSequence="0">
+                            <Name TextId="Fail Safe parameter"/>
+                            <Const ByteOffset="0" Data="0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_FailSafeMode" DataType="BitArea" BitLength="8" ByteOffset="0" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1 2 3" TextId="RecFSM_FailSafeMode"/>
+                            <Ref DataType="OctetString" Length="2" ByteOffset="1" DefaultValue="0x00,0x00" TextId="PatternValue" Changeable="true" Visible="true"/>
+                        </ParameterRecordDataItem>
+                    </RecordDataList>
+                    <ModuleInfo CategoryRef="IOLink Output + PQI">
+                        <Name TextId="CM IO-Link 2 O"/>
+                        <InfoText TextId="CM IO-Link 2 O"/>
+                        <OrderNumber Value=""/>
+                    </ModuleInfo>
+                </SubmoduleItem>
+                <!-- IO-Link device proxy 1O -->
+                <SubmoduleItem API="19969" ID="IDS_1 Port x IO-Link 1O" SubmoduleIdentNumber="0x00000101" RequiredSchemaVersion="V2.31" MayIssueProcessAlarm="true">
+                    <IOData>
+                        <Input Consistency="All items consistency">
+                            <DataItem DataType="Unsigned8" UseAsBits="true" TextId="PQI">
+                                <BitDataItem BitOffset="0" TextId="DI4"/>
+                                <BitDataItem BitOffset="1" TextId="DI2"/>
+                                <BitDataItem BitOffset="2" TextId="NP"/>
+                                <BitDataItem BitOffset="3" TextId="SV"/>
+                                <BitDataItem BitOffset="4" TextId="DA"/>
+                                <BitDataItem BitOffset="5" TextId="DC"/>
+                                <BitDataItem BitOffset="6" TextId="DE"/>
+                                <BitDataItem BitOffset="7" TextId="PQ"/>
+                            </DataItem>
+                        </Input>
+                        <Output Consistency="All items consistency">
+                            <DataItem DataType="OctetString" TextId="Output_Data_1" Length="1" UseAsBits="false"/>
+                        </Output>
+                    </IOData>
+                    <RecordDataList>
+                        <!-- Profile Index=0xB100 (45312)-->
+                        <ParameterRecordDataItem Index="45312" Length="12" TransferSequence="0">
+                            <Name TextId="Port parameters"/>
+                            <Const ByteOffset="0" Data="0x00,0x01,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_PortMode" DataType="BitArea" BitLength="4" ByteOffset="2" BitOffset="0" DefaultValue="11" Changeable="true" AllowedValues="11" TextId="RecIOL_PortMode"/>
+                            <Ref ValueItemTarget="M_Cycle" DataType="BitArea" ByteOffset="4" BitOffset="0" BitLength="8" DefaultValue="0" AllowedValues="0 20 40 68 88 128 148 188" TextId="CycleTime" Visible="true" Changeable="true"/>
+                            <Ref ValueItemTarget="I_Level" DataType="BitArea" ByteOffset="3" BitOffset="1" BitLength="3" DefaultValue="0" AllowedValues="0..4" TextId="IntegrationLevel" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned16" ByteOffset="5" DefaultValue="0" AllowedValues="0..65535" TextId="VendorID" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned32" ByteOffset="7" DefaultValue="0" AllowedValues="0..16777215" TextId="DeviceID"/>
+                            <Ref ValueItemTarget="VAL_DisableEvents" DataType="BitArea" BitLength="1" ByteOffset="11" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1" TextId="RecIOL_DisableEvents"/>
+                        </ParameterRecordDataItem>
+                        <ParameterRecordDataItem Index="300" Length="33" TransferSequence="0">
+                            <Name TextId="Fail Safe parameter"/>
+                            <Const ByteOffset="0" Data="0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_FailSafeMode" DataType="BitArea" BitLength="8" ByteOffset="0" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1 2 3" TextId="RecFSM_FailSafeMode"/>
+                            <Ref DataType="OctetString" Length="1" ByteOffset="1" DefaultValue="0x00" TextId="PatternValue" Changeable="true" Visible="true"/>
+                        </ParameterRecordDataItem>
+                    </RecordDataList>
+                    <ModuleInfo CategoryRef="IOLink Output + PQI">
+                        <Name TextId="CM IO-Link 1 O"/>
+                        <InfoText TextId="CM IO-Link 1 O"/>
+                        <OrderNumber Value=""/>
+                    </ModuleInfo>
+                </SubmoduleItem>
+                <!-- IO-Link device proxy 32I -->
+                <SubmoduleItem API="19969" ID="IDS_1 Port x IO-Link 32I" SubmoduleIdentNumber="0x00000021" RequiredSchemaVersion="V2.31" MayIssueProcessAlarm="true">
+                    <IOData>
+                        <Input Consistency="All items consistency">
+                            <DataItem DataType="OctetString" TextId="Input_Data_32" Length="32" UseAsBits="false"/>
+                            <DataItem DataType="Unsigned8" UseAsBits="true" TextId="PQI">
+                                <BitDataItem BitOffset="0" TextId="DI4"/>
+                                <BitDataItem BitOffset="1" TextId="DI2"/>
+                                <BitDataItem BitOffset="2" TextId="NP"/>
+                                <BitDataItem BitOffset="3" TextId="SV"/>
+                                <BitDataItem BitOffset="4" TextId="DA"/>
+                                <BitDataItem BitOffset="5" TextId="DC"/>
+                                <BitDataItem BitOffset="6" TextId="DE"/>
+                                <BitDataItem BitOffset="7" TextId="PQ"/>
+                            </DataItem>
+                        </Input>
+                    </IOData>
+                    <RecordDataList>
+                        <!-- Profile Index=0xB100 (45312)-->
+                        <ParameterRecordDataItem Index="45312" Length="12" TransferSequence="0">
+                            <Name TextId="Port parameters"/>
+                            <Const ByteOffset="0" Data="0x00,0x01,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_PortMode" DataType="BitArea" BitLength="4" ByteOffset="2" BitOffset="0" DefaultValue="11" Changeable="true" AllowedValues="11" TextId="RecIOL_PortMode"/>
+                            <Ref ValueItemTarget="M_Cycle" DataType="BitArea" ByteOffset="4" BitOffset="0" BitLength="8" DefaultValue="0" AllowedValues="0 20 40 68 88 128 148 188" TextId="CycleTime" Visible="true" Changeable="true"/>
+                            <Ref ValueItemTarget="I_Level" DataType="BitArea" ByteOffset="3" BitOffset="1" BitLength="3" DefaultValue="0" AllowedValues="0..4" TextId="IntegrationLevel" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned16" ByteOffset="5" DefaultValue="0" AllowedValues="0..65535" TextId="VendorID" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned32" ByteOffset="7" DefaultValue="0" AllowedValues="0..16777215" TextId="DeviceID"/>
+                            <Ref ValueItemTarget="VAL_DisableEvents" DataType="BitArea" BitLength="1" ByteOffset="11" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1" TextId="RecIOL_DisableEvents"/>
+                        </ParameterRecordDataItem>
+                    </RecordDataList>
+                    <ModuleInfo CategoryRef="IOLink Input + PQI">
+                        <Name TextId="CM IO-Link 33 I"/>
+                        <InfoText TextId="CM IO-Link 33 I"/>
+                        <OrderNumber Value=""/>
+                    </ModuleInfo>
+                </SubmoduleItem>
+                <!-- IO-Link device proxy 16I -->
+                <SubmoduleItem API="19969" ID="IDS_1 Port x IO-Link 16I" SubmoduleIdentNumber="0x00000011" RequiredSchemaVersion="V2.31" MayIssueProcessAlarm="true">
+                    <IOData>
+                        <Input Consistency="All items consistency">
+                            <DataItem DataType="OctetString" TextId="Input_Data_16" Length="16" UseAsBits="false"/>
+                            <DataItem DataType="Unsigned8" UseAsBits="true" TextId="PQI">
+                                <BitDataItem BitOffset="0" TextId="DI4"/>
+                                <BitDataItem BitOffset="1" TextId="DI2"/>
+                                <BitDataItem BitOffset="2" TextId="NP"/>
+                                <BitDataItem BitOffset="3" TextId="SV"/>
+                                <BitDataItem BitOffset="4" TextId="DA"/>
+                                <BitDataItem BitOffset="5" TextId="DC"/>
+                                <BitDataItem BitOffset="6" TextId="DE"/>
+                                <BitDataItem BitOffset="7" TextId="PQ"/>
+                            </DataItem>
+                        </Input>
+                    </IOData>
+                    <RecordDataList>
+                        <!--Profile Index=0xB100 (45312) -->
+                        <ParameterRecordDataItem Index="45312" Length="12" TransferSequence="0">
+                            <Name TextId="Port parameters"/>
+                            <Const ByteOffset="0" Data="0x00,0x01,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_PortMode" DataType="BitArea" BitLength="4" ByteOffset="2" BitOffset="0" DefaultValue="11" Changeable="true" AllowedValues="11" TextId="RecIOL_PortMode"/>
+                            <Ref ValueItemTarget="M_Cycle" DataType="BitArea" ByteOffset="4" BitOffset="0" BitLength="8" DefaultValue="0" AllowedValues="0 20 40 68 88 128 148 188" TextId="CycleTime" Visible="true" Changeable="true"/>
+                            <Ref ValueItemTarget="I_Level" DataType="BitArea" ByteOffset="3" BitOffset="1" BitLength="3" DefaultValue="0" AllowedValues="0..4" TextId="IntegrationLevel" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned16" ByteOffset="5" DefaultValue="0" AllowedValues="0..65535" TextId="VendorID" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned32" ByteOffset="7" DefaultValue="0" AllowedValues="0..16777215" TextId="DeviceID"/>
+                            <Ref ValueItemTarget="VAL_DisableEvents" DataType="BitArea" BitLength="1" ByteOffset="11" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1" TextId="RecIOL_DisableEvents"/>
+                        </ParameterRecordDataItem>
+                    </RecordDataList>
+                    <ModuleInfo CategoryRef="IOLink Input + PQI">
+                        <Name TextId="CM IO-Link 17 I"/>
+                        <InfoText TextId="CM IO-Link 17 I"/>
+                        <OrderNumber Value=""/>
+                    </ModuleInfo>
+                </SubmoduleItem>
+                <!-- IO-Link device proxy 8I -->
+                <SubmoduleItem API="19969" ID="IDS_1 Port x IO-Link 8I" SubmoduleIdentNumber="0x00000009" RequiredSchemaVersion="V2.31" MayIssueProcessAlarm="true">
+                    <IOData>
+                        <Input Consistency="All items consistency">
+                            <DataItem DataType="OctetString" TextId="Input_Data_8" Length="8" UseAsBits="false"/>
+                            <DataItem DataType="Unsigned8" UseAsBits="true" TextId="PQI">
+                                <BitDataItem BitOffset="0" TextId="DI4"/>
+                                <BitDataItem BitOffset="1" TextId="DI2"/>
+                                <BitDataItem BitOffset="2" TextId="NP"/>
+                                <BitDataItem BitOffset="3" TextId="SV"/>
+                                <BitDataItem BitOffset="4" TextId="DA"/>
+                                <BitDataItem BitOffset="5" TextId="DC"/>
+                                <BitDataItem BitOffset="6" TextId="DE"/>
+                                <BitDataItem BitOffset="7" TextId="PQ"/>
+                            </DataItem>
+                        </Input>
+                    </IOData>
+                    <RecordDataList>
+                        <!-- Profile Index=0xB100 (45312)-->
+                        <ParameterRecordDataItem Index="45312" Length="12" TransferSequence="0">
+                            <Name TextId="Port parameters"/>
+                            <Const ByteOffset="0" Data="0x00,0x01,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_PortMode" DataType="BitArea" BitLength="4" ByteOffset="2" BitOffset="0" DefaultValue="11" Changeable="true" AllowedValues="11" TextId="RecIOL_PortMode"/>
+                            <Ref ValueItemTarget="M_Cycle" DataType="BitArea" ByteOffset="4" BitOffset="0" BitLength="8" DefaultValue="0" AllowedValues="0 20 40 68 88 128 148 188" TextId="CycleTime" Visible="true" Changeable="true"/>
+                            <Ref ValueItemTarget="I_Level" DataType="BitArea" ByteOffset="3" BitOffset="1" BitLength="3" DefaultValue="0" AllowedValues="0..4" TextId="IntegrationLevel" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned16" ByteOffset="5" DefaultValue="0" AllowedValues="0..65535" TextId="VendorID" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned32" ByteOffset="7" DefaultValue="0" AllowedValues="0..16777215" TextId="DeviceID"/>
+                            <Ref ValueItemTarget="VAL_DisableEvents" DataType="BitArea" BitLength="1" ByteOffset="11" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1" TextId="RecIOL_DisableEvents"/>
+                        </ParameterRecordDataItem>
+                    </RecordDataList>
+                    <ModuleInfo CategoryRef="IOLink Input + PQI">
+                        <Name TextId="CM IO-Link 9 I"/>
+                        <InfoText TextId="CM IO-Link 9 I"/>
+                        <OrderNumber Value=""/>
+                    </ModuleInfo>
+                </SubmoduleItem>
+                <!-- IO-Link device proxy 4I -->
+                <SubmoduleItem API="19969" ID="IDS_1 Port x IO-Link 4I" SubmoduleIdentNumber="0x00000005" RequiredSchemaVersion="V2.31" MayIssueProcessAlarm="true">
+                    <IOData>
+                        <Input Consistency="All items consistency">
+                            <DataItem DataType="OctetString" TextId="Input_Data_4" Length="4" UseAsBits="false"/>
+                            <DataItem DataType="Unsigned8" UseAsBits="true" TextId="PQI">
+                                <BitDataItem BitOffset="0" TextId="DI4"/>
+                                <BitDataItem BitOffset="1" TextId="DI2"/>
+                                <BitDataItem BitOffset="2" TextId="NP"/>
+                                <BitDataItem BitOffset="3" TextId="SV"/>
+                                <BitDataItem BitOffset="4" TextId="DA"/>
+                                <BitDataItem BitOffset="5" TextId="DC"/>
+                                <BitDataItem BitOffset="6" TextId="DE"/>
+                                <BitDataItem BitOffset="7" TextId="PQ"/>
+                            </DataItem>
+                        </Input>
+                    </IOData>
+                    <RecordDataList>
+                        <!-- Profile Index=0xB100 (45312)-->
+                        <ParameterRecordDataItem Index="45312" Length="12" TransferSequence="0">
+                            <Name TextId="Port parameters"/>
+                            <Const ByteOffset="0" Data="0x00,0x01,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_PortMode" DataType="BitArea" BitLength="4" ByteOffset="2" BitOffset="0" DefaultValue="11" Changeable="true" AllowedValues="11" TextId="RecIOL_PortMode"/>
+                            <Ref ValueItemTarget="M_Cycle" DataType="BitArea" ByteOffset="4" BitOffset="0" BitLength="8" DefaultValue="0" AllowedValues="0 20 40 68 88 128 148 188" TextId="CycleTime" Visible="true" Changeable="true"/>
+                            <Ref ValueItemTarget="I_Level" DataType="BitArea" ByteOffset="3" BitOffset="1" BitLength="3" DefaultValue="0" AllowedValues="0..4" TextId="IntegrationLevel" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned16" ByteOffset="5" DefaultValue="0" AllowedValues="0..65535" TextId="VendorID" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned32" ByteOffset="7" DefaultValue="0" AllowedValues="0..16777215" TextId="DeviceID"/>
+                            <Ref ValueItemTarget="VAL_DisableEvents" DataType="BitArea" BitLength="1" ByteOffset="11" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1" TextId="RecIOL_DisableEvents"/>
+                        </ParameterRecordDataItem>
+                    </RecordDataList>
+                    <ModuleInfo CategoryRef="IOLink Input + PQI">
+                        <Name TextId="CM IO-Link 5 I"/>
+                        <InfoText TextId="CM IO-Link 5 I"/>
+                        <OrderNumber Value=""/>
+                    </ModuleInfo>
+                </SubmoduleItem>
+                <!-- IO-Link device proxy 2I -->
+                <SubmoduleItem API="19969" ID="IDS_1 Port x IO-Link 2I" SubmoduleIdentNumber="0x00000003" RequiredSchemaVersion="V2.31" MayIssueProcessAlarm="true">
+                    <IOData>
+                        <Input Consistency="All items consistency">
+                            <DataItem DataType="OctetString" TextId="Input_Data_2" Length="2" UseAsBits="false"/>
+                            <DataItem DataType="Unsigned8" UseAsBits="true" TextId="PQI">
+                                <BitDataItem BitOffset="0" TextId="DI4"/>
+                                <BitDataItem BitOffset="1" TextId="DI2"/>
+                                <BitDataItem BitOffset="2" TextId="NP"/>
+                                <BitDataItem BitOffset="3" TextId="SV"/>
+                                <BitDataItem BitOffset="4" TextId="DA"/>
+                                <BitDataItem BitOffset="5" TextId="DC"/>
+                                <BitDataItem BitOffset="6" TextId="DE"/>
+                                <BitDataItem BitOffset="7" TextId="PQ"/>
+                            </DataItem>
+                        </Input>
+                    </IOData>
+                    <RecordDataList>
+                        <!-- Profile Index=0xB100 (45312)-->
+                        <ParameterRecordDataItem Index="45312" Length="12" TransferSequence="0">
+                            <Name TextId="Port parameters"/>
+                            <Const ByteOffset="0" Data="0x00,0x01,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_PortMode" DataType="BitArea" BitLength="4" ByteOffset="2" BitOffset="0" DefaultValue="11" Changeable="true" AllowedValues="11" TextId="RecIOL_PortMode"/>
+                            <Ref ValueItemTarget="M_Cycle" DataType="BitArea" ByteOffset="4" BitOffset="0" BitLength="8" DefaultValue="0" AllowedValues="0 20 40 68 88 128 148 188" TextId="CycleTime" Visible="true" Changeable="true"/>
+                            <Ref ValueItemTarget="I_Level" DataType="BitArea" ByteOffset="3" BitOffset="1" BitLength="3" DefaultValue="0" AllowedValues="0..4" TextId="IntegrationLevel" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned16" ByteOffset="5" DefaultValue="0" AllowedValues="0..65535" TextId="VendorID" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned32" ByteOffset="7" DefaultValue="0" AllowedValues="0..16777215" TextId="DeviceID"/>
+                            <Ref ValueItemTarget="VAL_DisableEvents" DataType="BitArea" BitLength="1" ByteOffset="11" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1" TextId="RecIOL_DisableEvents"/>
+                        </ParameterRecordDataItem>
+                    </RecordDataList>
+                    <ModuleInfo CategoryRef="IOLink Input + PQI">
+                        <Name TextId="CM IO-Link 3 I"/>
+                        <InfoText TextId="CM IO-Link 3 I"/>
+                        <OrderNumber Value=""/>
+                    </ModuleInfo>
+                </SubmoduleItem>
+                <!-- IO-Link device proxy 1I -->
+                <SubmoduleItem API="19969" ID="IDS_1 Port x IO-Link 1I" SubmoduleIdentNumber="0x00000002" RequiredSchemaVersion="V2.31" MayIssueProcessAlarm="true">
+                    <IOData>
+                        <Input Consistency="All items consistency">
+                            <DataItem DataType="OctetString" TextId="Input_Data_1" Length="1" UseAsBits="false"/>
+                            <DataItem DataType="Unsigned8" UseAsBits="true" TextId="PQI">
+                                <BitDataItem BitOffset="0" TextId="DI4"/>
+                                <BitDataItem BitOffset="1" TextId="DI2"/>
+                                <BitDataItem BitOffset="2" TextId="NP"/>
+                                <BitDataItem BitOffset="3" TextId="SV"/>
+                                <BitDataItem BitOffset="4" TextId="DA"/>
+                                <BitDataItem BitOffset="5" TextId="DC"/>
+                                <BitDataItem BitOffset="6" TextId="DE"/>
+                                <BitDataItem BitOffset="7" TextId="PQ"/>
+                            </DataItem>
+                        </Input>
+                    </IOData>
+                    <RecordDataList>
+                        <!-- Profile Index=0xB100 (45312)-->
+                        <ParameterRecordDataItem Index="45312" Length="12" TransferSequence="0">
+                            <Name TextId="Port parameters"/>
+                            <Const ByteOffset="0" Data="0x00,0x01,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_PortMode" DataType="BitArea" BitLength="4" ByteOffset="2" BitOffset="0" DefaultValue="11" Changeable="true" AllowedValues="11" TextId="RecIOL_PortMode"/>
+                            <Ref ValueItemTarget="M_Cycle" DataType="BitArea" ByteOffset="4" BitOffset="0" BitLength="8" DefaultValue="0" AllowedValues="0 20 40 68 88 128 148 188" TextId="CycleTime" Visible="true" Changeable="true"/>
+                            <Ref ValueItemTarget="I_Level" DataType="BitArea" ByteOffset="3" BitOffset="1" BitLength="3" DefaultValue="0" AllowedValues="0..4" TextId="IntegrationLevel" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned16" ByteOffset="5" DefaultValue="0" AllowedValues="0..65535" TextId="VendorID" Changeable="true" Visible="true"/>
+                            <Ref DataType="Unsigned32" ByteOffset="7" DefaultValue="0" AllowedValues="0..16777215" TextId="DeviceID"/>
+                            <Ref ValueItemTarget="VAL_DisableEvents" DataType="BitArea" BitLength="1" ByteOffset="11" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1" TextId="RecIOL_DisableEvents"/>
+                        </ParameterRecordDataItem>
+                    </RecordDataList>
+                    <ModuleInfo CategoryRef="IOLink Input + PQI">
+                        <Name TextId="CM IO-Link 2 I"/>
+                        <InfoText TextId="CM IO-Link 2 I"/>
+                        <OrderNumber Value=""/>
+                    </ModuleInfo>
+                </SubmoduleItem>
+                <!-- IO-Link device proxy Digital Input -->
+                <SubmoduleItem API="19969" ID="IDS_1 Port x DI" SubmoduleIdentNumber="0x00000081" RequiredSchemaVersion="V2.31" MayIssueProcessAlarm="true">
+                    <IOData>
+                        <Input Consistency="All items consistency">
+                            <DataItem DataType="Unsigned8" UseAsBits="true" TextId="PQI">
+                                <BitDataItem BitOffset="0" TextId="DI4"/>
+                                <BitDataItem BitOffset="1" TextId="DI2"/>
+                                <BitDataItem BitOffset="2" TextId="NP"/>
+                                <BitDataItem BitOffset="3" TextId="SV"/>
+                                <BitDataItem BitOffset="4" TextId="DA"/>
+                                <BitDataItem BitOffset="5" TextId="DC"/>
+                                <BitDataItem BitOffset="6" TextId="DE"/>
+                                <BitDataItem BitOffset="7" TextId="PQ"/>
+                            </DataItem>
+                        </Input>
+                    </IOData>
+                    <RecordDataList>
+                        <!-- Profile Index=0xB100 (45312)-->
+                        <ParameterRecordDataItem Index="45312" Length="12" TransferSequence="0">
+                            <Name TextId="Port parameters"/>
+                            <Const ByteOffset="0" Data="0x00,0x01,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_PortMode" DataType="BitArea" BitLength="4" ByteOffset="2" BitOffset="0" DefaultValue="3" AllowedValues="3" TextId="RecIOL_PortMode" Changeable="false" Visible="false"/>
+                            <Ref ValueItemTarget="M_Cycle" DataType="BitArea" ByteOffset="4" BitOffset="0" BitLength="8" DefaultValue="0" AllowedValues="0 20 40 68 88 128 148 188" TextId="CycleTime" Changeable="false" Visible="false"/>
+                            <Ref ValueItemTarget="I_Level" DataType="BitArea" ByteOffset="3" BitOffset="1" BitLength="3" DefaultValue="0" AllowedValues="0..4" TextId="IntegrationLevel" Changeable="false" Visible="false"/>
+                            <Ref DataType="Unsigned16" ByteOffset="5" DefaultValue="0" AllowedValues="0..65535" TextId="VendorID" Changeable="false" Visible="false"/>
+                            <Ref DataType="Unsigned32" ByteOffset="7" DefaultValue="0" AllowedValues="0..16777215" TextId="DeviceID" Changeable="false" Visible="false"/>
+                            <Ref ValueItemTarget="VAL_DisableEvents" DataType="BitArea" BitLength="1" ByteOffset="11" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1" TextId="RecIOL_DisableEvents"/>
+                        </ParameterRecordDataItem>
+                    </RecordDataList>
+                    <ModuleInfo CategoryRef="Digital + PQI">
+                        <Name TextId="CM IO-Link DI"/>
+                        <InfoText TextId="CM IO-Link DI"/>
+                        <OrderNumber Value=""/>
+                    </ModuleInfo>
+                </SubmoduleItem>
+                <!-- IO-Link device proxy Digital Output -->
+                <SubmoduleItem API="19969" ID="IDS_1 Port x DO" SubmoduleIdentNumber="0x00008100" RequiredSchemaVersion="V2.31" MayIssueProcessAlarm="true">
+                    <IOData>
+                        <Input Consistency="All items consistency">
+                            <DataItem DataType="Unsigned8" UseAsBits="true" TextId="PQI">
+                                <BitDataItem BitOffset="0" TextId="DI4"/>
+                                <BitDataItem BitOffset="1" TextId="DI2"/>
+                                <BitDataItem BitOffset="2" TextId="NP"/>
+                                <BitDataItem BitOffset="3" TextId="SV"/>
+                                <BitDataItem BitOffset="4" TextId="DA"/>
+                                <BitDataItem BitOffset="5" TextId="DC"/>
+                                <BitDataItem BitOffset="6" TextId="DE"/>
+                                <BitDataItem BitOffset="7" TextId="PQ"/>
+                            </DataItem>
+                        </Input>
+                        <Output Consistency="Item consistency">
+                            <DataItem DataType="Unsigned8" TextId="Output"/>
+                        </Output>
+                    </IOData>
+                    <RecordDataList>
+                        <!-- Profile Index=0xB100 (45312)-->
+                        <ParameterRecordDataItem Index="45312" Length="12" TransferSequence="0">
+                            <Name TextId="Port parameters"/>
+                            <Const ByteOffset="0" Data="0x00,0x01,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                            <Ref ValueItemTarget="VAL_PortMode" DataType="BitArea" BitLength="4" ByteOffset="2" BitOffset="0" DefaultValue="4" AllowedValues="4" TextId="RecIOL_PortMode" Changeable="false" Visible="false"/>
+                            <Ref ValueItemTarget="M_Cycle" DataType="BitArea" ByteOffset="4" BitOffset="0" BitLength="8" DefaultValue="0" AllowedValues="0 20 40 68 88 128 148 188" TextId="CycleTime" Changeable="false" Visible="false"/>
+                            <Ref ValueItemTarget="I_Level" DataType="BitArea" ByteOffset="3" BitOffset="1" BitLength="3" DefaultValue="0" AllowedValues="0..4" TextId="IntegrationLevel" Changeable="false" Visible="false"/>
+                            <Ref DataType="Unsigned16" ByteOffset="5" DefaultValue="0" AllowedValues="0..65535" TextId="VendorID" Changeable="false" Visible="false"/>
+                            <Ref DataType="Unsigned32" ByteOffset="7" DefaultValue="0" AllowedValues="0..16777215" TextId="DeviceID" Changeable="false" Visible="false"/>
+                            <Ref ValueItemTarget="VAL_DisableEvents" DataType="BitArea" BitLength="1" ByteOffset="11" BitOffset="0" DefaultValue="0" Changeable="true" AllowedValues="0 1" TextId="RecIOL_DisableEvents"/>
+                        </ParameterRecordDataItem>
+                        <ParameterRecordDataItem Index="300" Length="1" TransferSequence="0">
+                            <Name TextId="Fail Safe parameter"/>
+                            <Const ByteOffset="0" Data="0x00"/>
+                            <Ref ValueItemTarget="VAL_FailSafeMode" DataType="BitArea" BitLength="8" ByteOffset="0" BitOffset="0" DefaultValue="2" Changeable="true" AllowedValues="1 2 4" TextId="RecFSM_FailSafeMode"/>
+                        </ParameterRecordDataItem>
+                    </RecordDataList>
+                    <ModuleInfo CategoryRef="Digital + PQI">
+                        <Name TextId="CM IO-Link DO"/>
+                        <InfoText TextId="CM IO-Link DO"/>
+                        <OrderNumber Value=""/>
+                    </ModuleInfo>
+                </SubmoduleItem>
+                <!-- IO-Link device proxy Inactivate -->
+                <SubmoduleItem API="19969" ID="IDS_1 Port x INACTIVATE" SubmoduleIdentNumber="0x4FFF0000" RequiredSchemaVersion="V2.31" MayIssueProcessAlarm="true">
+                    <IOData/>
+                    <RecordDataList>
+                        <!-- Profile Index=0xB100 (45312)-->
+                        <ParameterRecordDataItem Index="45312" Length="12" TransferSequence="0">
+                            <Name TextId="Port parameters"/>
+                            <Const ByteOffset="0" Data="0x00,0x01,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00"/>
+                        </ParameterRecordDataItem>
+                        <ParameterRecordDataItem Index="300" Length="1" TransferSequence="0">
+                            <Name TextId="Fail Safe parameter"/>
+                            <Const ByteOffset="0" Data="0x00"/>
+                        </ParameterRecordDataItem>
+                    </RecordDataList>
+                    <ModuleInfo>
+                        <!--CategoryRef="Digital + PQI" -->
+                        <Name TextId="CM IO-Link INACTIVATE"/>
+                        <InfoText TextId="CM IO-Link INACTIVATE"/>
+                        <OrderNumber Value=""/>
+                    </ModuleInfo>
+                </SubmoduleItem>
+            </SubmoduleList>
+            <ValueList>
+                <ValueItem ID="I_Level">
+                    <Assignments>
+                        <Assign Content="0" TextId="Level 1"/>
+                        <Assign Content="1" TextId="Level 2"/>
+                        <Assign Content="2" TextId="Level 3"/>
+                        <Assign Content="3" TextId="Level 4"/>
+                        <Assign Content="4" TextId="Level 5"/>
+                    </Assignments>
+                </ValueItem>
+                <ValueItem ID="M_Cycle">
+                    <Assignments>
+                        <Assign Content="0" TextId="M0"/>
+                        <Assign Content="20" TextId="M2"/>
+                        <Assign Content="40" TextId="M4"/>
+                        <Assign Content="68" TextId="M8"/>
+                        <Assign Content="88" TextId="M16"/>
+                        <Assign Content="128" TextId="M32"/>
+                        <Assign Content="148" TextId="M64"/>
+                        <Assign Content="188" TextId="M128"/>
+                    </Assignments>
+                </ValueItem>
+                <ValueItem ID="VAL_PortMode">
+                    <Assignments>
+                        <Assign Content="0" TextId="Inactive"/>
+                        <Assign Content="3" TextId="DigitalInput"/>
+                        <Assign Content="4" TextId="DigitalOutput"/>
+                        <Assign Content="11" TextId="IOLink"/>
+                    </Assignments>
+                </ValueItem>
+                <ValueItem ID="VAL_DisableEvents">
+                    <Assignments>
+                        <Assign Content="0" TextId="EventsEnabled"/>
+                        <Assign Content="1" TextId="EventsDisabled"/>
+                    </Assignments>
+                </ValueItem>
+                <ValueItem ID="VAL_FailSafeMode">
+                    <Assignments>
+                        <Assign Content="0" TextId="NoFailSafe"/>
+                        <Assign Content="1" TextId="ZeroFailSafe"/>
+                        <Assign Content="2" TextId="OldFailSafe"/>
+                        <Assign Content="3" TextId="PatternFailSafe"/>
+                        <Assign Content="4" TextId="SetOutFailSafe"/>
+                    </Assignments>
+                </ValueItem>
+                <ValueItem ID="VAL_Usecase">
+                    <Assignments>
+                        <Assign Content="0" TextId="PNandLRAE"/>
+                        <Assign Content="1" TextId="PNandLRAEro"/>
+                        <Assign Content="2" TextId="PNonly"/>
+                        <Assign Content="255" TextId="UCunchange"/>
+                    </Assignments>
+                </ValueItem>
+            </ValueList>
+            <!-- Diagnosis texts -->
+            <ChannelDiagList>
+                <ChannelDiagItem ErrorType="16">
+                    <Name TextId="Parameter assignment error"/>
+                </ChannelDiagItem>
+                <ChannelDiagItem ErrorType="17">
+                    <Name TextId="Sensor or load voltage missing"/>
+                </ChannelDiagItem>
+                <ChannelDiagItem ErrorType="18">
+                    <Name TextId="Fuse defective"/>
+                </ChannelDiagItem>
+                <ChannelDiagItem ErrorType="19">
+                    <Name TextId="Slot not addressable"/>
+                </ChannelDiagItem>
+                <ChannelDiagItem ErrorType="20">
+                    <Name TextId="Ground error"/>
+                </ChannelDiagItem>
+                <ChannelDiagItem ErrorType="21">
+                    <Name TextId="Reference channel error"/>
+                </ChannelDiagItem>
+                <ChannelDiagItem ErrorType="22">
+                    <Name TextId="Process interrupt lost"/>
+                </ChannelDiagItem>
+                <ChannelDiagItem ErrorType="23">
+                    <Name TextId="Warning"/>
+                </ChannelDiagItem>
+                <ChannelDiagItem ErrorType="24">
+                    <Name TextId="Shutoff"/>
+                </ChannelDiagItem>
+                <ChannelDiagItem ErrorType="25">
+                    <Name TextId="Fail-safe shutoff"/>
+                </ChannelDiagItem>
+                <ChannelDiagItem ErrorType="26">
+                    <Name TextId="external error"/>
+                </ChannelDiagItem>
+                <ChannelDiagItem ErrorType="27">
+                    <Name TextId="ambiguous error"/>
+                </ChannelDiagItem>
+                <ChannelDiagItem ErrorType="29">
+                    <Name TextId="hand drive"/>
+                </ChannelDiagItem>
+                <ChannelDiagItem ErrorType="31">
+                    <Name TextId="temporary error"/>
+                </ChannelDiagItem>
+                <!-- IO-Link V1.1  -->
+                <!-- IO-Link device ** ChannelErrorType 0x9500, lower range 0x0000-0x7FFF (IO-Link events 0x0000-0x7FFF)" -->
+                <ProfileChannelDiagItem API="19969" ErrorType="38144">
+                    <Name TextId="IOL_EventLow"/>
+                    <Help TextId="IOL_EventLow_Help"/>
+                    <ExtChannelDiagList>
+                        <!-- profile specific extended Channel Diagnosis (not new) fictive 0x9000 -->
+                        <!-- Standardized IO-Link device EventCode specified by IO-Link spec -->
+                        <ExtChannelDiagItem ErrorType="4096">
+                            <Name TextId="0x1000"/>
+                            <Help TextId="Help_0x1000"/>
+                        </ExtChannelDiagItem>
+                        <!-- 0x1001 to 0x17FF reserved -->
+                        <!-- 0x1800 to 0x18FF vendor specific -->
+                        <!-- 0x1900 to 0x3FFF reserved -->
+                        <ExtChannelDiagItem ErrorType="16384">
+                            <Name TextId="0x4000"/>
+                            <Help TextId="Help_0x4000"/>
+                        </ExtChannelDiagItem>
+                        <!-- 0x4001 to 0x420F reserved -->
+                        <ExtChannelDiagItem ErrorType="16912">
+                            <Name TextId="0x4210"/>
+                            <Help TextId="Help_0x4210"/>
+                        </ExtChannelDiagItem>
+                        <!-- 0x4211 to 0x421F reserved -->
+                        <ExtChannelDiagItem ErrorType="16928">
+                            <Name TextId="0x4220"/>
+                            <Help TextId="Help_0x4220"/>
+                        </ExtChannelDiagItem>
+                        <!-- 0x4221 to 0x4FFF reserved -->
+                        <ExtChannelDiagItem ErrorType="20480">
+                            <Name TextId="0x5000"/>
+                            <Help TextId="Help_0x5000"/>
+                        </ExtChannelDiagItem>
+                        <!-- 0x5001 to 0x500F reserved -->
+                        <ExtChannelDiagItem ErrorType="20496">
+                            <Name TextId="0x5010"/>
+                            <Help TextId="Help_0x5010"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="20497">
+                            <Name TextId="0x5011"/>
+                            <Help TextId="Help_0x5011"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="20498">
+                            <Name TextId="0x5012"/>
+                            <Help TextId="Help_0x5012"/>
+                        </ExtChannelDiagItem>
+                        <!-- 0x5013 to 0x50FF reserved -->
+                        <ExtChannelDiagItem ErrorType="20736">
+                            <Name TextId="0x5100"/>
+                            <Help TextId="Help_0x5100"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="20737">
+                            <Name TextId="0x5101"/>
+                            <Help TextId="Help_0x5101"/>
+                        </ExtChannelDiagItem>
+                        <!-- 0x5102 to 0x510F reserved -->
+                        <ExtChannelDiagItem ErrorType="20752">
+                            <Name TextId="0x5110"/>
+                            <Help TextId="Help_0x5110"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="20753">
+                            <Name TextId="0x5111"/>
+                            <Help TextId="Help_0x5111"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="20754">
+                            <Name TextId="0x5112"/>
+                            <Help TextId="Help_0x5112"/>
+                        </ExtChannelDiagItem>
+                        <!-- 0x5113 to 5FFF reserved -->
+                        <ExtChannelDiagItem ErrorType="24576">
+                            <Name TextId="0x6000"/>
+                            <Help TextId="Help_0x6000"/>
+                        </ExtChannelDiagItem>
+                        <!-- 0x6001 to 0x631F reserved -->
+                        <ExtChannelDiagItem ErrorType="25376">
+                            <Name TextId="0x6320"/>
+                            <Help TextId="Help_0x6320"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="25377">
+                            <Name TextId="0x6321"/>
+                            <Help TextId="Help_0x6321"/>
+                        </ExtChannelDiagItem>
+                        <!-- 0x6322 to 0x634F reserved -->
+                        <ExtChannelDiagItem ErrorType="25424">
+                            <Name TextId="0x6350"/>
+                            <Help TextId="Help_0x6350"/>
+                        </ExtChannelDiagItem>
+                        <!-- 0x6351 to 0x76FF reserved -->
+                        <ExtChannelDiagItem ErrorType="30464">
+                            <Name TextId="0x7700"/>
+                            <Help TextId="Help_0x7700"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="30465">
+                            <Name TextId="0x7701"/>
+                            <Help TextId="Help_0x7701"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="30466">
+                            <Name TextId="0x7702"/>
+                            <Help TextId="Help_0x7702"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="30467">
+                            <Name TextId="0x7703"/>
+                            <Help TextId="Help_0x7703"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="30468">
+                            <Name TextId="0x7704"/>
+                            <Help TextId="Help_0x7704"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="30469">
+                            <Name TextId="0x7705"/>
+                            <Help TextId="Help_0x7705"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="30470">
+                            <Name TextId="0x7706"/>
+                            <Help TextId="Help_0x7706"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="30471">
+                            <Name TextId="0x7707"/>
+                            <Help TextId="Help_0x7707"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="30472">
+                            <Name TextId="0x7708"/>
+                            <Help TextId="Help_0x7708"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="30473">
+                            <Name TextId="0x7709"/>
+                            <Help TextId="Help_0x7709"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="30474">
+                            <Name TextId="0x770A"/>
+                            <Help TextId="Help_0x770A"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="30475">
+                            <Name TextId="0x770B"/>
+                            <Help TextId="Help_0x770B"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="30476">
+                            <Name TextId="0x770C"/>
+                            <Help TextId="Help_0x770C"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="30477">
+                            <Name TextId="0x770D"/>
+                            <Help TextId="Help_0x770D"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="30478">
+                            <Name TextId="0x770E"/>
+                            <Help TextId="Help_0x770E"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="30479">
+                            <Name TextId="0x770F"/>
+                            <Help TextId="Help_0x770F"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="30480">
+                            <Name TextId="0x7710"/>
+                            <Help TextId="Help_0x7710"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="30481">
+                            <Name TextId="0x7711"/>
+                            <Help TextId="Help_0x7711"/>
+                        </ExtChannelDiagItem>
+                        <!-- 0x7712 to 0x7FFF reserved -->
+                    </ExtChannelDiagList>
+                </ProfileChannelDiagItem>
+                <!-- IO-Link device ** ErrorCode 0x9501, higher range 0x0000-0x7FFF (IO-Link events 0x8000-0xFFFF)" -->
+                <ProfileChannelDiagItem API="19969" ErrorType="38145">
+                    <Name TextId="IOL_EventHigh"/>
+                    <Help TextId="IOL_EventHigh_Help"/>
+                    <ExtChannelDiagList>
+                        <!-- Standardized IO-Link device EventCode specified by IO-Link spec -->
+                        <!-- 0x8000 to 0x8BFF reserved -->
+                        <ExtChannelDiagItem ErrorType="3072">
+                            <Name TextId="0x8C00"/>
+                            <Help TextId="Help_0x8C00"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="3073">
+                            <Name TextId="0x8C01"/>
+                            <Help TextId="Help_0x8C01"/>
+                        </ExtChannelDiagItem>
+                        <!-- 0x8C02 to 0x8C0F reserved -->
+                        <ExtChannelDiagItem ErrorType="3088">
+                            <Name TextId="0x8C10"/>
+                            <Help TextId="Help_0x8C10"/>
+                        </ExtChannelDiagItem>
+                        <!-- 0x8C11 to 0x8C1F reserved -->
+                        <ExtChannelDiagItem ErrorType="3104">
+                            <Name TextId="0x8C20"/>
+                            <Help TextId="Help_0x8C20"/>
+                        </ExtChannelDiagItem>
+                        <!-- 0x8C21 to 0x8C2F reserved -->
+                        <ExtChannelDiagItem ErrorType="3120">
+                            <Name TextId="0x8C30"/>
+                            <Help TextId="Help_0x8C30"/>
+                        </ExtChannelDiagItem>
+                        <!-- 0x8C31 to 0x8C3F reserved -->
+                        <ExtChannelDiagItem ErrorType="3136">
+                            <Name TextId="0x8C40"/>
+                            <Help TextId="Help_0x8C40"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="3137">
+                            <Name TextId="0x8C41"/>
+                            <Help TextId="Help_0x8C41"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="3138">
+                            <Name TextId="0x8C42"/>
+                            <Help TextId="Help_0x8C42"/>
+                        </ExtChannelDiagItem>
+                        <!-- 0x8C43 to 0x8C9F reserved -->
+                        <!-- 0x8CA0 to 0x8DFF vendor specific -->
+                        <ExtChannelDiagItem ErrorType="3232">
+                            <Name TextId="0x0CA0"/>
+                            <Help TextId="Help_EventCode"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="3233">
+                            <Name TextId="0x0CA1"/>
+                            <Help TextId="Help_EventCode"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="3234">
+                            <Name TextId="0x0CA2"/>
+                            <Help TextId="Help_EventCode"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="3235">
+                            <Name TextId="0x0CA3"/>
+                            <Help TextId="Help_EventCode"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="3236">
+                            <Name TextId="0x0CA4"/>
+                            <Help TextId="Help_EventCode"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="3237">
+                            <Name TextId="0x0CA5"/>
+                            <Help TextId="Help_EventCode"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="3238">
+                            <Name TextId="0x0CA6"/>
+                            <Help TextId="Help_EventCode"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="3239">
+                            <Name TextId="0x0CA7"/>
+                            <Help TextId="Help_EventCode"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="3240">
+                            <Name TextId="0x0CA8"/>
+                            <Help TextId="Help_EventCode"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="3241">
+                            <Name TextId="0x0CA9"/>
+                            <Help TextId="Help_EventCode"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="3242">
+                            <Name TextId="0x0CAA"/>
+                            <Help TextId="Help_EventCode"/>
+                        </ExtChannelDiagItem>
+                        <!-- 0x8E00 to 0xAFFF reserved -->
+                        <!-- 0xB000 to 0xBFFF reserved for profiles -->
+                        <!-- 0xC000 to 0xFEFF reserved -->
+                        <!-- 0xFF00 to 0xFFFF SDCI specific EventCodes -->
+                    </ExtChannelDiagList>
+                </ProfileChannelDiagItem>
+                <!-- Port diagnosis ** ErrorCode 0x9502 -->
+                <ProfileChannelDiagItem API="19969" ErrorType="38146">
+                    <Name TextId="PortEvent"/>
+                    <ExtChannelDiagList>
+                        <!-- 0x000 to 0x17FF vendor specific -->
+                        <!-- 0x1800 reserved -->
+                        <ExtChannelDiagItem ErrorType="6145">
+                            <Name TextId="0x1801_P"/>
+                            <Help TextId="Help_0x1801_P"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="6146">
+                            <Name TextId="0x1802_P"/>
+                            <Help TextId="Help_0x1802_P"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="6147">
+                            <Name TextId="0x1803_P"/>
+                            <Help TextId="Help_0x1803_P"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="6148">
+                            <Name TextId="0x1804_P"/>
+                            <Help TextId="Help_0x1804_P"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="6149">
+                            <Name TextId="0x1805_P"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="6150">
+                            <Name TextId="0x1806_P"/>
+                            <Help TextId="Help_0x1806_P"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="6151">
+                            <Name TextId="0x1807_P"/>
+                            <Help TextId="Help_0x1807_P"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="6152">
+                            <Name TextId="0x1808_P"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="6153">
+                            <Name TextId="0x1809_P"/>
+                            <Help TextId="Help_0x1809_P"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="6154">
+                            <Name TextId="0x180A_P"/>
+                            <Help TextId="Help_0x180A_P"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="6155">
+                            <Name TextId="0x180B_P"/>
+                            <Help TextId="Help_0x180B_P"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="6156">
+                            <Name TextId="0x180C_P"/>
+                            <Help TextId="Help_0x180C_P"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="6157">
+                            <Name TextId="0x180D_P"/>
+                            <Help TextId="Help_0x180D_P"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="6158">
+                            <Name TextId="0x180E_P"/>
+                            <Help TextId="Help_0x180E_P"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="6159">
+                            <Name TextId="0x180F_P"/>
+                            <Help TextId="Help_0x180F_P"/>
+                        </ExtChannelDiagItem>
+                        <!-- 0x1810 to 0x5FFF vendor specific  -->
+                        <ExtChannelDiagItem ErrorType="6275">
+                            <Name TextId="0x1883_P"/>
+                            <Help TextId="Help_0x1883_P"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="6280">
+                            <Name TextId="0x1888_P"/>
+                            <Help TextId="Help_0x1888_P"/>
+                        </ExtChannelDiagItem>
+                        <!-- end of vendor specific elements-->
+                        <ExtChannelDiagItem ErrorType="24576">
+                            <Name TextId="0x6000_P"/>
+                            <Help TextId="Help_0x6000_P"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="24577">
+                            <Name TextId="0x6001_P"/>
+                            <Help TextId="Help_0x6001_P"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="24578">
+                            <Name TextId="0x6002_P"/>
+                            <Help TextId="Help_0x6002_P"/>
+                        </ExtChannelDiagItem>
+                        <!-- 0x6003 to 0x7F21 reserved -->
+                        <ExtChannelDiagItem ErrorType="32546">
+                            <Name TextId="0x7F22_P"/>
+                            <Help TextId="Help_0x7F22_P"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="32547">
+                            <Name TextId="0x7F23_P"/>
+                            <Help TextId="Help_0x7F23_P"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="32548">
+                            <Name TextId="0x7F24_P"/>
+                            <Help TextId="Help_0x7F24_P"/>
+                        </ExtChannelDiagItem>
+                        <ExtChannelDiagItem ErrorType="32549">
+                            <Name TextId="0x7F25_P"/>
+                            <Help TextId="Help_0x7F25_P"/>
+                        </ExtChannelDiagItem>
+                        <!-- 0x7F26 to 0x7F30 reserved -->
+                        <ExtChannelDiagItem ErrorType="32561">
+                            <Name TextId="0x7F31_P"/>
+                            <Help TextId="Help_0x7F31_P"/>
+                        </ExtChannelDiagItem>
+                        <!-- 0x7F32 to 0x7FFF reserved -->
+                    </ExtChannelDiagList>
+                </ProfileChannelDiagItem>
+            </ChannelDiagList>
+            <GraphicsList>
+                <GraphicItem ID="1" GraphicFile="GSDML-ifm-AL1100-p"/>
+            </GraphicsList>
+            <CategoryList>
+                <CategoryItem ID="Input slot" TextId="Input slot"/>
+                <CategoryItem ID="Output slot" TextId="Output slot"/>
+                <CategoryItem ID="Modular slot" TextId="Modular slot"/>
+                <CategoryItem ID="IOLink Input + Output + PQI" TextId="IOLink Input + Output + PQI"/>
+                <CategoryItem ID="IOLink Input + PQI" TextId="IOLink Input + PQI"/>
+                <CategoryItem ID="IOLink Output + PQI" TextId="IOLink Output + PQI"/>
+                <CategoryItem ID="Digital + PQI" TextId="Digital + PQI"/>
+            </CategoryList>
+            <!--      -->
+            <!-- Text -->
+            <!--      -->
+            <ExternalTextList>
+                <PrimaryLanguage>
+                    <Text TextId="device_info" Value="AL1100: IO-Link Master StandardLine Profinet 4 Ports IP67"/>
+                    <!--PDEV-->
+                    <Text TextId="InterfaceName" Value="X1"/>
+                    <Text TextId="IDT_Port1" Value="Port 1"/>
+                    <Text TextId="IDT_Port2" Value="Port 2"/>
+                    <Text TextId="PDEV_X1" Value="X1"/>
+                    <Text TextId="PDEV_X1_P1" Value="X1 P1"/>
+                    <Text TextId="PDEV_X1_P2" Value="X1 P2"/>
+                    <Text TextId="IDT_NAME_PORT1" Value="Port 1"/>
+                    <Text TextId="IDT_NAME_PORT2" Value="Port 2"/>
+                    <Text TextId="IDT_NAME_PORT3" Value="Port 3"/>
+                    <Text TextId="IDT_NAME_PORT4" Value="Port 4"/>
+                    <!-- Categories -->
+                    <Text TextId="Modular slot" Value="IO-Link Master StandardLine"/>
+                    <Text TextId="Output slot" Value="Output slot"/>
+                    <Text TextId="Input slot" Value="Input slot"/>
+                    <Text TextId="IOLink Input + Output + PQI" Value="IO-Link Input + Output + PQI"/>
+                    <Text TextId="IOLink Input + PQI" Value="IO-Link Input + PQI"/>
+                    <Text TextId="IOLink Output + PQI" Value="IO-Link Output + PQI"/>
+                    <Text TextId="Digital + PQI" Value="Digital + PQI"/>
+                    <!-- IO-Link Master module -->
+                    <Text TextId="DAP" Value="AL1100"/>
+                    <Text TextId="DAP Desc" Value="IO-Link Master StandardLine Profinet 4 Ports IP67"/>
+                    <Text TextId="SUB_MOD_DAP" Value="AL1100"/>
+                    <Text TextId="SUB_MOD_DAP_Desc" Value="IO-Link Master StandardLine Profinet 4 Ports IP67"/>
+                    <Text TextId="Modular module text" Value="4 Ports"/>
+                    <Text TextId="Modular module help" Value="IO-Link Master StandardLine Profinet 4 Ports IP67"/>
+                    <!-- Submodules -->
+                    <Text TextId="CM IO-Link 32 I/ 32 O" Value="IO-Link In/Out 32/32 Byte + PQI"/>
+                    <Text TextId="CM IO-Link 17 I/ 16 O" Value="IO-Link In/Out 16/16 Byte + PQI"/>
+                    <Text TextId="CM IO-Link 9 I/ 8 O" Value="IO-Link In/Out  8/ 8 Byte + PQI"/>
+                    <Text TextId="CM IO-Link 5 I/ 4 O" Value="IO-Link In/Out  4/ 4 Byte + PQI"/>
+                    <Text TextId="CM IO-Link 3 I/ 2 O" Value="IO-Link In/Out  2/ 2 Byte + PQI"/>
+                    <Text TextId="CM IO-Link 2 I/ 1 O" Value="IO-Link In/Out  1/ 1 Byte + PQI"/>
+                    <Text TextId="CM IO-Link 2 I/ 15 O" Value="IO-Link In/Out  1/15 Byte + PQI"/>
+                    <Text TextId="CM IO-Link 33 I" Value="IO-Link In 32 Byte + PQI"/>
+                    <Text TextId="CM IO-Link 17 I" Value="IO-Link In 16 Byte + PQI"/>
+                    <Text TextId="CM IO-Link 9 I" Value="IO-Link In  8 Byte + PQI"/>
+                    <Text TextId="CM IO-Link 5 I" Value="IO-Link In  4 Byte + PQI"/>
+                    <Text TextId="CM IO-Link 3 I" Value="IO-Link In  2 Byte + PQI"/>
+                    <Text TextId="CM IO-Link 2 I" Value="IO-Link In  1 Byte + PQI"/>
+                    <Text TextId="CM IO-Link 32 O" Value="IO-Link Out 32 Byte + PQI"/>
+                    <Text TextId="CM IO-Link 16 O" Value="IO-Link Out 16 Byte + PQI"/>
+                    <Text TextId="CM IO-Link 8 O" Value="IO-Link Out  8 Byte + PQI"/>
+                    <Text TextId="CM IO-Link 4 O" Value="IO-Link Out  4 Byte + PQI"/>
+                    <Text TextId="CM IO-Link 2 O" Value="IO-Link Out  2 Byte + PQI"/>
+                    <Text TextId="CM IO-Link 1 O" Value="IO-Link Out  1 Byte + PQI"/>
+                    <Text TextId="CM IO-Link DO" Value="Digital Output + PQI"/>
+                    <Text TextId="CM IO-Link DI" Value="Digital Input + PQI"/>
+                    <Text TextId="CM IO-Link INACTIVATE" Value="Disabled"/>
+                    <!-- IO-Link: Auswahl Integration Level -->
+                    <Text TextId="Level 1" Value="no check and clear"/>
+                    <Text TextId="Level 2" Value="type compatible V1.0 device"/>
+                    <Text TextId="Level 3" Value="type compatible V1.1 device"/>
+                    <Text TextId="Level 4" Value="type compatible V1.1 device with Backup + Restore"/>
+                    <Text TextId="Level 5" Value="type compatible V1.1 device with Restore"/>
+                    <!-- master Cycle time -->
+                    <Text TextId="M0" Value="as fast as possible"/>
+                    <Text TextId="M2" Value="2.0 ms"/>
+                    <Text TextId="M4" Value="4.0 ms"/>
+                    <Text TextId="M8" Value="8.0 ms"/>
+                    <Text TextId="M16" Value="16.0 ms"/>
+                    <Text TextId="M32" Value="32.0 ms"/>
+                    <Text TextId="M64" Value="64.0 ms"/>
+                    <Text TextId="M128" Value="128.0 ms"/>
+                    <!-- Fail Safe Mode -->
+                    <Text TextId="NoFailSafe" Value="No Fail Safe"/>
+                    <Text TextId="ZeroFailSafe" Value="Fail Safe Reset Value"/>
+                    <Text TextId="OldFailSafe" Value="Fail Safe Old Value"/>
+                    <Text TextId="PatternFailSafe" Value="Fail Safe with Pattern"/>
+                    <Text TextId="SetOutFailSafe" Value="Fail Safe Set Value"/>
+                    <!-- Usecase Profinet and LRAE -->
+                    <Text TextId="PNandLRAE" Value="Profinet + LineRecorder"/>
+                    <Text TextId="PNandLRAEro" Value="Profinet + LineRecorder (ro)"/>
+                    <Text TextId="PNonly" Value="Profinet only"/>
+                    <Text TextId="UCunchange" Value="keep setting"/>
+                    <!-- Input Output data -->
+                    <Text TextId="Input_Data_16" Value="Input data 16 Bytes"/>
+                    <Text TextId="Output_Data_16" Value="Output data 16 Bytes"/>
+                    <Text TextId="Output_Data_15" Value="Output data 15 Bytes"/>
+                    <Text TextId="Input_Data_32" Value="Input data 32 Bytes"/>
+                    <Text TextId="Output_Data_32" Value="Output data 32 Bytes"/>
+                    <Text TextId="Input_Data_8" Value="Input data 8 Bytes"/>
+                    <Text TextId="Output_Data_8" Value="Output data 8 Bytes"/>
+                    <Text TextId="Input_Data_4" Value="Input data 4 Bytes"/>
+                    <Text TextId="Output_Data_4" Value="Output data 4 Bytes"/>
+                    <Text TextId="Input_Data_2" Value="Input data 2 Bytes"/>
+                    <Text TextId="Output_Data_2" Value="Output data 2 Bytes"/>
+                    <Text TextId="Input_Data_1" Value="Input data 1 Byte"/>
+                    <Text TextId="Output_Data_1" Value="Output data 1 Byte"/>
+                    <!-- port status -->
+                    <Text TextId="PQI" Value="Port Status"/>
+                    <Text TextId="PQ" Value="Port Qualifier"/>
+                    <Text TextId="DE" Value="Device error pending"/>
+                    <Text TextId="DC" Value="Device available"/>
+                    <Text TextId="DA" Value="Reserved"/> <!-- Device activated -->
+                    <Text TextId="SV" Value="Reserved"/> <!-- Substitute Device detection -->
+                    <Text TextId="NP" Value="Reserved"/> <!-- New parameter -->
+                    <Text TextId="DI2" Value="Digital Input Pin 2"/>
+                    <Text TextId="DI4" Value="Digital Input Pin 4"/>
+                    <!-- parameter submodule -->
+                    <Text TextId="VendorID" Value="Vendor ID (VID)"/>
+                    <Text TextId="DeviceID" Value="Device ID (DID)"/>
+                    <Text TextId="CycleTime" Value="Port cycle time"/>
+                    <!--- PortMode -->
+                    <Text TextId="Inactive" Value="Disabled"/>
+                    <Text TextId="DigitalInput" Value="Digital Input (Pin 2/4)"/>
+                    <Text TextId="DigitalOutput" Value="Digital Output (Pin 4)"/>
+                    <Text TextId="IOLink" Value="IO-Link (Pin 4)"/>
+                    <Text TextId="EventsDisabled" Value="Disabled"/>
+                    <Text TextId="EventsEnabled" Value="Enabled"/>
+                    <!-- IO-Link Master-->
+                    <Text TextId="IO-Link Master" Value="IO-Link Master"/>
+                    <!-- allgemeine Bezeichner -->
+                    <Text TextId="Port parameters" Value="IO-Link Port parameter"/>
+                    <Text TextId="Output" Value="Output"/>
+                    <Text TextId="RecIOL_PortMode" Value="Port Mode"/>
+                    <Text TextId="RecIOL_DisableEvents" Value="IO-Link Events"/>
+                    <Text TextId="IntegrationLevel" Value="Validation / Data Storage"/>
+                    <Text TextId="RecFSM_FailSafeMode" Value="Fail Safe Mode"/>
+                    <Text TextId="Fail Safe parameter" Value="Fail Safe parameter"/>
+                    <Text TextId="PatternValue" Value="Pattern Value"/>
+                    <Text TextId="Usecase parameter" Value="Access Rights Parameter"/>
+                    <Text TextId="RecUC_UseCaseMode" Value="Access Rights"/>
+                    <!-- general diagnosis-->
+                    <Text TextId="Parameter assignment error" Value="Parameter assignment error"/>
+                    <Text TextId="Sensor or load voltage missing" Value="Missing 1L+ or 2L+"/>
+                    <Text TextId="Fuse defective" Value="Fuse defective"/>
+                    <Text TextId="Slot not addressable" Value="Slot not addressable"/>
+                    <Text TextId="Ground error" Value="Ground error"/>
+                    <Text TextId="Reference channel error" Value="Reference channel error"/>
+                    <Text TextId="Process interrupt lost" Value="Process interrupt lost"/>
+                    <Text TextId="Warning" Value="Warning"/>
+                    <Text TextId="Shutoff" Value="Shutoff"/>
+                    <Text TextId="Fail-safe shutoff" Value="Fail-safe shutoff"/>
+                    <Text TextId="external error" Value="external error"/>
+                    <Text TextId="ambiguous error" Value="ambiguous error"/>
+                    <Text TextId="hand drive" Value="Actuator/sensor fault 1"/>
+                    <Text TextId="temporary error" Value="Channel temporarily unavailable"/>
+                    <!-- Device diagnosis IO-Link V1.1 TPS-1 -->
+                    <!-- Extended Channel diagnosis -->
+                    <Text TextId="IOL_EventLow" Value="IO-Link devices diagnosis - Page 1"/>
+                    <Text TextId="IOL_EventLow_Help" Value="IO-Link devices diagnosis EventCode 0x0000-0x7FFF"/>
+                    <Text TextId="IOL_EventHigh" Value="IO-Link devices diagnosis - Page 2"/>
+                    <Text TextId="IOL_EventHigh_Help" Value="IO-Link devices diagnosis EventCode 0x8000-0xFFFF"/>
+                    <Text TextId="PortEvent" Value="Port diagnosis"/>
+                    <!-- Device diagnosis low -->
+                    <Text TextId="Help_EventCode" Value="check IO-Link device manual"/>
+                    <Text TextId="0x1000" Value="General malfunction"/>
+                    <Text TextId="Help_0x1000" Value="unknown error"/>
+                    <Text TextId="0x4000" Value="Temperature fault"/>
+                    <Text TextId="Help_0x4000" Value="Overload"/>
+                    <Text TextId="0x4210" Value="Device temperature over-run"/>
+                    <Text TextId="Help_0x4210" Value="Clear source of heat"/>
+                    <Text TextId="0x4220" Value="Device temperature under-run"/>
+                    <Text TextId="Help_0x4220" Value="Insulate Device"/>
+                    <Text TextId="0x5000" Value="Device hardware fault"/>
+                    <Text TextId="Help_0x5000" Value="Device exchange"/>
+                    <Text TextId="0x5010" Value="Component malfunction"/>
+                    <Text TextId="Help_0x5010" Value="Repair or exchange"/>
+                    <Text TextId="0x5011" Value="Non volatile memory loss"/>
+                    <Text TextId="Help_0x5011" Value="Check batteries"/>
+                    <Text TextId="0x5012" Value="Batteries low"/>
+                    <Text TextId="Help_0x5012" Value="Exchange batteries"/>
+                    <Text TextId="0x5100" Value="General power supply fault"/>
+                    <Text TextId="Help_0x5100" Value="Check availability"/>
+                    <Text TextId="0x5101" Value="Fuse blown/open"/>
+                    <Text TextId="Help_0x5101" Value="Exchange fuse"/>
+                    <Text TextId="0x5110" Value="Primary supply voltage over-run"/>
+                    <Text TextId="Help_0x5110" Value="Check tolerance"/>
+                    <Text TextId="0x5111" Value="Primary supply voltage under-run"/>
+                    <Text TextId="Help_0x5111" Value="Check tolerance"/>
+                    <Text TextId="0x5112" Value="Secondary supply voltage fault (Port Class B)"/>
+                    <Text TextId="Help_0x5112" Value="Check tolerance"/>
+                    <Text TextId="0x6000" Value="Device software fault"/>
+                    <Text TextId="Help_0x6000" Value="Check firmware revision"/>
+                    <Text TextId="0x6320" Value="Parameter error"/>
+                    <Text TextId="Help_0x6320" Value="Check data sheet and values"/>
+                    <Text TextId="0x6321" Value="Parameter missing"/>
+                    <Text TextId="Help_0x6321" Value="Check data sheet"/>
+                    <Text TextId="0x6350" Value="Parameter changed"/>
+                    <Text TextId="Help_0x6350" Value="Check configuration"/>
+                    <Text TextId="0x7700" Value="Wire break of a subordinate device"/>
+                    <Text TextId="Help_0x7700" Value="Check installation"/>
+                    <Text TextId="0x7701" Value="Wire break of subordinate device 1"/>
+                    <Text TextId="Help_0x7701" Value="Check installation"/>
+                    <Text TextId="0x7702" Value="Wire break of subordinate device 2"/>
+                    <Text TextId="Help_0x7702" Value="Check installation"/>
+                    <Text TextId="0x7703" Value="Wire break of subordinate device 3"/>
+                    <Text TextId="Help_0x7703" Value="Check installation"/>
+                    <Text TextId="0x7704" Value="Wire break of subordinate device 4"/>
+                    <Text TextId="Help_0x7704" Value="Check installation"/>
+                    <Text TextId="0x7705" Value="Wire break of subordinate device 5"/>
+                    <Text TextId="Help_0x7705" Value="Check installation"/>
+                    <Text TextId="0x7706" Value="Wire break of subordinate device 6"/>
+                    <Text TextId="Help_0x7706" Value="Check installation"/>
+                    <Text TextId="0x7707" Value="Wire break of subordinate device 7"/>
+                    <Text TextId="Help_0x7707" Value="Check installation"/>
+                    <Text TextId="0x7708" Value="Wire break of subordinate device 8"/>
+                    <Text TextId="Help_0x7708" Value="Check installation"/>
+                    <Text TextId="0x7709" Value="Wire break of subordinate device 9"/>
+                    <Text TextId="Help_0x7709" Value="Check installation"/>
+                    <Text TextId="0x770A" Value="Wire break of subordinate device 10"/>
+                    <Text TextId="Help_0x770A" Value="Check installation"/>
+                    <Text TextId="0x770B" Value="Wire break of subordinate device 11"/>
+                    <Text TextId="Help_0x770B" Value="Check installation"/>
+                    <Text TextId="0x770C" Value="Wire break of subordinate device 12"/>
+                    <Text TextId="Help_0x770C" Value="Check installation"/>
+                    <Text TextId="0x770D" Value="Wire break of subordinate device 13"/>
+                    <Text TextId="Help_0x770D" Value="Check installation"/>
+                    <Text TextId="0x770E" Value="Wire break of subordinate device 14"/>
+                    <Text TextId="Help_0x770E" Value="Check installation"/>
+                    <Text TextId="0x770F" Value="Wire break of subordinate device 15"/>
+                    <Text TextId="Help_0x770F" Value="Check installation"/>
+                    <Text TextId="0x7710" Value="Short circuit"/>
+                    <Text TextId="Help_0x7710" Value="Check installation"/>
+                    <Text TextId="0x7711" Value="Ground fault"/>
+                    <Text TextId="Help_0x7711" Value="Check installation"/>
+                    <!-- Device diagnosis high -->
+                    <Text TextId="0x8C00" Value="Technology specific application fault"/>
+                    <Text TextId="Help_0x8C00" Value="Reset Device"/>
+                    <Text TextId="0x8C01" Value="Simulation active"/>
+                    <Text TextId="Help_0x8C01" Value="Check operational mode"/>
+                    <Text TextId="0x8C10" Value="Process variable range over-run"/>
+                    <Text TextId="Help_0x8C10" Value="Process Data uncertain"/>
+                    <Text TextId="0x8C20" Value="Measurement range over-run"/>
+                    <Text TextId="Help_0x8C20" Value="Check application"/>
+                    <Text TextId="0x8C30" Value="Process variable range under-run"/>
+                    <Text TextId="Help_0x8C30" Value="Process Data uncertain"/>
+                    <Text TextId="0x8C40" Value="Maintenance required - Cleaning"/>
+                    <Text TextId="Help_0x8C40" Value="Clean device"/>
+                    <Text TextId="0x8C41" Value="Maintenance required - Refill"/>
+                    <Text TextId="Help_0x8C41" Value="Refill device"/>
+                    <Text TextId="0x8C42" Value="Maintenance required - Wear and tear"/>
+                    <Text TextId="Help_0x8C42" Value="Exchange wear and tear parts"/>
+                    <Text TextId="0x0CA0" Value="IO-Link EventCode 0x8CA0"/>
+                    <Text TextId="0x0CA1" Value="IO-Link EventCode 0x8CA1"/>
+                    <Text TextId="0x0CA2" Value="IO-Link EventCode 0x8CA2"/>
+                    <Text TextId="0x0CA3" Value="IO-Link EventCode 0x8CA3"/>
+                    <Text TextId="0x0CA4" Value="IO-Link EventCode 0x8CA4"/>
+                    <Text TextId="0x0CA5" Value="IO-Link EventCode 0x8CA5"/>
+                    <Text TextId="0x0CA6" Value="IO-Link EventCode 0x8CA6"/>
+                    <Text TextId="0x0CA7" Value="IO-Link EventCode 0x8CA7"/>
+                    <Text TextId="0x0CA8" Value="IO-Link EventCode 0x8CA8"/>
+                    <Text TextId="0x0CA9" Value="IO-Link EventCode 0x8CA9"/>
+                    <Text TextId="0x0CAA" Value="IO-Link EventCode 0x8CAA"/>
+                    <!-- port diagnosis -->
+                    <Text TextId="0x1801_P" Value="Startup parametrization error"/>
+                    <Text TextId="Help_0x1801_P" Value="check parameter"/>
+                    <Text TextId="0x1802_P" Value="Incorrect device"/>
+                    <Text TextId="Help_0x1802_P" Value="Inspection Level mismatch"/>
+                    <Text TextId="0x1803_P" Value="Process data mismatch"/>
+                    <Text TextId="Help_0x1803_P" Value="check submodule configuration"/>
+                    <Text TextId="0x1804_P" Value="Short circuit at C/Q"/>
+                    <Text TextId="Help_0x1804_P" Value="check wire connection"/>
+                    <Text TextId="0x1805_P" Value="IO-Link PHY over temperature"/>
+                    <Text TextId="0x1806_P" Value="Short circuit at L+"/>
+                    <Text TextId="Help_0x1806_P" Value="check wire connection"/>
+                    <Text TextId="0x1807_P" Value="Undervoltage at L+"/>
+                    <Text TextId="Help_0x1807_P" Value="check power supply (e.g. L1+)"/>
+                    <Text TextId="0x1808_P" Value="Device event overflow"/>
+                    <Text TextId="0x1809_P" Value="Backup inconsistency"/>
+                    <Text TextId="Help_0x1809_P" Value="memory out of range (2k)"/>
+                    <Text TextId="0x180A_P" Value="Backup inconsistency"/>
+                    <Text TextId="Help_0x180A_P" Value="Data storage index not available"/>
+                    <Text TextId="0x180B_P" Value="Backup inconsistency"/>
+                    <Text TextId="Help_0x180B_P" Value="Data storage unspecific error"/>
+                    <Text TextId="0x180C_P" Value="Backup inconsistency"/>
+                    <Text TextId="Help_0x180C_P" Value="upload fault"/>
+                    <Text TextId="0x180D_P" Value="Backup inconsistency"/>
+                    <Text TextId="Help_0x180D_P" Value="download fault"/>
+                    <Text TextId="0x180E_P" Value="P24 (Class B) missing or undervoltage"/>
+                    <Text TextId="Help_0x180E_P" Value="check wire connection (e.g. L2+)"/>
+                    <Text TextId="0x180F_P" Value="Short circuit at P24 (Class B)"/>
+                    <Text TextId="Help_0x180F_P" Value="check wire connection (e.g. L2+)"/>
+                    <Text TextId="0x1883_P" Value="S7-PCT configuration error (wrong or not consistent parameterization)"/>
+                    <Text TextId="Help_0x1883_P" Value="Check parameterization"/>
+                    <Text TextId="0x1888_P" Value="Module defect"/>
+                    <Text TextId="Help_0x1888_P" Value="exchange module"/>
+                    <Text TextId="0x6000_P" Value="Invalid cycle time"/>
+                    <Text TextId="Help_0x6000_P" Value="check cycle time"/>
+                    <Text TextId="0x6001_P" Value="Revision fault"/>
+                    <Text TextId="Help_0x6001_P" Value="incompatible protocol version"/>
+                    <Text TextId="0x6002_P" Value="Parameter inconsistency?"/>
+                    <Text TextId="Help_0x6002_P" Value="ISDU batch failed"/>
+                    <Text TextId="0x7F22_P" Value="Device not available"/>
+                    <Text TextId="Help_0x7F22_P" Value="communication lost"/>
+                    <Text TextId="0x7F23_P" Value="Invalid Backup"/>
+                    <Text TextId="Help_0x7F23_P" Value="Data Storage identification mismatch"/>
+                    <Text TextId="0x7F24_P" Value="Invalid Backup"/>
+                    <Text TextId="Help_0x7F24_P" Value="Data Storage buffer overflow"/>
+                    <Text TextId="0x7F25_P" Value="Invalid Backup"/>
+                    <Text TextId="Help_0x7F25_P" Value="Data Storage parameter access denied"/>
+                    <Text TextId="0x7F31_P" Value="Event lost"/>
+                    <Text TextId="Help_0x7F31_P" Value="incorrect event signaling"/>
+                    <!-- miscellaneous -->
+                    <Text TextId="empty" Value=""/>
+                </PrimaryLanguage>
+            </ExternalTextList>
+        </ApplicationProcess>
+    </ProfileBody>
+</ISO15745Profile>

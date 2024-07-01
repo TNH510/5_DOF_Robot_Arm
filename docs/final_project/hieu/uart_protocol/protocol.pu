@@ -12,13 +12,20 @@ PROTOCOL is idle
 +100 is X_POS
 +300 is Y_POS
 +300 is Z_POS
-+300 is CRC
-+100 is idle
++300 is X_VEL
++200 is Y_VEL
++200 is Z_VEL
++200 is CRC
++100 is 0xFF
 @100 <-> @200 : 1 Byte
 @200 <-> @300 : 1 Byte
 @300 <-> @600 : 3 Byte
 @600 <-> @900 : 3 Byte
 @900 <-> @1200 : 3 Byte
-@1200 <-> @1300 : 1 Byte
+@1200 <-> @1400 : 2 Byte
+@1400 <-> @1600 : 2 Byte
+@1600 <-> @1800 : 2 Byte
+@1800 <-> @1900 : 1 Byte
+@1900 <-> @2000 : 1 Byte
 @enduml
 

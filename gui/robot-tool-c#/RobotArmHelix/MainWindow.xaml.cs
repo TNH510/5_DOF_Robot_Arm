@@ -12,7 +12,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-
 using HelixToolkit.Wpf;
 using System.IO;
 using System.Reflection;
@@ -40,6 +39,9 @@ using System.Globalization;
 using MathNet.Numerics;
 using System.Data.Common;
 using MathNet.Numerics.LinearAlgebra;
+using System.Windows.Shell;
+using Lokdeptrai;
+using System.Runtime.InteropServices;
 /**
 * Author: Gabriele Marini (Gabryxx7)
 * This class load the 3d models of all the parts of the robotic arms and add them to the viewport
@@ -71,10 +73,35 @@ namespace RobotArmHelix
     /// </summary>
     public partial class MainWindow : System.Windows.Window
    {
+        // Create a socket object
+        Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        public string bmpString = "";
+        public string bmpStringCamera = "";
+        public double[] selectmemberX = new double[500];
+        public double[] selectmemberY = new double[500];
+        public double[] selectmemberZ = new double[500];
+        public double[] velmember = new double[500];
 
-        public double[] selectmemberX = new double[100];
-        public double[] selectmemberY = new double[100];
-        public double[] selectmemberZ = new double[100];
+        public bool low_pass_init = false;
+        public int plc_csv = 0;
+        public double x_lpf = 0.0, y_lpf = 0.0, z_lpf = 0.0;
+        public double alpha = 0.2;
+
+
+        public byte plc_receive_data = 0x00;
+        public byte plc_receive_height = 0x00;
+        public byte plc_receive_length = 0x00;
+        public bool plc_receive_object = false;
+        public bool plc_accept = false;
+        public bool plc_come_object = false;
+        public bool Done_stt = false;
+        public string shape = "";
+        public int[,] Centerpoint = new int[1,2];
+        public int turn = 0;
+
+        public string[] plc_program_arr = { "home.csv", "conveyor1_in.csv", "conveyor1_out.csv", "conveyor2_in.csv", "conveyor2_out.csv", "conveyor3_in.csv", "conveyor3_out.csv", "conveyor4_in.csv", "conveyor4_out.csv"};
+        public int plc_stt = 0;
+        public bool csv_write_enable = false;
 
         public int visible_robot = 1;
         public int visible_display = 1;
@@ -84,8 +111,46 @@ namespace RobotArmHelix
         public int visible_glove = 1;
         public int status_first_time = 0;
         private bool write_csv = false;
-                        int value = 0;
+        
+        private byte pre_byte_arr1 = 0x00;
+
+        public byte pre_cmd = 0x00;
+        public byte cur_cmd = 0x00;
+        public enum tracjectory_mode_t
+        {
+            MODE_IDLE, 
+            MODE_ONLY_CONTROL,
+            MODE_WAITING_START_RECORD, 
+            MODE_START_RECORD_DATA,
+            MODE_DELETE_LAST_DATA,
+        }
+        public enum plc_run_mode_t
+        {
+            MODE_IDLE,
+            MODE_TAKE_PICTURE,
+            MODE_RETURN, 
+            MODE_WAITING_POSITION,
+            MODE_RUN_TRAJECTORY,
+        }
+
+        public enum run_trajectory_mode_t
+        {
+            MODE_MAP_1,
+            MODE_WAITING_MAP1,
+            MODE_MAP_2,
+            MODE_WAITING_MAP2,
+            MODE_MAP_3,
+            MODE_WAITING_MAP3,
+            MODE_WAITING_DONE,
+        }
+
+        tracjectory_mode_t g_trajectory_mode = tracjectory_mode_t.MODE_IDLE;
+        plc_run_mode_t g_plc_run_mode = plc_run_mode_t.MODE_IDLE;
+        run_trajectory_mode_t g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_1;
+
+        int value = 0;
         int vel_1_test;
+        public int csv_lines = 0;
         double[] point1_test = new double[3];
         double[] point2_test = new double[3];
 
@@ -95,6 +160,8 @@ namespace RobotArmHelix
         // Define the file path
         public string filePath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\data\\test.csv";
         public string savePath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\data\\good.csv";
+        public string program_path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\";
+
 
         public string[] fields;
         public string[] totalLines_csv;
@@ -173,9 +240,6 @@ namespace RobotArmHelix
         System.Windows.Forms.Timer timer1;
         System.Windows.Forms.Timer timer2;
 
-        // Tạo một đối tượng StreamWriter để ghi dữ liệu vào tập tin CSV
-        static string g_csvFilePath = "H:\\OneDrive - hcmute.edu.vn\\Desktop\\5_DOF_Robot_Arm\\gui\\robot-tool-c#\\RobotArmHelix\\data\\test.csv";
-
 #if IRB6700
         //directroy of all stl files
         private const string MODEL_PATH0 = "K0.stl";
@@ -197,7 +261,6 @@ namespace RobotArmHelix
 
         private readonly DispatcherTimer _timer;
         private readonly BackgroundWorker _uartWorker;
-
         public MainWindow()
         {
             InitializeComponent();
@@ -205,6 +268,14 @@ namespace RobotArmHelix
             string[] ports = SerialPort.GetPortNames();
             com_port_list1.ItemsSource = ports;
 
+            //Program list
+            string[] program_list = LayTenTatCaThuMuc(program_path);
+            program_list_name.ItemsSource = program_list;
+
+            //Trajectory list
+            string trajectory_path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + program_list_name.Text + "\\";
+            string[] trajectory_list = LayTenTatCaFileCSV(trajectory_path);
+            trajectory_list_name.ItemsSource = trajectory_list;
             // uart.DataReceived += SerialPort_DataReceived;
 
             //// Attach the event handler to the MouseDown event
@@ -244,11 +315,18 @@ namespace RobotArmHelix
             double[] glv_quaternion = {0, 0, 0, 1};
             ForwardKinematics(angles, glv_quaternion);
 
+            // Set the source of the Image control to display an image file
+            //displayedImage.Source = new BitmapImage(new Uri("C:\\Users\\daveb\\Desktop\\5_DOF_Robot_Arm\\gui\\robot-tool-c#\\RobotArmHelix\\image\\113.bmp"));
+
             #region Timer_Declaration
 
             timer1 = new System.Windows.Forms.Timer();
             timer1.Interval = 100;
             timer1.Tick += new System.EventHandler(timer1_Tick);
+
+            timer2 = new System.Windows.Forms.Timer();
+            timer2.Interval = 100;
+            timer2.Tick += new System.EventHandler(timer2_Tick);
 
             #endregion
 
@@ -256,6 +334,7 @@ namespace RobotArmHelix
 
             // Create plot model
             _plotModel_position = new PlotModel { Title = "Robot Oxyz" };
+            //_plotModel_lpf_trajectory = new PlotModel { Title = "LPF Trajectory Oxyz" };
             _plotModel_theta = new PlotModel { Title = "Robot Theta" };
             _plotModel_omega = new PlotModel { Title = "Robot Omega" };
             _plotModel_velocity = new PlotModel { Title = "Robot Velocity" };
@@ -301,6 +380,18 @@ namespace RobotArmHelix
 
             #endregion
 
+
+            /* Check csv files */
+            string[] csvfiles = LayTenTatCaFileCSV(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" +"plc\\");
+            plc_stt = csvfiles.Length;
+            if(plc_stt < 1)
+            {
+                /* Do nothing */
+            }
+            else if(plc_stt >= 1)
+            {
+                plc_stt = plc_stt - 1;
+            }
         }
 
         #region Thread_Timer
@@ -417,6 +508,606 @@ namespace RobotArmHelix
             catch (Exception er)
             {
                 PrintLog("Bug", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", er));
+            }
+        }
+
+        public void take_pic()
+        {
+            // Perform your desired action here
+            string CaptureImageMessage = "1003t\r\n";
+            byte[] CaptureImageBytes = Encoding.ASCII.GetBytes(CaptureImageMessage);
+            clientSocket.Send(CaptureImageBytes);
+            // Receive the response from the server
+            var buffer = new byte[308295];
+            int bytesRead = clientSocket.Receive(buffer);
+
+            System.Threading.Thread.Sleep(100); // Simulating 100ms delay
+
+            string RequestImageMessage = "1003I?\r\n";
+            // Send the command to the server
+            byte[] RequestImageBytes = Encoding.ASCII.GetBytes(RequestImageMessage);
+            clientSocket.Send(RequestImageBytes);
+
+            string sentencetosend = "1003I?\r\n";
+
+            // Receive the response from the server
+            buffer = new byte[308295];
+            bytesRead = clientSocket.Receive(buffer);
+
+            if (RequestImageMessage == sentencetosend)
+            {
+                response_client = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                //PrintLog("", "", response_client);
+                //Console.WriteLine(response_client);
+                while (bytesRead < 308291)
+                {
+                    bytesRead += clientSocket.Receive(buffer, bytesRead, 308291 - bytesRead, SocketFlags.None);
+                }
+            }
+
+            response_client = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+            //PrintLog("Data received", "", response_client);
+
+            // Sentences to remove
+            string[] sentencesToRemove = { "1003000308278", "1003*", "1003?", "1003000307200" };
+            //Console.WriteLine("hello");
+            // Loop through each sentence and replace it with an empty string
+            foreach (string sentence in sentencesToRemove)
+            {
+                response_client = response_client.Replace(sentence, "");
+            }
+
+            // Convert the modified response string back to bytes
+            byte[] modifiedBuffer = Encoding.ASCII.GetBytes(response_client);
+            // Convert each byte to its string representation
+            string[] byteStrings = new string[modifiedBuffer.Length];
+            for (int i = 0; i < modifiedBuffer.Length; i++)
+            {
+                byteStrings[i] = modifiedBuffer[i].ToString();
+            }
+
+
+            // Join the string representations of bytes
+            bmpString = string.Join(" ", byteStrings);
+        }
+
+        public void move_trajectory_plc(string path1)
+        {
+            string duongDanCoSo = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + "plc\\";
+            string tenTrajectory = path1;
+            string duongDanDayDu = Path.Combine(duongDanCoSo, tenTrajectory);
+
+            Modify_low_pass_filter(duongDanDayDu);
+
+            int point_csv = 100;
+            //Initialize a 2D array to hold the CSV data
+            //Assuming you know the size of the array (10 rows and number of columns as per your data)
+            double[,] data = new double[100, 3];
+            int[] value_vel = new int[200];
+            int[] temp_vel = new int[100];
+            for (int t = 0; t < point_csv; t++)
+            {
+                data[t, 0] = selectmemberX[t];
+                data[t, 1] = selectmemberY[t];
+                data[t, 2] = selectmemberZ[t];
+                temp_vel[t] = (int)velmember[t] * 1000;
+                plot(velmember[t], 0, 0);
+
+
+                Console.WriteLine(velmember[t].ToString());
+                Console.WriteLine(selectmemberX[t].ToString());
+                Console.WriteLine(selectmemberY[t].ToString());
+                Console.WriteLine(selectmemberZ[t].ToString());
+            }
+            Move_mod_Function(data, "D1010");
+            Memory_velocity_write(temp_vel, value_vel, "D1810", 100);
+
+            turn_on_1_pulse_relay(530);
+            Press_button(MethodBase.GetCurrentMethod().Name, "M530");
+        }
+
+        public void Detect_shape_function(string bmp_string)
+        {
+            //// ảnh cạnh được phân bởi phương pháp canny
+            //int[,] edges = DeTectEdgeByCannyMethod(image, 50, 200);
+            ////biểu đồ hough để tìm ra đường thẳng
+            //int[,] hough = PerformHoughTransform(edges);
+            ////tìm ra các phương trình đường thẳng từ biểu đồ hough
+            //int[,] lines = Find_line_info(hough, out int count_hough_point);
+            //// tìm điểm giao của các phương trình.
+            //int[,] corner = Find_corner_info(lines);
+            //Detect_Shape_dimention(int[,] edges, int[,] lines, int[,] corner, out string shape, out int[,] dimention, out int[,] Center_Point)
+
+
+            bmp_string = bmpString;
+            // Split the byte string into individual byte values
+            string[] byteValues = bmp_string.Split();
+
+            // Convert each byte value from string to integer
+            List<byte> byteData = new List<byte>();
+
+
+            foreach (string byteString in byteValues)
+            {
+                byteData.Add(Convert.ToByte(byteString));
+            }
+
+            // Define the number of bytes to delete from the beginning
+
+            // Bitmap Header(14 bytes) + Bitmap Information (40 bytes) + Color Palette (4 * 256) = 1078 bytes to delete
+
+            // The kinds of image format (RAW or bitmap) is based on the configuration on E2D200.exe
+            int bytesToDelete = 1125; // Adjust this number according to your requirement
+
+            // Delete the specified number of bytes from the beginning
+            byteData.RemoveRange(0, bytesToDelete);
+
+            // Convert the list of bytes back to byte array
+            byte[] byteArrayModified = byteData.ToArray();
+
+            // Determine the dimensions of the original image
+            int width = 640;  // Adjust according to your image width
+            int height = 480;  // Adjust according to your image height
+
+            // Calculate the new dimensions of the image after removing bytes
+            int bytesPerPixel = 1; // 1 byte per pixel for grayscale
+            int pixelsRemoved = bytesToDelete / bytesPerPixel;
+            int newHeight = height - (pixelsRemoved / width);
+
+
+            // Ensure newHeight is valid
+            if (newHeight < 0)
+            {
+                throw new InvalidOperationException("The number of bytes to delete is too large for the given image dimensions.");
+            }
+
+            // The width remains the same
+            int newWidth = width;
+            // Convert from 1-D array to 2-D array
+            byte[,] byteArray2D = new byte[newHeight, newWidth];
+            int[,] intArray2D = new int[newHeight, newWidth];
+
+            // Fill the 2-D array with the remaining byte data
+            for (int i = 0; i < newHeight; i++)
+            {
+                for (int j = 0; j < newWidth; j++)
+                {
+                    byteArray2D[i, j] = byteArrayModified[i * newWidth + j];
+                    intArray2D[i, j] = byteArrayModified[i * newWidth + j];
+                }
+            }
+
+            // Convert byte array to BitmapImage
+            var bitmapImage = ByteArrayToBitmapSource(byteArrayModified, newWidth, newHeight);
+
+            byteArray2D = ConvertTo2DArray(byteArrayModified, newHeight, newWidth);
+
+
+            //Hien thi hinh goc trong picBox_Hinhgoc da tao
+            Dispatcher.Invoke(() =>
+            {
+                displayedImage.Source = bitmapImage;
+
+            });
+            // Chuyển đổi từng phần tử từ byte sang int
+            for (int i = 0; i < newHeight; i++)
+            {
+                for (int j = 0; j < newWidth; j++)
+                {
+                    intArray2D[i, j] = byteArray2D[i, j];
+                }
+            }
+
+
+            int high_threshold = 200;//ngưỡng trên cho canny detect
+            int low_threshold = 50;//ngưỡng dưới cho canny detect 
+            
+
+            int[,] edges = Image_Processing.DeTectEdgeByCannyMethod(intArray2D,200,50,"as");
+            byte[,] edges_byte = new byte[edges.GetLength(0), edges.GetLength(1)];
+
+            //biểu đồ hough
+            int[,] hough = Image_Processing.PerformHoughTransform_Rectangle(edges);
+            int[,] lines = Image_Processing.Find_line_info(hough, out int count_hough_point);
+            //int[,] result = EdgeDetection.Drawline2(lines);
+            int[,] corner = Image_Processing.Find_corner_info(lines);
+
+            Image_Processing.Detect_Shape_dimention(edges, lines, corner, out shape, out int[,] dimention, out int[,] center_point);
+
+            Console.WriteLine(shape);
+        }
+
+        public void timer2_Tick(object sender, EventArgs e)
+        {
+            switch (g_plc_run_mode)
+            {
+            case plc_run_mode_t.MODE_IDLE:
+            Console.WriteLine("MODE_IDLE");
+                // Handle
+                 
+                if(plc_receive_data == 0x01)
+                {
+                    g_plc_run_mode = plc_run_mode_t.MODE_TAKE_PICTURE;
+                    
+                    // Connect to the server
+                    string host = "192.168.000.49";
+                    int port = Convert.ToInt32("50010");//50010
+
+                    try
+                    {
+                        clientSocket.Connect(host, port);
+                        Console.WriteLine("Connected");
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Unable to connect");
+                    }
+                 } 
+                
+                break;
+
+            case plc_run_mode_t.MODE_TAKE_PICTURE:
+            Console.WriteLine("MODE_TAKE_PICTURE");
+
+                take_pic();
+
+                /* Detect picture */
+                Detect_shape_function(bmpString);
+
+                bool taken_pic = true;
+                if(taken_pic == true)
+                {
+                    //Hien thi hinh goc trong picBox_Hinhgoc da tao
+                    Dispatcher.Invoke(() =>
+                    {
+                        shape_name.Text = shape;
+                        CoordX_name.Text = Centerpoint[0, 0].ToString(); 
+                        CoordY_name.Text = Centerpoint[0, 1].ToString(); 
+                    });
+                    g_plc_run_mode = plc_run_mode_t.MODE_RETURN;
+                    byte[] sendata = new byte[4];
+                    sendata[0] = 0xBB;
+                    sendata[1] = 0x02;
+                    sendata[2] = 0x00;
+                    sendata[3] = 0x00;
+                    uart.Write(sendata, 0, sendata.Length);               
+                    
+                }
+                
+            break;
+
+            case plc_run_mode_t.MODE_RETURN:
+            Console.WriteLine("MODE_RETURN");
+                
+                if(plc_receive_data == 0x03)
+                {
+                    g_plc_run_mode = plc_run_mode_t.MODE_WAITING_POSITION;
+                }
+                
+            break;
+
+            case plc_run_mode_t.MODE_WAITING_POSITION:
+
+            Console.WriteLine("MODE_WAITING_POSITION");
+                //plc_receive_data = plc.Read();
+                if(plc_receive_data == 0x04)
+                {
+                    g_plc_run_mode = plc_run_mode_t.MODE_RUN_TRAJECTORY;
+                }
+                
+            break;
+
+            case plc_run_mode_t.MODE_RUN_TRAJECTORY:
+            Console.WriteLine("MODE_RUN_TRAJECTORY");
+                int ret, map_complete;
+                int take_object;
+                switch (shape)
+                {
+                case "Rectangle":
+                    
+                    string[] map = { "home.csv", "conveyor1_in.csv", "conveyor1_out.csv" };
+                    switch (g_run_trajectory_plc)
+                    {
+                    case run_trajectory_mode_t.MODE_MAP_1:
+                    Console.WriteLine("MODE_MAP_1");
+
+                        move_trajectory_plc(map[0]);
+                        g_run_trajectory_plc = run_trajectory_mode_t.MODE_WAITING_MAP1;
+
+                    break;
+                    case run_trajectory_mode_t.MODE_WAITING_MAP1:
+                    Console.WriteLine("MODE_WAITING_MAP1");
+                        /* Read status of Brake and AC Servo */
+                        ret = PLCReadbit("M700", out map_complete);
+                        if (map_complete == 1)
+                        {
+                            take_object = PLCWritebit("M111", 1);
+                            g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_2;
+                        }         
+                    break;
+                    case run_trajectory_mode_t.MODE_MAP_2:
+                    Console.WriteLine("MODE_MAP_2");
+
+                        move_trajectory_plc(map[1]);
+                        g_run_trajectory_plc = run_trajectory_mode_t.MODE_WAITING_MAP2;
+                    break;
+                    case run_trajectory_mode_t.MODE_WAITING_MAP2:
+                    Console.WriteLine("MODE_WAITING_MAP2");
+                        /* Read status of Brake and AC Servo */
+                        ret = PLCReadbit("M700", out map_complete);
+                        if (map_complete == 1)
+                        {
+                            take_object = PLCWritebit("M111", 0);
+                            g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_3;
+                            
+                        }
+
+                    break;
+                    case run_trajectory_mode_t.MODE_MAP_3:
+                    Console.WriteLine("MODE_MAP_3");
+                        move_trajectory_plc(map[2]);
+                        g_run_trajectory_plc = run_trajectory_mode_t.MODE_WAITING_DONE;
+                    break;
+                    case run_trajectory_mode_t.MODE_WAITING_DONE:
+                    Console.WriteLine("MODE_WAITING_DONE");
+                        /* Read status of Brake and AC Servo */
+                        ret = PLCReadbit("M700", out map_complete);
+                        if (map_complete == 1)
+                        {
+                            plc_receive_data = 0x00;
+                            plc_accept = false;
+                            plc_come_object = false;
+                            g_plc_run_mode = plc_run_mode_t.MODE_IDLE;
+                            g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_1;
+                            byte[] sendata = new byte[4];
+                            sendata[0] = 0xBB;
+                            sendata[1] = 0x05;
+                            sendata[2] = 0x00;
+                            sendata[3] = 0x00;
+                            uart.Write(sendata, 0, sendata.Length);
+                        }
+                    break;
+
+                    default:
+                    break;
+                    }
+                break;
+                case "Square":
+                    string[] map2 = { "home.csv", "conveyor2_in.csv", "conveyor2_out.csv" };
+                    switch (g_run_trajectory_plc)
+                    {
+                    case run_trajectory_mode_t.MODE_MAP_1:
+                    Console.WriteLine("MODE_MAP_1");
+
+                        move_trajectory_plc(map2[0]);
+                        g_run_trajectory_plc = run_trajectory_mode_t.MODE_WAITING_MAP1;
+
+                    break;
+                    case run_trajectory_mode_t.MODE_WAITING_MAP1:
+                    Console.WriteLine("MODE_WAITING_MAP1");
+                        /* Read status of Brake and AC Servo */
+                        ret = PLCReadbit("M700", out map_complete);
+                        if (map_complete == 1)
+                        {
+                            take_object = PLCWritebit("M111", 1);
+                            g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_2;
+                        }         
+                    break;
+                    case run_trajectory_mode_t.MODE_MAP_2:
+                    Console.WriteLine("MODE_MAP_2");
+
+                        move_trajectory_plc(map2[1]);
+                        g_run_trajectory_plc = run_trajectory_mode_t.MODE_WAITING_MAP2;
+                    break;
+                    case run_trajectory_mode_t.MODE_WAITING_MAP2:
+                    Console.WriteLine("MODE_WAITING_MAP2");
+                        /* Read status of Brake and AC Servo */
+                        ret = PLCReadbit("M700", out map_complete);
+                        if (map_complete == 1)
+                        {
+                            take_object = PLCWritebit("M111", 0);
+                            g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_3;
+                        }
+
+                    break;
+                    case run_trajectory_mode_t.MODE_MAP_3:
+                    Console.WriteLine("MODE_MAP_3");
+
+                        move_trajectory_plc(map2[2]);
+                        g_run_trajectory_plc = run_trajectory_mode_t.MODE_WAITING_DONE;
+                    break;
+                    case run_trajectory_mode_t.MODE_WAITING_DONE:
+                    Console.WriteLine("MODE_WAITING_DONE");
+                        /* Read status of Brake and AC Servo */
+                        ret = PLCReadbit("M700", out map_complete);
+                        if (map_complete == 1)
+                        {
+                            plc_receive_data = 0x00;
+                            plc_accept = false;
+                            plc_come_object = false;
+                            g_plc_run_mode = plc_run_mode_t.MODE_IDLE;
+                            g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_1;
+                            byte[] sendata = new byte[4];
+                            sendata[0] = 0xBB;
+                            sendata[1] = 0x05;
+                            sendata[2] = 0x00;
+                            sendata[3] = 0x00;
+                            uart.Write(sendata, 0, sendata.Length);
+                        }
+                    break;
+                    default:
+                    break;
+                    }
+                
+                break;
+
+                case "Circle":
+                    string[] map3 = { "home.csv", "conveyor3_in.csv", "conveyor3_out.csv" };
+                    switch (g_run_trajectory_plc)
+                    {
+                    case run_trajectory_mode_t.MODE_MAP_1:
+                    Console.WriteLine("MODE_MAP_1");
+
+                        move_trajectory_plc(map3[0]);
+                        g_run_trajectory_plc = run_trajectory_mode_t.MODE_WAITING_MAP1;
+
+                    break;
+                    case run_trajectory_mode_t.MODE_WAITING_MAP1:
+                    Console.WriteLine("MODE_WAITING_MAP1");
+                        /* Read status of Brake and AC Servo */
+                        ret = PLCReadbit("M700", out map_complete);
+                        if (map_complete == 1)
+                        {
+                            take_object = PLCWritebit("M111", 1);
+                            g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_2;
+                        }         
+                    break;
+                    case run_trajectory_mode_t.MODE_MAP_2:
+                    Console.WriteLine("MODE_MAP_2");
+
+                        move_trajectory_plc(map3[1]);
+                        g_run_trajectory_plc = run_trajectory_mode_t.MODE_WAITING_MAP2;
+                    break;
+                    case run_trajectory_mode_t.MODE_WAITING_MAP2:
+                    Console.WriteLine("MODE_WAITING_MAP2");
+                        /* Read status of Brake and AC Servo */
+                        ret = PLCReadbit("M700", out map_complete);
+                        if (map_complete == 1)
+                        {
+                            take_object = PLCWritebit("M111", 0);
+                            g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_3;
+                        }
+
+                    break;
+                    case run_trajectory_mode_t.MODE_MAP_3:
+                    Console.WriteLine("MODE_MAP_3");
+
+                        move_trajectory_plc(map3[2]);
+                        g_run_trajectory_plc = run_trajectory_mode_t.MODE_WAITING_DONE;
+                    break;
+                    case run_trajectory_mode_t.MODE_WAITING_DONE:
+                    Console.WriteLine("MODE_WAITING_DONE");
+                        /* Read status of Brake and AC Servo */
+                        ret = PLCReadbit("M700", out map_complete);
+                        if (map_complete == 1)
+                        {
+                            plc_receive_data = 0x00;
+                            plc_accept = false;
+                            plc_come_object = false;
+                            g_plc_run_mode = plc_run_mode_t.MODE_IDLE;
+                            g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_1;
+                            byte[] sendata = new byte[4];
+                            sendata[0] = 0xBB;
+                            sendata[1] = 0x05;
+                            sendata[2] = 0x00;
+                            sendata[3] = 0x00;
+                            uart.Write(sendata, 0, sendata.Length);
+                        }
+                    break;
+                    default:
+                    break;
+                    }
+                
+                break;
+
+                case "Triangle":
+                    string[] map4 = { "home.csv", "conveyor4_in.csv", "conveyor4_out.csv" };
+                    switch (g_run_trajectory_plc)
+                    {
+                    case run_trajectory_mode_t.MODE_MAP_1:
+                    Console.WriteLine("MODE_MAP_1");
+
+                        move_trajectory_plc(map4[0]);
+                        g_run_trajectory_plc = run_trajectory_mode_t.MODE_WAITING_MAP1;
+
+                    break;
+                    case run_trajectory_mode_t.MODE_WAITING_MAP1:
+                    Console.WriteLine("MODE_WAITING_MAP1");
+                        /* Read status of Brake and AC Servo */
+                        ret = PLCReadbit("M700", out map_complete);
+                        if (map_complete == 1)
+                        {
+                            take_object = PLCWritebit("M111", 1);
+                            g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_2;
+                        }         
+                    break;
+                    case run_trajectory_mode_t.MODE_MAP_2:
+                    Console.WriteLine("MODE_MAP_2");
+
+                        move_trajectory_plc(map4[1]);
+                        g_run_trajectory_plc = run_trajectory_mode_t.MODE_WAITING_MAP2;
+                    break;
+                    case run_trajectory_mode_t.MODE_WAITING_MAP2:
+                    Console.WriteLine("MODE_WAITING_MAP2");
+                        /* Read status of Brake and AC Servo */
+                        ret = PLCReadbit("M700", out map_complete);
+                        if (map_complete == 1)
+                        {
+                            take_object = PLCWritebit("M111", 0);
+                            g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_3;
+                        }
+
+                    break;
+                    case run_trajectory_mode_t.MODE_MAP_3:
+                    Console.WriteLine("MODE_MAP_3");
+
+                        move_trajectory_plc(map4[2]);
+                        g_run_trajectory_plc = run_trajectory_mode_t.MODE_WAITING_DONE;
+                    break;
+                    case run_trajectory_mode_t.MODE_WAITING_DONE:
+                    Console.WriteLine("MODE_WAITING_DONE");
+                        /* Read status of Brake and AC Servo */
+                        ret = PLCReadbit("M700", out map_complete);
+                        if (map_complete == 1)
+                        {
+                            plc_receive_data = 0x00;
+                            plc_accept = false;
+                            plc_come_object = false;
+                            g_plc_run_mode = plc_run_mode_t.MODE_IDLE;
+                            g_run_trajectory_plc = run_trajectory_mode_t.MODE_MAP_1;
+                            byte[] sendata = new byte[4];
+                            sendata[0] = 0xBB;
+                            sendata[1] = 0x05;
+                            sendata[2] = 0x00;
+                            sendata[3] = 0x00;
+                            uart.Write(sendata, 0, sendata.Length);
+                        }
+                    break;
+                    default:
+                    break;
+                    }
+                
+                break;
+                case "unknown":
+                    plc_receive_data = 0x00;
+                    plc_accept = false;
+                    plc_come_object = false;
+                    g_plc_run_mode = plc_run_mode_t.MODE_IDLE;
+                    byte[] sendata2 = new byte[4];
+                    sendata2[0] = 0xBB;
+                    sendata2[1] = 0x05;
+                    sendata2[2] = 0x00;
+                    sendata2[3] = 0x00;
+                    uart.Write(sendata2, 0, sendata2.Length);
+                break;
+                default:
+                break;
+                }
+
+                if(Done_stt == true)
+                {
+                    turn = 0;
+                    plc_receive_data = 0x00;
+                    plc_accept = false;
+                    plc_come_object = false;
+                    g_plc_run_mode = plc_run_mode_t.MODE_IDLE;
+                }
+
+            break;
+
+            default:
+            break;
             }
         }
 
@@ -962,6 +1653,19 @@ namespace RobotArmHelix
 
         private void GoHome_button_Click(object sender, RoutedEventArgs e)
         {
+            /* Stop command axis 1 */
+            turn_on_1_pulse_relay(3200);
+            /* Stop command axis 2 */
+            turn_on_1_pulse_relay(3220);
+            /* Stop command axis 3 */
+            turn_on_1_pulse_relay(3240);
+            /* Stop command axis 4 */
+            turn_on_1_pulse_relay(3260);
+            /* Stop command axis 5 */
+            turn_on_1_pulse_relay(3280);
+
+            turn_on_1_pulse_relay(515);
+
             Press_button(MethodBase.GetCurrentMethod().Name, Constants.R_GOHOME);
         }
         #endregion
@@ -1042,7 +1746,7 @@ namespace RobotArmHelix
             }
             /* Start timer1 and timer2 */
             // timer1.Start();
-            // Thread1Start();
+            Thread1Start();
             // Thread1Start();
             //Thread2Start();
             //timer1.Start();
@@ -1320,7 +2024,7 @@ namespace RobotArmHelix
                 y = double.Parse(TbY.Text);
                 z = double.Parse(TbZ.Text);
 
-                if (z >= 500 && z <= 1000)
+                if (z >= 480 && z <= 1000)
                 {
                     (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
                     ret = Check_angle(t1, t2, t3, t4, t5);
@@ -1464,20 +2168,19 @@ namespace RobotArmHelix
         private void Move_mod_Function(double[,] tar_pos, string device)
         {
             double t1, t2, t3, t4, t5;
-            int[,] angle_array = new int[10, 5];
+            int[,] angle_array = new int[100, 5];
+            int[] vel_array = new int[100];
             double x, y, z;
             int ret;
-            int[] value_angle = new int[80];
-            int[] value_angle_t5 = new int[20];
-
+            int[] value_angle = new int[800];
+            int[] value_angle_t5 = new int[200];
+            
             /* Linear Equation */
-            for (int t = 0; t < 10; t++)
+            for (int t = 0; t < 100; t++)
             {
                 x = tar_pos[t,0];
                 y = tar_pos[t,1];
                 z = tar_pos[t,2];
-                //if (z >= 500 && z <= 1000)
-                //{
                 (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
                 if(t1 > Constants.T1_LU) t1 = Constants.T1_LU;
                 else if(t1 < Constants.T1_LD) t1 = Constants.T1_LD;
@@ -1494,36 +2197,27 @@ namespace RobotArmHelix
                 t2 -= 90.0;
                 t3 += 90.0;
                 t4 += 90.0;
+
                 /* Assign value */
                 angle_array[t, 0] = (int)(t1 * 100000 + 18000000);
                 angle_array[t, 1] = (int)(t2 * 100000 + 18000000);
                 angle_array[t, 2] = (int)(t3 * 100000 + 18000000);
                 angle_array[t, 3] = (int)(t4 * 100000 + 18000000);
                 angle_array[t, 4] = (int)(t5 * 100000);
-                //}
-                //else
-                //{
-                //    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("Error: {0}", "Out of range of Z axis"));
-                //}
-
             }
-            Memory_angle_write(angle_array, value_angle, device, 10);
 
-            for (int j = 0; j < 10; j++)
-            {
-                value_angle_t5[2 * j] = Write_Theta(angle_array[j, 4])[0];
-                value_angle_t5[2 * j + 1] = Write_Theta(angle_array[j, 4])[1];
-            }
+            Memory_angle_write(angle_array, value_angle, device, 100);
+
         }
         private void MoveL_Function(double[] curr_pos, double[] targ_pos, string device)
         {
             double[] vect_u = new double[3];
             double t1, t2, t3, t4, t5;
-            int[,] angle_array = new int[10, 5];
+            int[,] angle_array = new int[100, 5];
             double x, y, z;
             int ret;
-            int[] value_angle = new int[80];
-            int[] value_angle_t5 = new int[20];
+            int[] value_angle = new int[800];
+            int[] value_angle_t5 = new int[200];
             /* Referred vector */
             for (int i = 0; i < 3; i++)
             {
@@ -1532,11 +2226,11 @@ namespace RobotArmHelix
             }
 
             /* Linear Equation */
-            for (int t = 0; t < 10; t++)
+            for (int t = 0; t < 100; t++)
             {
-                x = curr_pos[0] + (vect_u[0] / 10) * (t + 1); /* 500 is the actual position of robot following the x axis */
-                y = curr_pos[1] + (vect_u[1] / 10) * (t + 1); /* 0 is the actual position of robot following the y axis */
-                z = curr_pos[2] + (vect_u[2] / 10) * (t + 1); /* 900 is the actual position of robot following the y axis */
+                x = curr_pos[0] + (vect_u[0] / 100) * (t + 1); /* 500 is the actual position of robot following the x axis */
+                y = curr_pos[1] + (vect_u[1] / 100) * (t + 1); /* 0 is the actual position of robot following the y axis */
+                z = curr_pos[2] + (vect_u[2] / 100) * (t + 1); /* 900 is the actual position of robot following the y axis */
                 if (z >= 500 && z <= 1000)
                 {
                     (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
@@ -1568,13 +2262,13 @@ namespace RobotArmHelix
                 }
 
             }
-            Memory_angle_write(angle_array, value_angle, device, 10);
+            Memory_angle_write(angle_array, value_angle, device, 100);
 
-            for (int j = 0; j < 10; j++)
-            {
-                value_angle_t5[2 * j] = Write_Theta(angle_array[j, 4])[0];
-                value_angle_t5[2 * j + 1] = Write_Theta(angle_array[j, 4])[1];
-            }
+            //for (int j = 0; j < 100; j++)
+            //{
+            //    value_angle_t5[2 * j] = Write_Theta(angle_array[j, 4])[0];
+            //    value_angle_t5[2 * j + 1] = Write_Theta(angle_array[j, 4])[1];
+            //}
         }
         private void Tsm_moveL_btn_Click(object sender, RoutedEventArgs e)
         {
@@ -1599,6 +2293,19 @@ namespace RobotArmHelix
         }
         private void run_bttn_Click(object sender, RoutedEventArgs e)
         {
+            /* Set speed for PLC */
+            int velocity;
+            try
+            {
+                velocity = Convert.ToInt32(spd_tb.Text) * 1000;
+                write_d_mem_32_bit(1008, velocity);
+                PrintLog("Info", MethodBase.GetCurrentMethod().Name, "Set Velocity successfully");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
             if (move == 1)
             {
                 // turn_on_1_pulse_relay(528);
@@ -1802,16 +2509,18 @@ namespace RobotArmHelix
                 value_angle[8 * j + 6] = Write_Theta(array[j, 3])[0];
                 value_angle[8 * j + 7] = Write_Theta(array[j, 3])[1];
 
-                PrintLog("vect", "value:", Convert.ToString(value_angle[8 * j]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 1]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 2]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 3]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 4]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 5]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 6]));
-                PrintLog("vect", "value", Convert.ToString(value_angle[8 * j + 7]));
             }
             plc.WriteDeviceBlock(device, 8 * point, ref value_angle[0]);
+        }
+
+        private void Memory_velocity_write(int[] array, int[] value_vel, string device, int point)
+        {
+            for (int j = 0; j < point; j++)
+            {
+                value_vel[2 * j] = Write_Theta(array[j])[0];
+                value_vel[2 * j + 1] = Write_Theta(array[j])[1];
+            }
+            plc.WriteDeviceBlock(device, 2 * point, ref value_vel[0]);
         }
         public void write_d_mem_32_bit(int device, int data)
         {
@@ -1884,6 +2593,19 @@ namespace RobotArmHelix
                     byte[] byteArray = new byte[uart.BytesToRead];
                     uart.Read(byteArray, 0, byteArray.Length);
                     // Convert the byte array to a hexadecimal string
+                    if (byteArray[0] == 0xBB)
+                    {
+                        Console.WriteLine("Hello hehe");
+                        plc_receive_data = byteArray[1];
+                        plc_receive_height = byteArray[2];
+                        plc_receive_length = byteArray[3];
+
+                        Console.WriteLine(plc_receive_data.ToString());
+                        Console.WriteLine("-----------");
+                        Console.WriteLine(plc_receive_height.ToString());
+                        Console.WriteLine("-----------");
+                        Console.WriteLine(plc_receive_length.ToString());
+                    }
                     if (byteArray.Length >= 19)
                     {
                         byte crc_byte = 0x00;
@@ -1892,137 +2614,207 @@ namespace RobotArmHelix
                         {
                             if (byteArray[0] == 0xAA)
                             {
-                                //onsole.WriteLine(byteArray[0].ToString("X"));
-                                switch (byteArray[1])
+                                // Position variables (double)
+                                double x = 0, y = 0, z = 0;
+                                // Omega placeholders
+                                double omega1_plc = 0.0, omega2_plc = 0.0, omega3_plc = 0.0, omega4_plc = 0.0, omega5_plc = 0.0;
+                                // Always check cmd
+                                cur_cmd = byteArray[1];
+
+                                switch (g_trajectory_mode)
                                 {
-                                    case 0x00:
-                                        // Position variables (integer)
-                                        int x_pos = 0, y_pos = 0, z_pos = 0;
-
-                                        // Position variables (double)
-                                        double x = 0, y = 0, z = 0;
-
-                                        // Velocity variables (double)
-                                        double x_vel = 0, y_vel = 0, z_vel = 0;
-
-                                        // Jacobian matrices
-                                        double[,] Jacobi_plus = new double[5, 3];
-                                        double[,] Jacobi_vel = new double[3, 1];
-
-                                        // Omega array
-                                        double[] omega = new double[5];
-
-                                        // Omega placeholders
-                                        double omega1_plc = 0.0, omega2_plc = 0.0, omega3_plc = 0.0, omega4_plc = 0.0, omega5_plc = 0.0;
-
-                                        x_pos = CombineBytesToInt32(byteArray[2], byteArray[3], byteArray[4]);
-                                        y_pos = CombineBytesToInt32(byteArray[5], byteArray[6], byteArray[7]);
-                                        z_pos = CombineBytesToInt32(byteArray[8], byteArray[9], byteArray[10]);
-
-                                        x_vel = CombineBytesToInt16Vel(byteArray[12], byteArray[13]) / 10.0; // cm/s
-                                        y_vel = CombineBytesToInt16Vel(byteArray[14], byteArray[15]) / 10.0;
-                                        z_vel = CombineBytesToInt16Vel(byteArray[16], byteArray[17]) / 10.0;
-
-                                        plot(x_vel, y_vel, z_vel);
-
-                                        if (x_pos >= 0x800000)
-                                        {
-                                            x_pos = (x_pos - 0x800000);
-                                            x_pos = (-1) * x_pos;
-                                        }
-                                        x = x_pos / 10000.0;
-
-                                        if (y_pos >= 0x800000)
-                                        {
-                                            y_pos = (y_pos - 0x800000);
-                                            y_pos = (-1) * y_pos;
-                                        }
-                                        y = y_pos / 10000.0;
-
-                                        if (z_pos >= 0x800000)
-                                        {
-                                            z_pos = (z_pos - 0x800000);
-                                            z_pos = (-1) * z_pos;
-                                        }
-                                        z = z_pos / 10000.0;
-
-                                        x = x * 20;
-                                        y = y * 20;
-                                        z = z * 15 + 700;
-                                        int ret;
-                                        double t1, t2, t3, t4, t5;
-
-                                        (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
-                                        Jacobi_plus = CreateJacobianMatrix(t1 * Math.PI / 180.0, t2 * Math.PI / 180.0, t3 * Math.PI / 180.0, t4 * Math.PI / 180.0, t5 * Math.PI / 180.0);
-                                        Jacobi_vel = CreateVelocityMatrix(x_vel, y_vel, z_vel);
-                                        omega = MultiplyMatrices(Jacobi_plus, Jacobi_vel);
-                                        omega1_plc = omega[0] * 1800 * 15 / Math.PI + 100.0;
-                                        omega2_plc = omega[1] * 1800 * 5 / Math.PI + 50.0;
-                                        omega3_plc = omega[2] * 1800 * 5 / Math.PI + 50.0;
-                                        omega4_plc = -(omega[1] + omega[2]) * 1800 * 20 / Math.PI + 100.0;
-                                        omega5_plc = 0.0; 
-
-
-                                        ret = Check_angle(t1, t2, t3, t4, t5);
-
-                                        if (ret == 0)
-                                        {
-
-                                           /* Anti wind-up */
-                                           if (Math.Abs(omega1_plc) >= 500)
-                                           {
-                                               omega1_plc = 500;
-                                           }
-                                           if (Math.Abs(omega2_plc) >= 300)
-                                           {
-                                               omega2_plc = 300;
-                                           }
-                                           if (Math.Abs(omega3_plc) >= 300)
-                                           {
-                                               omega3_plc = 300;
-                                           }
-
-                                           if (write_csv == true)
-                                           {
-                                               using (StreamWriter writer = new StreamWriter(filePath, true))
-                                               {
-                                                   // string csvLine = $"{x},{y},{z},{x_vel},{y_vel},{z_vel}";
-                                                   string csvLine = $"{x},{y},{z}";
-                                                   writer.WriteLine(csvLine);
-                                               }
-                                           }
-
-                                           //plot(Math.Abs(omega1_plc), Math.Abs(omega2_plc), Math.Abs(omega3_plc));
-                                           //plot(x_vel);
-                                           //scatter(x, y);
-                                           //Console.WriteLine("---");
-
-                                        //    plot(x, y, z);
-
-                                           //plot(Math.Abs(omega[0]) * 5, Math.Abs(omega[1]) * 5, Math.Abs(omega[2] * 5));
-
-
-                                           adaptive_runtime(x, y, z, Math.Abs(omega1_plc), Math.Abs(omega2_plc), Math.Abs(omega3_plc), Math.Abs(omega4_plc), Math.Abs(omega5_plc), glove_enable);
-                                        }
-                                    // plot(x, y, z);
-                                    break;
-
-                                    case 0x01:
-                                        if (write_csv == true)
-                                        {
-                                            write_csv = false;
-                                        }
-                                        else if (write_csv == false)
-                                        {
-                                            write_csv = true;
-                                        }
-                                        Console.WriteLine(write_csv.ToString());
-                                        Console.WriteLine("Hehe");
-                                    break;
-                                    default:
-                                    Console.WriteLine("Hex value is not 0x1, 0x2, 0xA, or 0xB");
-                                    break;
+                                case tracjectory_mode_t.MODE_IDLE:
+                                Console.WriteLine("MODE_IDLE");
+                                
+                                if (glove_enable == 1)
+                                {
+                                    g_trajectory_mode = tracjectory_mode_t.MODE_ONLY_CONTROL;
                                 }
+                                break;
+                                case tracjectory_mode_t.MODE_ONLY_CONTROL:
+                                Console.WriteLine("MODE_ONLY_CONTROL");
+                                // Handle only control here
+                                if(update_pos_vel_data(byteArray, out x, out y, out z, out omega1_plc, out omega2_plc,  out omega3_plc, out omega4_plc, out omega5_plc))
+                                {
+                                    adaptive_runtime(x, y, z, Math.Abs(omega1_plc), Math.Abs(omega2_plc), Math.Abs(omega3_plc), Math.Abs(omega4_plc), Math.Abs(omega5_plc));
+                                    Console.WriteLine(omega1_plc.ToString() + " " + omega2_plc.ToString() + " " + omega3_plc.ToString() + " " + omega4_plc.ToString());
+                                }
+
+                                if (csv_write_enable == true)
+                                {
+                                    g_trajectory_mode= tracjectory_mode_t.MODE_WAITING_START_RECORD;
+                                    
+                                }
+                                else if (glove_enable == 0)
+                                {
+                                    g_trajectory_mode= tracjectory_mode_t.MODE_IDLE;
+                                }
+
+                                break;
+
+                                case tracjectory_mode_t.MODE_WAITING_START_RECORD:
+                                Console.WriteLine("MODE_WAITING_START_RECORD");
+
+                                // Handle Waiting start record here
+                                if(update_pos_vel_data(byteArray, out x, out y, out z, out omega1_plc, out omega2_plc,  out omega3_plc, out omega4_plc, out omega5_plc))
+                                {
+                                    adaptive_runtime(x, y, z, Math.Abs(omega1_plc), Math.Abs(omega2_plc), Math.Abs(omega3_plc), Math.Abs(omega4_plc), Math.Abs(omega5_plc));
+                                }
+
+                                if (plc_stt <= 8 && pre_cmd == 0 && cur_cmd == 1)
+                                {
+                                    g_trajectory_mode= tracjectory_mode_t.MODE_START_RECORD_DATA;
+
+                                    
+                                }
+                                else if (csv_write_enable == false)
+                                {
+                                    g_trajectory_mode = tracjectory_mode_t.MODE_ONLY_CONTROL;
+                                }
+
+                                break;
+
+                                case tracjectory_mode_t.MODE_START_RECORD_DATA:
+                                Console.WriteLine("MODE_START_RECORD_DATA");
+                                Console.WriteLine("Trajectory"+ plc_stt.ToString());
+                                // Handle only control here
+                                if (update_pos_vel_data(byteArray, out x, out y, out z, out omega1_plc, out omega2_plc,  out omega3_plc, out omega4_plc, out omega5_plc))
+                                {
+                                    
+                                    adaptive_runtime(x, y, z, Math.Abs(omega1_plc), Math.Abs(omega2_plc), Math.Abs(omega3_plc), Math.Abs(omega4_plc), Math.Abs(omega5_plc));
+                                    Dispatcher.Invoke(() =>
+                                    {
+                                        Name_csv.Content = plc_program_arr[plc_stt];
+                                        /**/
+                                        string duongDanCoSo = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + "plc\\";
+                                        string tenTrajectory = plc_program_arr[plc_stt];
+                                        string duongDanDayDu = Path.Combine(duongDanCoSo, tenTrajectory);
+                                        string tenFileKhongDuoi = Path.GetFileNameWithoutExtension(duongDanDayDu);
+
+                                        if (File.Exists(duongDanDayDu))
+                                        {
+                                            var lines = File.ReadAllLines(duongDanDayDu); // n numbers
+                                            int num = lines.Length;
+                                            Saving_point_name.Content = num.ToString();
+                                        }
+                                        using (StreamWriter writer = new StreamWriter(duongDanDayDu, true))
+                                        {
+                                            string csvLine = $"{x_lpf},{y_lpf},{z_lpf}";
+                                            writer.WriteLine(csvLine);
+                                        }
+                                    });
+                                 }
+
+                                if (pre_cmd == 0x01 && cur_cmd == 0x00)
+                                {
+                                    g_trajectory_mode = tracjectory_mode_t.MODE_WAITING_START_RECORD;
+                                    double last_pointX = 0.0, last_pointY = 0.0, last_pointZ = 0.0; 
+                                    Dispatcher.Invoke(() =>
+                                    {
+                                        Name_csv.Content = plc_program_arr[plc_stt];
+                                        /**/
+                                        string duongDanCoSo = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + "plc\\";
+                                        string tenTrajectory = plc_program_arr[plc_stt];
+                                        string duongDanDayDu = Path.Combine(duongDanCoSo, tenTrajectory);
+                                        string tenFileKhongDuoi = Path.GetFileNameWithoutExtension(duongDanDayDu);
+
+                                        if (File.Exists(duongDanDayDu))
+                                        {
+                                            var lines = File.ReadAllLines(duongDanDayDu); // n numbers
+                                            int num = lines.Length;
+                                            Saving_point_name.Content = num.ToString();
+                                        }
+                                        using (StreamWriter writer = new StreamWriter(duongDanDayDu, true))
+                                        {
+                                            if(plc_stt == 0) // Home
+                                            {
+                                                last_pointX = Convert.ToDouble(TbX_home.Text);
+                                                last_pointY = Convert.ToDouble(TbY_home.Text);
+                                                last_pointZ = Convert.ToDouble(TbZ_home.Text);
+                                                string csvLine = $"{last_pointX},{last_pointY},{last_pointZ}";
+                                                writer.WriteLine(csvLine);
+                                            }
+                                            else if(plc_stt == 1) //CV in 1
+                                            {
+                                                last_pointX = Convert.ToDouble(TbCVX1.Text);
+                                                last_pointY = Convert.ToDouble(TbCVY1.Text);
+                                                last_pointZ = Convert.ToDouble(TbCVZ1.Text);
+                                                string csvLine = $"{last_pointX},{last_pointY},{last_pointZ}";
+                                                writer.WriteLine(csvLine);
+                                            }
+                                            else if (plc_stt == 2) //CV out 1
+                                            {
+                                                last_pointX = 500;
+                                                last_pointY = 0;
+                                                last_pointZ = 830;
+                                                string csvLine = $"{last_pointX},{last_pointY},{last_pointZ}";
+                                                writer.WriteLine(csvLine);
+                                            }
+                                            else if (plc_stt == 3) //CV in 2
+                                            {
+                                                last_pointX = Convert.ToDouble(TbCVX2.Text);
+                                                last_pointY = Convert.ToDouble(TbCVY2.Text);
+                                                last_pointZ = Convert.ToDouble(TbCVZ2.Text);
+                                                string csvLine = $"{last_pointX},{last_pointY},{last_pointZ}";
+                                                writer.WriteLine(csvLine);
+                                            }
+                                            else if (plc_stt == 4) //CV out 2
+                                            {
+                                                last_pointX = 500;
+                                                last_pointY = 0;
+                                                last_pointZ = 830;
+                                                string csvLine = $"{last_pointX},{last_pointY},{last_pointZ}";
+                                                writer.WriteLine(csvLine);
+                                            }
+                                            else if (plc_stt == 5) //CV in 3
+                                            {
+                                                last_pointX = Convert.ToDouble(TbCVX3.Text);
+                                                last_pointY = Convert.ToDouble(TbCVY3.Text);
+                                                last_pointZ = Convert.ToDouble(TbCVZ3.Text);
+                                                string csvLine = $"{last_pointX},{last_pointY},{last_pointZ}";
+                                                writer.WriteLine(csvLine);
+                                            }
+                                            else if (plc_stt == 6) //CV out 3
+                                            {
+                                                last_pointX = 500;
+                                                last_pointY = 0;
+                                                last_pointZ = 830;
+                                                string csvLine = $"{last_pointX},{last_pointY},{last_pointZ}";
+                                                writer.WriteLine(csvLine);
+                                            }
+                                            else if (plc_stt == 7) //CV in 4
+                                            {
+                                                last_pointX = Convert.ToDouble(TbCVX4.Text);
+                                                last_pointY = Convert.ToDouble(TbCVY4.Text);
+                                                last_pointZ = Convert.ToDouble(TbCVZ4.Text);
+                                                string csvLine = $"{last_pointX},{last_pointY},{last_pointZ}";
+                                                writer.WriteLine(csvLine);
+                                            }
+                                            else if (plc_stt == 8) //CV out 4
+                                            {
+                                                last_pointX = 500;
+                                                last_pointY = 0;
+                                                last_pointZ = 830;
+                                                string csvLine = $"{last_pointX},{last_pointY},{last_pointZ}";
+                                                writer.WriteLine(csvLine);
+                                            }
+
+                                        }
+                                    });
+
+                                    plc_stt++;
+                                    if (plc_stt > 8)
+                                    {
+                                        plc_stt = 8;
+                                    }
+                                        }
+                                break;
+
+                                default:
+                                break;
+                                }
+
+                                pre_cmd = cur_cmd;
                             }
                        }
                     }
@@ -2031,46 +2823,209 @@ namespace RobotArmHelix
         }
         #endregion
 
-        private void adaptive_runtime(double x, double y, double z, double v1, double v2, double v3, double v4, double v5, int enable_stt)
+
+        private bool update_pos_vel_data(byte[] byteArray,
+                                         out double x, out double y, out double z,
+                                         out double omega1_plc, out double omega2_plc,
+                                         out double omega3_plc, out double omega4_plc,
+                                         out double omega5_plc)
+        {
+            // Position variables (integer)
+            int x_pos = 0, y_pos = 0, z_pos = 0;
+
+            // Position variables (double)
+            x = 0;
+            y = 0;
+            z = 0;
+
+            // Velocity variables (double)
+            double x_vel = 0, y_vel = 0, z_vel = 0;
+
+            // Jacobian matrices
+            double[,] Jacobi_plus = new double[5, 3];
+            double[,] Jacobi_vel = new double[3, 1];
+
+            // Omega array
+            double[] omega = new double[5];
+
+            // Omega placeholders
+            omega1_plc = 0.0;
+            omega2_plc = 0.0;
+            omega3_plc = 0.0;
+            omega4_plc = 0.0;
+            omega5_plc = 0.0;
+
+            x_pos = CombineBytesToInt32(byteArray[2], byteArray[3], byteArray[4]);
+            y_pos = CombineBytesToInt32(byteArray[5], byteArray[6], byteArray[7]);
+            z_pos = CombineBytesToInt32(byteArray[8], byteArray[9], byteArray[10]);
+
+            x_vel = CombineBytesToInt16Vel(byteArray[12], byteArray[13]) / 10.0; // cm/s
+            y_vel = CombineBytesToInt16Vel(byteArray[14], byteArray[15]) / 10.0;
+            z_vel = CombineBytesToInt16Vel(byteArray[16], byteArray[17]) / 10.0;
+
+            //plot(x_vel, y_vel, z_vel);
+
+            if (x_pos >= 0x800000)
+            {
+                x_pos = (x_pos - 0x800000);
+                x_pos = (-1) * x_pos;
+            }
+            x = x_pos / 10000.0;
+
+            if (y_pos >= 0x800000)
+            {
+                y_pos = (y_pos - 0x800000);
+                y_pos = (-1) * y_pos;
+            }
+            y = y_pos / 10000.0;
+
+            if (z_pos >= 0x800000)
+            {
+                z_pos = (z_pos - 0x800000);
+                z_pos = (-1) * z_pos;
+            }
+            z = z_pos / 10000.0;
+
+            x = x * 21;
+            y = y * 21;
+            z = z * 15 + 650;
+
+            // Position variables through low pass filter
+            if(low_pass_init == false)
+            {
+                x_lpf = x;
+                y_lpf = y; 
+                z_lpf = z;
+                low_pass_init = true;
+            }
+
+            /* Low pass filter */
+            x_lpf = x_lpf * (1 - alpha) + x * alpha;
+            y_lpf = y_lpf * (1 - alpha) + y * alpha;
+            z_lpf = z_lpf * (1 - alpha) + z * alpha;
+            int ret;
+            int ret2 = 0;
+            double t1, t2, t3, t4, t5;
+
+            (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
+            Jacobi_plus = CreateJacobianMatrix(t1 * Math.PI / 180.0, t2 * Math.PI / 180.0, t3 * Math.PI / 180.0, t4 * Math.PI / 180.0, t5 * Math.PI / 180.0);
+            Jacobi_vel = CreateVelocityMatrix(x_vel, y_vel, z_vel);
+            omega = MultiplyMatrices(Jacobi_plus, Jacobi_vel);
+            omega1_plc = omega[0] * 1800 * 35 / Math.PI + 80.0;
+            omega2_plc = omega[1] * 1800 * 20 / Math.PI + 60.0;
+            omega3_plc = omega[2] * 1800 * 20 / Math.PI + 60.0;
+            omega4_plc = -(omega[1] + omega[2]) * 1800 * 20 / Math.PI + 200.0;
+            omega5_plc = 0.0;
+
+            /* Anti wind-up */
+            if (Math.Abs(omega1_plc) >= 500)
+            {
+                omega1_plc = 500;
+            }
+            if (Math.Abs(omega2_plc) >= 400)
+            {
+                omega2_plc = 400;
+            }
+            if (Math.Abs(omega3_plc) >= 400)
+            {
+                omega3_plc = 400;
+            }
+
+            ret = Check_angle(t1, t2, t3, t4, t5);
+
+            if(z < 500)
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    Status_mode_name.Content = "FAIL";
+                    Saving_stt_name.Content = "Waiting...";
+                });
+                return false;
+            }
+
+            if(ret == 0)
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    Saving_stt_name.Content = "Writing";
+                    Status_mode_name.Content = "OK";
+                });
+                return true;
+            }
+            else 
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    Status_mode_name.Content = "FAIL";
+                    Saving_stt_name.Content = "Waiting...";
+                });
+                return false;
+            }
+        }
+
+
+        private void adaptive_runtime(double x, double y, double z, double v1, double v2, double v3, double v4, double v5)
         {
             int[] temp_vel = new int[5];
             double t1_adapt, t2_adapt, t3_adapt, t4_adapt, t5_adapt;
             int ret = 0;
+            int ret2 = 0;
             int movepath_status;
 
             /* Read status of Brake and AC Servo */
             ret = PLCReadbit(Constants.MOVEL_PATH, out movepath_status);
 
-
             ///* đang bỏ qua điều kiện Z --> Phải nhớ để add vô sau */
             ////---------------------------------
             (t1_adapt, t2_adapt, t3_adapt, t4_adapt, t5_adapt) = convert_position_angle(x, y, z);
-            int[] temp_value = new int[5];
-            if (enable_stt == 1)
-            {
-                int[] value_angle = new int[10];
-                /* Run */
-                temp_value[0] = (int)(Convert.ToDouble(t1_adapt) * 100000 + 18000000);
-                temp_value[1] = (int)(Convert.ToDouble(t2_adapt - 90) * 100000 + 18000000);
-                temp_value[2] = (int)(Convert.ToDouble(t3_adapt + 90) * 100000 + 18000000);
-                temp_value[3] = (int)(Convert.ToDouble(t4_adapt + 90) * 100000 + 18000000);
-                temp_value[4] = (int)(Convert.ToDouble(t5_adapt) * 100000 + 18000000);
 
-                temp_vel[0] = (int)(Convert.ToDouble(v1) * 1000);
-                temp_vel[1] = (int)(Convert.ToDouble(v2) * 1000);
-                temp_vel[2] = (int)(Convert.ToDouble(v3) * 1000);
-                temp_vel[3] = (int)(Convert.ToDouble(v4) * 1000);
-                temp_vel[4] = (int)(Convert.ToDouble(v5) * 1000);
-                /* Write the angle and velocity */
-                for (int ind = 0; ind < 5; ind++)
-                {
-                    write_d_mem_32_bit(2100 + 2 * ind, temp_vel[ind]);
-                }
-                turn_on_1_pulse_relay(650);
-                for (int ind = 0; ind < 5; ind++)
-                {
-                    write_d_mem_32_bit(1400 + 2 * ind, temp_value[ind]);
-                }
+            ret2 = Check_angle(t1_adapt, t2_adapt, t3_adapt, t4_adapt, t5_adapt);
+            if (ret2 != 0)
+            {
+                double theta = 0.0;
+                if (ret2 == 1) theta = t1_adapt;
+                else if (ret2 == 2) theta = t2_adapt;
+                else if (ret2 == 3) theta = t3_adapt;
+                else if (ret2 == 4) theta = t4_adapt;
+                else if (ret2 == 5) theta = t5_adapt;
+                // PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
+                return;
+            }
+
+
+            double[] angles_csv = { t1_adapt, t2_adapt - 90, t3_adapt + 90, t4_adapt + 90, t5_adapt };
+            double[] glv_quaternion = { 0, 0, 0, 1 };
+
+            // Update UI asynchronously using Dispatcher
+            Dispatcher.Invoke(() =>
+            {
+                /* Update position for robot on GUI */
+                ForwardKinematics(angles_csv, glv_quaternion);
+            });
+
+            int[] temp_value = new int[5];
+            int[] value_angle = new int[10];
+            /* Run */
+            temp_value[0] = (int)(Convert.ToDouble(t1_adapt) * 100000 + 18000000);
+            temp_value[1] = (int)(Convert.ToDouble(t2_adapt - 90) * 100000 + 18000000);
+            temp_value[2] = (int)(Convert.ToDouble(t3_adapt + 90) * 100000 + 18000000);
+            temp_value[3] = (int)(Convert.ToDouble(t4_adapt + 90) * 100000 + 18000000);
+            temp_value[4] = (int)(Convert.ToDouble(t5_adapt) * 100000 + 18000000);
+
+            temp_vel[0] = (int)(Convert.ToDouble(v1) * 1000);
+            temp_vel[1] = (int)(Convert.ToDouble(v2) * 1000);
+            temp_vel[2] = (int)(Convert.ToDouble(v3) * 1000);
+            temp_vel[3] = (int)(Convert.ToDouble(v4) * 1000);
+            temp_vel[4] = (int)(Convert.ToDouble(v5) * 1000);
+            /* Write the angle and velocity */
+            for (int ind = 0; ind < 5; ind++)
+            {
+                write_d_mem_32_bit(2100 + 2 * ind, temp_vel[ind]);
+            }
+            turn_on_1_pulse_relay(650);
+            for (int ind = 0; ind < 5; ind++)
+            {
+                write_d_mem_32_bit(1400 + 2 * ind, temp_value[ind]);
             }
         }
 
@@ -2207,6 +3162,18 @@ namespace RobotArmHelix
         }
         private void Glove_disable_button_Click(object sender, RoutedEventArgs e)
         {
+            /* Stop command axis 1 */
+            turn_on_1_pulse_relay(3200);
+            /* Stop command axis 2 */
+            turn_on_1_pulse_relay(3220);
+            /* Stop command axis 3 */
+            turn_on_1_pulse_relay(3240);
+            /* Stop command axis 4 */
+            turn_on_1_pulse_relay(3260);
+            /* Stop command axis 5 */
+            turn_on_1_pulse_relay(3280);
+
+            turn_on_1_pulse_relay(515);
             glove_enable = 0;
         }
         private void Glove_refresh_button_Click(object sender, RoutedEventArgs e)
@@ -2224,34 +3191,74 @@ namespace RobotArmHelix
         }
         private void Modify_dat_csv_Click(object sender, RoutedEventArgs e)
         {
-            Modify_polynomial_regression(filePath);
-
-        }
-        private void Test_move_mod_Click(object sender, RoutedEventArgs e)
-        {
+            //Modify_polynomial_regression(filePath);
+            string path_csv = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + program_list_name.Text + "\\" + trajectory_list_name.Text + ".csv";
+            Modify_low_pass_filter(path_csv);
+            double t1, t2, t3, t4, t5;
             move = 2;
-            int point_csv = 50;
+            int point_csv = 100;
             // Initialize a 2D array to hold the CSV data
             // Assuming you know the size of the array (10 rows and number of columns as per your data)
-            double[,] data = new double[50, 3];
+            double[,] data = new double[100, 3];
+            int[] value_vel = new int[200];
+            int[] temp_vel = new int[100];
+            int ret = 0;
             for (int t = 0; t < point_csv; t++)
             {
                 data[t, 0] = selectmemberX[t];
                 data[t, 1] = selectmemberY[t];
                 data[t, 2] = selectmemberZ[t];
-                Console.WriteLine(data[t, 0].ToString());
-                Console.WriteLine(data[t, 1].ToString());
-                Console.WriteLine(data[t, 2].ToString());
-                Console.WriteLine("---");
+                temp_vel[t] = (int)velmember[t] * 1000;
+                plot(velmember[t], 0, 0);
 
-                using (StreamWriter writer = new StreamWriter(savePath, true))
+                (t1, t2, t3, t4, t5) = convert_position_angle(data[t, 0], data[t, 1], data[t, 2]);
+                ret = Check_angle(t1, t2, t3, t4, t5);
+                if (ret != 0)
                 {
-                    // string csvLine = $"{x},{y},{z},{x_vel},{y_vel},{z_vel}";
-                    string csvLine = $"{data[t, 0]},{data[t, 1]},{data[t, 2]}";
-                    writer.WriteLine(csvLine);
+                    double theta = 0.0;
+                    if (ret == 1) theta = t1;
+                    else if (ret == 2) theta = t2;
+                    else if (ret == 3) theta = t3;
+                    else if (ret == 4) theta = t4;
+                    else if (ret == 5) theta = t5;
+                    PrintLog("Error", MethodBase.GetCurrentMethod().Name, string.Format("P2P: theta{0} = {1} out range", ret, theta));
+                    return;
                 }
+
+                //Console.WriteLine(velmember[t].ToString());
+                //Console.WriteLine(selectmemberX[t].ToString());
+                //Console.WriteLine(selectmemberY[t].ToString());
+                //Console.WriteLine(selectmemberZ[t].ToString());
+            }
+            Move_mod_Function(data, "D1010");
+            Memory_velocity_write(temp_vel, value_vel, "D1810", 100);
+
+        }
+        private void Test_move_mod_Click(object sender, RoutedEventArgs e)
+        {
+            move = 2;
+            int point_csv = 100;
+            // Initialize a 2D array to hold the CSV data
+            // Assuming you know the size of the array (10 rows and number of columns as per your data)
+            double[,] data = new double[100, 3];
+            int[] value_vel = new int[200];
+            int[] temp_vel = new int[100];
+            for (int t = 0; t < point_csv; t++)
+            {
+                data[t, 0] = selectmemberX[t];
+                data[t, 1] = selectmemberY[t];
+                data[t, 2] = selectmemberZ[t];
+
+                temp_vel[t] = (int)velmember[t] * 1000;
+
+                plot(velmember[t], 0, 0);
+
+                Console.WriteLine(selectmemberX[t].ToString());
+                Console.WriteLine(selectmemberY[t].ToString());
+                Console.WriteLine(selectmemberZ[t].ToString());
             }
 
+            Memory_velocity_write(temp_vel, value_vel, "D1810", 100);
             Move_mod_Function(data, "D1010");
         }
 
@@ -2317,6 +3324,32 @@ namespace RobotArmHelix
             plotView_position.InvalidatePlot();
         }
 
+
+        private void plot_lpf(double x, double y, double z)
+        {
+            // Update data points
+            var timestamp = DateTime.Now;
+            var dataPoint1 = new DataPoint(DateTimeAxis.ToDouble(timestamp), x);
+            var dataPoint2 = new DataPoint(DateTimeAxis.ToDouble(timestamp), y);
+            var dataPoint3 = new DataPoint(DateTimeAxis.ToDouble(timestamp), z);
+
+            // Update series
+            var series_x_pos = (LineSeries)_plotModel_position.Series[0];
+            var series_y_pos = (LineSeries)_plotModel_position.Series[1];
+            var series_z_pos = (LineSeries)_plotModel_position.Series[2];
+            series_x_pos.Points.Add(dataPoint1);
+            series_y_pos.Points.Add(dataPoint2);
+            series_z_pos.Points.Add(dataPoint3);
+
+            // Limit number of data points to keep plot responsive
+            if (series_x_pos.Points.Count > 100)
+            {
+                series_x_pos.Points.RemoveAt(0);
+                series_y_pos.Points.RemoveAt(0);
+                series_z_pos.Points.RemoveAt(0);
+            }
+        }
+
         private void scatter(double x, double y)
         {
             // Xóa các điểm dữ liệu cũ
@@ -2332,6 +3365,432 @@ namespace RobotArmHelix
         }
 
         #endregion
+
+
+        public static string[] LayTenTatCaThuMuc(string duongDan)
+        {
+            try
+            {
+                // Lấy tất cả các thư mục trong đường dẫn và chỉ lấy tên thư mục (không bao gồm đường dẫn đầy đủ)
+                string[] duongDanThuMuc = Directory.GetDirectories(duongDan);
+                string[] tenThuMuc = new string[duongDanThuMuc.Length];
+
+                for (int i = 0; i < duongDanThuMuc.Length; i++)
+                {
+                    tenThuMuc[i] = Path.GetFileName(duongDanThuMuc[i]);
+                }
+
+                return tenThuMuc;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Có lỗi xảy ra: " + e.Message);
+                return new string[0]; // Trả về mảng rỗng nếu có lỗi
+            }
+        }
+
+        public static string[] LayTenTatCaFileCSV(string duongDanThuMuc)
+        {
+            try
+            {
+                // Lấy tất cả các file CSV trong thư mục
+                string[] duongDanFileCSV = Directory.GetFiles(duongDanThuMuc, "*.csv");
+                string[] tenFileCSV = new string[duongDanFileCSV.Length];
+
+                for (int i = 0; i < duongDanFileCSV.Length; i++)
+                {
+                    tenFileCSV[i] = Path.GetFileNameWithoutExtension(duongDanFileCSV[i]);
+                }
+
+                return tenFileCSV;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Có lỗi xảy ra: " + e.Message);
+                return new string[0]; // Trả về mảng rỗng nếu có lỗi
+            }
+        }
+
+        private void New_Program_Click(object sender, RoutedEventArgs e)
+        {
+            string duongDanCoSo = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\";
+            string tenThuMuc = "program";
+            string duongDanDayDu = Path.Combine(duongDanCoSo, tenThuMuc);
+            int soThuTu = 0;
+
+            while (Directory.Exists(duongDanDayDu))
+            {
+                soThuTu++;
+                duongDanDayDu = Path.Combine(duongDanCoSo, $"{tenThuMuc}_{soThuTu}");
+            }
+            Directory.CreateDirectory(duongDanDayDu);
+        }
+
+        private void Delete_dat_csv_Click(object sender, RoutedEventArgs e)
+        {
+            string delete_path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + "plc\\" + plc_program_arr[plc_stt];
+
+            // Clear the file contents
+            File.Delete(delete_path); // Xóa file nếu nó tồn tại
+            if(plc_stt > 0)
+            {
+                plc_stt--;
+                Console.WriteLine(plc_stt.ToString());
+            }
+        }
+
+        public static int[,] ConvertBmpTo2DArray(string filePath)
+        {
+            // Tạo BitmapImage từ đường dẫn file
+            BitmapImage bitmapImage = new BitmapImage(new Uri(filePath, UriKind.Absolute));
+
+            // Tạo WriteableBitmap từ BitmapImage để có thể truy cập các pixel
+            WriteableBitmap writeableBitmap = new WriteableBitmap(bitmapImage);
+
+            int width = writeableBitmap.PixelWidth;
+            int height = writeableBitmap.PixelHeight;
+            int stride = writeableBitmap.BackBufferStride;
+            int bytesPerPixel = (writeableBitmap.Format.BitsPerPixel + 7) / 8;
+
+            byte[] pixelData = new byte[height * stride];
+            writeableBitmap.CopyPixels(pixelData, stride, 0);
+
+            int[,] pixelArray = new int[height, width];
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    int index = y * stride + x * bytesPerPixel;
+                    byte blue = pixelData[index];
+                    byte green = pixelData[index + 1];
+                    byte red = pixelData[index + 2];
+                    int grayscaleValue = (int)((red * 0.3) + (green * 0.59) + (blue * 0.11));
+                    pixelArray[y, x] = grayscaleValue;
+                }
+            }
+
+            return pixelArray;
+        }
+
+        private void Enable_plc_button_Click(object sender, RoutedEventArgs e)
+        {
+            csv_write_enable = true;
+        }
+
+        private void Disable_plc_button_Click(object sender, RoutedEventArgs e)
+        {
+            csv_write_enable = false;
+        }
+
+        private void Connect_camera_click(object sender, RoutedEventArgs e)
+        {
+            // Connect to the server
+            string host = "192.168.000.49";
+            int port = Convert.ToInt32("50010");//50010
+
+            try
+            {
+                clientSocket.Connect(host, port);
+                Console.WriteLine("Connected");
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Unable to connect");
+            }
+        }
+
+        private void Take_img_Click(object sender, RoutedEventArgs e)
+        {
+            // Perform your desired action here
+            string CaptureImageMessage = "1003t\r\n";
+            byte[] CaptureImageBytes = Encoding.ASCII.GetBytes(CaptureImageMessage);
+            clientSocket.Send(CaptureImageBytes);
+            // Receive the response from the server
+            var buffer = new byte[308295];
+            int bytesRead = clientSocket.Receive(buffer);
+
+            System.Threading.Thread.Sleep(100); // Simulating 100ms delay
+
+            string RequestImageMessage = "1003I?\r\n";
+            // Send the command to the server
+            byte[] RequestImageBytes = Encoding.ASCII.GetBytes(RequestImageMessage);
+            clientSocket.Send(RequestImageBytes);
+
+            string sentencetosend = "1003I?\r\n";
+
+            // Receive the response from the server
+            buffer = new byte[308295];
+            bytesRead = clientSocket.Receive(buffer);
+
+            if (RequestImageMessage == sentencetosend)
+            {
+                response_client = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                //PrintLog("", "", response_client);
+                //Console.WriteLine(response_client);
+                while (bytesRead < 308291)
+                {
+                    bytesRead += clientSocket.Receive(buffer, bytesRead, 308291 - bytesRead, SocketFlags.None);
+                }
+            }
+
+            response_client = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+            //PrintLog("Data received", "", response_client);
+
+            // Sentences to remove
+            string[] sentencesToRemove = { "1003000308278", "1003*", "1003?", "1003000307200" };
+            //Console.WriteLine("hello");
+            // Loop through each sentence and replace it with an empty string
+            foreach (string sentence in sentencesToRemove)
+            {
+                response_client = response_client.Replace(sentence, "");
+            }
+
+            // Convert the modified response string back to bytes
+            byte[] modifiedBuffer = Encoding.ASCII.GetBytes(response_client);
+            // Convert each byte to its string representation
+            string[] byteStrings = new string[modifiedBuffer.Length];
+            for (int i = 0; i < modifiedBuffer.Length; i++)
+            {
+                byteStrings[i] = modifiedBuffer[i].ToString();
+            }
+
+
+            // Join the string representations of bytes
+            bmpString = string.Join(" ", byteStrings);
+            
+        }
+
+        public static byte[,] ConvertTo2DArray(byte[] array1D, int rows, int columns)
+        {
+            byte[,] array2D = new byte[rows, columns];
+            int index = 0;
+
+            // Iterate over the elements of the 1D array and assign them to the 2D array
+            for (int i = rows - 1; i >= 0; i--)
+            {
+                for (int j = 0; j < columns; j++)
+                {
+                    // Check if there are enough elements in the 1D array
+                    if (index < array1D.Length)
+                    {
+                        array2D[i, j] = array1D[index];
+                        index++;
+                    }
+                    else
+                    {
+                        array2D[i, j] = 0;
+                    }
+                }
+            }
+            return array2D;
+        }
+
+        // Method to convert byte array to BitmapImage
+        public static BitmapSource ByteArrayToBitmapSource(byte[] byteData, int newWidth, int newHeight)
+        {
+            if (byteData == null || byteData.Length == 0)
+                return null;
+
+            try
+            {
+
+                // Create BitmapSource
+                return BitmapSource.Create(
+                    (newWidth),
+                    (newHeight),
+                    96, // dpi x
+                    96, // dpi y
+                    PixelFormats.Gray8, // pixel format (8-bit grayscale)
+                    null, // palette
+                    byteData, // pixel data
+                    newWidth); // stride (width * bytes per pixel)
+            }
+            catch (Exception ex)
+            {
+                // Handle any exceptions
+                Console.WriteLine("Error converting byte array to BitmapSource: " + ex.Message);
+                return null;
+            }
+        }
+
+
+        private void Detect_shape_Click(object sender, RoutedEventArgs e)
+        {
+            // Split the byte string into individual byte values
+            string[] byteValues = bmpString.Split();
+
+            // Convert each byte value from string to integer
+            List<byte> byteData = new List<byte>();
+
+
+            foreach (string byteString in byteValues)
+            {
+                byteData.Add(Convert.ToByte(byteString));
+            }
+
+            // Define the number of bytes to delete from the beginning
+
+            // Bitmap Header(14 bytes) + Bitmap Information (40 bytes) + Color Palette (4 * 256) = 1078 bytes to delete
+
+            // The kinds of image format (RAW or bitmap) is based on the configuration on E2D200.exe
+            int bytesToDelete = 1125; // Adjust this number according to your requirement
+
+            // Delete the specified number of bytes from the beginning
+            byteData.RemoveRange(0, bytesToDelete);
+
+            // Convert the list of bytes back to byte array
+            byte[] byteArrayModified = byteData.ToArray();
+
+            // Determine the dimensions of the original image
+            int width = 640;  // Adjust according to your image width
+            int height = 480;  // Adjust according to your image height
+
+            // Calculate the new dimensions of the image after removing bytes
+            int bytesPerPixel = 1; // 1 byte per pixel for grayscale
+            int pixelsRemoved = bytesToDelete / bytesPerPixel;
+            int newHeight = height - (pixelsRemoved / width);
+
+
+            // Ensure newHeight is valid
+            if (newHeight < 0)
+            {
+                throw new InvalidOperationException("The number of bytes to delete is too large for the given image dimensions.");
+            }
+
+            // The width remains the same
+            int newWidth = width;
+            // Convert from 1-D array to 2-D array
+            byte[,] byteArray2D = new byte[newHeight, newWidth];
+            int[,] intArray2D = new int[newHeight, newWidth];
+
+            // Fill the 2-D array with the remaining byte data
+            for (int i = 0; i < newHeight; i++)
+            {
+                for (int j = 0; j < newWidth; j++)
+                {
+                    byteArray2D[i, j] = byteArrayModified[i * newWidth + j];
+                    intArray2D[i, j] = byteArrayModified[i * newWidth + j];
+                }
+            }
+
+            // Convert byte array to BitmapImage
+            var bitmapImage = ByteArrayToBitmapSource(byteArrayModified, newWidth, newHeight);
+
+            byteArray2D = ConvertTo2DArray(byteArrayModified, newHeight, newWidth);
+
+
+            // Chuyển đổi từng phần tử từ byte sang int
+            for (int i = 0; i < newHeight; i++)
+            {
+                for (int j = 0; j < newWidth; j++)
+                {
+                    intArray2D[i, j] = byteArray2D[i, j];
+                }
+            }
+
+
+            int high_threshold = 200;//ngưỡng trên cho canny detect
+            int low_threshold = 50;//ngưỡng dưới cho canny detect 
+
+            int[,] edges = Image_Processing.DeTectEdgeByCannyMethod(intArray2D,200,50,"ab");
+            byte[,] edges_byte = new byte[edges.GetLength(0), edges.GetLength(1)];
+
+            //biểu đồ hough
+            int[,] hough = Image_Processing.PerformHoughTransform_Rectangle(edges);
+            int[,] lines = Image_Processing.Find_line_info(hough, out int count_hough_point);
+            //int[,] result = EdgeDetection.Drawline2(lines);
+            int[,] corner = Image_Processing.Find_corner_info(lines);
+
+            Image_Processing.Detect_Shape_dimention(edges, lines, corner, out shape, out int[,] dimention, out Centerpoint);
+
+            Console.WriteLine(shape);
+            Console.WriteLine(dimention[0, 0]);
+            Console.WriteLine(dimention[0, 1]);
+            Console.WriteLine(dimention[0, 1]);
+            Console.WriteLine(Centerpoint[0, 1]);
+            Console.WriteLine(Centerpoint[1, 0]);
+        }
+
+        private void Forward_button_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Receive_btn_Click(object sender, RoutedEventArgs e)
+        {
+            plc_receive_data = 0x00;
+        }
+
+        private void Shape_btn_Click(object sender, RoutedEventArgs e)
+        {
+            shape = "square";
+        }
+
+        private void PLC_accept_button_Click(object sender, RoutedEventArgs e)
+        {
+            plc_accept = true;
+        }
+
+        private void PLC_come_button_Click(object sender, RoutedEventArgs e)
+        {
+            plc_come_object = true;
+        }
+
+        private void Run_PLC_Click(object sender, RoutedEventArgs e)
+        {
+            plc_receive_data = 0x00;
+            plc_accept = false;
+            plc_come_object = false;
+            g_plc_run_mode = plc_run_mode_t.MODE_IDLE;
+            /* Send command for PLC to run */
+            byte[] sendata = new byte[4];
+            sendata[0] = 0xBB;
+            sendata[1] = 0x05;
+            sendata[2] = 0x00;
+            sendata[3] = 0x00;
+            uart.Write(sendata, 0, sendata.Length);
+            timer2.Start();
+        }
+
+        private void Stop_PLC_Click(object sender, RoutedEventArgs e)
+        {
+            timer2.Stop();
+        }
+
+        private void New_Trajectory_Click(object sender, RoutedEventArgs e)
+        {
+            string duongDanCoSo = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + program_list_name.Text + "\\";
+            string tenTrajectory = "trajectory" + ".csv";
+            string duongDanDayDu = Path.Combine(duongDanCoSo, tenTrajectory);
+            string tenFileKhongDuoi = Path.GetFileNameWithoutExtension(duongDanDayDu);
+            int soThuTu = 0;
+
+            // Kiểm tra và tạo tên file duy nhất
+            while (File.Exists(duongDanDayDu))
+            {
+                soThuTu++;
+                string duoiFile = Path.GetExtension(tenTrajectory);
+                duongDanDayDu = Path.Combine(duongDanCoSo, $"{tenFileKhongDuoi}_{soThuTu}{duoiFile}");
+            }
+
+            // Tạo mới file CSV
+            using (StreamWriter writer = new StreamWriter(duongDanDayDu, false))
+            {
+                
+            }
+        }
+
+        private void Refresh_button_Click(object sender, RoutedEventArgs e)
+        {
+            string trajectory_path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + program_list_name.Text + "\\";
+            //Program list
+            string[] program_list = LayTenTatCaThuMuc(program_path);
+            program_list_name.ItemsSource = program_list;
+            //Trajectory list
+            string[] trajectory_list = LayTenTatCaFileCSV(trajectory_path);
+            trajectory_list_name.ItemsSource = trajectory_list;
+        }
 
         static void CreateCSV(string filePath, string[] data)
         {
@@ -2351,7 +3810,7 @@ namespace RobotArmHelix
         {
 
             // Read all lines from the CSV file
-            var lines = File.ReadAllLines(csvfilepath);
+            var lines = File.ReadAllLines(csvfilepath); // n numbers
 
             // Initialize arrays to store the coordinates
             int numSamples = lines.Length;
@@ -2373,22 +3832,21 @@ namespace RobotArmHelix
             for (int i = 0; i < numSamples; i++)
             {
                 t[i] = (double)i / (numSamples - 1);  // Adjust this if your data requires a different time vector
-                //t[i] = i;  // Adjust this if your data requires a different time vector
             }
 
             // Number of points per group
-            int group_size = 2;
+            int group_size = 10;
             /* Data to load to the PLC */
-            int points = 10;
+            int points = 50;
 
             // Chia đều bánh cho mỗi người
             int numGroups = numSamples / group_size;
             // Số bánh còn lại sau khi chia đều
             int num_remaining_points = numSamples % group_size;
             // Degree of the polynomial
-            int degree = 2;  
+            int degree = 4;  
 
-            int[] cakes_per_person = DistributeCakes(numSamples, numGroups);
+            int[] cakes_per_person = DistributeCakes(numSamples, numGroups); // Số điểm nhận được của mỗi nhóm
             Console.WriteLine(cakes_per_person.Length);
 
             /* Calculate the points each group need to have */
@@ -2396,25 +3854,34 @@ namespace RobotArmHelix
             int baseCakesPerGroup = points / cakes_per_person.Length;
             int remainderCakes = points % cakes_per_person.Length;
 
-
             int start_index = 0;
             int end_index = 0;
             int next_gr = 0;
             int end_gr = 0;
+            int last_gr = 0;
             // Loop through each group
             for (int i = 0; i < numGroups; i++)
             {
-                if(i == 0)
+                end_gr = end_gr + cakes_per_person[i];
+                if (i == 0)
                 {
                     start_index = 0;
-                    end_index = cakes_per_person[i] - 1;
+                    end_index = cakes_per_person[0] - 1;
                 }
                 else
                 {
-                    start_index = end_index + 1;
-                    end_index = end_index + 1 + cakes_per_person[i];
-                }
 
+                    if (i % 2 == 0)  // nếu i chẵn
+                    {
+                        start_index = end_index - 1;
+                        end_index = end_gr - 1;
+                    }
+                    else  // nếu i lẻ
+                    {
+                        start_index = end_index;
+                        end_index = end_gr;
+                    }
+                }
                 // Extract data for the current group
                 double[] t_group = new double[end_index - start_index + 1];
                 Array.Copy(t, start_index, t_group, 0, cakes_per_person[i]);
@@ -2432,7 +3899,7 @@ namespace RobotArmHelix
                 // Perform polynomial regression for each group
                 var coefficients_x = PolynomialFit.MyPolyfit(t_group, x_group, degree);
                 var coefficients_y = PolynomialFit.MyPolyfit(t_group, y_group, degree);
-                var coefficients_z = PolynomialFit.MyPolyfit(t_group, z_group, degree);
+                var coefficients_z = PolynomialFit.MyPolyfit(t_group, z_group, degree - 2);
 
                 double[] t_fit = Generate.LinearSpaced(cakes_per_person[i], t_group[0], t_group[t_group.Length - 1]);
 
@@ -2444,7 +3911,6 @@ namespace RobotArmHelix
                     predicted_x_group[j] = PolynomialFit.EvaluatePolynomial(coefficients_x, t_fit[j]);
                     predicted_y_group[j] = PolynomialFit.EvaluatePolynomial(coefficients_y, t_fit[j]);
                     predicted_z_group[j] = PolynomialFit.EvaluatePolynomial(coefficients_z, t_fit[j]);
-                    //Console.WriteLine(predicted_x_group[j].ToString());
                 }
                 /* Chia bánh cho người nhận */
                 int[] points_each_group = DistributeCakes(points, cakes_per_person.Length);
@@ -2458,6 +3924,7 @@ namespace RobotArmHelix
                     {
                         memberIndex = cakes_per_person[i] - 1;
                     }
+
                     selectmemberX[next_gr + k] = predicted_x_group[memberIndex];
                     selectmemberY[next_gr + k] = predicted_y_group[memberIndex];
                     selectmemberZ[next_gr + k] = predicted_z_group[memberIndex];
@@ -2466,10 +3933,10 @@ namespace RobotArmHelix
                     Console.WriteLine($"- {predicted_x_group[memberIndex]}");
                     Console.WriteLine($"- {predicted_y_group[memberIndex]}");
                     Console.WriteLine($"- {predicted_z_group[memberIndex]}");
-                    end_gr = next_gr + k;
+                    last_gr = k;
                 }
-                next_gr = end_gr + 1;
-                
+                next_gr = next_gr + last_gr + 1;
+
 
                 //Console.WriteLine(i.ToString());
                 Console.WriteLine("----------------------------------");
@@ -2488,7 +3955,7 @@ namespace RobotArmHelix
                 }
 
                 // Xây dựng ma trận Vandermonde
-                var A = Matrix<double>.Build.Dense(x.Length, degree + 1);
+                var A = MathNet.Numerics.LinearAlgebra.Matrix<double>.Build.Dense(x.Length, degree + 1);
                 for (int i = 0; i <= degree; i++)
                 {
                     for (int j = 0; j < x.Length; j++)
@@ -2562,6 +4029,86 @@ namespace RobotArmHelix
         }
 
         #endregion
+
+        #region low_pass_filter
+        public void Modify_low_pass_filter(string csvfilepath)
+        {
+            // Read all lines from the CSV file
+            var lines = File.ReadAllLines(csvfilepath); // n numbers
+
+            // Initialize arrays to store the coordinates
+            int numSamples = lines.Length;
+            csv_lines = lines.Length;
+            double[] x = new double[numSamples];
+            double[] y = new double[numSamples];
+            double[] z = new double[numSamples];
+
+            // Loop through the lines and parse the coordinates
+            for (int i = 0; i < numSamples; i++)
+            {
+                var values = lines[i].Split(',').Select(double.Parse).ToArray();
+                x[i] = values[0];
+                y[i] = values[1];
+                z[i] = values[2];
+            }
+
+            /* Data to load to the PLC */
+            int points_lpf = 100;
+            int vel_max = 1500;
+            /* Take points for saving in PLC */
+            double step = (double) numSamples / points_lpf;
+
+            for (int j = 0; j < points_lpf; j++)
+            {
+                int jump = LamTronSoThapPhan(j * step);
+                if (j >= numSamples - 1)
+                {
+                    selectmemberX[j] = x[numSamples - 1];
+                    selectmemberY[j] = y[numSamples - 1]; 
+                    selectmemberZ[j] = z[numSamples - 1];
+                    velmember[j] = 0;
+                }
+                else
+                {
+                    int numSamples30 = (int)(numSamples * 0.2);
+                    int numSamples70 = numSamples - numSamples30;
+                    if (j < numSamples30)
+                    {
+                        velmember[j] = (int)((vel_max / numSamples30) * j);
+                    }
+                    else if (j < numSamples70)
+                    {
+                        // Set to vel_max
+                        velmember[j] = vel_max;
+                    }
+                    else
+                    {
+                        // Linearly ramp down from vel_max to 0
+                        int n = j - numSamples70;
+                        velmember[j] = (int)(vel_max - (vel_max / numSamples30) * n);
+                    }
+                    selectmemberX[j] = x[jump];
+                    selectmemberY[j] = y[jump];
+                    selectmemberZ[j] = z[jump];
+                }
+            }
+
+
+        }
+        public static int LamTronSoThapPhan(double so)
+        {
+            if (so - Math.Floor(so) < 0.5)
+            {
+                return (int)Math.Floor(so);
+            }
+            else
+            {
+                return (int)Math.Ceiling(so);
+            }
+        }
+
+        #endregion
+
     }
 
 }

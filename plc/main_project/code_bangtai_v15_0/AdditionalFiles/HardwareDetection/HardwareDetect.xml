@@ -1,0 +1,57 @@
+<OnlineDevices>
+  <OnlineDevice VendorID="136" DeviceID="AC52" TypeID="136AC52" DeviceType="ifm IO-Link Master AL1100" IsInSameSubnetAsOwnPgPc="True">
+    <DeviceRole>Device</DeviceRole>
+    <OrderNumber>AL1100</OrderNumber>
+    <NameOfStation>al1100</NameOfStation>
+    <MacAddress>00-02-01-06-80-ED</MacAddress>
+    <IPAddress>192.168.0.2</IPAddress>
+    <SubnetMask>255.255.255.0</SubnetMask>
+    <RevisionPrefix>V</RevisionPrefix>
+    <IMVersionMajor>2</IMVersionMajor>
+    <IMVersionMinor>1</IMVersionMinor>
+    <Modules>
+      <Module VendorID="136" DeviceID="0" TypeID="1360000" DeviceType="">
+        <ModuleIdentNumber>269484032</ModuleIdentNumber>
+        <SlotNumber>0</SlotNumber>
+        <OrderNumber>AL1100</OrderNumber>
+        <RevisionPrefix>V</RevisionPrefix>
+        <IMVersionMajor>1</IMVersionMajor>
+        <IMVersionMinor>1</IMVersionMinor>
+        <SubModules>
+          <SubModule VendorID="136" DeviceID="0" TypeID="1360000" DeviceType="">
+            <SubModuleIdentNumber>269549568</SubModuleIdentNumber>
+            <SubSlotNumber>1</SubSlotNumber>
+            <OrderNumber>AL1100</OrderNumber>
+            <RevisionPrefix>V</RevisionPrefix>
+            <IMVersionMajor>1</IMVersionMajor>
+            <IMVersionMinor>1</IMVersionMinor>
+          </SubModule>
+          <SubModule VendorID="136" DeviceID="0" TypeID="1360000" DeviceType="">
+            <SubModuleIdentNumber>269549569</SubModuleIdentNumber>
+            <SubSlotNumber>32768</SubSlotNumber>
+            <OrderNumber>AL1100</OrderNumber>
+            <RevisionPrefix>V</RevisionPrefix>
+            <IMVersionMajor>1</IMVersionMajor>
+            <IMVersionMinor>1</IMVersionMinor>
+          </SubModule>
+          <SubModule VendorID="136" DeviceID="0" TypeID="1360000" DeviceType="">
+            <SubModuleIdentNumber>269549570</SubModuleIdentNumber>
+            <SubSlotNumber>32769</SubSlotNumber>
+            <OrderNumber>AL1100</OrderNumber>
+            <RevisionPrefix>V</RevisionPrefix>
+            <IMVersionMajor>1</IMVersionMajor>
+            <IMVersionMinor>1</IMVersionMinor>
+          </SubModule>
+          <SubModule VendorID="136" DeviceID="0" TypeID="1360000" DeviceType="">
+            <SubModuleIdentNumber>269549571</SubModuleIdentNumber>
+            <SubSlotNumber>32770</SubSlotNumber>
+            <OrderNumber>AL1100</OrderNumber>
+            <RevisionPrefix>V</RevisionPrefix>
+            <IMVersionMajor>1</IMVersionMajor>
+            <IMVersionMinor>1</IMVersionMinor>
+          </SubModule>
+        </SubModules>
+      </Module>
+    </Modules>
+  </OnlineDevice>
+</OnlineDevices>
