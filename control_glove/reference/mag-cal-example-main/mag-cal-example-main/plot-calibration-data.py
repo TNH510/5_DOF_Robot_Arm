@@ -35,10 +35,10 @@ import matplotlib.pyplot as plt
 
 
 # Define calibration parameters
-A = np.array(   [[87.423326, -2.273900, -0.483181],
-                [-2.273900, 91.119974, -1.580122],
-                [-0.483181, -1.580122, 105.946092]])
-b = np.array([38.294125, -167.486285, -9.709824])
+A = np.array(   [[0.779461, 0.008545, -0.002906],
+                [0.008545, 0.819412, -0.018728],
+                [-0.002906, -0.018728, 0.963059]])
+b = np.array([129.605404, -251.437191, -24.113506])
 
 
 # Read raw data and apply calibration
@@ -56,8 +56,8 @@ plt.figure()
 plt.plot(rawData[:, 0], rawData[:, 1], 'b*', label='Raw Meas.')
 plt.plot(calibData[:, 0], calibData[:, 1], 'r*', label='Calibrated Meas.')
 plt.title('XY Magnetometer Data')
-plt.xlabel('X [uT]')
-plt.ylabel('Y [uT]')
+plt.xlabel('X [mG]')
+plt.ylabel('Y [mG]')
 plt.legend()
 plt.grid()
 plt.axis('equal')
@@ -67,8 +67,8 @@ plt.figure()
 plt.plot(rawData[:, 1], rawData[:, 2], 'b*', label='Raw Meas.')
 plt.plot(calibData[:, 1], calibData[:, 2], 'r*', label='Calibrated Meas.')
 plt.title('YZ Magnetometer Data')
-plt.xlabel('Y [uT]')
-plt.ylabel('Z [uT]')
+plt.xlabel('Y [mG]')
+plt.ylabel('Z [mG]')
 plt.legend()
 plt.grid()
 plt.axis('equal')
@@ -78,8 +78,8 @@ plt.figure()
 plt.plot(rawData[:, 0], rawData[:, 2], 'b*', label='Raw Meas.')
 plt.plot(calibData[:, 0], calibData[:, 2], 'r*', label='Calibrated Meas.')
 plt.title('XZ Magnetometer Data')
-plt.xlabel('X [uT]')
-plt.ylabel('Z [uT]')
+plt.xlabel('X [mG]')
+plt.ylabel('Z [mG]')
 plt.legend()
 plt.grid()
 plt.axis('equal')
@@ -101,9 +101,9 @@ for i in range(N):
     ax.scatter(xcalib, ycalib, zcalib, color='b')
 
 ax.set_title('3D Scatter Plot of Magnetometer Data')
-ax.set_xlabel('X [uT]')
-ax.set_ylabel('Y [uT]')
-ax.set_zlabel('Z [uT]')
+ax.set_xlabel('X [mG]')
+ax.set_ylabel('Y [mG]')
+ax.set_zlabel('Z [mG]')
 
 
 plt.show()
