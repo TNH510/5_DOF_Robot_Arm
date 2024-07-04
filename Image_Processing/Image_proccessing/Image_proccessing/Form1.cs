@@ -1154,7 +1154,8 @@ namespace Image_proccessing
                     int indexx=0 ;
                     for(int i =1;i<4;i++)
                     {
-                        if (Math.Abs(Lines[0, 0] - Lines[i,0])<5)
+                        double a = Math.Abs(Lines[0, 0] - Lines[i, 0]);
+                        if ( a < 10 || a > 170)
                         {
                             Radian_Theta[1]= Lines[i, 0] * Math.PI / 180;
                             rho[1] = Lines[i, 1];
