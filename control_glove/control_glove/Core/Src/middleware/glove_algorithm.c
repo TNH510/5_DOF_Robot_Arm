@@ -62,8 +62,8 @@ void glv_set_init_yaw(float yaw_value_rad)
 void glv_pos_convert(float q0, float q1, float q2, float q3, float elbow_angle, 
                               float *x, float *y, float *z)
 {
-	const float l1 = 12.0;
-	const float l2 = 20.0;
+	const float l1 = 15.0;
+	const float l2 = 17.0;
 	float ce = cos(elbow_angle);
 	float se = sin(elbow_angle);
 
