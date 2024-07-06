@@ -3727,6 +3727,82 @@ namespace RobotArmHelix
             timer2.Stop();
         }
 
+        public class DataRecord
+        {
+            public double X { get; set; }
+            public double Y { get; set; }
+            public double Z { get; set; }
+        }
+
+        public class CalculatedRecord
+        {
+            public double T1 { get; set; }
+            public double T2 { get; set; }
+            public double T3 { get; set; }
+            public double T4 { get; set; }
+            public double T5 { get; set; }
+        }
+
+        private void Convert_bttn_Click(object sender, RoutedEventArgs e)
+        {
+            string filePath = "E:\\University\\report\\path_MoveL.csv"; // Thay 'path_to_your_file.csv' bằng đường dẫn đến file CSV của bạn
+            string outputFilePath = "E:\\University\\report\\outputPath.csv"; // Thay 'path_to_your_file.csv' bằng đường dẫn đến file CSV của bạn
+            double t1, t2, t3, t4, t5;
+
+            // Cấu hình để đọc file CSV
+            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                Delimiter = ",", // Sử dụng tab làm dấu phân cách nếu file của bạn sử dụng tab
+                HasHeaderRecord = false // Nếu file của bạn không có tiêu đề cột
+            };
+
+            // Đọc dữ liệu từ file CSV
+            using (var reader = new StreamReader(filePath))
+            using (var csv = new CsvReader(reader, config))
+            {
+                var records = new List<DataRecord>();
+                while (csv.Read())
+                {
+                    var record = new DataRecord
+                    {
+                        X = csv.GetField<double>(0),
+                        Y = csv.GetField<double>(1),
+                        Z = csv.GetField<double>(2)
+                    };
+                    records.Add(record);
+                }
+                var calculatedRecords = new List<CalculatedRecord>();
+                // Sử dụng dữ liệu đã đọc
+                foreach (var record in records)
+                {
+                    double x = record.X;
+                    double y = record.Y;
+                    double z = record.Z;
+
+                    (t1, t2, t3, t4, t5) = convert_position_angle(x, y, z);
+
+                    var calculatedRecord = new CalculatedRecord
+                    {
+                        T1 = t1,
+                        T2 = t2,
+                        T3 = t3,
+                        T4 = t4,
+                        T5 = t5
+                    };
+                    calculatedRecords.Add(calculatedRecord);
+                }
+
+                // Ghi dữ liệu tính toán vào file CSV đầu ra
+                using (var writer = new StreamWriter(outputFilePath))
+                using (var csv_out = new CsvWriter(writer, CultureInfo.InvariantCulture))
+                {
+                    csv_out.WriteRecords(calculatedRecords);
+                }
+
+                Console.WriteLine($"Dữ liệu đã được ghi vào {outputFilePath}");
+            }
+        }
+
         private void New_Trajectory_Click(object sender, RoutedEventArgs e)
         {
             string duongDanCoSo = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\program\\" + program_list_name.Text + "\\";
