@@ -3,7 +3,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 
 # Đường dẫn đến file CSV
-csv_file = 'H:/OneDrive - hcmute.edu.vn/Desktop/5_DOF_Robot_Arm/lap_lai_quy_dao_lien_tuc.csv'
+csv_file = 'H:/OneDrive - hcmute.edu.vn/Desktop/5_DOF_Robot_Arm/docs/final_project/final_test_data/set_point/home.csv'
 
 # Đọc dữ liệu từ file CSV
 data1 = []
@@ -34,10 +34,10 @@ ax = fig.add_subplot(111, projection='3d')
 
 ax.scatter(data1, data2, data3)
 
-ax.set_xlabel('x (cm)')
-ax.set_ylabel('y (cm)')
-ax.set_zlabel('z (cm)')
+ax.set_xlabel('x (mm)')
+ax.set_ylabel('y (mm)')
+ax.set_zlabel('z (mm)')
 
-plt.title('Các điểm di chuyển của thiết bị trong không gian')
+plt.title('Các điểm di chuyển của robot trong quỹ đạo đi đến băng tải')
 
 plt.show()
