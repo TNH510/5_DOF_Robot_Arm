@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2024-07-04T09:53:50.859Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36" etag="4uwqiwBgbRSzFyilol8n" version="24.6.4" type="device" pages="11">
+<mxfile host="app.diagrams.net" modified="2024-07-06T06:36:30.277Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36" etag="4R1XcGzQoanRTeObj8g2" version="24.6.4" type="device" pages="12">
   <diagram id="C5RBs43oDa-KdzZeNtuy" name="Init">
     <mxGraphModel dx="840" dy="946" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -934,6 +934,105 @@
         </mxCell>
         <mxCell id="fLvmI05bS0OhEbY9IoKt-16" value="If value &amp;lt;= 100 &amp;amp;&amp;amp; &amp;gt;= -100" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="190" y="280" width="190" height="80" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="3DaX1WCs4pwilzltAm28" name="Lưu đồ hệ thống">
+    <mxGraphModel dx="989" dy="514" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="fhZQ0ViB8dxTaZeywWAy-2" value="Giao diện điều khiển hệ thống&lt;div&gt;(Laptop)&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="290" y="300" width="185" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="6TMGUi0uUtljtoryZi2E-1" value="Camera" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="85" y="170" width="195" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="6TMGUi0uUtljtoryZi2E-2" value="PLC Mishubishi" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="180" width="130" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="6TMGUi0uUtljtoryZi2E-3" value="Cánh tay robot 5 bậc tự do" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="690" y="270" width="110" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="6TMGUi0uUtljtoryZi2E-4" value="PLC Siemens" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="550" y="455" width="130" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="6TMGUi0uUtljtoryZi2E-5" value="Hệ thống băng tải và cảm biến" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="550" y="555" width="130" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="6TMGUi0uUtljtoryZi2E-6" value="Thiết bị theo dõi chuyển động cánh tay" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="70" y="430" width="120" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="6TMGUi0uUtljtoryZi2E-8" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" edge="1" parent="1" source="fhZQ0ViB8dxTaZeywWAy-2" target="6TMGUi0uUtljtoryZi2E-1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="410" y="440" as="sourcePoint" />
+            <mxPoint x="460" y="390" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="383" y="200" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6TMGUi0uUtljtoryZi2E-10" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="6TMGUi0uUtljtoryZi2E-6" target="fhZQ0ViB8dxTaZeywWAy-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="410" y="440" as="sourcePoint" />
+            <mxPoint x="460" y="390" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="240" y="475" />
+              <mxPoint x="240" y="355" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6TMGUi0uUtljtoryZi2E-11" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="fhZQ0ViB8dxTaZeywWAy-2" target="6TMGUi0uUtljtoryZi2E-4">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="410" y="440" as="sourcePoint" />
+            <mxPoint x="460" y="390" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="615" y="355" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6TMGUi0uUtljtoryZi2E-13" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="6TMGUi0uUtljtoryZi2E-5" target="6TMGUi0uUtljtoryZi2E-4">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="410" y="440" as="sourcePoint" />
+            <mxPoint x="460" y="390" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6TMGUi0uUtljtoryZi2E-15" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=1;exitY=0.25;exitDx=0;exitDy=0;" edge="1" parent="1" source="fhZQ0ViB8dxTaZeywWAy-2" target="6TMGUi0uUtljtoryZi2E-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="480" y="350" as="sourcePoint" />
+            <mxPoint x="460" y="390" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="585" y="328" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6TMGUi0uUtljtoryZi2E-17" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="6TMGUi0uUtljtoryZi2E-3" target="6TMGUi0uUtljtoryZi2E-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="410" y="440" as="sourcePoint" />
+            <mxPoint x="460" y="390" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="745" y="215" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6TMGUi0uUtljtoryZi2E-18" value="TCP/IP" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="330" y="220" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="6TMGUi0uUtljtoryZi2E-19" value="RS232" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="500" y="300" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="6TMGUi0uUtljtoryZi2E-20" value="AC Driver" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="680" y="190" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="6TMGUi0uUtljtoryZi2E-21" value="RF (UART)" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="500" y="360" width="80" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="6TMGUi0uUtljtoryZi2E-22" value="RF (UART)" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="160" y="370" width="80" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="6TMGUi0uUtljtoryZi2E-23" value="IO và TCP/IP" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="620" y="520" width="80" height="30" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
