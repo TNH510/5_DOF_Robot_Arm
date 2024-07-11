@@ -3825,10 +3825,10 @@ namespace RobotArmHelix
 
                 // Ghi dữ liệu tính toán vào file CSV đầu ra
                 using (var writer = new StreamWriter(outputFilePath))
-                using (var csv_out = new CsvWriter(writer, CultureInfo.InvariantCulture))
-                {
-                    csv_out.WriteRecords(calculatedRecords);
-                }
+                //using (var csv_out = new CsvWriter(writer, CultureInfo.InvariantCulture))
+                //{
+                //    csv_out.WriteRecords(calculatedRecords);
+                //}
 
                 Console.WriteLine($"Dữ liệu đã được ghi vào {outputFilePath}");
             }
